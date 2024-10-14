@@ -4,7 +4,7 @@ import { useMutation, useQuery } from 'react-query';
 import { toast } from 'sonner';
 
 // const API_BASE_URL = process.env.VITE_API_BASE_URL;
-const API_BASE_URL = 'http://localhost:3001';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 const environment = process.env.VITE_ENVIRONMENT;
 
 export const useSignUp = () => {
