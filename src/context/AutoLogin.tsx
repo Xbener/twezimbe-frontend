@@ -17,8 +17,8 @@ function AutoLogin({ children }: Props) {
     const { signIn } = useSignIn()
     const searchParams = useSearchParams()
     useEffect(() => {
-        if (searchParams.get('token') !== null && searchParams.get('user') !== null) {
-            Cookies.set('access-token', searchParams.get('token'))
+        if (searchParams.get('token') !== null && searchParams.get('use') !== 'reset-password') {
+            Cookies.set('access-token', searchParams.get('token')!)
             window.location.replace('/')
         }
     }, [])

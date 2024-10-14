@@ -75,7 +75,7 @@ const SignInForm = ({ onSignIn, isLoading }: Props) => {
         </div>
         <div className='mt-5'>
           {`Forgot your password? `}
-          <a href={'/forgotpassword'} className='text-blue-600'>Recover or reset your password</a>
+          <a href={'/public_pages/forgotpassword'} className='text-blue-600'>Recover or reset your password</a>
         </div>
 
         <SocialAuthForm />

@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { Checkbox } from '../ui/checkbox';
 import LoadingButton from '../LoadingButton';
 
+
 const formSchema = z.object({
   password: z.string().min(2, 'Invalid password')
 });
@@ -21,13 +22,13 @@ type Props = {
 
 const ResetPasswordForm = ({ onResetPassword, isLoading }: Props) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
-
   const form = useForm<ResetPasswordFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       password: '',
     }
   });
+
 
   return (
     <Form {...form}>

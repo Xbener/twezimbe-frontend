@@ -53,7 +53,7 @@ export const useSignIn = () => {
         const responseData = await response.json();
 
         if (!response.ok) {
-            throw new Error(responseData.message);
+            throw new Error(responseData.errors);
         }
 
         Cookies.set('access-token', responseData.token, {
@@ -90,9 +90,12 @@ export const useForgotPassword = () => {
 
         const responseData = await response.json();
 
+        console.log(responseData)
         if (!response.ok) {
-            throw new Error(responseData.message);
+            throw new Error(responseData.errors);
         }
+
+        Cookies.set('reset-token', responseData.token)
     };
 
     const { mutateAsync: forgotPassword, isLoading, isError, isSuccess, error } = useMutation(ForgotPasswordRequest);
@@ -111,7 +114,6 @@ export const useForgotPassword = () => {
 
 export const useResetPassword = () => {
     const accessToken = Cookies.get("reset-token");
-
     const ResetPasswordRequest = async (user: { password: string }) => {
         const response = await fetch(`${API_BASE_URL}/api/v1/auth/resetPassword`, {
             method: 'POST',
@@ -125,7 +127,7 @@ export const useResetPassword = () => {
         const responseData = await response.json();
 
         if (!response.ok) {
-            throw new Error(responseData.message);
+            throw new Error(responseData.errors);
         }
     };
 
@@ -156,7 +158,7 @@ export const useValidateOTP = () => {
         const responseData = await response.json();
 
         if (!response.ok) {
-            throw new Error(responseData.message);
+            throw new Error(responseData.errors);
         }
     };
 
@@ -187,7 +189,7 @@ export const useRegenerateOTP = () => {
         const responseData = await response.json();
 
         if (!response.ok) {
-            throw new Error(responseData.message);
+            throw new Error(responseData.errors);
         }
     };
 
