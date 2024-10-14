@@ -44,7 +44,7 @@ const PrimaryMenu = () => {
                     <Popover>
                         <PopoverTrigger className="flex items-center gap-2">
                             <Avatar>
-                                <AvatarImage src="/assets/avatar.svg" className="bg-black"/>
+                                <AvatarImage src="/assets/avatar.svg" className="bg-black" />
                                 <AvatarFallback>{iconTextGenerator(userInfo.firstName, userInfo.lastName)}</AvatarFallback>
                             </Avatar>
                             <p className="text-[#2f578b]">{userInfo.firstName}</p>
@@ -60,7 +60,7 @@ const PrimaryMenu = () => {
                             </Link>
                             <Button variant={'secondary'} className="text-white" size={'sm'} onClick={() => {
                                 Cookies.remove('access-token');
-                                window.location.reload();
+                                window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/public_pages/SignIn`
                                 // setUser(false);
                             }}>Sign out</Button>
                         </PopoverContent>
