@@ -17,7 +17,7 @@ const SignIn = () => {
       <div className="flex mx-auto w-full md:w-1/2">
         <img src="/assets/progress3.png" alt="signin" />
       </div>
-      <div className="flex flex-col mx-auto w-full md:w-1/2">
+      <div className="flex flex-col mx-auto w-full md:w-1/2 border-2  border-neutral-100 p-4 rounded-md shadow-xl items-center justify-center">
         <h1 className="text-3xl text-center md:text-start my-3 font-bold">Sign in to your account</h1>
         <SignInForm onSignIn={signIn} isLoading={isLoading} />
       </div>
