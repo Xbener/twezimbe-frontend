@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import "./globals.css";
 import { Toaster } from "sonner";
 import { useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import Cookies from "js-cookie";
 import { useSignIn } from "@/api/auth";
 import AutoLogin from "@/context/AutoLogin";
@@ -36,20 +36,22 @@ export default function RootLayout({
 
 
   return (
-    <html lang="en">
-      <title>Welcome to Twezimbe</title>
-      <body className={inter.className}>
-        <StoreContext>
-          <QueryClientProvider client={queryClient} >
-            <AutoLogin>
-              <HelmetProvider context={helmetContext}>
-                <Toaster />
-                {children}
-              </HelmetProvider>
-            </AutoLogin>
-          </QueryClientProvider>
-        </StoreContext>
-      </body>
-    </html>
+   <Suspense fallback={<h1>Loading ...</h1>}>
+      <html lang="en">
+        <title>Welcome to Twezimbe</title>
+        <body className={inter.className}>
+          <StoreContext>
+            <QueryClientProvider client={queryClient} >
+              <AutoLogin>
+                <HelmetProvider context={helmetContext}>
+                  <Toaster />
+                  {children}
+                </HelmetProvider>
+              </AutoLogin>
+            </QueryClientProvider>
+          </StoreContext>
+        </body>
+      </html>
+   </Suspense>
   );
 }
