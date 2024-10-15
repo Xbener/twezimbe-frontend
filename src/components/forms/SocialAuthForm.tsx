@@ -7,7 +7,7 @@ import Image from 'next/image'
 
 type Props = {}
 
-const socials = [
+export const socials = [
   { name: "Google", icon: "/brand-logos/google.svg", color: "red" },
   { name: "Facebook", icon: "/brand-logos/facebook.svg", color: "lightblue" },
 ]
@@ -42,7 +42,9 @@ function SocialAuthForm({ }: Props) {
               key={index}
               type='button'
               className={`w-full border-[2px] p-5 flex items-center gap-2 rounded-xl cursor-pointer`} // Removed justify-start to let items align left by default
-              onClick={continueWithFacebook}
+              onClick={() => {
+                social.name === "Facebook" ? continueWithFacebook() : continueWithGoogle()
+              }}
             >
               <span style={{ borderColor: social.color, color: social.color }} className="">
                 <Image
