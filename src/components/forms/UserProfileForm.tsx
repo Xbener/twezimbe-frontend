@@ -113,7 +113,7 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
                         defaultValue={currentUser.birthday}
                         render={({ field }) => (
                             <FormItem className='w-[31%]'>
-                                <FormLabel>Birhday: {currentUser.birthday ?  new Date(currentUser.birthday).toLocaleDateString() : 'null'}</FormLabel>
+                                <FormLabel>Birhday: {currentUser.birthday ?  new Date(currentUser.birthday).toLocaleDateString() : ''}</FormLabel>
                                 <FormControl>
                                     <Input {...field} className='bg-white' type='date' />
                                 </FormControl>
