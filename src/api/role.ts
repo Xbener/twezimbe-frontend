@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 
 // const API_BASE_URL = process.env.VITE_API_BASE_URL;
 const API_BASE_URL = 'http://localhost:3001';
-const environment = process.env. VITE_ENVIRONMENT;
+const environment = process.env.VITE_ENVIRONMENT;
 
 export const useAddRole = () => {
     const RoleRequest = async (role: CreateRoleTypes) => {
@@ -19,7 +19,7 @@ export const useAddRole = () => {
         const responseData = await response.json();
 
         if (!response.ok) {
-            throw new Error(responseData.message);
+            throw new Error(responseData.errors || responseData.message);
         }
     };
 

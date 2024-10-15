@@ -41,7 +41,8 @@ const SignUpForm = ({ onSignUp, isLoading }: Props) => {
 
 
   useEffect(() => {
-    if (Cookies.get('access-token') !== null) {
+    if (Cookies.get('access-token')) {
+      console.log('cookie found')
       window.location.href = '/'
     }
   }, [])

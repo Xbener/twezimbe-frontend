@@ -9,7 +9,7 @@ const API_BASE_URL = "http://localhost:3001"
 export const useSubmitApplication = () => {
     const submitApplicationRequest = async (application: ApplicationFormData) => {
         console.log(application);
-        
+
         const response = await fetch(`${API_BASE_URL}/api/v1/application/add`, {
             method: 'POST',
             headers: {
@@ -21,7 +21,7 @@ export const useSubmitApplication = () => {
         const responseData = await response.json();
 
         if (!response.ok) {
-            throw new Error(responseData.message);
+            throw new Error(responseData.errors || responseData.message);
         }
     };
 
@@ -40,7 +40,7 @@ export const useSubmitApplication = () => {
 
 export const useGetUserApplications = () => {
     const accessToken = Cookies.get('access-token');
-    
+
     const getAllUserApplicationsRequest = async (): Promise<Application> => {
         const response = await fetch(`${API_BASE_URL}/api/v1/application/findByUser`, {
             headers: {
@@ -49,9 +49,9 @@ export const useGetUserApplications = () => {
         });
 
         const responseData = await response.json();
-        
+
         if (!response.ok) {
-            throw new Error(responseData.message);
+            throw new Error(responseData.errors || responseData.message);
         }
 
         return responseData;
@@ -64,8 +64,8 @@ export const useGetUserApplications = () => {
 
 export const useGetLoanApplicationData = (loanId: string) => {
     const accessToken = Cookies.get('access-token');
-    
-    const getApplicationRequest = async (loanId:string): Promise<Application> => {
+
+    const getApplicationRequest = async (loanId: string): Promise<Application> => {
         const response = await fetch(`${API_BASE_URL}/api/v1/application/findById?id=${loanId}`, {
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
@@ -73,9 +73,9 @@ export const useGetLoanApplicationData = (loanId: string) => {
         });
 
         const responseData = await response.json();
-        
+
         if (!response.ok) {
-            throw new Error(responseData.message);
+            throw new Error(responseData.errors || responseData.message);
         }
 
         return responseData;
@@ -101,7 +101,7 @@ export const useUpdateApplication = () => {
         const responseData = await response.json();
 
         if (!response.ok) {
-            throw new Error(responseData.message);
+            throw new Error(responseData.errors || responseData.message);
         }
     }
 
@@ -130,14 +130,14 @@ export const useDeleteApplication = () => {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json', 
+                'Content-Type': 'application/json',
             }
         });
 
         const responseData = await response.json();
 
         if (!response.ok) {
-            throw new Error(responseData.message);
+            throw new Error(responseData.errors || responseData.message);
         }
     }
 

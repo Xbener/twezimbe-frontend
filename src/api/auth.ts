@@ -282,7 +282,7 @@ export const useGetAllUsers = () => {
         const { allUsers } = responseData
         console.log(allUsers)
         if (!response.ok) {
-            throw new Error(responseData.message);
+            throw new Error(responseData.errors || responseData.message);
         }
 
         return allUsers;

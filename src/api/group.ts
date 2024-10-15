@@ -20,7 +20,7 @@ export const useAddGroup = () => {
         const responseData = await response.json();
         console.log(responseData)
         if (!response.ok) {
-            throw new Error(responseData.errors || responseData.message);
+            throw new Error(responseData.errors || responseData.errors || responseData.message);
         }
 
 
@@ -61,7 +61,7 @@ export const useGetGroupList = () => {
         const responseData = await response.json();
 
         if (!response.ok) {
-            throw new Error(responseData.message);
+            throw new Error(responseData.errors || responseData.message);
         }
         const { groups } = responseData
         return groups;
@@ -86,7 +86,7 @@ export const useGetjoinedGroupList = () => {
         const responseData = await response.json();
 
         if (!response.ok) {
-            throw new Error(responseData.message);
+            throw new Error(responseData.errors || responseData.message);
         }
 
         const { groups } = responseData

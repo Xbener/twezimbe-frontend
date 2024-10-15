@@ -14,7 +14,7 @@ const GroupNav = () => {
     const { groupNotificationFlag, sendMsgGroupId, groupList } = useMyContext()
 
     return (
-        <nav className='space-y-2 bg-[#202234] p-3 overflow-y-auto overflow-x-hidden h-full' style={{ scrollbarWidth: 'none' }}>
+        <nav className='space-y-2  bg-[#013a6f] p-3 overflow-y-auto overflow-x-hidden h-full' style={{ scrollbarWidth: 'none' }}>
 
             <hr className='mx-2 rounded border-t-2 border-t-white/[0.06]' />
 
@@ -31,7 +31,7 @@ const GroupNav = () => {
             {groupList?.map((group) => (
                 <NavLink
                     // href={`/Groups/servers/${group.group_id}/channels/${server.categories[0].channels[0].id}`}
-                    href={`/Groups/${group?.group_id}/welcome/1`}
+                    href={`/groups/${group?.group_id}`}
                     key={group.group_id}
                 // active={params.sid === group.group_id.toString()}
                 >

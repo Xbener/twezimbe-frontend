@@ -19,7 +19,7 @@ function Groups({ }: Props) {
   return (
     <div className='flex flex-col w-full h-screen overflow-hidden'>
       {/* Sticky Header */}
-      <div className='w-full bg-[#013a6f] text-neutral-200 sticky top-0 left-0 z-20'>
+      <div className='w-full bg-[#202234] text-neutral-200 sticky top-0 left-0 z-20'>
         <div className='flex items-center justify-between p-5 w-full'>
           <h1 className='text-[2rem] font-bold'>Discover</h1>
           <ul className='flex gap-3'>
@@ -40,7 +40,7 @@ function Groups({ }: Props) {
       </div>
 
       <div className='h-full overflow-auto flex flex-col'>
-        <div className='flex flex-col bg-[#013a6f] p-5 text-neutral-200'>
+        <div className='flex flex-col bg-[#202234] p-5 text-neutral-200'>
           <h1 className="text-[4rem] uppercase font-bold">Find Your Community</h1>
           <p>From Social, Educational, Professional, and many more!</p>
         </div>
