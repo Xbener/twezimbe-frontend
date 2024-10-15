@@ -86,8 +86,8 @@ const SignInForm = ({ onSignIn, isLoading }: Props) => {
           <a href={'/public_pages/forgotpassword'} className='text-blue-600'>Recover or reset your password</a>
         </div>
 
-        <SocialAuthForm />
       </form>
+        <SocialAuthForm />
 
     </Form>
   )
