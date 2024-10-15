@@ -56,7 +56,7 @@ export type OPTTypes = {
 
 export type Application = {
     _id: string;
-    firstName: string;   
+    firstName: string;
     lastName: string;
     nationalId: string;
     email: string;
@@ -80,7 +80,7 @@ export type Application = {
 };
 
 export type CreateApplicationTypes = {
-    firstName: string;   
+    firstName: string;
     lastName: string;
     nationalId: string;
     email: string;
@@ -103,7 +103,7 @@ export type CreateApplicationTypes = {
 
 export type UpdateApplicationTypes = {
     _id: string;
-    firstName: string;   
+    firstName: string;
     lastName: string;
     nationalId: string;
     email: string;
@@ -147,6 +147,7 @@ export type GroupTypes = {
     created_by: string;
     del_flag: number;
     createdAt: Date;
+    memberCount: number;
 };
 
 export type CreateGroupTypes = {

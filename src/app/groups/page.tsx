@@ -32,7 +32,7 @@ function Groups({ }: Props) {
             }
           </ul>
 
-          <div className="flex items-center bg-gray-200 p-2">
+          <div className="flex items-center bg-gray-200 p-2 text-neutral-700">
             <input className='bg-transparent outline-none' placeholder='Search ...' />
             <Search />
           </div>
@@ -51,26 +51,33 @@ function Groups({ }: Props) {
           {
             isLoading && "Loading ..."
           }
-        <div className='flex p-5 mt-5 items-start justify-start gap-5 '>
+          <div className='flex p-5 mt-5 items-start justify-start gap-5 flex-wrap w-full'>
             {
               groups?.map((group, key) => (
-                <div key={key} className='flex flex-col p-5 bg-[#66acee39] h-[300px] relative shadow-lg rounded-md min-w-[20%] max-w-[40%]'>
-                  {/* Placeholder for Image */}
+                <div
+                  key={key}
+                  className='flex flex-col p-5 bg-[#66acee39] h-[300px] shadow-lg rounded-md sm:w-[45%] md:w-[30%] lg:w-[23%] gap-3'
+                >
+                  {/* Image Placeholder */}
                   <div className='h-[100px] w-full bg-gray-300 mb-3'>
-                    {/* You can add an <img> tag here or any other content as needed */}
+                    {/* Add <img> here if needed */}
                   </div>
 
+                  {/* Content */}
                   <h1 className='flex-grow'>{group.name}</h1>
                   <p className='flex-grow'>{group.description}</p>
-
-                  <Link href={`/group/[id]`} as={`/group/${group.id}`}>
-                    <button className='px-5 py-2 rounded-md bg-[#013a6f] text-white mt-auto'>Join Group</button>
+                  <p>{group.memberCount} {group.memberCount > 1 ? "members" : 'member'}</p>
+                  {/* Link Button */}
+                  <Link href={`/group/[id]`} as={`/group/${group._id}`}>
+                    <button className='px-5 py-2 rounded-md bg-[#013a6f] text-white mt-auto'>
+                      Join Group
+                    </button>
                   </Link>
                 </div>
               ))
             }
+          </div>
 
-        </div>
         </div>
       </div>
     </div>
