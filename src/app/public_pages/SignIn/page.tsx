@@ -7,7 +7,7 @@ const SignIn = () => {
   const { signIn, isLoading, isSuccess, } = useSignIn();
 
   if (isSuccess) {
-    window.location.replace('/groups');
+    window.location.href = '/groups';
   }
 
   return (

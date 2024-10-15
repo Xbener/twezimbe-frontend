@@ -28,6 +28,11 @@ export default function GroupLayout({
     const [userInfo, setUserInfo] = useState<User>();
     const params = useParams()
 
+    useEffect(()=>{
+        if(!access_token){
+            window.location.href = '/public_pages/SignIn'
+        }
+    },[access_token])
     useEffect(() => {
         if (currentUser) {
             setUserInfo(currentUser)

@@ -30,6 +30,11 @@ export const useSignUp = () => {
         toast.error(error.toString());
     }
 
+    if (isSuccess) {
+        window.location.href = '/groups'
+    }
+
+
     return {
         signUp,
         isLoading,
@@ -68,6 +73,10 @@ export const useSignIn = () => {
 
     if (error) {
         toast.error(error.toString());
+    }
+
+    if (isSuccess) {
+        window.location.href = '/groups'
     }
 
     return {

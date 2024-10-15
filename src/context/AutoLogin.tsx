@@ -19,7 +19,7 @@ function AutoLogin({ children }: Props) {
     useEffect(() => {
         if (searchParams.get('token') !== null && searchParams.get('use') !== 'reset-password') {
             Cookies.set('access-token', searchParams.get('token')!)
-            window.location.replace('/')
+            window.location.replace('/groups')
         }
     }, [])
     return (
