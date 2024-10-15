@@ -22,6 +22,7 @@ export type User = {
     otp: number;
     otpExpiryTime: Date;
     // _doc: UserDoc;
+    
 };
 
 export type CreateRoleTypes = {
@@ -135,6 +136,42 @@ export type Response = {
     status: "Resolved" | "Denied" | "In progress";
 
 };
+
+export type FriendTypes = {
+    _id: string;
+    title?: string;
+    surName: string;
+    givenName: string;
+    otherNames?: string;
+    photograph?: string; // assuming it's a file upload
+    gender: "Male" | "Female" | "Other";
+    tribe: string;
+    religion: string;
+    placeOfBirth: string;
+    currentParish: string;
+    birthday: Date;
+    nationalIDNumber: string;
+    nationalIDPhoto?: string; // assuming it's a file upload
+    phone: string;
+    email: string;
+    homeAddress: string;
+    homeLocation: string;
+    districtOfBirth: string;
+    birthParish: string;
+    birthVillage: string;
+    birthHome: string;
+    maritalStatus?: string;
+    profession: string;
+    placeOfWorkAddress?: string;
+    userID?: string;
+    is_active: boolean;
+    userId?: string;
+    friendId?: string;
+    groupId?: string;
+    roomId?: string;
+    role_name?: string;
+};
+
 
 
 export type GroupTypes = {

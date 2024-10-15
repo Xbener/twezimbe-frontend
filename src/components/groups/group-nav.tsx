@@ -6,10 +6,12 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ReactNode } from 'react';
 import GroupCreateDialog from './GroupCreateDialog';
+import { useMyContext } from '@/context/MyContext';
 
 const GroupNav = () => {
     // const { joinedGroupList } = useGetjoinedGroupList(userId as string);
     const { currentUser } = useGetProfileData()
+    const { groupNotificationFlag, sendMsgGroupId, groupList } = useMyContext()
 
     return (
         <nav className='space-y-2 bg-[#202234] p-3 overflow-y-auto overflow-x-hidden h-full' style={{ scrollbarWidth: 'none' }}>
@@ -25,7 +27,7 @@ const GroupNav = () => {
           <Image width={48} height={48} src={`/servers/${server.img}`} alt='' />
         </NavLink>
       ))} */}
-{/* 
+
             {groupList?.map((group) => (
                 <NavLink
                     // href={`/Groups/servers/${group.group_id}/channels/${server.categories[0].channels[0].id}`}
@@ -38,7 +40,7 @@ const GroupNav = () => {
                     )}
                     <img width={48} height={48} src={(group?.group_avatar === 'default' || !group?.group_avatar) ? '/servers/mirage.png' : `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/${group.group_avatar}`} alt='group' />
                 </NavLink>
-            ))} */}
+            ))}
 
             <hr className='mx-2 rounded border-t-2 border-t-white/[0.06]' />
 

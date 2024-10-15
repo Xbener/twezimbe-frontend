@@ -10,6 +10,7 @@ import { Suspense, useEffect } from "react";
 import Cookies from "js-cookie";
 import { useSignIn } from "@/api/auth";
 import AutoLogin from "@/context/AutoLogin";
+import { MyProvider } from "@/context/MyContext";
 const inter = Inter({ subsets: ["latin"] });
 
 const helmetContext = {}
@@ -43,10 +44,12 @@ export default function RootLayout({
           <StoreContext>
             <QueryClientProvider client={queryClient} >
               <AutoLogin>
-                <HelmetProvider context={helmetContext}>
-                  <Toaster />
-                  {children}
-                </HelmetProvider>
+                <MyProvider>
+                  <HelmetProvider context={helmetContext}>
+                    <Toaster />
+                    {children}
+                  </HelmetProvider>
+                </MyProvider>
               </AutoLogin>
             </QueryClientProvider>
           </StoreContext>

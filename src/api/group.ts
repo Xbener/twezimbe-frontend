@@ -71,3 +71,30 @@ export const useGetGroupList = () => {
     return { groups, isLoading }
 };
 
+
+
+export const useGetjoinedGroupList = () => {
+    const accessToken = Cookies.get('access-token');
+
+    const getJoinedGroupList = async () => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/groups/findByUserId`, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+            }
+        });
+
+        const responseData = await response.json();
+
+        if (!response.ok) {
+            throw new Error(responseData.message);
+        }
+
+        const { groups } = responseData
+
+        return groups;
+    };
+
+    const { data: groups, isLoading } = useQuery("joinedGroupList", () => getJoinedGroupList());
+
+    return { joinedGroupList: groups, isLoading }
+};
