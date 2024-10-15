@@ -4,14 +4,16 @@ import { useGetProfileData } from '@/api/auth';
 import { Eye, Verified } from '@/components/groups/icons';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ReactNode } from 'react';
+import { ReactNode, useContext } from 'react';
 import GroupCreateDialog from './GroupCreateDialog';
 import { useMyContext } from '@/context/MyContext';
+import { GroupContext } from '@/context/GroupContext';
 
 const GroupNav = () => {
     // const { joinedGroupList } = useGetjoinedGroupList(userId as string);
     const { currentUser } = useGetProfileData()
     const { groupNotificationFlag, sendMsgGroupId, groupList } = useMyContext()
+    const { group: currentGroup, setGroup } = useContext(GroupContext)
 
     return (
         <nav className='space-y-2  bg-[#013a6f] p-3 overflow-y-auto overflow-x-hidden h-full' style={{ scrollbarWidth: 'none' }}>

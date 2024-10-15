@@ -21,13 +21,15 @@ export const useAddGroup = () => {
         if (!response.ok) {
             throw new Error(responseData.errors || responseData.errors || responseData.message);
         }
+
+        return responseData
     };
 
     const { mutateAsync: addGroup, isLoading, isError, isSuccess, error, reset } = useMutation(GroupRequest);
 
     if (isSuccess) {
         toast.success("New Group Added!");
-        // window.location.reload();
+        // window.location.reload(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups/${responseData.}`);
     }
 
     if (error) {
@@ -119,10 +121,6 @@ export const useGetGroup = () => {
 
     const { mutateAsync: getGroup, isLoading, isError, isSuccess, error, reset } = useMutation(GroupRequest);
 
-    if (isSuccess) {
-        toast.success("Group Found");
-        // window.location.reload();
-    }
 
     if (error) {
         toast.error(error.toString());

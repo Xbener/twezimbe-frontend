@@ -49,7 +49,7 @@ interface SelectValue {
 const GroupCreateDialog = ({ }: Props) => {
 
     const { currentUser } = useGetProfileData();
-    const { addGroup } = useAddGroup();
+    const { addGroup, isSuccess } = useAddGroup();
 
     // const { allUsers } = useGetAllUsers()
     const allUsers = [currentUser]
@@ -180,7 +180,10 @@ const GroupCreateDialog = ({ }: Props) => {
             group_avatar: groupAvatar === "" ? "default" : groupAvatar
         }
 
-        await addGroup(newData)
+        const res = await addGroup(newData)
+        if (res.group._id!==null) {
+            window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups/${res.group._id}`
+        }
     }
 
 
