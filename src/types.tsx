@@ -22,7 +22,7 @@ export type User = {
     otp: number;
     otpExpiryTime: Date;
     // _doc: UserDoc;
-    
+
 };
 
 export type CreateRoleTypes = {
@@ -185,6 +185,7 @@ export type GroupTypes = {
     del_flag: number;
     createdAt: Date;
     memberCount: number;
+    members: User[]
 };
 
 export type CreateGroupTypes = {

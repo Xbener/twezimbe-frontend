@@ -9,6 +9,7 @@ import { User } from "@/types";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import Cookies from 'js-cookie'
+import GroupProvider from "@/context/GroupContext";
 
 const geologica = Geologica({ subsets: ['latin'] })
 
@@ -38,8 +39,10 @@ export default function GroupLayout({
     }, [joinedGroupList])
     return (
         <div className={`${geologica.className} flex fixed top-0 h-[100dvh] w-full`}>
-            <GroupNav />
-            {children}
+            <GroupProvider>
+                <GroupNav />
+                {children}
+            </GroupProvider>
         </div>
     )
 }

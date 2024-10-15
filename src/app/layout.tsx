@@ -11,6 +11,7 @@ import Cookies from "js-cookie";
 import { useSignIn } from "@/api/auth";
 import AutoLogin from "@/context/AutoLogin";
 import { MyProvider } from "@/context/MyContext";
+import MainLoader from "@/components/MainLoader";
 const inter = Inter({ subsets: ["latin"] });
 
 const helmetContext = {}
@@ -40,7 +41,7 @@ export default function RootLayout({
     <html lang="en">
       <title>Welcome to Twezimbe</title>
       <body className={inter.className}>
-        <Suspense fallback={<h1>Loading ...</h1>}>
+        <Suspense fallback={<MainLoader />}>
           <StoreContext>
             <QueryClientProvider client={queryClient} >
               <AutoLogin>

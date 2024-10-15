@@ -18,12 +18,9 @@ export const useAddGroup = () => {
         });
 
         const responseData = await response.json();
-        console.log(responseData)
         if (!response.ok) {
             throw new Error(responseData.errors || responseData.errors || responseData.message);
         }
-
-
     };
 
     const { mutateAsync: addGroup, isLoading, isError, isSuccess, error, reset } = useMutation(GroupRequest);
@@ -98,3 +95,44 @@ export const useGetjoinedGroupList = () => {
 
     return { joinedGroupList: groups, isLoading }
 };
+
+
+
+export const useGetGroup = () => {
+    const accessToken = Cookies.get('access-token');
+
+    const GroupRequest = async (groupId: string) => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/groups/${groupId}`, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+            }
+        });
+
+        const responseData = await response.json();
+
+        if (!response.ok) {
+            throw new Error(responseData.errors || responseData.message);
+        }
+
+        return responseData.group
+    };
+
+    const { mutateAsync: getGroup, isLoading, isError, isSuccess, error, reset } = useMutation(GroupRequest);
+
+    if (isSuccess) {
+        toast.success("Group Found");
+        // window.location.reload();
+    }
+
+    if (error) {
+        toast.error(error.toString());
+        reset();
+    }
+
+    return {
+        getGroup,
+        isLoading,
+        isError,
+        isSuccess
+    }
+}

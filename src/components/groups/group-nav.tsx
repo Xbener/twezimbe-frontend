@@ -48,13 +48,13 @@ const GroupNav = () => {
                 <GroupCreateDialog currentUser={currentUser} />
             </GeneralLink>
 
-            <NavLink href='/Groups/'>
+            <NavLink href='/groups/'>
                 <Eye className='h-5 w-7' />
             </NavLink>
             <hr className='mx-2 rounded border-t-2 border-t-white/[0.06]' />
-            <NavLink href='/Groups/'>
+            {/* <NavLink href='/groups/'>
                 <Verified className='h-5 w-7' />
-            </NavLink>
+            </NavLink> */}
 
         </nav>
     );

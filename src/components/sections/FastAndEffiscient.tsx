@@ -6,7 +6,7 @@ const FastAndEffiscient = () => {
                     <img src="/assets/grow.jpg" loading="lazy" className="w-1/2 mx-auto mb-10 rounded-3xl" alt="Apply here" />
                 </div>
                 <div className="right w-full md:w-[49%] flex flex-col">
-                    <span className="font-bold">Fast & Effiscient</span>
+                    <span className="font-bold">Fast & Efficient</span>
                     <h1 className="text-[#013a6f] text-3xl font-bold mt-3 mb-7">About Twezimbe platform</h1>
                     <p className="text-slate-700">Twezimbe is a cutting-edge, all-in-one solution designed to revolutionize the management of 
                                                     SACCOs (Savings and Credit Cooperative Organizations), Group Bereavement Fund and Social 
