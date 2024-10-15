@@ -16,6 +16,9 @@
   }
 }
 
+*{
+}
+
 body {
   color: var(--foreground-rgb);
   background: linear-gradient(

@@ -135,3 +135,55 @@ export type Response = {
     status: "Resolved" | "Denied" | "In progress";
 
 };
+
+
+export type GroupTypes = {
+    _id: string
+    name: string;
+    group_type: string;
+    group_avatar: string;
+    tags: string;
+    description: string;
+    created_by: string;
+    del_flag: number;
+    createdAt: Date;
+};
+
+export type CreateGroupTypes = {
+    name: string;
+    group_type?: string;
+    group_state?: string;
+    selectedUsers_Id?: string[];
+    group_avatar?: string;
+    tags?: string;
+    description?: string;
+    created_by?: string;
+};
+
+export type UpdateGroupTypes = {
+    name: string;
+    group_type?: string;
+    description?: string;
+    created_by?: string;
+};
+
+export type JoinedGroupTypes = {
+    _id?: string;
+    group_id: string;
+    role_name: string;
+    group_name: string;
+    group_type: string;
+    group_state: string;
+    group_avatar: string;
+    description: string;
+    tags: string;
+    created_by: string;
+    del_flag: number;
+    createdAt: Date;
+    updatedAt: Date;
+};
+
+export type JoinGroupTypes = {
+    user_id?: string;
+    groud_id?: string;
+};
