@@ -36,10 +36,10 @@ export default function RootLayout({
 
 
   return (
-   <Suspense fallback={<h1>Loading ...</h1>}>
-      <html lang="en">
-        <title>Welcome to Twezimbe</title>
-        <body className={inter.className}>
+    <html lang="en">
+      <title>Welcome to Twezimbe</title>
+      <body className={inter.className}>
+        <Suspense fallback={<h1>Loading ...</h1>}>
           <StoreContext>
             <QueryClientProvider client={queryClient} >
               <AutoLogin>
@@ -50,8 +50,8 @@ export default function RootLayout({
               </AutoLogin>
             </QueryClientProvider>
           </StoreContext>
-        </body>
-      </html>
-   </Suspense>
+        </Suspense>
+      </body>
+    </html>
   );
 }

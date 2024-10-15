@@ -4,10 +4,10 @@ import HelmetComponent from "@/components/HelmetComponent";
 import SignInForm from "@/components/forms/SignInForm";
 
 const SignIn = () => {
-  const { signIn, isLoading, isSuccess,  } = useSignIn(); 
+  const { signIn, isLoading, isSuccess, } = useSignIn();
 
   if (isSuccess) {
-    window.location.replace('/');
+    window.location.replace('/groups');
   }
 
   return (

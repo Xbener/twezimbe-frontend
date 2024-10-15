@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import LoadingButton from '../LoadingButton';
@@ -8,6 +8,7 @@ import { Checkbox } from '../ui/checkbox';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import { Input } from '../ui/input';
 import SocialAuthForm from './SocialAuthForm';
+import Cookies from 'js-cookie'
 
 const formSchema = z.object({
   firstName: z.string().min(2).max(50),
@@ -37,6 +38,14 @@ const SignUpForm = ({ onSignUp, isLoading }: Props) => {
       phone: '',
     }
   });
+
+
+  useEffect(() => {
+    if (Cookies.get('access-token') !== null) {
+      window.location.href = '/'
+    }
+  }, [])
+
 
   return (
     <Form {...form}>
