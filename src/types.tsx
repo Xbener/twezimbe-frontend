@@ -224,5 +224,5 @@ export type JoinedGroupTypes = {
 
 export type JoinGroupTypes = {
     user_id?: string;
-    groud_id?: string;
+    group_id?: string;
 };

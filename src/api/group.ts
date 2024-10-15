@@ -134,3 +134,44 @@ export const useGetGroup = () => {
         isSuccess
     }
 }
+
+
+export const useJoinGroup = () => {
+    const accessToken = Cookies.get('access-token');
+    const JoinGroupRequest = async (joinData: JoinGroupTypes) => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/groups/join`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify(joinData),
+        });
+
+        const responseData = await response.json();
+
+        if (!response.ok) {
+            throw new Error(responseData.message);
+        }
+
+        return responseData.group
+    };
+
+    const { mutateAsync: joinGroup, isLoading, isError, isSuccess, error, reset } = useMutation(JoinGroupRequest);
+
+    if (isSuccess) {
+        toast.success("Joined Succesfully!");
+    }
+
+    if (error) {
+        toast.error(error.toString());
+        reset();
+    }
+
+    return {
+        joinGroup,
+        isLoading,
+        isError,
+        isSuccess
+    }
+};
