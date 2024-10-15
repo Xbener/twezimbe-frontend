@@ -1,9 +1,12 @@
 'use client'
 
-import { useGetGroupList } from '@/api/group';
+import { useGetProfileData } from '@/api/auth';
+import { useGetGroupList, useJoinGroup } from '@/api/group';
+import { GroupTypes } from '@/types';
 import { Search } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
+import { toast } from 'sonner';
 
 type Props = {};
 
@@ -16,6 +19,21 @@ const categoryList = [
 
 function Groups({ }: Props) {
   const { groups, isLoading } = useGetGroupList()
+  const { currentUser } = useGetProfileData()
+  const { joinGroup } = useJoinGroup()
+
+  const joinPublicGroup = async (group: GroupTypes) => {
+    try {
+      const res = await joinGroup({ user_id: currentUser?._id, group_id: group?._id })
+
+      console.log('res', res)
+      if (res._id !== null) {
+        window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups/${group?._id}`
+      }
+    } catch (error) {
+      toast.error("An error occurred. Please try again")
+    }
+  }
   return (
     <div className='flex flex-col w-full h-screen overflow-hidden'>
       {/* Sticky Header */}
@@ -64,11 +82,11 @@ function Groups({ }: Props) {
                   </div>
 
                   {/* Content */}
-                  <h1 className='flex-grow'>{group.name}</h1>
+                  <h1 className='flex-grow'>{group.group_name}</h1>
                   <p className='flex-grow'>{group.description}</p>
                   <p>{group.memberCount} {group.memberCount > 1 ? "members" : 'member'}</p>
                   {/* Link Button */}
-                  <Link href={`/group/[id]`} as={`/group/${group._id}`}>
+                  <Link href={`/groups/[id]`} onClick={() => joinPublicGroup(group)} as={`/groups/${group._id}`}>
                     <button className='px-5 py-2 rounded-md bg-[#013a6f] text-white mt-auto'>
                       Join Group
                     </button>

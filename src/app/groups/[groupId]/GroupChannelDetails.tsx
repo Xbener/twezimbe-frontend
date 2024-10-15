@@ -12,7 +12,7 @@ function ChannelDetails({ }: Props) {
     return (
         <>
             <div className='w-full shadow-md text-[1.2rem] cursor-pointer font-extrabold  p-2 flex items-center justify-between'>
-                {group?.name}
+                {group?.group_name}
                 <CaretDownIcon className='w-[20px] ' />
             </div>
 

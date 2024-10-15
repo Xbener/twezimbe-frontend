@@ -51,7 +51,7 @@ function InvitationPage({ }: Props) {
                     <div className='w-[50px] h-[50px] rounded-full border-t-2 border-l-2 animate-spin'></div>
                 ) : (
                     <div className='text-center flex flex-col gap-5 items-center justify-center'>
-                        <h1 className='text-[1.3rem]'> You were invited to join <span className=' capitalize font-bold'>{group?.name}</span></h1>
+                        <h1 className='text-[1.3rem]'> You were invited to join <span className=' capitalize font-bold'>{group?.group_name}</span></h1>
                         <div className='flex gap-3'>
                             <Button variant={'default'} onClick={() => acceptInvitation()} disabled={isLoading} className='bg-[#013a6fd8] text-white'>Accept</Button>
                             {/* <Button variant={'destructive'} className='border-red-500 text-red-500 border-2'>Decline</Button> */}

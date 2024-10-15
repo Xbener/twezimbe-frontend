@@ -11,7 +11,7 @@ function GroupId({ }: Props) {
     return (
         <div className='w-[75%] flex items-center justify-center h-full'>
             <h1 className='text-[3rem]'>
-                Welcome to {group?.name} Group!
+                Welcome to {group?.group_name} Group!
             </h1>
         </div>
     )

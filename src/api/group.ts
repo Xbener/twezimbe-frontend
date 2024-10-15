@@ -28,7 +28,7 @@ export const useAddGroup = () => {
     const { mutateAsync: addGroup, isLoading, isError, isSuccess, error, reset } = useMutation(GroupRequest);
 
     if (isSuccess) {
-        toast.success("New Group Added!");
+        toast.success("New Group Added!. Check your inbox for invitation link");
         // window.location.reload(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups/${responseData.}`);
     }
 
@@ -63,6 +63,7 @@ export const useGetGroupList = () => {
             throw new Error(responseData.errors || responseData.message);
         }
         const { groups } = responseData
+        console.log('groups dfs', groups)
         return groups;
     };
 
