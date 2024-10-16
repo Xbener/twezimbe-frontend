@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { MessageCircleWarning, XCircle } from 'lucide-react'
 import { useUpdateGroup } from '@/api/group'
 import { useRouter } from 'next/navigation'
+import { useGetProfileData } from '@/api/auth'
 
 type Props = {}
 
@@ -18,6 +19,7 @@ function GroupSettings({ }: Props) {
     const [file, setFile] = useState<File | null>(null)
     const [uploading, setUploading] = useState(false)
     const { isLoading, updateGroup } = useUpdateGroup()
+    const { currentUser } = useGetProfileData()
     const router = useRouter()
     const [imagePreview, setImagePreview] = useState<string | null>(null);
 
@@ -90,82 +92,94 @@ function GroupSettings({ }: Props) {
                 <Button disabled={uploading} onClick={() => router.back()}>
                     <XCircle color={"white"} />
                 </Button>
-                <h1 className='font-bold uppercase'>Overview Settings</h1>
+                <h1 className='font-bold uppercase'>Settings</h1>
             </div>
 
-            <div className='p-3 border-b flex items-start justify-around'>
-                <div className='flex justify-center text-center items-start gap-3'>
-                    <div className="width-[200px] height-[200px] rounded-full">
-                        <img
-                            src={imagePreview || group?.group_picture}
-                            alt=''
-                            className='object-cover w-[100px] h-[100px] rounded-full'
-                        />
+            {
+                group?.created_by[0]?._id === currentUser?._id && (
+                    <div className='p-3 border-b flex items-start justify-around'>
+                        <div className='flex justify-center text-center items-start gap-3'>
+                            <div className="width-[200px] height-[200px] rounded-full">
+                                <img
+                                    src={imagePreview || group?.group_picture}
+                                    alt=''
+                                    className='object-cover w-[100px] h-[100px] rounded-full'
+                                />
 
-                    </div>
-                    <div className='flex flex-col gap-2'>
-                        <input
-                            name="picture"
-                            id="picture"
-                            type="file"
-                            hidden
-                            onChange={handleImageChange}
-                        />
-                        <p className='text-[0.8rem]'>Choose an image</p>
-                        <Button className='bg-blue-500' disabled={uploading}>
-                            <label htmlFor="picture" className='cursor-pointer'>
-                                Choose picture
-                            </label>
-                        </Button>
-
-                        {
-                            imagePreview && (
-                                <Button className="border border-black text-black" disabled={uploading} onClick={uploadPicture}>
-                                    Update
+                            </div>
+                            <div className='flex flex-col gap-2'>
+                                <input
+                                    name="picture"
+                                    id="picture"
+                                    type="file"
+                                    hidden
+                                    onChange={handleImageChange}
+                                />
+                                <p className='text-[0.8rem]'>Choose an image</p>
+                                <Button className='bg-blue-500' disabled={uploading}>
+                                    <label htmlFor="picture" className='cursor-pointer'>
+                                        Choose picture
+                                    </label>
                                 </Button>
-                            )
-                        }
+
+                                {
+                                    imagePreview && (
+                                        <Button className="border border-black text-black" disabled={uploading} onClick={uploadPicture}>
+                                            Update
+                                        </Button>
+                                    )
+                                }
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <label className='uppercase font-extrabold text-[.8rem]' htmlFor="group_name">Group Name</label>
+                            <input
+                                id="group_name"
+                                name="name"
+                                value={group?.group_name}
+                                // onChange={(e) => setGroupName(e.target.value)}
+                                className="bg-transparent p-2 border outline-none" placeholder="Group Name" />
+                        </div>
                     </div>
-                </div>
-                <div className="flex flex-col gap-2">
-                    <label className='uppercase font-extrabold text-[.8rem]' htmlFor="group_name">Group Name</label>
-                    <input
-                        id="group_name"
-                        name="name"
-                        value={group?.group_name}
-                        // onChange={(e) => setGroupName(e.target.value)}
-                        className="bg-transparent p-2 border outline-none" placeholder="Group Name" />
-                </div>
-            </div>
+                )
+            }
 
             <div className='p-3 border-b  w-full'>
                 <h1 className='p-2 text-[1.2rem] font-extrabold uppercase'>Privacy Settings</h1>
 
                 <div className='flex flex-col gap-3 w-full mt-5'>
-                    <div className='flex w-full justify-between items-center'>
-                        <h1>Change Visibility ({group?.group_state})</h1>
+                {
+                        group?.created_by[0]?._id === currentUser?._id && (
+                            <div className='flex w-full justify-between items-center'>
+                                <h1>Change Visibility ({group?.group_state})</h1>
 
-                        <div>
-                            <Button disabled={uploading} className={`bg-${group?.group_state === 'Public' ? 'blue-500' : 'neutral-50'} text-white px-3 py-2 rounded-md transition duration-300 ease-in-out ${group?.group_state === 'public' ? 'hover:bg-blue-600' : ''}`}
-                                onClick={() => changeVisibility(group?.group_state === 'Public' ? 'Private' : 'Public')}
-                            >
-                                {group?.group_state === 'Public' ? 'Make Private' : 'Make Public'}
-                            </Button>
-                        </div>
-                    </div>
-                    <div className='flex w-full justify-between items-center'>
-                        <div className="flex flex-col gap-1">
-                            <h1>
-                                {group?.isSacco ? "Remove SACCO" : "Transition to SACCO"}
-                            </h1>
-                            <p className="text-[.8rem]">{group?.isSacco ? "This group is already a SACCO" : `You need at least 5 members of a group to transition to sacco. Currently you have ${group?.members.length} members`}</p>
-                        </div>
-                        <div>
-                            <Button disabled={uploading} className={`bg-blue-500 text-white`} onClick={transitionToSacco}>
-                                {group?.isSacco ? "Remove SACCO" : "Transition"}
-                            </Button>
-                        </div>
-                    </div>
+                                <div>
+                                    <Button disabled={uploading} className={`bg-${group?.group_state === 'Public' ? 'blue-500' : 'neutral-50'} text-white px-3 py-2 rounded-md transition duration-300 ease-in-out ${group?.group_state === 'public' ? 'hover:bg-blue-600' : ''}`}
+                                        onClick={() => changeVisibility(group?.group_state === 'Public' ? 'Private' : 'Public')}
+                                    >
+                                        {group?.group_state === 'Public' ? 'Make Private' : 'Make Public'}
+                                    </Button>
+                                </div>
+                            </div>
+                        )
+                }
+                    {
+                        group?.created_by[0]?._id === currentUser?._id && (
+                            <div className='flex w-full justify-between items-center'>
+                                <div className="flex flex-col gap-1">
+                                    <h1>
+                                        {group?.isSacco ? "Remove SACCO" : "Transition to SACCO"}
+                                    </h1>
+                                    <p className="text-[.8rem]">{group?.isSacco ? "This group is already a SACCO" : `You need at least 5 members of a group to transition to sacco. Currently you have ${group?.members.length} members`}</p>
+                                </div>
+                                <div>
+                                    <Button disabled={uploading} className={`bg-blue-500 text-white`} onClick={transitionToSacco}>
+                                        {group?.isSacco ? "Remove SACCO" : "Transition"}
+                                    </Button>
+                                </div>
+                            </div>
+                        )
+                    }
                     <div className='flex w-full justify-between items-center'>
                         <h1>Copy Invite Link</h1>
                         <Button disabled={uploading} className='bg-blue-500 text-white' onClick={() => {
@@ -182,13 +196,17 @@ function GroupSettings({ }: Props) {
                         </Button>
                     </div>
 
-                    <div className='flex w-full justify-between items-center'>
-                        <h1>Delete Group </h1>
-                        <Button disabled={uploading} className='bg-red-500 text-white flex items-center gap-1'>
-                            <MessageCircleWarning />
-                            Delete
-                        </Button>
-                    </div>
+                    {
+                        group?.created_by[0]?._id === currentUser?._id && (
+                            <div className='flex w-full justify-between items-center'>
+                                <h1>Delete Group </h1>
+                                <Button disabled={uploading} className='bg-red-500 text-white flex items-center gap-1'>
+                                    <MessageCircleWarning />
+                                    Delete
+                                </Button>
+                            </div>
+                        )
+                    }
                 </div>
             </div>
         </div >

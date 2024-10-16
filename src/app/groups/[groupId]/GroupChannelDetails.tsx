@@ -1,3 +1,4 @@
+'use client'
 import { useGetProfileData } from '@/api/auth'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -9,6 +10,7 @@ import { Edit, LogOut, PlusIcon, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { userInfo } from 'os'
 import React, { useContext } from 'react'
+import Cookies from 'js-cookie'
 
 type Props = {
 
@@ -26,7 +28,13 @@ function ChannelDetails({ }: Props) {
 
     const settingsItems = [
         { name: "Edit profile", link: "/public_pages/Profile", icon: <Edit /> },
-        { name: "Logout", link: "#", icon: <LogOut /> },
+        {
+            name: "Logout", link: "#", icon: <LogOut />,
+            action: () => {
+                Cookies.remove('access-token');
+                window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/public_pages/SignIn`
+            }
+        },
     ]
     return (
         <>
@@ -78,7 +86,7 @@ function ChannelDetails({ }: Props) {
                         <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-40 gap-1 flex flex-col border-transparent border-l-8 border-l-neutral-400 pl-3 ">
                             {
                                 settingsItems.map((item, index) => (
-                                    <Link href={item.link} key={index} className="text-white flex p-2 w-full text-[1.1rem] hover:bg-[#6bb7ff73] cursor-pointer rounded-md items-center gap-2 duration-100">
+                                    <Link href={item.link} key={index} className="text-white flex p-2 w-full text-[1.1rem] hover:bg-[#6bb7ff73] cursor-pointer rounded-md items-center gap-2 duration-100" onClick={item?.action}>
                                         {item.icon}
                                         {item.name}
                                     </Link>

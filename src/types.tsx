@@ -183,12 +183,12 @@ export type GroupTypes = {
     group_picture: string;
     tags: string;
     description: string;
-    created_by: string;
+    created_by: any;
     del_flag: number;
     createdAt: Date;
     memberCount: number;
     members: User[];
-    isSacco?:boolean;
+    isSacco?: boolean;
     invite_link: string;
     group_state: string;
     upgraded: boolean;
@@ -213,7 +213,7 @@ export type UpdateGroupTypes = {
     group_state?: string;
     upgraded?: boolean;
     group_id: string;
-    isSacco?:boolean;
+    isSacco?: boolean;
 };
 
 export type JoinedGroupTypes = {
@@ -222,7 +222,7 @@ export type JoinedGroupTypes = {
     role_name: string;
     group_name: string;
     group_type: string;
-    isSacco?:boolean;
+    isSacco?: boolean;
     group_state: string;
     group_picture: string;
     description: string;

@@ -3,9 +3,10 @@
 import { useGetProfileData } from '@/api/auth';
 import { useGetGroupList, useJoinGroup } from '@/api/group';
 import { GroupTypes } from '@/types';
-import { Search } from 'lucide-react';
+import { EyeClosedIcon } from '@radix-ui/react-icons';
+import { Eye, Search } from 'lucide-react';
 import Link from 'next/link';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 type Props = {};
@@ -21,6 +22,12 @@ function Groups({ }: Props) {
   const { groups, isLoading } = useGetGroupList()
   const { currentUser } = useGetProfileData()
   const { joinGroup } = useJoinGroup()
+  const [formattedGroups, setFormattedGroups] = useState(groups)
+
+  useEffect(() => {
+    setFormattedGroups(groups)
+  }, [groups])
+
 
   const joinPublicGroup = async (group: GroupTypes) => {
     try {
@@ -29,6 +36,29 @@ function Groups({ }: Props) {
       console.log('res', res)
       if (res._id !== null) {
         window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups/${group?._id}`
+      }
+    } catch (error) {
+      toast.error("An error occurred. Please try again")
+    }
+  }
+
+
+  const sendRequestToJoin = async (group: GroupTypes) => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/requests`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ group_id: group?._id })
+      })
+      const data = await res.json()
+
+      if (data.status) {
+        toast.success('request sent successfully')
+        setFormattedGroups(prev => {
+          return prev?.filter(prevGroup => prevGroup?._id === group._id)
+        })
       }
     } catch (error) {
       toast.error("An error occurred. Please try again")
@@ -71,7 +101,7 @@ function Groups({ }: Props) {
           }
           <div className='flex p-5 mt-5 items-start justify-start gap-5 flex-wrap w-full'>
             {
-              groups?.map((group, key) => (
+              formattedGroups?.map((group, key) => (
                 <div
                   key={key}
                   className='flex flex-col p-5 bg-[#66acee39] h-[300px] shadow-lg rounded-md sm:w-[45%] md:w-[30%] lg:w-[23%] gap-3'
@@ -85,20 +115,21 @@ function Groups({ }: Props) {
                   </div>
 
                   {/* Content */}
-                  <h1 className='flex-grow'>{group.group_name}</h1>
+                  <h1 className='flex-grow flex items-center gap-2'>{group.group_name} {group.group_state === 'Public' ? <Eye /> : <EyeClosedIcon />}</h1>
                   <p className='flex-grow'>{group.description}</p>
                   <p>{group.memberCount} {group.memberCount > 1 ? "members" : 'member'}</p>
                   {/* Link Button */}
-                  <Link href={`/groups/[id]`} onClick={() => joinPublicGroup(group)} as={`/groups/${group._id}`}>
+                  <Link href={`/groups/[id]`} onClick={() => {
+                    group.group_state === "Public" ? joinPublicGroup(group) : sendRequestToJoin(group)
+                  }} as={`/groups/${group._id}`}>
                     <button className='px-5 py-2 rounded-md bg-[#013a6f] text-white mt-auto'>
-                      Join Group
+                      {group.group_state === "Public" ? "Join Group" : "Request To join"}
                     </button>
                   </Link>
                 </div>
               ))
             }
           </div>
-
         </div>
       </div>
     </div>
