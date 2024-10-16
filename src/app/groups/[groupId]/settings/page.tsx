@@ -7,6 +7,9 @@ import React, { useContext, useState } from 'react'
 import Cookies from 'js-cookie'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import { MessageCircleWarning } from 'lucide-react'
+import { useUpdateGroup } from '@/api/group'
+import MainLoader from '@/components/MainLoader'
 
 type Props = {}
 
@@ -14,7 +17,7 @@ function GroupSettings({ }: Props) {
     const { group } = useContext(GroupContext)
     const [file, setFile] = useState<File | null>(null)
     const [uploading, setUploading] = useState(false)
-
+    const { isLoading, updateGroup } = useUpdateGroup()
     const [imagePreview, setImagePreview] = useState<string | null>(null);
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,12 +56,26 @@ function GroupSettings({ }: Props) {
             setUploading(false)
         }
     }
+
+    const changeVisibility = async (current_vis: string) => {
+        try {
+            setUploading(true)
+
+            const res = await updateGroup({ group_state: current_vis, group_id: group?._id as string })
+            console.log(res)
+        } catch (error) {
+            toast.error("An error occurred. Please refresh the page")
+        } finally {
+            setUploading(false)
+        }
+    }
+
     return (
         <div
             className=''
         >
             <div className='border-b border-white p-3 text-[1.2rem]'>
-                <h1 className='font-bold'>Group Settings</h1>
+                <h1 className='font-bold uppercase'>Overview Settings</h1>
             </div>
 
             <div className='p-3 border-b flex items-start justify-around'>
@@ -105,7 +122,48 @@ function GroupSettings({ }: Props) {
                         className="bg-transparent p-2 border outline-none" placeholder="Group Name" />
                 </div>
             </div>
-        </div>
+
+            <div className='p-3 border-b  w-full'>
+                <h1 className='p-2 text-[1.2rem] font-extrabold uppercase'>Privacy Settings</h1>
+
+                <div className='flex flex-col gap-3 w-full mt-5'>
+                    <div className='flex w-full justify-between items-center'>
+                        <h1>Change Visibility ({group?.group_state})</h1>
+
+                        <div>
+                            <Button className={`bg-${group?.group_state === 'Public' ? 'blue-500' : 'neutral-50'} text-white px-3 py-2 rounded-md transition duration-300 ease-in-out ${group?.group_state === 'public' ? 'hover:bg-blue-600' : ''}`}
+                                onClick={() => changeVisibility(group?.group_state === 'Public' ? 'Private' : 'Public')}
+                            >
+                                {group?.group_state === 'Public' ? 'Make Private' : 'Make Public'}
+                            </Button>
+                        </div>
+                    </div>
+                    <div className='flex w-full justify-between items-center'>
+                        <h1>Copy Invite Link</h1>
+                        <Button className='bg-blue-500 text-white' onClick={() => {
+                            navigator.clipboard.writeText(group?.invite_link as string)
+                                .then(() => {
+                                    console.log('Text copied to clipboard');
+                                    toast.success("Invite link successfully copied to clipboard!")
+                                })
+                                .catch(err => {
+                                    console.error('Failed to copy: ', err);
+                                });
+                        }}>
+                            Copy Link
+                        </Button>
+                    </div>
+
+                    <div className='flex w-full justify-between items-center'>
+                        <h1>Delete Group </h1>
+                        <Button className='bg-red-500 text-white flex items-center gap-1'>
+                            <MessageCircleWarning />
+                            Delete
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        </div >
     )
 }
 

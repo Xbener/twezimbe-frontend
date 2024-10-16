@@ -29,6 +29,8 @@ function GroupIdLayout({ children }: Props) {
         fetchGroup()
     }, [groupId])
 
+
+    if (!group?._id) return <MainLoader />
     if (isLoading) return <MainLoader />
     if (isError) return <Error />
     return (

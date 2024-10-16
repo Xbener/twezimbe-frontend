@@ -188,6 +188,8 @@ export type GroupTypes = {
     createdAt: Date;
     memberCount: number;
     members: User[];
+    invite_link: string;
+    group_state: string;
 };
 
 export type CreateGroupTypes = {
@@ -202,10 +204,13 @@ export type CreateGroupTypes = {
 };
 
 export type UpdateGroupTypes = {
-    name: string;
+    group_name?: string;
     group_type?: string;
     description?: string;
     created_by?: string;
+    group_state?: string;
+    upgraded?: boolean;
+    group_id: string;
 };
 
 export type JoinedGroupTypes = {
@@ -228,3 +233,5 @@ export type JoinGroupTypes = {
     user_id?: string;
     group_id?: string;
 };
+
+

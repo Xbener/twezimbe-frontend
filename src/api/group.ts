@@ -1,4 +1,4 @@
-import { CreateGroupTypes, GroupTypes, JoinGroupTypes } from "@/types";
+import { CreateGroupTypes, GroupTypes, JoinGroupTypes, UpdateGroupTypes } from "@/types";
 import Cookies from "js-cookie";
 import { useMutation, useQuery } from 'react-query';
 import { toast } from 'sonner';
@@ -171,6 +171,49 @@ export const useJoinGroup = () => {
 
     return {
         joinGroup,
+        isLoading,
+        isError,
+        isSuccess
+    }
+};
+
+
+
+export const useUpdateGroup = () => {
+    const accessToken = Cookies.get('access-token');
+    const updateGroupRequest = async (updateData: UpdateGroupTypes) => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/groups/update`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify(updateData),
+        });
+
+        const responseData = await response.json();
+
+        if (!response.ok) {
+            throw new Error(responseData.message || responseData.errors);
+        }
+
+        return responseData
+    };
+
+    const { mutateAsync: updateGroup, isLoading, isError, isSuccess, error, reset } = useMutation(updateGroupRequest);
+
+    if (isSuccess) {
+        toast.success("Group updated Succesfully!");
+        window.location.reload()
+    }
+
+    if (error) {
+        toast.error(error.toString());
+        reset();
+    }
+
+    return {
+        updateGroup,
         isLoading,
         isError,
         isSuccess
