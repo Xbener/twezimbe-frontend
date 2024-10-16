@@ -177,7 +177,7 @@ const GroupCreateDialog = ({ }: Props) => {
             group_state: group_state?.value,
             selectedUsers_Id: selectedUsersId,
             created_by: currentUser?._id,
-            group_avatar: groupAvatar === "" ? "default" : groupAvatar
+            // group_avatar: groupAvatar === "" ? "default" : groupAvatar
         }
 
         const res = await addGroup(newData)

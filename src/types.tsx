@@ -180,7 +180,7 @@ export type GroupTypes = {
     _id: string
     group_name: string;
     group_type: string;
-    group_avatar: string;
+    group_picture: string;
     tags: string;
     description: string;
     created_by: string;
@@ -188,7 +188,6 @@ export type GroupTypes = {
     createdAt: Date;
     memberCount: number;
     members: User[];
-    group_picture: string;
 };
 
 export type CreateGroupTypes = {
@@ -196,7 +195,7 @@ export type CreateGroupTypes = {
     group_type?: string;
     group_state?: string;
     selectedUsers_Id?: string[];
-    group_avatar?: string;
+    group_picture?: string;
     tags?: string;
     description?: string;
     created_by?: string;
