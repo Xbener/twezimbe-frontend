@@ -34,3 +34,9 @@ body {
     text-wrap: balance;
   }
 }
+
+
+
+button{
+  @apply disabled:cursor-not-allowed
+}

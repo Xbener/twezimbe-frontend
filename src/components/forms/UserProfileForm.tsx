@@ -4,10 +4,13 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from '@/components/ui/input';
 import { User } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { any, z } from 'zod';
 import LoadingButton from '../LoadingButton';
+import Image from 'next/image';
+import { toast } from 'sonner';
+import Cookies from 'js-cookie'
 
 const formSchema = z.object({
     email: z.string().optional(),
@@ -21,7 +24,7 @@ const formSchema = z.object({
     current_challenges: z.string().optional(),
     preferred_date: z.string().optional(),
     joined_group: z.string().optional(),
-    role: z.string().optional()
+    role: z.string().optional(),
 });
 
 // Determining the type of our form data by infering it from the zod schema 
@@ -38,10 +41,55 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
         resolver: zodResolver(formSchema),
         defaultValues: currentUser,
     });
+    const [file, setFile] = useState<File | null>(null)
+    const [uploading, setUploading] = useState(false)
+
+    // useEffect(() => {
+    //     form.reset(currentUser);
+    // }, [currentUser, form])
+
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file !== undefined) setFile(file as File)
+        setImagePreview(URL.createObjectURL(file as File));
+    };
 
     useEffect(() => {
-        form.reset(currentUser);
-    }, [currentUser, form])
+        console.log('form', form.getValues())
+    }, [currentUser, form, imagePreview]);
+
+
+    const uploadPicture = async () => {
+        try {
+
+            if (file) {
+                setUploading(true)
+                const accessToken = Cookies.get('access-token');
+                const formData = new FormData()
+                formData.append('profile_pic', file)
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/auth/user/upload-profile-picture`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                    },
+                    body: formData
+                })
+
+                let result = await res.json()
+                if (!result.status) throw new Error()
+                toast.success('Profile Picture updated successfully')
+                // window.location.reload()
+            } else {
+                toast.error('please upload a file')
+            }
+        } catch (error) {
+            toast.error("Error occurred. Please refresh the page")
+        } finally {
+            setUploading(false)
+        }
+    }
 
     return (
         <Form {...form}>
@@ -49,6 +97,44 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
                 <FormDescription>
                     View and change your profile information here
                 </FormDescription>
+
+                {/* Image Upload and Preview Section */}
+                <div className='flex flex-col-reverse justify-center text-center items-start'>
+                    <FormItem className='w-full flex justify-start'>
+                        <div className='flex items-center gap-2'>
+                            <Button className="disabled:cursor-not-allowed" type='button' disabled={uploading}>
+                                <FormLabel className='p-2 border-2 mt-3 cursor-pointer bg-blue-500 text-white rounded-lg'> Choose Profile Picture</FormLabel>
+                            </Button>
+                            {
+                                imagePreview && (
+                                    <Button type='button' className='border disabled:cursor-not-allowed border-black' disabled={uploading} onClick={uploadPicture}>Upload</Button>
+                                )
+                            }
+                        </div>
+                        <FormControl>
+                            <input
+                                type='file'
+                                accept='image/*'
+                                onChange={handleImageChange}
+                                className='bg-white p-2 border border-gray-300 rounded-lg'
+                                hidden
+                                name="profile_pic"
+                            />
+                        </FormControl>
+                    </FormItem>
+                    {(
+                        <div className='w-[100px] h-[100px] rounded-full'>
+                            <div className='border border-gray-300 p-2 w-full rounded-full h-full'>
+                                <img
+                                    src={imagePreview || currentUser.profile_pic}
+                                    alt=''
+                                    className='object-cover w-full rounded-full h-full'
+                                />
+                            </div>
+                        </div>
+                    )}
+                </div>
+
                 <div className='flex flex-wrap w-full justify-between items-start gap-3'>
                     <FormField
                         control={form.control}
@@ -113,7 +199,7 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
                         defaultValue={currentUser.birthday}
                         render={({ field }) => (
                             <FormItem className='w-[31%]'>
-                                <FormLabel>Birhday: {currentUser.birthday ?  new Date(currentUser.birthday).toLocaleDateString() : ''}</FormLabel>
+                                <FormLabel>Birhday: {currentUser.birthday ? new Date(currentUser.birthday).toLocaleDateString() : ''}</FormLabel>
                                 <FormControl>
                                     <Input {...field} className='bg-white' type='date' />
                                 </FormControl>

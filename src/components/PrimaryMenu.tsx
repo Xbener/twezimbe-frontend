@@ -44,7 +44,7 @@ const PrimaryMenu = () => {
                     <Popover>
                         <PopoverTrigger className="flex items-center gap-2">
                             <Avatar>
-                                <AvatarImage src="/assets/avatar.svg" className="bg-black" />
+                                <AvatarImage src={userInfo.profile_pic} className="bg-black" />
                                 <AvatarFallback>{iconTextGenerator(userInfo.firstName, userInfo.lastName)}</AvatarFallback>
                             </Avatar>
                             <p className="text-[#2f578b]">{userInfo.firstName}</p>

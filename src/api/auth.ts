@@ -240,6 +240,7 @@ export const useGetProfileData = () => {
     return { currentUser, isLoading }
 };
 
+
 export const useUpdateUserAccount = () => {
     const updateUserAccountRequest = async (user: UpdateUserTypes) => {
         const accessToken = Cookies.get('access-token');
@@ -263,7 +264,7 @@ export const useUpdateUserAccount = () => {
 
     if (isSuccess) {
         toast.success("User profile updated!");
-        window.location.reload();
+        // window.location.reload();
     }
 
     if (error) {

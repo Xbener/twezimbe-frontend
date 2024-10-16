@@ -22,6 +22,7 @@ export type User = {
     otp: number;
     otpExpiryTime: Date;
     // _doc: UserDoc;
+    profile_pic?: string;
 
 };
 
@@ -44,6 +45,7 @@ export type UpdateUserTypes = {
     firstName: string;
     lastName: string;
     phone: string;
+    profile_pic?: File;
 }
 
 export type SignInTypes = {
