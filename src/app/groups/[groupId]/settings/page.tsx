@@ -7,9 +7,9 @@ import React, { useContext, useState } from 'react'
 import Cookies from 'js-cookie'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
-import { MessageCircleWarning } from 'lucide-react'
+import { MessageCircleWarning, XCircle } from 'lucide-react'
 import { useUpdateGroup } from '@/api/group'
-import MainLoader from '@/components/MainLoader'
+import { useRouter } from 'next/navigation'
 
 type Props = {}
 
@@ -18,6 +18,7 @@ function GroupSettings({ }: Props) {
     const [file, setFile] = useState<File | null>(null)
     const [uploading, setUploading] = useState(false)
     const { isLoading, updateGroup } = useUpdateGroup()
+    const router = useRouter()
     const [imagePreview, setImagePreview] = useState<string | null>(null);
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,7 +63,18 @@ function GroupSettings({ }: Props) {
             setUploading(true)
 
             const res = await updateGroup({ group_state: current_vis, group_id: group?._id as string })
-            console.log(res)
+        } catch (error) {
+            toast.error("An error occurred. Please refresh the page")
+        } finally {
+            setUploading(false)
+        }
+    }
+
+    const transitionToSacco = async () => {
+        try {
+            setUploading(true)
+
+            const res = await updateGroup({ isSacco: !group?.isSacco, group_id: group?._id as string })
         } catch (error) {
             toast.error("An error occurred. Please refresh the page")
         } finally {
@@ -74,7 +86,10 @@ function GroupSettings({ }: Props) {
         <div
             className=''
         >
-            <div className='border-b border-white p-3 text-[1.2rem]'>
+            <div className='border-b border-white p-3 text-[1.2rem] flex items-center gap-2'>
+                <Button disabled={uploading} onClick={() => router.back()}>
+                    <XCircle color={"white"} />
+                </Button>
                 <h1 className='font-bold uppercase'>Overview Settings</h1>
             </div>
 
@@ -131,7 +146,7 @@ function GroupSettings({ }: Props) {
                         <h1>Change Visibility ({group?.group_state})</h1>
 
                         <div>
-                            <Button className={`bg-${group?.group_state === 'Public' ? 'blue-500' : 'neutral-50'} text-white px-3 py-2 rounded-md transition duration-300 ease-in-out ${group?.group_state === 'public' ? 'hover:bg-blue-600' : ''}`}
+                            <Button disabled={uploading} className={`bg-${group?.group_state === 'Public' ? 'blue-500' : 'neutral-50'} text-white px-3 py-2 rounded-md transition duration-300 ease-in-out ${group?.group_state === 'public' ? 'hover:bg-blue-600' : ''}`}
                                 onClick={() => changeVisibility(group?.group_state === 'Public' ? 'Private' : 'Public')}
                             >
                                 {group?.group_state === 'Public' ? 'Make Private' : 'Make Public'}
@@ -139,8 +154,21 @@ function GroupSettings({ }: Props) {
                         </div>
                     </div>
                     <div className='flex w-full justify-between items-center'>
+                        <div className="flex flex-col gap-1">
+                            <h1>
+                                {group?.isSacco ? "Remove SACCO" : "Transition to SACCO"}
+                            </h1>
+                            <p className="text-[.8rem]">{group?.isSacco ? "This group is already a SACCO" : `You need at least 5 members of a group to transition to sacco. Currently you have ${group?.members.length} members`}</p>
+                        </div>
+                        <div>
+                            <Button disabled={uploading} className={`bg-blue-500 text-white`} onClick={transitionToSacco}>
+                                {group?.isSacco ? "Remove SACCO" : "Transition"}
+                            </Button>
+                        </div>
+                    </div>
+                    <div className='flex w-full justify-between items-center'>
                         <h1>Copy Invite Link</h1>
-                        <Button className='bg-blue-500 text-white' onClick={() => {
+                        <Button disabled={uploading} className='bg-blue-500 text-white' onClick={() => {
                             navigator.clipboard.writeText(group?.invite_link as string)
                                 .then(() => {
                                     console.log('Text copied to clipboard');
@@ -156,7 +184,7 @@ function GroupSettings({ }: Props) {
 
                     <div className='flex w-full justify-between items-center'>
                         <h1>Delete Group </h1>
-                        <Button className='bg-red-500 text-white flex items-center gap-1'>
+                        <Button disabled={uploading} className='bg-red-500 text-white flex items-center gap-1'>
                             <MessageCircleWarning />
                             Delete
                         </Button>
