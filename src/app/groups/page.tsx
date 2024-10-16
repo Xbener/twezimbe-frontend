@@ -78,7 +78,10 @@ function Groups({ }: Props) {
                 >
                   {/* Image Placeholder */}
                   <div className='h-[100px] w-full bg-gray-300 mb-3'>
-                    {/* Add <img> here if needed */}
+                    <img
+                      src={group.group_picture}
+                      className="w-full h-[100px] object-cover"
+                    />
                   </div>
 
                   {/* Content */}

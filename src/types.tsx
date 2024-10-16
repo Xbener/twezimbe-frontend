@@ -187,7 +187,8 @@ export type GroupTypes = {
     del_flag: number;
     createdAt: Date;
     memberCount: number;
-    members: User[]
+    members: User[];
+    group_picture: string;
 };
 
 export type CreateGroupTypes = {
@@ -215,7 +216,7 @@ export type JoinedGroupTypes = {
     group_name: string;
     group_type: string;
     group_state: string;
-    group_avatar: string;
+    group_picture: string;
     description: string;
     tags: string;
     created_by: string;

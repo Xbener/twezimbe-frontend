@@ -80,7 +80,7 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
                 let result = await res.json()
                 if (!result.status) throw new Error()
                 toast.success('Profile Picture updated successfully')
-                // window.location.reload()
+                window.location.reload()
             } else {
                 toast.error('please upload a file')
             }

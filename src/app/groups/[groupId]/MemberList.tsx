@@ -1,4 +1,6 @@
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { GroupContext } from '@/context/GroupContext'
+import { iconTextGenerator } from '@/lib/iconTextGenerator'
 import { CaretDownIcon } from '@radix-ui/react-icons'
 import React, { useContext } from 'react'
 
@@ -21,7 +23,10 @@ function MemberList({ }: Props) {
                 {
                     group?.members?.map((member, index) => (
                         <div key={index} className='flex items-center justify-normal gap-5 p-3'>
-                            <div className='w-[30px] h-[30px] bg-neutral-400 rounded-full cursor-pointer'></div>
+                            <Avatar>
+                                <AvatarImage src={member.profile_pic} className="bg-black" />
+                                <AvatarFallback>{iconTextGenerator(member.firstName, member.lastName)}</AvatarFallback>
+                            </Avatar>
 
                             <h1>{member.firstName} {member.lastName}</h1>
                         </div>
