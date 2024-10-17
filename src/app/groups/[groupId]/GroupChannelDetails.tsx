@@ -55,6 +55,9 @@ function ChannelDetails({ }: Props) {
     ]
 
     const filteredMenuItems = menuItems.filter(item => {
+        if (item.name === "Upgrade Plan" && group?.upgraded) {
+            return false;
+        }
         return item.privilege !== 'admin' || (currentUser?._id === group?.created_by[0]?._id);
     });
     return (
