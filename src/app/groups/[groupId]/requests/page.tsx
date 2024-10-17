@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import Cookies from 'js-cookie'
 import { Button } from '@/components/ui/button'
-import { GroupTypes, User } from '@/types'
+import { GroupJoinRequestTypes, GroupTypes, JoinGroupTypes, User } from '@/types'
 import { iconTextGenerator } from '@/lib/iconTextGenerator'
 import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar'
 
@@ -14,7 +14,7 @@ type Props = {}
 function GroupRequests({ }: Props) {
 
     const [loading, setLoading] = useState(false)
-    const [groupRequests, setGroupRequests] = useState([])
+    const [groupRequests, setGroupRequests] = useState<GroupJoinRequestTypes[]>([])
     const { groupId } = useParams()
     const router = useRouter()
 
@@ -43,6 +43,30 @@ function GroupRequests({ }: Props) {
     useEffect(() => {
         getGroupRequests()
     }, [groupId])
+
+    const declineRequest = async (request: GroupJoinRequestTypes) => {
+        try {
+            setLoading(true)
+            const accessToken = Cookies.get('access-token');
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/groups/requests?userId=${request.user._id}&groupId=${request.group._id}&requestId=${request._id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                }
+            })
+
+            const data = await res.json()
+            if (!data.status) return toast.error(data.message || data.errors)
+            toast.success("Request removed successfully")
+            setGroupRequests(prev => {
+                return prev.filter(prevRequest => prevRequest._id !== request._id)
+            })
+        } catch (error) {
+            toast.error("Something went wrong. Please refresh the page")
+        } finally {
+            setLoading(false)
+        }
+    }
     return (
         <div>
             <div className='border-b border-white p-3 text-[1.2rem] flex items-center gap-2'>
@@ -54,9 +78,14 @@ function GroupRequests({ }: Props) {
 
             <div className='w-full flex flex-col gap-3'>
                 {
-                    groupRequests.map((request: {
-                        user: User, group: GroupTypes
-                    }, index) => (
+                    groupRequests?.length! <= 0 && (
+                        <div className="w-full p-5 grid place-content-center">
+                            <h1>No Requests Found</h1>
+                        </div>
+                    )
+                }
+                {
+                    groupRequests.map((request: GroupJoinRequestTypes, index) => (
                         <div className='flex w-full justify-between items-center p-3'>
                             <div className="flex items-center justify-normal gap-5 p-3">
                                 <Avatar>
@@ -72,7 +101,7 @@ function GroupRequests({ }: Props) {
                                 >
                                     Accept
                                 </Button>
-                                <Button disabled={loading} className={`border-orange-500 border text-orange-500`}
+                                <Button onClick={() => declineRequest(request)} disabled={loading} className={`border-orange-500 border text-orange-500`}
                                 >
                                     Reject
                                 </Button>

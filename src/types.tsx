@@ -239,3 +239,10 @@ export type JoinGroupTypes = {
 };
 
 
+export type GroupJoinRequestTypes = {
+    user: User,
+    group: GroupTypes,
+    _id: string;
+    createdAt?: string;
+    updatedAt?: string;
+}
