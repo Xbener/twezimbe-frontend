@@ -1,0 +1,88 @@
+'use client'
+import { XCircle } from 'lucide-react'
+import { useParams, useRouter } from 'next/navigation'
+import React, { useEffect, useState } from 'react'
+import { toast } from 'sonner'
+import Cookies from 'js-cookie'
+import { Button } from '@/components/ui/button'
+import { GroupTypes, User } from '@/types'
+import { iconTextGenerator } from '@/lib/iconTextGenerator'
+import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar'
+
+type Props = {}
+
+function GroupRequests({ }: Props) {
+
+    const [loading, setLoading] = useState(false)
+    const [groupRequests, setGroupRequests] = useState([])
+    const { groupId } = useParams()
+    const router = useRouter()
+
+    const getGroupRequests = async () => {
+        try {
+            setLoading(true)
+            const accessToken = Cookies.get('access-token');
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/groups/requests/${groupId}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                }
+            })
+
+            const data = await res.json()
+            if (!data.status) return toast.error(data.message || data.errors)
+            console.log(data)
+            setGroupRequests(data.groupRequests)
+        } catch (error) {
+            toast.error("Something went wrong. Please refresh the page")
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    useEffect(() => {
+        getGroupRequests()
+    }, [groupId])
+    return (
+        <div>
+            <div className='border-b border-white p-3 text-[1.2rem] flex items-center gap-2'>
+                <Button disabled={loading} onClick={() => router.back()}>
+                    <XCircle color={"white"} />
+                </Button>
+                <h1 className='font-bold uppercase'>Join Requests</h1>
+            </div>
+
+            <div className='w-full flex flex-col gap-3'>
+                {
+                    groupRequests.map((request: {
+                        user: User, group: GroupTypes
+                    }, index) => (
+                        <div className='flex w-full justify-between items-center p-3'>
+                            <div className="flex items-center justify-normal gap-5 p-3">
+                                <Avatar>
+                                    <AvatarImage src={request.user.profile_pic} className="bg-black w-[60px] h-[60px] rounded-full" />
+                                    <AvatarFallback>{iconTextGenerator(request.user.firstName, request.user.lastName)}</AvatarFallback>
+                                </Avatar>
+
+                                <h1>{request.user.firstName} {request.user.lastName}</h1>
+                            </div>
+
+                            <div className='flex items-center gap-2'>
+                                <Button disabled={loading} className={`bg-blue-500 text-white`}
+                                >
+                                    Accept
+                                </Button>
+                                <Button disabled={loading} className={`border-orange-500 border text-orange-500`}
+                                >
+                                    Reject
+                                </Button>
+                            </div>
+                        </div>
+                    ))
+                }
+            </div>
+        </div>
+    )
+}
+
+export default GroupRequests

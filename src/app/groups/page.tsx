@@ -10,6 +10,7 @@ import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { toast } from 'sonner';
+import Cookies from 'js-cookie'
 
 type Props = {};
 
@@ -25,6 +26,7 @@ function Groups({ }: Props) {
   const { currentUser } = useGetProfileData()
   const { joinGroup, isLoading: joinLoading, isError: joinError } = useJoinGroup()
   const [formattedGroups, setFormattedGroups] = useState(groups)
+  const [requestLoading, setRequestLoading] = useState(false)
 
   useEffect(() => {
     setFormattedGroups(groups)
@@ -48,23 +50,30 @@ function Groups({ }: Props) {
 
   const sendRequestToJoin = async (group: GroupTypes) => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/requests`, {
+      setRequestLoading(true)
+      const accessToken = Cookies.get('access-token');
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/groups/requests`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          "Authorization": `Bearer ${accessToken}`
         },
-        body: JSON.stringify({ group_id: group?._id })
+        body: JSON.stringify({ groupId: group?._id, userId: currentUser?._id })
       })
       const data = await res.json()
-
+      
       if (data.status) {
-        toast.success('request sent successfully')
+        toast.success('request sent successfully. Wait for approval from admins')
         setFormattedGroups(prev => {
           return prev?.filter(prevGroup => prevGroup?._id === group._id)
         })
+      } else {
+        toast.error(data.errors || data.message)
       }
     } catch (error) {
       toast.error("An error occurred. Please try again")
+    } finally {
+      setRequestLoading(false)
     }
   }
   return (
@@ -106,7 +115,7 @@ function Groups({ }: Props) {
           }
 
           {
-            groups?.length! >= 0 && (
+            formattedGroups?.length! <= 0 && (
               <div className='w-full p-5 grid place-content-center'>
                 <h1>No Groups Found</h1>
               </div>
@@ -114,7 +123,7 @@ function Groups({ }: Props) {
           }
           <div className='flex p-5 mt-5 items-start justify-start gap-5 flex-wrap w-full'>
             {
-              formattedGroups?.map((group, key) => (
+              formattedGroups?.map((group: GroupTypes, key) => (
                 <div
                   key={key}
                   className='flex flex-col p-5 bg-[#66acee39] h-[300px] shadow-lg rounded-md sm:w-[45%] md:w-[30%] lg:w-[23%] gap-3 overflow-hidden'
@@ -134,7 +143,7 @@ function Groups({ }: Props) {
                   </p>
                   <p>{group.memberCount} {group.memberCount > 1 ? "members" : 'member'}</p>
                   {/* Link Button */}
-                  <Button className='w-full px-5 py-2 rounded-md bg-[#013a6f] text-white mt-auto' onClick={() => {
+                  <Button className='w-full px-5 py-2 rounded-md bg-[#013a6f] text-white mt-auto' disabled={requestLoading} onClick={() => {
                     group.group_state === "Public" ? joinPublicGroup(group) : sendRequestToJoin(group)
                   }}>
                     {group.group_state === "Public" ? "Join Group" : "Request To join"}

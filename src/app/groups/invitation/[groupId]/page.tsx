@@ -36,7 +36,6 @@ function InvitationPage({ }: Props) {
         try {
             const res = await joinGroup({ user_id: currentUser?._id, group_id: group?._id })
 
-            console.log('res', res)
             if (res._id !== null) {
                 window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups/${group?._id}`
             }

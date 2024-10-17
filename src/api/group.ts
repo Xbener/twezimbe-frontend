@@ -84,7 +84,6 @@ export const useGetjoinedGroupList = () => {
         });
 
         const responseData = await response.json();
-
         if (!response.ok) {
             throw new Error(responseData.errors || responseData.message);
         }
