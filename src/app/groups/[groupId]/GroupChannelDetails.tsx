@@ -22,6 +22,35 @@ function ChannelDetails({ }: Props) {
     const { group } = useContext(GroupContext)
     const { currentUser } = useGetProfileData()
 
+
+    // function makePayment() {
+    //     FlutterwaveCheckout({
+    //         public_key: "FLWPUBK_TEST-61fd8c76063ac4c81570ea26a682c719-X",
+    //         tx_ref: "txref-DI0NzMx13",
+    //         amount: 50000,
+    //         currency: "UGX",
+    //         payment_options: "mobilemoneyrwanda, mobilemoneyuganda, card, account, banktransfer",
+    //         meta: {
+    //             source: "docs-inline-test",
+    //             consumer_mac: "92a3-912ba-1192a",
+    //         },
+    //         customer: {
+    //             email: currentUser?.email,
+    //             phone_number: `+250781500709`,
+    //             name: `${currentUser?.firstName} ${currentUser?.lastName}`,
+    //         },
+    //         customizations: {
+    //             title: "Group Premium",
+    //             description: "Upgrade to Group Premium to have access to more features!",
+    //             logo: "https://checkout.flutterwave.com/assets/img/rave-logo.png",
+    //         },
+    //         callback: () => handleUpgrade(),
+    //         onclose: function () {
+    //             console.log("Payment cancelled!");
+    //         }
+    //     });
+    // }
+
     const handleUpgrade = async () => {
         const groupId = group?._id
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/groups/create-checkout-session`, {
@@ -34,6 +63,7 @@ function ChannelDetails({ }: Props) {
         const { id, url } = await res.json();
         window.location.href = `${url}`;
     };
+
 
 
     const menuItems = [

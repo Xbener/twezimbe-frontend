@@ -10,6 +10,8 @@ import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import Cookies from 'js-cookie'
 import GroupProvider from "@/context/GroupContext";
+import Script from 'next/script';
+
 
 const geologica = Geologica({ subsets: ['latin'] })
 
@@ -28,11 +30,11 @@ export default function GroupLayout({
     const [userInfo, setUserInfo] = useState<User>();
     const params = useParams()
 
-    useEffect(()=>{
-        if(!access_token){
+    useEffect(() => {
+        if (!access_token) {
             window.location.href = '/public_pages/SignIn'
         }
-    },[access_token])
+    }, [access_token])
     useEffect(() => {
         if (currentUser) {
             setUserInfo(currentUser)
@@ -45,6 +47,10 @@ export default function GroupLayout({
     return (
         <div className={`${geologica.className} flex fixed top-0 h-[100dvh] w-full`}>
             <GroupProvider>
+                <Script
+                    src="https://checkout.flutterwave.com/v3.js"
+                    strategy="afterInteractive"
+                />
                 <GroupNav />
                 {children}
             </GroupProvider>

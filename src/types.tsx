@@ -246,3 +246,7 @@ export type GroupJoinRequestTypes = {
     createdAt?: string;
     updatedAt?: string;
 }
+
+
+// flutterwave.d.ts
+declare var FlutterwaveCheckout: (options: any) => void;
