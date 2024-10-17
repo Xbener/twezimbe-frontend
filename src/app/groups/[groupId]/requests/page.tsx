@@ -44,6 +44,33 @@ function GroupRequests({ }: Props) {
         getGroupRequests()
     }, [groupId])
 
+    const acceptRequest = async (request: GroupJoinRequestTypes) => {
+        try {
+            setLoading(true)
+            console.log(request)
+            const accessToken = Cookies.get('access-token');
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/groups/requests`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ requestId: request._id, userId: request.user._id, groupId: request.group._id })
+            })
+
+            const data = await res.json()
+            if (!data.status) return toast.error(data.message || data.errors)
+            toast.success("Request Accepted successfully")
+            setGroupRequests(prev => {
+                return prev.filter(prevRequest => prevRequest._id !== request._id)
+            })
+        } catch (error) {
+            toast.error("Something went wrong. Please refresh the page")
+        } finally {
+            setLoading(false)
+        }
+    }
+
     const declineRequest = async (request: GroupJoinRequestTypes) => {
         try {
             setLoading(true)
@@ -97,7 +124,7 @@ function GroupRequests({ }: Props) {
                             </div>
 
                             <div className='flex items-center gap-2'>
-                                <Button disabled={loading} className={`bg-blue-500 text-white`}
+                                <Button onClick={() => acceptRequest(request)} disabled={loading} className={`bg-blue-500 text-white`}
                                 >
                                     Accept
                                 </Button>
