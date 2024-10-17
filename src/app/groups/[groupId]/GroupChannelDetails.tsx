@@ -6,7 +6,7 @@ import { GroupContext } from '@/context/GroupContext'
 import { iconTextGenerator } from '@/lib/iconTextGenerator'
 import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar'
 import { CaretDownIcon } from '@radix-ui/react-icons'
-import { Edit, LogOut, PlusIcon, Settings } from 'lucide-react'
+import { Bell, Edit, LogOut, MessageCirclePlus, PlusIcon, Settings, Upload } from 'lucide-react'
 import Link from 'next/link'
 import { userInfo } from 'os'
 import React, { useContext } from 'react'
@@ -68,9 +68,9 @@ function ChannelDetails({ }: Props) {
 
     const menuItems = [
         { name: "Group settings", link: `/groups/${group?._id}/settings`, icon: <Settings />, privilege: 'admin' },
-        { name: "Group Join requests", link: `/groups/${group?._id}/requests`, icon: <Settings />, privilege: 'admin' },
-        { name: "Notification Settings", link: `/groups/${group?._id}/settings`, icon: <Settings />, privilege: 'user' },
-        { name: "Upgrade Plan", link: `#`, onClick: () => handleUpgrade(), icon: <Settings />, privilege: 'admin' },
+        { name: "Group Join requests", link: `/groups/${group?._id}/requests`, icon: <MessageCirclePlus />, privilege: 'admin' },
+        { name: "Notification Settings", link: `/groups/${group?._id}/settings`, icon: <Bell />, privilege: 'user' },
+        { name: "Upgrade Plan", link: `#`, onClick: () => handleUpgrade(), icon: <Upload />, privilege: 'admin' },
     ]
 
     const settingsItems = [
