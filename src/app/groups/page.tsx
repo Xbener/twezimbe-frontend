@@ -61,7 +61,7 @@ function Groups({ }: Props) {
         body: JSON.stringify({ groupId: group?._id, userId: currentUser?._id })
       })
       const data = await res.json()
-      
+
       if (data.status) {
         toast.success('request sent successfully. Wait for approval from admins')
         setFormattedGroups(prev => {
@@ -107,7 +107,7 @@ function Groups({ }: Props) {
 
         <div className="mt-5">
 
-          <h1 className='p-5 text-[2rem] text-neutral-800'>Public Groups</h1>
+          <h1 className='p-5 text-[2rem] text-neutral-800'>Browse Groups</h1>
           {
             isLoading && <Skeleton
               containerClassName='flex gap-4'
