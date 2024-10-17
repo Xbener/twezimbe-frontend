@@ -3,7 +3,7 @@
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { GroupContext } from '@/context/GroupContext'
-import React, { useContext, useState } from 'react'
+import React, { ChangeEvent, useContext, useState } from 'react'
 import Cookies from 'js-cookie'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -22,6 +22,14 @@ function GroupSettings({ }: Props) {
     const { currentUser } = useGetProfileData()
     const router = useRouter()
     const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [groupData, setGroupData] = useState({
+        name: group?.group_name,
+        description: group?.description
+    })
+
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setGroupData(prev => ({ ...prev, [e.target.name]: e.target.value }))
+    }
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -84,6 +92,17 @@ function GroupSettings({ }: Props) {
         }
     }
 
+    const handleUpdateData = async () => {
+        try {
+            setUploading(true)
+            const res = await updateGroup({ ...groupData, group_id: group?._id! })
+        } catch (error) {
+            console.error("An error occurred. Please refresh the page")
+        } finally {
+            setUploading(false)
+        }
+    }
+
     return (
         <div
             className=''
@@ -131,14 +150,29 @@ function GroupSettings({ }: Props) {
                                 }
                             </div>
                         </div>
-                        <div className="flex flex-col gap-2">
-                            <label className='uppercase font-extrabold text-[.8rem]' htmlFor="group_name">Group Name</label>
-                            <input
-                                id="group_name"
-                                name="name"
-                                value={group?.group_name}
-                                // onChange={(e) => setGroupName(e.target.value)}
-                                className="bg-transparent p-2 border outline-none" placeholder="Group Name" />
+                        <div className='w-1/2 flex flex-col gap-2 items-end'>
+                            <div className="w-full flex flex-col gap-2">
+                                <label className='uppercase font-extrabold text-[.8rem]' htmlFor="group_name">Group Name</label>
+                                <input
+                                    id="group_name"
+                                    name="name"
+                                    value={groupData?.name}
+                                    onChange={handleChange}
+                                    className="bg-transparent p-2 border outline-none w-full" placeholder="Group Name" />
+                            </div>
+                            <div className="w-full flex flex-col gap-2">
+                                <label className='uppercase font-extrabold text-[.8rem]' htmlFor="description">Group Description</label>
+                                <textarea
+                                    id="description"
+                                    name="description"
+                                    value={groupData?.description}
+                                    onChange={handleChange}
+                                    className="w-full bg-transparent p-2 border outline-none" placeholder="Group Description ..." />
+                            </div>
+
+                            <div>
+                                <Button disabled={uploading} onClick={handleUpdateData} className='bg-blue-500 text-white'>Update</Button>
+                            </div>
                         </div>
                     </div>
                 )
@@ -148,7 +182,7 @@ function GroupSettings({ }: Props) {
                 <h1 className='p-2 text-[1.2rem] font-extrabold uppercase'>Privacy Settings</h1>
 
                 <div className='flex flex-col gap-3 w-full mt-5'>
-                {
+                    {
                         group?.created_by[0]?._id === currentUser?._id && (
                             <div className='flex w-full justify-between items-center'>
                                 <h1>Change Visibility ({group?.group_state})</h1>
@@ -162,7 +196,7 @@ function GroupSettings({ }: Props) {
                                 </div>
                             </div>
                         )
-                }
+                    }
                     {
                         group?.created_by[0]?._id === currentUser?._id && (
                             <div className='flex w-full justify-between items-center'>

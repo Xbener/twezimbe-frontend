@@ -206,7 +206,7 @@ export type CreateGroupTypes = {
 };
 
 export type UpdateGroupTypes = {
-    group_name?: string;
+    name?: string;
     group_type?: string;
     description?: string;
     created_by?: string;
