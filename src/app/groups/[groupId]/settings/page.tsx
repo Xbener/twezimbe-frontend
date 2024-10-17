@@ -7,7 +7,7 @@ import React, { ChangeEvent, useContext, useState } from 'react'
 import Cookies from 'js-cookie'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
-import { MessageCircleWarning, XCircle } from 'lucide-react'
+import { DoorOpen, MessageCircleWarning, XCircle } from 'lucide-react'
 import { useUpdateGroup } from '@/api/group'
 import { useRouter } from 'next/navigation'
 import { useGetProfileData } from '@/api/auth'
@@ -241,6 +241,14 @@ function GroupSettings({ }: Props) {
                             </div>
                         )
                     }
+
+                    <div className='flex w-full justify-between items-center'>
+                        <h1>Leave Group </h1>
+                        <Button disabled={uploading} className='bg-red-500 text-white flex items-center gap-1'>
+                            <DoorOpen />
+                            Leave
+                        </Button>
+                    </div>
                 </div>
             </div>
         </div >

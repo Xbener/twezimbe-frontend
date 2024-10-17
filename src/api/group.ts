@@ -151,7 +151,7 @@ export const useJoinGroup = () => {
         const responseData = await response.json();
 
         if (!response.ok) {
-            throw new Error(responseData.message||responseData.errors);
+            throw new Error(responseData.message || responseData.errors);
         }
 
         return responseData.group
