@@ -104,6 +104,14 @@ function Groups({ }: Props) {
               containerClassName='flex gap-4'
               inline height={300} count={5} className='h-[300px sm:w-[45%] md:w-[30%] lg:w-[23%]' />
           }
+
+          {
+            groups?.length! >= 0 && (
+              <div className='w-full p-5 grid place-content-center'>
+                <h1>No Groups Found</h1>
+              </div>
+            )
+          }
           <div className='flex p-5 mt-5 items-start justify-start gap-5 flex-wrap w-full'>
             {
               formattedGroups?.map((group, key) => (

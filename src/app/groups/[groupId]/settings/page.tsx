@@ -78,7 +78,7 @@ function GroupSettings({ }: Props) {
 
             const res = await updateGroup({ isSacco: !group?.isSacco, group_id: group?._id as string })
         } catch (error) {
-            toast.error("An error occurred. Please refresh the page")
+            console.error("An error occurred. Please refresh the page")
         } finally {
             setUploading(false)
         }
