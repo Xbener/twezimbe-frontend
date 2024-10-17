@@ -2,11 +2,13 @@
 
 import { useGetProfileData } from '@/api/auth';
 import { useGetGroupList, useJoinGroup } from '@/api/group';
+import { Button } from '@/components/ui/button';
 import { GroupTypes } from '@/types';
 import { EyeClosedIcon } from '@radix-ui/react-icons';
 import { Eye, Search } from 'lucide-react';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
+import Skeleton from 'react-loading-skeleton';
 import { toast } from 'sonner';
 
 type Props = {};
@@ -21,7 +23,7 @@ const categoryList = [
 function Groups({ }: Props) {
   const { groups, isLoading } = useGetGroupList()
   const { currentUser } = useGetProfileData()
-  const { joinGroup } = useJoinGroup()
+  const { joinGroup, isLoading: joinLoading, isError: joinError } = useJoinGroup()
   const [formattedGroups, setFormattedGroups] = useState(groups)
 
   useEffect(() => {
@@ -33,9 +35,10 @@ function Groups({ }: Props) {
     try {
       const res = await joinGroup({ user_id: currentUser?._id, group_id: group?._id })
 
-      console.log('res', res)
       if (res._id !== null) {
         window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups/${group?._id}`
+      } else {
+        toast.error(res.message || res.errors)
       }
     } catch (error) {
       toast.error("An error occurred. Please try again")
@@ -97,14 +100,16 @@ function Groups({ }: Props) {
 
           <h1 className='p-5 text-[2rem] text-neutral-800'>Public Groups</h1>
           {
-            isLoading && "Loading ..."
+            isLoading && <Skeleton
+              containerClassName='flex gap-4'
+              inline height={300} count={5} className='h-[300px sm:w-[45%] md:w-[30%] lg:w-[23%]' />
           }
           <div className='flex p-5 mt-5 items-start justify-start gap-5 flex-wrap w-full'>
             {
               formattedGroups?.map((group, key) => (
                 <div
                   key={key}
-                  className='flex flex-col p-5 bg-[#66acee39] h-[300px] shadow-lg rounded-md sm:w-[45%] md:w-[30%] lg:w-[23%] gap-3'
+                  className='flex flex-col p-5 bg-[#66acee39] h-[300px] shadow-lg rounded-md sm:w-[45%] md:w-[30%] lg:w-[23%] gap-3 overflow-hidden'
                 >
                   {/* Image Placeholder */}
                   <div className='h-[100px] w-full bg-gray-300 mb-3'>
@@ -116,16 +121,16 @@ function Groups({ }: Props) {
 
                   {/* Content */}
                   <h1 className='flex-grow flex items-center gap-2'>{group.group_name} {group.group_state === 'Public' ? <Eye /> : <EyeClosedIcon />}</h1>
-                  <p className='flex-grow'>{group.description}</p>
+                  <p className='flex-grow'>
+                    {group.description.length < 50 ? group.description : `${group.description.substring(0, 50)} ...`}
+                  </p>
                   <p>{group.memberCount} {group.memberCount > 1 ? "members" : 'member'}</p>
                   {/* Link Button */}
-                  <Link href={`/groups/[id]`} onClick={() => {
+                  <Button className='w-full px-5 py-2 rounded-md bg-[#013a6f] text-white mt-auto' onClick={() => {
                     group.group_state === "Public" ? joinPublicGroup(group) : sendRequestToJoin(group)
-                  }} as={`/groups/${group._id}`}>
-                    <button className='px-5 py-2 rounded-md bg-[#013a6f] text-white mt-auto'>
-                      {group.group_state === "Public" ? "Join Group" : "Request To join"}
-                    </button>
-                  </Link>
+                  }}>
+                    {group.group_state === "Public" ? "Join Group" : "Request To join"}
+                  </Button>
                 </div>
               ))
             }

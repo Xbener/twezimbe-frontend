@@ -12,6 +12,8 @@ import { useSignIn } from "@/api/auth";
 import AutoLogin from "@/context/AutoLogin";
 import { MyProvider } from "@/context/MyContext";
 import MainLoader from "@/components/MainLoader";
+import 'react-loading-skeleton/dist/skeleton.css'
+
 const inter = Inter({ subsets: ["latin"] });
 
 const helmetContext = {}
