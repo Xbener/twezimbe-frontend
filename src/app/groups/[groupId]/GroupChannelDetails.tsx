@@ -22,10 +22,25 @@ function ChannelDetails({ }: Props) {
     const { group } = useContext(GroupContext)
     const { currentUser } = useGetProfileData()
 
+    const handleUpgrade = async () => {
+        const groupId = group?._id
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/groups/create-checkout-session`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ groupId }),
+        });
+        const { id, url } = await res.json();
+        window.location.href = `${url}`;
+    };
+
+
     const menuItems = [
         { name: "Group settings", link: `/groups/${group?._id}/settings`, icon: <Settings />, privilege: 'admin' },
         { name: "Group Join requests", link: `/groups/${group?._id}/requests`, icon: <Settings />, privilege: 'admin' },
         { name: "Notification Settings", link: `/groups/${group?._id}/settings`, icon: <Settings />, privilege: 'user' },
+        { name: "Upgrade Plan", link: `#`, onClick: () => handleUpgrade(), icon: <Settings />, privilege: 'admin' },
     ]
 
     const settingsItems = [
@@ -54,6 +69,12 @@ function ChannelDetails({ }: Props) {
                     <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-40 gap-1 flex flex-col border-transparent border-l-8 border-l-neutral-400 pl-3 ">
                         {filteredMenuItems.map((item, index) => (
                             <Link
+                                onClick={(e) => {
+                                    if (item.onClick) {
+                                        e.preventDefault()
+                                        item.onClick()
+                                    }
+                                }}
                                 href={item.link}
                                 key={index}
                                 className="text-white flex p-2 w-full text-[1.1rem] hover:bg-[#6bb7ff73] cursor-pointer rounded-md items-center gap-2 duration-100"
