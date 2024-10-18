@@ -12,6 +12,7 @@ import { useUpdateGroup } from '@/api/group'
 import { useRouter } from 'next/navigation'
 import { useGetProfileData } from '@/api/auth'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog'
 
 type Props = {}
 
@@ -121,6 +122,7 @@ function GroupSettings({ }: Props) {
             let result = await res.json()
             if (!result.status) return toast.error(result.errors || result.message)
             window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups`
+
         }
         catch (error) {
             toast.error("Error occurred. Please refresh the page")
@@ -128,6 +130,30 @@ function GroupSettings({ }: Props) {
             setUploading(false)
         }
     }
+
+
+
+    const handleDeleteGroup = async () => {
+        try {
+            setUploading(true)
+            const accessToken = Cookies.get('access-token');
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/groups/${group?._id}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                },
+            })
+            let result = await res.json()
+            if (!result.status) return toast.error(result.errors || result.message)
+            window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups`
+        }
+        catch (error) {
+            toast.error("Error occurred. Please refresh the page")
+        } finally {
+            setUploading(false)
+        }
+    }
+
 
     return (
         <div
@@ -379,20 +405,61 @@ function GroupSettings({ }: Props) {
                         group?.created_by[0]?._id === currentUser?._id && (
                             <div className='flex w-full justify-between items-center'>
                                 <h1>Delete Group </h1>
-                                <Button disabled={uploading} className='bg-red-500 text-white flex items-center gap-1'>
-                                    <MessageCircleWarning />
-                                    Delete
-                                </Button>
+                                <Dialog>
+                                    <DialogTrigger disabled={uploading}>
+                                        <Button disabled={uploading} className='bg-red-500 text-white flex items-center gap-1'>
+                                            <MessageCircleWarning />
+                                            Delete
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="bg-white text-black">
+                                        <DialogHeader>
+                                            {/* <Warn */}
+                                            Confirm Deleting this Group
+                                        </DialogHeader>
+                                        <div>
+                                            <DialogClose>
+                                                <Button disabled={uploading}>
+                                                    Cancel
+                                                </Button>
+                                            </DialogClose>
+                                            <Button disabled={uploading} className="bg-red-500 text-white" onClick={handleDeleteGroup} >
+                                                Confirm
+                                            </Button>
+                                        </div>
+                                    </DialogContent>
+                                </Dialog>
+
                             </div>
                         )
                     }
 
                     <div className='flex w-full justify-between items-center'>
                         <h1>Leave Group </h1>
-                        <Button onClick={() => handleLeaveGroup()} disabled={uploading} className='bg-red-500 text-white flex items-center gap-1'>
-                            <DoorOpen />
-                            Leave
-                        </Button>
+                        <Dialog>
+                            <DialogTrigger disabled={uploading}>
+                                <Button disabled={uploading} className='bg-red-500 text-white flex items-center gap-1'>
+                                    <MessageCircleWarning />
+                                    Leave
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent className="bg-white text-black">
+                                <DialogHeader>
+                                    {/* <Warn */}
+                                    Confirm Leaving this Group
+                                </DialogHeader>
+                                <div>
+                                    <DialogClose>
+                                        <Button disabled={uploading}>
+                                            Cancel
+                                        </Button>
+                                    </DialogClose>
+                                    <Button disabled={uploading} className="bg-red-500 text-white" onClick={handleLeaveGroup} >
+                                        Confirm
+                                    </Button>
+                                </div>
+                            </DialogContent>
+                        </Dialog>
                     </div>
                 </div>
             </div>
