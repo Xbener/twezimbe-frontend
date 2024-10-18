@@ -67,7 +67,7 @@ function ChannelDetails({ }: Props) {
 
 
     const menuItems = [
-        { name: "Group settings", link: `/groups/${group?._id}/settings`, icon: <Settings />, privilege: 'admin' },
+        { name: "Group settings", link: `/groups/${group?._id}/settings`, icon: <Settings />, privilege: 'user' },
         { name: "Group Join requests", link: `/groups/${group?._id}/requests`, icon: <MessageCirclePlus />, privilege: 'admin' },
         { name: "Upgrade Plan", link: `#`, onClick: () => handleUpgrade(), icon: <Upload />, privilege: 'admin' },
     ]

@@ -9,6 +9,7 @@ type Props = {
     lastName?: string;
     _id?: string;
     email?: string;
+    role?: string;
 }
 
 function GroupMemberItem(member: Props) {
@@ -28,6 +29,7 @@ function GroupMemberItem(member: Props) {
                         <AvatarFallback>{iconTextGenerator(member?.firstName as string, member?.lastName as string)}</AvatarFallback>
                     </Avatar>
                     <h1 className="text-[1.4rem] font-bold">{member.firstName} {member.lastName}</h1>
+                    <h1>{member.role === "GroupManager" ? "Admin" : member.role === "GroupModerator" ? "Moderator" : "Member"}</h1>
                     <h1>{member.email}</h1>
                 </PopoverContent>
             </Popover>
