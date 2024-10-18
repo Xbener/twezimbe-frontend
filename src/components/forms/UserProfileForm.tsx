@@ -36,6 +36,7 @@ import Cookies from "js-cookie";
 import { useState } from "react";
 import { GeneralLink } from "../groups/group-nav";
 import { useUpdateUserAccount } from "@/api/auth";
+import { CheckCircle, XCircleIcon, XIcon } from "lucide-react";
 
 const formSchema = z.object({
     title: z.enum(["Mr.", "Ms.", "Mrs.", "Dr.", "Prof."]),
@@ -228,7 +229,13 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
         <>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSave)} className="space-y-2 bg-gray-50 rounded-lg md:p-10 w-full grid grid-cols-3 gap-5">
-                    <FormDescription>View and change your profile information here</FormDescription>
+                    <FormDescription className="flex flex-col">
+                        View and change your profile information here
+                        <span className="flex w-full items-center justify-between p-2 border rounded-md mt-3">
+                            Profile Complete
+                           {currentUser?.is_complete ? <CheckCircle color="green"/> :  <XCircleIcon color="red" />}
+                        </span>
+                    </FormDescription>
                     <div className='flex flex-col-reverse justify-center text-center items-start'>
                         <FormItem className='w-full flex justify-start'>
                             <div className='flex items-center gap-2'>

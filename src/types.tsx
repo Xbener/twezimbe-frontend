@@ -55,7 +55,8 @@ export type User = {
     securityQuestions: {
         question: string;
         answer: string;
-    }[]
+    }[];
+    is_complete: boolean;
 };
 
 
