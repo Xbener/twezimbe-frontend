@@ -25,7 +25,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { User } from "@/types";
+import { UpdateUserTypes, User } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -35,6 +35,7 @@ import { toast } from "sonner";
 import Cookies from "js-cookie";
 import { useState } from "react";
 import { GeneralLink } from "../groups/group-nav";
+import { useUpdateUserAccount } from "@/api/auth";
 
 const formSchema = z.object({
     title: z.enum(["Mr.", "Ms.", "Mrs.", "Dr.", "Prof."]),
@@ -108,6 +109,37 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
 
     const [file, setFile] = useState<File | null>(null)
     const [uploading, setUploading] = useState(false)
+    const [isUpdating, setIsUpdating] = useState(false)
+    const { updateAccount } = useUpdateUserAccount()
+    // State to hold the answers to the security questions
+    const [securityQuestions, setSecurityQuestions] = useState<{ question: string; answer: string; }[]>([
+        { question: "What was the name of your first pet?", answer: "" },
+        { question: "What is the name of the street you grew up on?", answer: "" }
+    ]);
+
+    // Handle input change
+    const handleInputChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = e.target;
+        setSecurityQuestions(prevQuestions => {
+            const updatedQuestions = [...prevQuestions];
+            updatedQuestions[index].answer = value; // Update the answer for the correct question
+            return updatedQuestions;
+        });
+    };
+
+    const handleUpdateSecurityQuestion = async () => {
+        try {
+            setIsUpdating(true)
+            const res = await updateAccount({ securityQuestions })
+            console.log(res)
+        } catch (err:any) {
+            toast.error("Something went wrong. Please try again")
+            console.log(err.message)
+        } finally {
+            setIsUpdating(false)
+        }
+    };
+
 
     const [imagePreview, setImagePreview] = useState<string | null>(null);
 
@@ -815,29 +847,23 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
                                         <DialogHeader className="font-bold text-[1.2rem]">
                                             Answer these questions for account recovery
                                         </DialogHeader>
-                                        <div className="flex flex-col gap-4 ">
-                                            <div className="flex flex-col gap-3">
-                                                <label className="font-bold">Question 1:</label>
-                                                <p>What was the name of your first pet?</p>
-                                                <input
-                                                    type="text"
-                                                    className="w-full p-2 border rounded"
-                                                    placeholder="Answer question 1"
-                                                />
-                                            </div>
-
-                                            <div className="flex flex-col gap-3">
-                                                <label className="font-bold">Question 2:</label>
-                                                <p>What is the name of the street you grew up on?</p>
-                                                <input
-                                                    type="text"
-                                                    className="w-full p-2 border rounded"
-                                                    placeholder="Answer question 2"
-                                                />
-                                            </div>
+                                        <div className="flex flex-col gap-4">
+                                            {securityQuestions.map((questionObj, index) => (
+                                                <div className="flex flex-col gap-3" key={index}>
+                                                    <label className="font-bold">Question {index + 1}:</label>
+                                                    <p>{questionObj.question}</p>
+                                                    <input
+                                                        type="text"
+                                                        className="w-full p-2 border rounded"
+                                                        placeholder={`Answer question ${index + 1}`}
+                                                        value={questionObj.answer}
+                                                        onChange={(e) => handleInputChange(index, e)} // Handle input change for this question
+                                                    />
+                                                </div>
+                                            ))}
 
                                             <div className="flex justify-end">
-                                                <Button className="bg-blue-500 text-white font-bold">
+                                                <Button className="bg-blue-500 text-white font-bold" disabled={isUpdating} onClick={handleUpdateSecurityQuestion}>
                                                     Submit
                                                 </Button>
                                             </div>

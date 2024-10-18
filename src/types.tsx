@@ -52,6 +52,10 @@ export type User = {
     employer_name?: string;
     current_salary?: string;
     side_hustle_income?: string;
+    securityQuestions?: {
+        question: string;
+        answer: string;
+    }[]
 };
 
 
@@ -120,6 +124,10 @@ export type UpdateUserTypes = {
     employer_name?: string;
     current_salary?: string;
     side_hustle_income?: string;
+    securityQuestions?: {
+        question: string;
+        answer: string;
+    }[]
 };
 
 export type SignInTypes = {
