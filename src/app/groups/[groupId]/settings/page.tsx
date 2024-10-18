@@ -106,6 +106,29 @@ function GroupSettings({ }: Props) {
         }
     }
 
+    const handleLeaveGroup = async () => {
+        try {
+            setUploading(true)
+            const accessToken = Cookies.get('access-token');
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/groups/leave/${group?._id}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                },
+                body: JSON.stringify({ userId: currentUser?._id })
+            })
+
+            let result = await res.json()
+            if (!result.status) return toast.error(result.errors || result.message)
+            window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups`
+        }
+        catch (error) {
+            toast.error("Error occurred. Please refresh the page")
+        } finally {
+            setUploading(false)
+        }
+    }
+
     return (
         <div
             className='overflow-auto'
@@ -366,7 +389,7 @@ function GroupSettings({ }: Props) {
 
                     <div className='flex w-full justify-between items-center'>
                         <h1>Leave Group </h1>
-                        <Button disabled={uploading} className='bg-red-500 text-white flex items-center gap-1'>
+                        <Button onClick={() => handleLeaveGroup()} disabled={uploading} className='bg-red-500 text-white flex items-center gap-1'>
                             <DoorOpen />
                             Leave
                         </Button>
@@ -380,7 +403,7 @@ function GroupSettings({ }: Props) {
                     <div>
                         <h1><span className='font-bold'>Name:</span> {group?.group_name}</h1>
                     </div>
-    
+
                     <div>
                         <h1><span className='font-bold'>State:</span> {group?.group_state}</h1>
                     </div>
