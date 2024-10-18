@@ -60,7 +60,12 @@ function MemberList({ }: Props) {
 
             <>
                 {
-                    isLoading ? ("loading ... ") : (
+                    isLoading ? (
+                        <div className="w-full p-2 grid place-content-center"> 
+                            loading ...
+                        </div>
+
+                    ) : (
                         <>
                             <div className="w-full p-2 mb-3 ">
                                 <h1 className='p-1 font-extrabold text-[0.9rem] mb-2 uppercase'>Admins ({admins.length})</h1>
