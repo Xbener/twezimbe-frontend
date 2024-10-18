@@ -271,7 +271,7 @@ export type GroupTypes = {
     createdAt: Date;
     memberCount: number;
     members: {
-        user: User;
+        users: User[];
         role: string;
     }[];
     isSacco?: boolean;
