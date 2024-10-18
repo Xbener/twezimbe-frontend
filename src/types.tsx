@@ -264,7 +264,6 @@ export type GroupTypes = {
     group_name: string;
     group_type: string;
     group_picture: string;
-    tags: string;
     description: string;
     created_by: any;
     del_flag: number;
@@ -278,6 +277,7 @@ export type GroupTypes = {
     invite_link: string;
     group_state: string;
     upgraded: boolean;
+    tags:string;
 };
 
 export type CreateGroupTypes = {

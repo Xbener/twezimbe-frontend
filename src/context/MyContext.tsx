@@ -190,31 +190,31 @@ export const MyProvider = ({ children }: Props) => {
 
     }
 
-    socket.on('S2C_ADD_FRIEND', (data) => {
-        const { friend } = data
-        if (friend[0] !== undefined || friend[0] !== 'undefined') {
-            setNewFriend(friend[0])
-        } else {
-            return
-        }
-    })
+    // socket.on('S2C_ADD_FRIEND', (data) => {
+    //     const { friend } = data
+    //     if (friend[0] !== undefined || friend[0] !== 'undefined') {
+    //         setNewFriend(friend[0])
+    //     } else {
+    //         return
+    //     }
+    // })
 
-    useEffect(() => {
-        connect()
-    }, [])
+    // useEffect(() => {
+    //     connect()
+    // }, [])
 
-    socket.on("S2C_SEND_ALL_USER_MESSAGE", (data) => {
-        const { results } = data
-        const msg = results[0]
-        if (msg?.creatorId === userId) {
-            setSendMsgGroupId('')
-            // setSendMsgRoomId([])
-        } else {
-            setSendMsgGroupId(msg?.groupId)
-            setGroupNotificationFlag(true)
-            sendMsgRoomId.push(msg?.roomId)
-        }
-    })
+    // socket.on("S2C_SEND_ALL_USER_MESSAGE", (data) => {
+    //     const { results } = data
+    //     const msg = results[0]
+    //     if (msg?.creatorId === userId) {
+    //         setSendMsgGroupId('')
+    //         // setSendMsgRoomId([])
+    //     } else {
+    //         setSendMsgGroupId(msg?.groupId)
+    //         setGroupNotificationFlag(true)
+    //         sendMsgRoomId.push(msg?.roomId)
+    //     }
+    // })
 
     return (
         <MyContext.Provider

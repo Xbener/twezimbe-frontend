@@ -37,7 +37,7 @@ function GroupIdLayout({ children }: Props) {
         <div className='flex w-full text-neutral-200'>
             <Aside />
             <div className='w-[80%] bg-[#013a6fae] flex'>
-                <div className="w-[75%]">
+                <div className="w-[75%] overflow-auto">
                     {children}
                 </div>
                 <MemberList />
