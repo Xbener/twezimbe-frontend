@@ -113,6 +113,52 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
     const { updateAccount } = useUpdateUserAccount()
     // State to hold the answers to the security questions
     const [securityQuestions, setSecurityQuestions] = useState<{ question: string; answer: string; }[]>(currentUser.securityQuestions);
+    const [qrCodeUrl, setQrCodeUrl] = useState('');
+    const [token, setToken] = useState('');
+    const [isVerified, setIsVerified] = useState(false);
+
+    const setup2FA = async () => {
+        const accessToken = Cookies.get('access-token');
+
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/auth/2fa/setup`, {
+                method: "GET",
+                headers: {
+                    'Content-Type': 'applications',
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            });
+            const data = await response.json()
+            setQrCodeUrl(data.qrCodeUrl);
+        } catch (error) {
+            console.error('Error setting up 2FA:', error);
+        }
+    };
+
+
+    const verify2FA = async () => {
+        const accessToken = Cookies.get('access-token');
+
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/auth/api/2fa/verify`, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify({ token })
+            });
+            const data = await response.json()
+            if (data.message === "2FA verification successful!") {
+                setIsVerified(true);
+                alert("2FA setup complete!");
+            } else {
+                alert("Invalid 2FA token. Try again.");
+            }
+        } catch (error) {
+            console.error('Error verifying 2FA:', error);
+        }
+    };
 
     // Handle input change
     const handleInputChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
@@ -820,19 +866,38 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
                                 <h1>Enable Two-Factor Authentication</h1>
                                 <Dialog>
                                     <DialogTrigger>
-                                        <Button className="bg-green-500 text-white font-bold">
+                                        <Button className="bg-green-500 text-white font-bold" onClick={setup2FA}>
                                             Set up 2FA
                                         </Button>
                                     </DialogTrigger>
-                                    <DialogContent className='bg-white'>
+                                    <DialogContent className="bg-white">
                                         <DialogHeader className="font-bold text-[1.2rem]">
                                             Set up 2FA for improved security
                                         </DialogHeader>
 
+                                        {qrCodeUrl && (
+                                            <div className="flex flex-col gap-4">
+                                                <h2 className="font-semibold">Scan this QR code with your Authenticator App:</h2>
+                                                <img src={qrCodeUrl} alt="QR Code" className="w-32 h-32 mx-auto" />
+
+                                                <input
+                                                    type="text"
+                                                    className="w-full p-2 border rounded"
+                                                    placeholder="Enter the token from the app"
+                                                    value={token}
+                                                    onChange={(e) => setToken(e.target.value)}
+                                                />
+
+                                                <Button className="bg-blue-500 text-white font-bold" onClick={verify2FA}>
+                                                    Verify Token
+                                                </Button>
+
+                                                {isVerified && <p className="text-green-500">2FA is successfully enabled!</p>}
+                                            </div>
+                                        )}
                                     </DialogContent>
                                 </Dialog>
                             </div>
-
                             {/* Security Questions */}
                             <div className="flex w-full justify-between items-center">
                                 <h1>Set Security Questions</h1>
