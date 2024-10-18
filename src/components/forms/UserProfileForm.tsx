@@ -755,6 +755,23 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
                     {isLoading ? <LoadingButton /> : "Save Changes"}
                 </Button>
             </form>
+
+
+            <div className="w-full p-2">
+                <h1 className="font-extrabold text-[1.2rem]">Other Settings</h1>
+                <div className="w-full flex flex-col gap-2">
+                    <div className='flex w-full justify-between items-center'>
+                        <h1>Subscribe to Notifications</h1>
+
+                        <div>
+                            <Button className={`bg-orange-500 text-white font-bold `}
+                            >
+                                Subscribe
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </Form>
     );
 };
