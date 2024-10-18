@@ -99,7 +99,7 @@ function NavLink({
     );
 }
 
-function GeneralLink({
+export function GeneralLink({
     children,
     active,
 }: {

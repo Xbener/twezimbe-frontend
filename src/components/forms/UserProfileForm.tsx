@@ -9,6 +9,14 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogClose
+} from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input";
 import {
     Select,
@@ -26,6 +34,7 @@ import Image from "next/image";
 import { toast } from "sonner";
 import Cookies from "js-cookie";
 import { useState } from "react";
+import { GeneralLink } from "../groups/group-nav";
 
 const formSchema = z.object({
     title: z.enum(["Mr.", "Ms.", "Mrs.", "Dr.", "Prof."]),
@@ -759,19 +768,107 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
 
             <div className="w-full p-2">
                 <h1 className="font-extrabold text-[1.2rem]">Other Settings</h1>
-                <div className="w-full flex flex-col gap-2">
-                    <div className='flex w-full justify-between items-center'>
-                        <h1>Subscribe to Notifications</h1>
 
+                <div className="w-full flex flex-col gap-4">
+                    {/* Subscribe to Notifications */}
+                    <div className="flex w-full justify-between items-center">
+                        <h1>Subscribe to Notifications</h1>
                         <div>
-                            <Button className={`bg-orange-500 text-white font-bold `}
-                            >
+                            <Button className="bg-orange-500 text-white font-bold">
                                 Subscribe
                             </Button>
                         </div>
                     </div>
+
+                    {/* Security Features */}
+                    <div className="w-full">
+                        <h1 className="font-extrabold text-[1.2rem]">Security Features</h1>
+                        <div className="flex flex-col gap-2">
+                            {/* Two-factor Authentication */}
+                            <div className="flex w-full justify-between items-center">
+                                <h1>Enable Two-Factor Authentication</h1>
+                                <Dialog>
+                                    <DialogTrigger>
+                                        <Button className="bg-green-500 text-white font-bold">
+                                            Set up 2FA
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className='bg-white'>
+                                        <DialogHeader className="font-bold text-[1.2rem]">
+                                            Set up 2FA for improved security
+                                        </DialogHeader>
+
+                                    </DialogContent>
+                                </Dialog>
+                            </div>
+
+                            {/* Security Questions */}
+                            <div className="flex w-full justify-between items-center">
+                                <h1>Set Security Questions</h1>
+                                <Dialog>
+                                    <DialogTrigger>
+                                        <Button className="bg-green-500 text-white font-bold">
+                                            Set Questions
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="bg-white" >
+                                        <DialogHeader className="font-bold text-[1.2rem]">
+                                            Answer these questions for account recovery
+                                        </DialogHeader>
+                                        <div className="flex flex-col gap-4 ">
+                                            <div className="flex flex-col gap-3">
+                                                <label className="font-bold">Question 1:</label>
+                                                <p>What was the name of your first pet?</p>
+                                                <input
+                                                    type="text"
+                                                    className="w-full p-2 border rounded"
+                                                    placeholder="Answer question 1"
+                                                />
+                                            </div>
+
+                                            <div className="flex flex-col gap-3">
+                                                <label className="font-bold">Question 2:</label>
+                                                <p>What is the name of the street you grew up on?</p>
+                                                <input
+                                                    type="text"
+                                                    className="w-full p-2 border rounded"
+                                                    placeholder="Answer question 2"
+                                                />
+                                            </div>
+
+                                            <div className="flex justify-end">
+                                                <Button className="bg-blue-500 text-white font-bold">
+                                                    Submit
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </DialogContent>
+                                </Dialog>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Consent and Agreements */}
+                    <div className="w-full">
+                        <h1 className="font-extrabold text-[1.2rem]">Consent and Agreements</h1>
+                        <div className="flex flex-col gap-2">
+                            <div className="flex items-center">
+                                <input type="checkbox" id="terms" className="mr-2" />
+                                <label htmlFor="terms">I agree to the Terms and Conditions</label>
+                            </div>
+                            <div className="flex items-center">
+                                <input type="checkbox" id="privacy" className="mr-2" />
+                                <label htmlFor="privacy">I agree to the Privacy Policy</label>
+                            </div>
+                            <div className="flex items-center">
+                                <input type="checkbox" id="data-sharing" className="mr-2" />
+                                <label htmlFor="data-sharing">I agree to Data Sharing Agreements</label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+
         </Form>
     );
 };
