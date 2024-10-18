@@ -132,7 +132,7 @@ export type OPTTypes = {
 }
 
 export type Application = {
-    _id: string;
+    _id?: string;
     firstName: string;
     lastName: string;
     nationalId: string;

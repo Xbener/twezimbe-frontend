@@ -116,7 +116,7 @@ export const columns: ColumnDef<Application>[] = [
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(application._id)}
+                            onClick={() => navigator.clipboard.writeText(application._id!)}
                         >
                             Copy payment ID
                         </DropdownMenuItem>
