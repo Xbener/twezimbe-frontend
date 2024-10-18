@@ -28,59 +28,59 @@ import Cookies from "js-cookie";
 import { useState } from "react";
 
 const formSchema = z.object({
-    title: z.enum(["Mr.", "Ms.", "Mrs.", "Dr.", "Prof."]).optional(),
+    title: z.enum(["Mr.", "Ms.", "Mrs.", "Dr.", "Prof."]),
     email: z.string(),
     firstName: z.string(),
     lastName: z.string(),
-    gender: z.enum(["Male", "Female", "Other"]).optional(),
-    religion: z.string().optional(),
-    place_of_birth: z.string().optional(),
-    current_parish: z.string().optional(),
+    gender: z.enum(["Male", "Female", "Other"]),
+    religion: z.string(),
+    place_of_birth: z.string(),
+    current_parish: z.string(),
     birthday: z.string().min(10, "Birthday is required"),
-    national_id_number: z.string().optional(),
+    national_id_number: z.string(),
     national_id_photo: z.string().optional(),
     phone: z.string().min(10, "Phone number is required"),
-    home_address: z.string().optional(),
-    home_location_map: z.string().optional(),
-    district_of_birth: z.string().optional(),
-    parish_of_birth: z.string().optional(),
-    village_of_birth: z.string().optional(),
-    marital_status: z.enum(["Single", "Married", "Divorced", "Widowed"]).optional(),
-    occupation: z.string().optional(),
-    job_title: z.string().optional(),
+    home_address: z.string(),
+    home_location_map: z.string(),
+    district_of_birth: z.string(),
+    parish_of_birth: z.string(),
+    village_of_birth: z.string(),
+    marital_status: z.enum(["Single", "Married", "Divorced", "Widowed"]),
+    occupation: z.string(),
+    job_title: z.string(),
     next_of_kin: z.object({
-        national_id_link: z.string().optional(),
-        name: z.string().optional(),
-        phone: z.string().optional(),
-        email: z.string().optional(),
-    }).optional(),
+        national_id_link: z.string(),
+        name: z.string(),
+        phone: z.string(),
+        email: z.string(),
+    }),
     monthly_income_level: z.enum([
         "Less than UGX 1,000,000",
         "UGX 1,000,000 - 5,000,000",
         "UGX 5,000,000 - 15,000,000",
         "Above UGX 15,000,000",
-    ]).optional(),
-    bank_name: z.string().optional(),
-    bank_account_number: z.string().optional(),
-    bank_mobile_account: z.string().optional(),
-    bank_email: z.string().optional(),
+    ]),
+    bank_name: z.string(),
+    bank_account_number: z.string(),
+    bank_mobile_account: z.string(),
+    bank_email: z.string(),
     highest_education_level: z.enum([
         "Secondary (Ordinary Level)",
         "Secondary (Advanced Level)",
         "Tertiary",
         "University",
         "Other (Specify)",
-    ]).optional(),
+    ]),
     employment_status: z.enum([
         "Employed",
         "Self-employed",
         "Unemployed",
         "Retired",
-    ]).optional(),
-    current_work_address: z.string().optional(),
-    employer_name: z.string().optional(),
-    current_salary: z.string().optional(),
-    side_hustle_income: z.string().optional(),
+    ]),
+    current_work_address: z.string(),
+    employer_name: z.string(),
+    current_salary: z.string(),
+    side_hustle_income: z.string(),
 });
 
 type UserFormData = z.infer<typeof formSchema>;
@@ -188,7 +188,7 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
                         <FormItem>
                             <FormLabel>Title</FormLabel>
                             <FormControl>
-                                <Select {...field}>
+                                <Select {...field} onValueChange={(e) => form.setValue("title", e as UserFormData["title"])}>
                                     <SelectTrigger className="bg-white w-full">
                                         <SelectValue placeholder="Select Title" />
                                     </SelectTrigger>
@@ -244,7 +244,7 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
                         <FormItem>
                             <FormLabel>Gender</FormLabel>
                             <FormControl>
-                                <Select {...field}>
+                                <Select {...field} onValueChange={(e) => form.setValue("gender", e as UserFormData["gender"])}>
                                     <SelectTrigger className="bg-white w-full">
                                         <SelectValue placeholder="Select Gender" />
                                     </SelectTrigger>
@@ -333,7 +333,7 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
                         </FormItem>
                     )}
                 />
-                <FormField
+                {/* <FormField
                     control={form.control}
                     name="national_id_photo"
                     render={({ field }) => (
@@ -345,7 +345,7 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
                             <FormMessage />
                         </FormItem>
                     )}
-                />
+                /> */}
 
                 {/* Contact Information */}
                 <FormField
@@ -457,7 +457,7 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
                         <FormItem>
                             <FormLabel>Marital Status</FormLabel>
                             <FormControl>
-                                <Select {...field}>
+                                <Select {...field} onValueChange={(e) => form.setValue("marital_status", e as UserFormData["marital_status"])}>
                                     <SelectTrigger className="bg-white w-full">
                                         <SelectValue placeholder="Select Marital Status" />
                                     </SelectTrigger>
@@ -570,7 +570,7 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
                         <FormItem>
                             <FormLabel>Monthly Income Level</FormLabel>
                             <FormControl>
-                                <Select {...field}>
+                                <Select {...field} onValueChange={(e) => form.setValue("monthly_income_level", e as UserFormData["monthly_income_level"])}>
                                     <SelectTrigger className="bg-white w-full">
                                         <SelectValue placeholder="Select Income Level" />
                                     </SelectTrigger>
@@ -651,7 +651,7 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
                         <FormItem>
                             <FormLabel>Highest Level of Education</FormLabel>
                             <FormControl>
-                                <Select {...field}>
+                                <Select {...field} onValueChange={(e) => form.setValue("highest_education_level", e as UserFormData["highest_education_level"])}>
                                     <SelectTrigger className="bg-white w-full">
                                         <SelectValue placeholder="Select Education Level" />
                                     </SelectTrigger>
@@ -676,7 +676,7 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
                         <FormItem>
                             <FormLabel>Employment Status</FormLabel>
                             <FormControl>
-                                <Select {...field}>
+                                <Select {...field} onValueChange={(e) => form.setValue("employment_status", e as UserFormData["employment_status"])}>
                                     <SelectTrigger className="bg-white w-full">
                                         <SelectValue placeholder="Select Employment Status" />
                                     </SelectTrigger>
