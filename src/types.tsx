@@ -270,7 +270,10 @@ export type GroupTypes = {
     del_flag: number;
     createdAt: Date;
     memberCount: number;
-    members: User[];
+    members: {
+        user: User;
+        role: string;
+    }[];
     isSacco?: boolean;
     invite_link: string;
     group_state: string;
