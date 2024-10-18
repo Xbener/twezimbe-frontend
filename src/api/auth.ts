@@ -254,7 +254,7 @@ export const useUpdateUserAccount = () => {
         });
 
         const responseData = await response.json();
-
+        
         if (!response.ok) {
             throw new Error(responseData.errors);
         }

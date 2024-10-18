@@ -112,10 +112,7 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
     const [isUpdating, setIsUpdating] = useState(false)
     const { updateAccount } = useUpdateUserAccount()
     // State to hold the answers to the security questions
-    const [securityQuestions, setSecurityQuestions] = useState<{ question: string; answer: string; }[]>([
-        { question: "What was the name of your first pet?", answer: "" },
-        { question: "What is the name of the street you grew up on?", answer: "" }
-    ]);
+    const [securityQuestions, setSecurityQuestions] = useState<{ question: string; answer: string; }[]>(currentUser.securityQuestions);
 
     // Handle input change
     const handleInputChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
@@ -131,8 +128,8 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
         try {
             setIsUpdating(true)
             const res = await updateAccount({ securityQuestions })
-            console.log(res)
-        } catch (err:any) {
+            console.log("res", res)
+        } catch (err: any) {
             toast.error("Something went wrong. Please try again")
             console.log(err.message)
         } finally {
@@ -182,78 +179,132 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
 
 
     return (
-        <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSave)} className="space-y-2 bg-gray-50 rounded-lg md:p-10 w-full grid grid-cols-3 gap-5">
-                <FormDescription>View and change your profile information here</FormDescription>
-                <div className='flex flex-col-reverse justify-center text-center items-start'>
-                    <FormItem className='w-full flex justify-start'>
-                        <div className='flex items-center gap-2'>
-                            <Button className="disabled:cursor-not-allowed" type='button' disabled={uploading}>
-                                <FormLabel className='p-2 border-2 mt-3 cursor-pointer bg-blue-500 text-white rounded-lg'> Choose Profile Picture</FormLabel>
-                            </Button>
-                            {
-                                imagePreview && (
-                                    <Button type='button' className='border disabled:cursor-not-allowed border-black' disabled={uploading} onClick={uploadPicture}>Upload</Button>
-                                )
-                            }
-                        </div>
-                        <FormControl>
-                            <input
-                                type='file'
-                                accept='image/*'
-                                onChange={handleImageChange}
-                                className='bg-white p-2 border border-gray-300 rounded-lg'
-                                hidden
-                                name="profile_pic"
-                            />
-                        </FormControl>
-                    </FormItem>
-                    {(
-                        <div className='w-[100px] h-[100px] rounded-full'>
-                            <div className='border border-gray-300 p-2 w-full rounded-full h-full'>
-                                <img
-                                    src={imagePreview || currentUser.profile_pic}
-                                    alt=''
-                                    className='object-cover w-full rounded-full h-full'
-                                />
+        <>
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSave)} className="space-y-2 bg-gray-50 rounded-lg md:p-10 w-full grid grid-cols-3 gap-5">
+                    <FormDescription>View and change your profile information here</FormDescription>
+                    <div className='flex flex-col-reverse justify-center text-center items-start'>
+                        <FormItem className='w-full flex justify-start'>
+                            <div className='flex items-center gap-2'>
+                                <Button className="disabled:cursor-not-allowed" type='button' disabled={uploading}>
+                                    <FormLabel className='p-2 border-2 mt-3 cursor-pointer bg-blue-500 text-white rounded-lg'> Choose Profile Picture</FormLabel>
+                                </Button>
+                                {
+                                    imagePreview && (
+                                        <Button type='button' className='border disabled:cursor-not-allowed border-black' disabled={uploading} onClick={uploadPicture}>Upload</Button>
+                                    )
+                                }
                             </div>
-                        </div>
-                    )}
-                </div>
-
-                {/* Title */}
-                <FormField
-                    control={form.control}
-                    name="title"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Title</FormLabel>
                             <FormControl>
-                                <Select {...field} onValueChange={(e) => form.setValue("title", e as UserFormData["title"])}>
-                                    <SelectTrigger className="bg-white w-full">
-                                        <SelectValue placeholder="Select Title" />
-                                    </SelectTrigger>
-                                    <SelectContent className="bg-white">
-                                        <SelectItem className="cursor-pointer" value="Mr.">Mr.</SelectItem>
-                                        <SelectItem className="cursor-pointer" value="Ms.">Ms.</SelectItem>
-                                        <SelectItem className="cursor-pointer" value="Mrs.">Mrs.</SelectItem>
-                                        <SelectItem className="cursor-pointer" value="Dr.">Dr.</SelectItem>
-                                        <SelectItem className="cursor-pointer" value="Prof.">Prof.</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                <input
+                                    type='file'
+                                    accept='image/*'
+                                    onChange={handleImageChange}
+                                    className='bg-white p-2 border border-gray-300 rounded-lg'
+                                    hidden
+                                    name="profile_pic"
+                                />
                             </FormControl>
                         </FormItem>
-                    )}
-                />
+                        {(
+                            <div className='w-[100px] h-[100px] rounded-full'>
+                                <div className='border border-gray-300 p-2 w-full rounded-full h-full'>
+                                    <img
+                                        src={imagePreview || currentUser.profile_pic}
+                                        alt=''
+                                        className='object-cover w-full rounded-full h-full'
+                                    />
+                                </div>
+                            </div>
+                        )}
+                    </div>
 
-                {/* Full Name */}
-                <div className="flex flex-wrap w-full justify-between gap-3">
+                    {/* Title */}
                     <FormField
                         control={form.control}
-                        name="lastName"
+                        name="title"
                         render={({ field }) => (
-                            <FormItem className="w-full">
-                                <FormLabel>Last Name</FormLabel>
+                            <FormItem>
+                                <FormLabel>Title</FormLabel>
+                                <FormControl>
+                                    <Select {...field} onValueChange={(e) => form.setValue("title", e as UserFormData["title"])}>
+                                        <SelectTrigger className="bg-white w-full">
+                                            <SelectValue placeholder="Select Title" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-white">
+                                            <SelectItem className="cursor-pointer" value="Mr.">Mr.</SelectItem>
+                                            <SelectItem className="cursor-pointer" value="Ms.">Ms.</SelectItem>
+                                            <SelectItem className="cursor-pointer" value="Mrs.">Mrs.</SelectItem>
+                                            <SelectItem className="cursor-pointer" value="Dr.">Dr.</SelectItem>
+                                            <SelectItem className="cursor-pointer" value="Prof.">Prof.</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </FormControl>
+                            </FormItem>
+                        )}
+                    />
+
+                    {/* Full Name */}
+                    <div className="flex flex-wrap w-full justify-between gap-3">
+                        <FormField
+                            control={form.control}
+                            name="lastName"
+                            render={({ field }) => (
+                                <FormItem className="w-full">
+                                    <FormLabel>Last Name</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} className="bg-white" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="firstName"
+                            render={({ field }) => (
+                                <FormItem className="w-full">
+                                    <FormLabel>First Name</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} className="bg-white" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                    </div>
+                    {/* Gender */}
+                    <FormField
+                        control={form.control}
+                        name="gender"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Gender</FormLabel>
+                                <FormControl>
+                                    <Select {...field} onValueChange={(e) => form.setValue("gender", e as UserFormData["gender"])}>
+                                        <SelectTrigger className="bg-white w-full">
+                                            <SelectValue placeholder="Select Gender" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-white">
+                                            <SelectItem className="cursor-pointer" value="Male">Male</SelectItem>
+                                            <SelectItem className="cursor-pointer" value="Female">Female</SelectItem>
+                                            <SelectItem className="cursor-pointer" value="Other">Other</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </FormControl>
+                            </FormItem>
+                        )}
+                    />
+
+                    {/* Religion */}
+                    <FormField
+                        control={form.control}
+                        name="religion"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Religion</FormLabel>
                                 <FormControl>
                                     <Input {...field} className="bg-white" />
                                 </FormControl>
@@ -262,12 +313,13 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
                         )}
                     />
 
+                    {/* Place of Birth */}
                     <FormField
                         control={form.control}
-                        name="firstName"
+                        name="place_of_birth"
                         render={({ field }) => (
-                            <FormItem className="w-full">
-                                <FormLabel>First Name</FormLabel>
+                            <FormItem>
+                                <FormLabel>Place of Birth</FormLabel>
                                 <FormControl>
                                     <Input {...field} className="bg-white" />
                                 </FormControl>
@@ -276,105 +328,51 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
                         )}
                     />
 
-                </div>
-                {/* Gender */}
-                <FormField
-                    control={form.control}
-                    name="gender"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Gender</FormLabel>
-                            <FormControl>
-                                <Select {...field} onValueChange={(e) => form.setValue("gender", e as UserFormData["gender"])}>
-                                    <SelectTrigger className="bg-white w-full">
-                                        <SelectValue placeholder="Select Gender" />
-                                    </SelectTrigger>
-                                    <SelectContent className="bg-white">
-                                        <SelectItem className="cursor-pointer" value="Male">Male</SelectItem>
-                                        <SelectItem className="cursor-pointer" value="Female">Female</SelectItem>
-                                        <SelectItem className="cursor-pointer" value="Other">Other</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </FormControl>
-                        </FormItem>
-                    )}
-                />
+                    {/* Current Parish */}
+                    <FormField
+                        control={form.control}
+                        name="current_parish"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Your Current Parish</FormLabel>
+                                <FormControl>
+                                    <Input {...field} className="bg-white" />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
 
-                {/* Religion */}
-                <FormField
-                    control={form.control}
-                    name="religion"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Religion</FormLabel>
-                            <FormControl>
-                                <Input {...field} className="bg-white" />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                    {/* Date of Birth */}
+                    <FormField
+                        control={form.control}
+                        name="birthday"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Date of Birth</FormLabel>
+                                <FormControl>
+                                    <Input {...field} type="date" className="bg-white" />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
 
-                {/* Place of Birth */}
-                <FormField
-                    control={form.control}
-                    name="place_of_birth"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Place of Birth</FormLabel>
-                            <FormControl>
-                                <Input {...field} className="bg-white" />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                {/* Current Parish */}
-                <FormField
-                    control={form.control}
-                    name="current_parish"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Your Current Parish</FormLabel>
-                            <FormControl>
-                                <Input {...field} className="bg-white" />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                {/* Date of Birth */}
-                <FormField
-                    control={form.control}
-                    name="birthday"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Date of Birth</FormLabel>
-                            <FormControl>
-                                <Input {...field} type="date" className="bg-white" />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                {/* National ID Details */}
-                <FormField
-                    control={form.control}
-                    name="national_id_number"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>National ID Number</FormLabel>
-                            <FormControl>
-                                <Input {...field} className="bg-white" />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                {/* <FormField
+                    {/* National ID Details */}
+                    <FormField
+                        control={form.control}
+                        name="national_id_number"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>National ID Number</FormLabel>
+                                <FormControl>
+                                    <Input {...field} className="bg-white" />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    {/* <FormField
                     control={form.control}
                     name="national_id_photo"
                     render={({ field }) => (
@@ -388,71 +386,13 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
                     )}
                 /> */}
 
-                {/* Contact Information */}
-                <FormField
-                    control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Phone Number</FormLabel>
-                            <FormControl>
-                                <Input {...field} className="bg-white" />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Email Address</FormLabel>
-                            <FormControl>
-                                <Input {...field} type="email" disabled className="bg-white" />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                {/* Address Information */}
-                <FormField
-                    control={form.control}
-                    name="home_address"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Current Home Address</FormLabel>
-                            <FormControl>
-                                <Input {...field} className="bg-white" />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="home_location_map"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Home Location on Google Map</FormLabel>
-                            <FormControl>
-                                <Input {...field} className="bg-white" />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                {/* Birth Information */}
-                <div className="flex flex-wrap w-full justify-between gap-3">
+                    {/* Contact Information */}
                     <FormField
                         control={form.control}
-                        name="district_of_birth"
+                        name="phone"
                         render={({ field }) => (
-                            <FormItem className="w-full">
-                                <FormLabel>District of Birth</FormLabel>
+                            <FormItem>
+                                <FormLabel>Phone Number</FormLabel>
                                 <FormControl>
                                     <Input {...field} className="bg-white" />
                                 </FormControl>
@@ -463,10 +403,235 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
 
                     <FormField
                         control={form.control}
-                        name="parish_of_birth"
+                        name="email"
                         render={({ field }) => (
-                            <FormItem className="w-full">
-                                <FormLabel>Parish of Birth</FormLabel>
+                            <FormItem>
+                                <FormLabel>Email Address</FormLabel>
+                                <FormControl>
+                                    <Input {...field} type="email" disabled className="bg-white" />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    {/* Address Information */}
+                    <FormField
+                        control={form.control}
+                        name="home_address"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Current Home Address</FormLabel>
+                                <FormControl>
+                                    <Input {...field} className="bg-white" />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="home_location_map"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Home Location on Google Map</FormLabel>
+                                <FormControl>
+                                    <Input {...field} className="bg-white" />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    {/* Birth Information */}
+                    <div className="flex flex-wrap w-full justify-between gap-3">
+                        <FormField
+                            control={form.control}
+                            name="district_of_birth"
+                            render={({ field }) => (
+                                <FormItem className="w-full">
+                                    <FormLabel>District of Birth</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} className="bg-white" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="parish_of_birth"
+                            render={({ field }) => (
+                                <FormItem className="w-full">
+                                    <FormLabel>Parish of Birth</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} className="bg-white" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="village_of_birth"
+                            render={({ field }) => (
+                                <FormItem className="w-full">
+                                    <FormLabel>Village of Birth</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} className="bg-white" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+
+                    {/* Marital Status */}
+                    <FormField
+                        control={form.control}
+                        name="marital_status"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Marital Status</FormLabel>
+                                <FormControl>
+                                    <Select {...field} onValueChange={(e) => form.setValue("marital_status", e as UserFormData["marital_status"])}>
+                                        <SelectTrigger className="bg-white w-full">
+                                            <SelectValue placeholder="Select Marital Status" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-white">
+                                            <SelectItem className="cursor-pointer" value="Single">Single</SelectItem>
+                                            <SelectItem className="cursor-pointer" value="Married">Married</SelectItem>
+                                            <SelectItem className="cursor-pointer" value="Divorced">Divorced</SelectItem>
+                                            <SelectItem className="cursor-pointer" value="Widowed">Widowed</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </FormControl>
+                            </FormItem>
+                        )}
+                    />
+
+                    {/* Occupation */}
+                    <div className="flex flex-wrap w-full justify-between gap-3">
+                        <FormField
+                            control={form.control}
+                            name="occupation"
+                            render={({ field }) => (
+                                <FormItem className="w-full">
+                                    <FormLabel>Profession</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} className="bg-white" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="job_title"
+                            render={({ field }) => (
+                                <FormItem className="w-full">
+                                    <FormLabel>Job Title/Description</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} className="bg-white" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+
+                    {/* Next of Kin/Beneficiaries */}
+                    <FormField
+                        control={form.control}
+                        name="next_of_kin.national_id_link"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Link to National ID</FormLabel>
+                                <FormControl>
+                                    <Input {...field} className="bg-white" />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <div className="flex flex-wrap w-full justify-between gap-3">
+                        <FormField
+                            control={form.control}
+                            name="next_of_kin.name"
+                            render={({ field }) => (
+                                <FormItem className="w-full">
+                                    <FormLabel>Next of Kin Name</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} className="bg-white" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="next_of_kin.phone"
+                            render={({ field }) => (
+                                <FormItem className="w-full">
+                                    <FormLabel>Next of Kin Phone</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} className="bg-white" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="next_of_kin.email"
+                            render={({ field }) => (
+                                <FormItem className="w-full">
+                                    <FormLabel>Next of Kin Email</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} type="email" className="bg-white" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+
+                    {/* Financial Information */}
+                    <FormField
+                        control={form.control}
+                        name="monthly_income_level"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Monthly Income Level</FormLabel>
+                                <FormControl>
+                                    <Select {...field} onValueChange={(e) => form.setValue("monthly_income_level", e as UserFormData["monthly_income_level"])}>
+                                        <SelectTrigger className="bg-white w-full">
+                                            <SelectValue placeholder="Select Income Level" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-white">
+                                            <SelectItem className="cursor-pointer" value="Less than UGX 1,000,000">Less than UGX 1,000,000</SelectItem>
+                                            <SelectItem className="cursor-pointer" value="UGX 1,000,000 - 5,000,000">UGX 1,000,000 - 5,000,000</SelectItem>
+                                            <SelectItem className="cursor-pointer" value="UGX 5,000,000 - 15,000,000">UGX 5,000,000 - 15,000,000</SelectItem>
+                                            <SelectItem className="cursor-pointer" value="Above UGX 15,000,000">Above UGX 15,000,000</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </FormControl>
+                            </FormItem>
+                        )}
+                    />
+
+                    {/* Bank Account Details */}
+                    <FormField
+                        control={form.control}
+                        name="bank_name"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Name of Bank</FormLabel>
                                 <FormControl>
                                     <Input {...field} className="bg-white" />
                                 </FormControl>
@@ -477,51 +642,10 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
 
                     <FormField
                         control={form.control}
-                        name="village_of_birth"
+                        name="bank_account_number"
                         render={({ field }) => (
-                            <FormItem className="w-full">
-                                <FormLabel>Village of Birth</FormLabel>
-                                <FormControl>
-                                    <Input {...field} className="bg-white" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </div>
-
-                {/* Marital Status */}
-                <FormField
-                    control={form.control}
-                    name="marital_status"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Marital Status</FormLabel>
-                            <FormControl>
-                                <Select {...field} onValueChange={(e) => form.setValue("marital_status", e as UserFormData["marital_status"])}>
-                                    <SelectTrigger className="bg-white w-full">
-                                        <SelectValue placeholder="Select Marital Status" />
-                                    </SelectTrigger>
-                                    <SelectContent className="bg-white">
-                                        <SelectItem className="cursor-pointer" value="Single">Single</SelectItem>
-                                        <SelectItem className="cursor-pointer" value="Married">Married</SelectItem>
-                                        <SelectItem className="cursor-pointer" value="Divorced">Divorced</SelectItem>
-                                        <SelectItem className="cursor-pointer" value="Widowed">Widowed</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </FormControl>
-                        </FormItem>
-                    )}
-                />
-
-                {/* Occupation */}
-                <div className="flex flex-wrap w-full justify-between gap-3">
-                    <FormField
-                        control={form.control}
-                        name="occupation"
-                        render={({ field }) => (
-                            <FormItem className="w-full">
-                                <FormLabel>Profession</FormLabel>
+                            <FormItem>
+                                <FormLabel>Account Number</FormLabel>
                                 <FormControl>
                                     <Input {...field} className="bg-white" />
                                 </FormControl>
@@ -532,40 +656,10 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
 
                     <FormField
                         control={form.control}
-                        name="job_title"
+                        name="bank_mobile_account"
                         render={({ field }) => (
-                            <FormItem className="w-full">
-                                <FormLabel>Job Title/Description</FormLabel>
-                                <FormControl>
-                                    <Input {...field} className="bg-white" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </div>
-
-                {/* Next of Kin/Beneficiaries */}
-                <FormField
-                    control={form.control}
-                    name="next_of_kin.national_id_link"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Link to National ID</FormLabel>
-                            <FormControl>
-                                <Input {...field} className="bg-white" />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <div className="flex flex-wrap w-full justify-between gap-3">
-                    <FormField
-                        control={form.control}
-                        name="next_of_kin.name"
-                        render={({ field }) => (
-                            <FormItem className="w-full">
-                                <FormLabel>Next of Kin Name</FormLabel>
+                            <FormItem>
+                                <FormLabel>Registered Mobile Account with Bank</FormLabel>
                                 <FormControl>
                                     <Input {...field} className="bg-white" />
                                 </FormControl>
@@ -576,24 +670,10 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
 
                     <FormField
                         control={form.control}
-                        name="next_of_kin.phone"
+                        name="bank_email"
                         render={({ field }) => (
-                            <FormItem className="w-full">
-                                <FormLabel>Next of Kin Phone</FormLabel>
-                                <FormControl>
-                                    <Input {...field} className="bg-white" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField
-                        control={form.control}
-                        name="next_of_kin.email"
-                        render={({ field }) => (
-                            <FormItem className="w-full">
-                                <FormLabel>Next of Kin Email</FormLabel>
+                            <FormItem>
+                                <FormLabel>Registered Email with Bank</FormLabel>
                                 <FormControl>
                                     <Input {...field} type="email" className="bg-white" />
                                 </FormControl>
@@ -601,173 +681,62 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
                             </FormItem>
                         )}
                     />
-                </div>
 
-                {/* Financial Information */}
-                <FormField
-                    control={form.control}
-                    name="monthly_income_level"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Monthly Income Level</FormLabel>
-                            <FormControl>
-                                <Select {...field} onValueChange={(e) => form.setValue("monthly_income_level", e as UserFormData["monthly_income_level"])}>
-                                    <SelectTrigger className="bg-white w-full">
-                                        <SelectValue placeholder="Select Income Level" />
-                                    </SelectTrigger>
-                                    <SelectContent className="bg-white">
-                                        <SelectItem className="cursor-pointer" value="Less than UGX 1,000,000">Less than UGX 1,000,000</SelectItem>
-                                        <SelectItem className="cursor-pointer" value="UGX 1,000,000 - 5,000,000">UGX 1,000,000 - 5,000,000</SelectItem>
-                                        <SelectItem className="cursor-pointer" value="UGX 5,000,000 - 15,000,000">UGX 5,000,000 - 15,000,000</SelectItem>
-                                        <SelectItem className="cursor-pointer" value="Above UGX 15,000,000">Above UGX 15,000,000</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </FormControl>
-                        </FormItem>
-                    )}
-                />
-
-                {/* Bank Account Details */}
-                <FormField
-                    control={form.control}
-                    name="bank_name"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Name of Bank</FormLabel>
-                            <FormControl>
-                                <Input {...field} className="bg-white" />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="bank_account_number"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Account Number</FormLabel>
-                            <FormControl>
-                                <Input {...field} className="bg-white" />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="bank_mobile_account"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Registered Mobile Account with Bank</FormLabel>
-                            <FormControl>
-                                <Input {...field} className="bg-white" />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="bank_email"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Registered Email with Bank</FormLabel>
-                            <FormControl>
-                                <Input {...field} type="email" className="bg-white" />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                {/* Educational Information */}
-                <FormField
-                    control={form.control}
-                    name="highest_education_level"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Highest Level of Education</FormLabel>
-                            <FormControl>
-                                <Select {...field} onValueChange={(e) => form.setValue("highest_education_level", e as UserFormData["highest_education_level"])}>
-                                    <SelectTrigger className="bg-white w-full">
-                                        <SelectValue placeholder="Select Education Level" />
-                                    </SelectTrigger>
-                                    <SelectContent className="bg-white">
-                                        <SelectItem className="cursor-pointer" value="Secondary (Ordinary Level)">Secondary (Ordinary Level)</SelectItem>
-                                        <SelectItem className="cursor-pointer" value="Secondary (Advanced Level)">Secondary (Advanced Level)</SelectItem>
-                                        <SelectItem className="cursor-pointer" value="Tertiary">Tertiary</SelectItem>
-                                        <SelectItem className="cursor-pointer" value="University">University</SelectItem>
-                                        <SelectItem className="cursor-pointer" value="Other (Specify)">Other (Specify)</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </FormControl>
-                        </FormItem>
-                    )}
-                />
-
-                {/* Employment Information */}
-                <FormField
-                    control={form.control}
-                    name="employment_status"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Employment Status</FormLabel>
-                            <FormControl>
-                                <Select {...field} onValueChange={(e) => form.setValue("employment_status", e as UserFormData["employment_status"])}>
-                                    <SelectTrigger className="bg-white w-full">
-                                        <SelectValue placeholder="Select Employment Status" />
-                                    </SelectTrigger>
-                                    <SelectContent className="bg-white">
-                                        <SelectItem className="cursor-pointer" value="Employed">Employed</SelectItem>
-                                        <SelectItem className="cursor-pointer" value="Self-employed">Self-employed</SelectItem>
-                                        <SelectItem className="cursor-pointer" value="Unemployed">Unemployed</SelectItem>
-                                        <SelectItem className="cursor-pointer" value="Retired">Retired</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </FormControl>
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="current_work_address"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Current Place of Work Address</FormLabel>
-                            <FormControl>
-                                <Input {...field} className="bg-white" />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="employer_name"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Name of Employer</FormLabel>
-                            <FormControl>
-                                <Input {...field} className="bg-white" />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <div className="flex flex-wrap w-full justify-between gap-3">
+                    {/* Educational Information */}
                     <FormField
                         control={form.control}
-                        name="current_salary"
+                        name="highest_education_level"
                         render={({ field }) => (
-                            <FormItem className="w-full">
-                                <FormLabel>Current Salary (Gross)</FormLabel>
+                            <FormItem>
+                                <FormLabel>Highest Level of Education</FormLabel>
+                                <FormControl>
+                                    <Select {...field} onValueChange={(e) => form.setValue("highest_education_level", e as UserFormData["highest_education_level"])}>
+                                        <SelectTrigger className="bg-white w-full">
+                                            <SelectValue placeholder="Select Education Level" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-white">
+                                            <SelectItem className="cursor-pointer" value="Secondary (Ordinary Level)">Secondary (Ordinary Level)</SelectItem>
+                                            <SelectItem className="cursor-pointer" value="Secondary (Advanced Level)">Secondary (Advanced Level)</SelectItem>
+                                            <SelectItem className="cursor-pointer" value="Tertiary">Tertiary</SelectItem>
+                                            <SelectItem className="cursor-pointer" value="University">University</SelectItem>
+                                            <SelectItem className="cursor-pointer" value="Other (Specify)">Other (Specify)</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </FormControl>
+                            </FormItem>
+                        )}
+                    />
+
+                    {/* Employment Information */}
+                    <FormField
+                        control={form.control}
+                        name="employment_status"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Employment Status</FormLabel>
+                                <FormControl>
+                                    <Select {...field} onValueChange={(e) => form.setValue("employment_status", e as UserFormData["employment_status"])}>
+                                        <SelectTrigger className="bg-white w-full">
+                                            <SelectValue placeholder="Select Employment Status" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-white">
+                                            <SelectItem className="cursor-pointer" value="Employed">Employed</SelectItem>
+                                            <SelectItem className="cursor-pointer" value="Self-employed">Self-employed</SelectItem>
+                                            <SelectItem className="cursor-pointer" value="Unemployed">Unemployed</SelectItem>
+                                            <SelectItem className="cursor-pointer" value="Retired">Retired</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </FormControl>
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="current_work_address"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Current Place of Work Address</FormLabel>
                                 <FormControl>
                                     <Input {...field} className="bg-white" />
                                 </FormControl>
@@ -778,10 +747,10 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
 
                     <FormField
                         control={form.control}
-                        name="side_hustle_income"
+                        name="employer_name"
                         render={({ field }) => (
-                            <FormItem className="w-full">
-                                <FormLabel>Other Side Hustle Income (Gross)</FormLabel>
+                            <FormItem>
+                                <FormLabel>Name of Employer</FormLabel>
                                 <FormControl>
                                     <Input {...field} className="bg-white" />
                                 </FormControl>
@@ -789,14 +758,44 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
                             </FormItem>
                         )}
                     />
-                </div>
 
-                {/* Submit Button */}
-                <Button type="submit" className="bg-blue-500 text-white hover:bg-blue-600">
-                    {isLoading ? <LoadingButton /> : "Save Changes"}
-                </Button>
-            </form>
+                    <div className="flex flex-wrap w-full justify-between gap-3">
+                        <FormField
+                            control={form.control}
+                            name="current_salary"
+                            render={({ field }) => (
+                                <FormItem className="w-full">
+                                    <FormLabel>Current Salary (Gross)</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} className="bg-white" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
 
+                        <FormField
+                            control={form.control}
+                            name="side_hustle_income"
+                            render={({ field }) => (
+                                <FormItem className="w-full">
+                                    <FormLabel>Other Side Hustle Income (Gross)</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} className="bg-white" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+
+                    {/* Submit Button */}
+                    <Button type="submit" className="bg-blue-500 text-white hover:bg-blue-600">
+                        {isLoading ? <LoadingButton /> : "Save Changes"}
+                    </Button>
+                </form>
+
+            </Form>
 
             <div className="w-full p-2">
                 <h1 className="font-extrabold text-[1.2rem]">Other Settings</h1>
@@ -863,7 +862,10 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
                                             ))}
 
                                             <div className="flex justify-end">
-                                                <Button className="bg-blue-500 text-white font-bold" disabled={isUpdating} onClick={handleUpdateSecurityQuestion}>
+                                                <Button className="bg-blue-500 text-white font-bold" disabled={isUpdating} type="button" onClick={(e) => {
+                                                    e.preventDefault()
+                                                    handleUpdateSecurityQuestion()
+                                                }}>
                                                     Submit
                                                 </Button>
                                             </div>
@@ -894,8 +896,8 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
                     </div>
                 </div>
             </div>
+        </>
 
-        </Form>
     );
 };
 

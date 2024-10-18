@@ -52,7 +52,7 @@ export type User = {
     employer_name?: string;
     current_salary?: string;
     side_hustle_income?: string;
-    securityQuestions?: {
+    securityQuestions: {
         question: string;
         answer: string;
     }[]
