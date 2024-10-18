@@ -233,7 +233,7 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
                         View and change your profile information here
                         <span className="flex w-full items-center justify-between p-2 border rounded-md mt-3">
                             Profile Complete
-                           {currentUser?.is_complete ? <CheckCircle color="green"/> :  <XCircleIcon color="red" />}
+                            {currentUser?.is_complete ? <CheckCircle color="green" /> : <XCircleIcon color="red" />}
                         </span>
                     </FormDescription>
                     <div className='flex flex-col-reverse justify-center text-center items-start'>
