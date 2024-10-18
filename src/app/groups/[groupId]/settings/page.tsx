@@ -380,12 +380,7 @@ function GroupSettings({ }: Props) {
                     <div>
                         <h1><span className='font-bold'>Name:</span> {group?.group_name}</h1>
                     </div>
-                    <div>
-                        <h1 className="text-wrap w-full break-words">
-                            <span className="font-bold">Description: &nbsp;</span>
-                            <span className="text-wrap w-full break-words">{group?.description}</span>
-                        </h1>
-                    </div>
+    
                     <div>
                         <h1><span className='font-bold'>State:</span> {group?.group_state}</h1>
                     </div>
