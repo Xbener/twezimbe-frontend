@@ -14,9 +14,12 @@ const Profile = () => {
       <section className="flex flex-col gap-4">
         <div className="flex flex-col gap-4 p-5 md:p-0">
           <h2 className='text-2xl font-bold'>Profile</h2>
-          <UserProfileForm 
+          <UserProfileForm
             currentUser={currentUser}
-            onSave={updateAccount}
+            onSave={(data)=>{
+              updateAccount(data)
+            }
+            }
             isLoading={isLoading}
           />
         </div>

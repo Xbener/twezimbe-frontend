@@ -1,17 +1,17 @@
 export type User = {
-    _id: string;
+    _id?: string;
     firstName: string;
     lastName: string;
     email: string;
     phone: string;
     password: string;
     birthday: string;
-    home_address: string;
-    office_address: string;
-    primary_interest: string;
-    current_challenges: string;
+    home_address?: string;
+    office_address?: string;
+    primary_interest?: string;
+    current_challenges?: string;
     is_demo: number;
-    preferred_date: string;
+    preferred_date?: string;
     is_active: boolean;
     last_login: Date;
     date_joined: Date;
@@ -21,10 +21,39 @@ export type User = {
     role: "User" | "Manager" | "Admin";
     otp: number;
     otpExpiryTime: Date;
-    // _doc: UserDoc;
     profile_pic?: string;
 
+    title?: "Mr." | "Ms." | "Mrs." | "Dr." | "Prof.";
+    gender?: "Male" | "Female" | "Other";
+    religion?: string;
+    place_of_birth?: string;
+    current_parish?: string;
+    national_id_number?: string;
+    national_id_photo?: string;
+    home_location_map?: string;
+    district_of_birth?: string;
+    parish_of_birth?: string;
+    village_of_birth?: string;
+    marital_status?: "Single" | "Married" | "Divorced" | "Widowed";
+    occupation?: string;
+    job_title?: string;
+    next_of_kin_name?: string;
+    next_of_kin_phone?: string;
+    next_of_kin_email?: string;
+    next_of_kin_national_id?: string;
+    monthly_income_level?: "Less than UGX 1,000,000" | "UGX 1,000,000 - 5,000,000" | "UGX 5,000,000 - 15,000,000" | "Above UGX 15,000,000";
+    bank_name?: string;
+    bank_account_number?: string;
+    bank_mobile_account?: string;
+    bank_email?: string;
+    highest_education_level?: "Secondary (Ordinary Level)" | "Secondary (Advanced Level)" | "Tertiary" | "University" | "Other (Specify)";
+    employment_status?: "Employed" | "Self-employed" | "Unemployed" | "Retired";
+    current_work_address?: string;
+    employer_name?: string;
+    current_salary?: string;
+    side_hustle_income?: string;
 };
+
 
 export type CreateRoleTypes = {
     role_name: string;
@@ -41,12 +70,57 @@ export type CreateUserTypes = {
 }
 
 export type UpdateUserTypes = {
+    _id?: string;
+    firstName?: string;
+    lastName?: string;
     email?: string;
-    firstName: string;
-    lastName: string;
-    phone: string;
-    profile_pic?: File;
-}
+    phone?: string;
+    password?: string;
+    birthday?: string;
+    home_address?: string;
+    office_address?: string;
+    primary_interest?: string;
+    current_challenges?: string;
+    preferred_date?: string;
+    is_active?: boolean;
+    last_login?: Date;
+    date_joined?: Date;
+    del_falg?: number;
+    verified?: boolean;
+    otp?: number;
+    otpExpiryTime?: Date;
+    profile_pic?: string;
+
+    title?: "Mr." | "Ms." | "Mrs." | "Dr." | "Prof.";
+    gender?: "Male" | "Female" | "Other";
+    religion?: string;
+    place_of_birth?: string;
+    current_parish?: string;
+    national_id_number?: string;
+    national_id_photo?: string;
+    home_location_map?: string;
+    district_of_birth?: string;
+    parish_of_birth?: string;
+    village_of_birth?: string;
+    marital_status?: "Single" | "Married" | "Divorced" | "Widowed";
+    occupation?: string;
+    job_title?: string;
+    next_of_kin_name?: string;
+    next_of_kin_phone?: string;
+    next_of_kin_email?: string;
+    next_of_kin_national_id?: string;
+    monthly_income_level?: "Less than UGX 1,000,000" | "UGX 1,000,000 - 5,000,000" | "UGX 5,000,000 - 15,000,000" | "Above UGX 15,000,000";
+    bank_name?: string;
+    bank_account_number?: string;
+    bank_mobile_account?: string;
+    bank_email?: string;
+    highest_education_level?: "Secondary (Ordinary Level)" | "Secondary (Advanced Level)" | "Tertiary" | "University" | "Other (Specify)";
+    employment_status?: "Employed" | "Self-employed" | "Unemployed" | "Retired";
+    current_work_address?: string;
+    employer_name?: string;
+    current_salary?: string;
+    side_hustle_income?: string;
+};
 
 export type SignInTypes = {
     email: string;
