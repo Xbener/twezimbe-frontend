@@ -317,7 +317,7 @@ function GroupSettings({ }: Props) {
                 </div>
             </div>
 
-            <div className='p-3 border-b  w-full'>
+            {/* <div className='p-3 border-b  w-full'>
                 <h1 className='p-2 text-[1.2rem] font-extrabold uppercase'>Quick Actions</h1>
                 <div className="w-full flex items-center gap-3">
                     <Dialog>
@@ -433,7 +433,7 @@ function GroupSettings({ }: Props) {
                         </DialogContent>
                     </Dialog>
                 </div>
-            </div>
+            </div> */}
 
             <div className='p-3 border-b  w-full'>
                 <h1 className='p-2 text-[1.2rem] font-extrabold uppercase'>Privacy Settings</h1>

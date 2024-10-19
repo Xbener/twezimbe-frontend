@@ -8,6 +8,11 @@ import { ReactNode, useContext } from 'react';
 import GroupCreateDialog from './GroupCreateDialog';
 import { useMyContext } from '@/context/MyContext';
 import { GroupContext } from '@/context/GroupContext';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { PopoverTrigger, Popover, PopoverContent } from '../ui/popover';
+import { iconTextGenerator } from '@/lib/iconTextGenerator';
+import { Edit, LogOut } from 'lucide-react';
+import Cookies from 'js-cookie'
 
 const GroupNav = () => {
     // const { joinedGroupList } = useGetjoinedGroupList(userId as string);
@@ -15,8 +20,19 @@ const GroupNav = () => {
     const { groupNotificationFlag, sendMsgGroupId, groupList } = useMyContext()
     const { group: currentGroup, setGroup } = useContext(GroupContext)
 
+    const settingsItems = [
+        { name: "Edit profile", link: "/public_pages/Profile", icon: <Edit /> },
+        {
+            name: "Logout", link: "#", icon: <LogOut />,
+            action: () => {
+                Cookies.remove('access-token');
+                window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/public_pages/SignIn`
+            }
+        },
+    ]
+
     return (
-        <nav className='space-y-2  bg-[#013a6f] p-3 overflow-y-auto overflow-x-hidden h-full' style={{ scrollbarWidth: 'none' }}>
+        <nav className='space-y-2  bg-[#013a6f] p-3 overflow-y-auto overflow-x-hidden h-full mb-5' style={{ scrollbarWidth: 'none' }}>
 
             <hr className='mx-2 rounded border-t-2 border-t-white/[0.06]' />
 
@@ -58,6 +74,27 @@ const GroupNav = () => {
                 <Verified className='h-5 w-7' />
             </NavLink> */}
 
+            <div className='absolute bottom-0 mb-5 mb-2'>
+                    <Popover>
+                        <PopoverTrigger>
+                            <Avatar>
+                                <AvatarImage src={currentUser?.profile_pic} className="bg-black w-[50px] h-[50px] rounded-full" />
+                                <AvatarFallback>{iconTextGenerator(currentUser?.firstName as string, currentUser?.lastName as string)}</AvatarFallback>
+                            </Avatar>
+                        </PopoverTrigger>
+
+                        <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-40 gap-1 flex flex-col border-transparent border-l-8 border-l-neutral-400 pl-3 ">
+                            {
+                                settingsItems.map((item, index) => (
+                                    <Link href={item.link} key={index} className="text-white flex p-2 w-full text-[1.1rem] hover:bg-[#6bb7ff73] cursor-pointer rounded-md items-center gap-2 duration-100" onClick={item?.action}>
+                                        {item.icon}
+                                        {item.name}
+                                    </Link>
+                                ))
+                            }
+                        </PopoverContent>
+                    </Popover>
+            </div>
         </nav>
     );
 }
