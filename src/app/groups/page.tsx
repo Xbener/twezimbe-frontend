@@ -84,7 +84,7 @@ function Groups({ }: Props) {
 
   const joinPublicGroup = async (group: GroupTypes) => {
     try {
-      if (!currentUser?.is_complete) return toast.error("Complete your profile first to join.");
+      if (!currentUser?.is_complete && group?.isSacco) return toast.error("Complete your profile first to join.");
       const res = await joinGroup({ user_id: currentUser?._id, group_id: group?._id });
 
       if (res._id !== null) {
