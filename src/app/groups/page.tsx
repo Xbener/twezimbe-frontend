@@ -160,7 +160,7 @@ function Groups({ }: Props) {
               categoryList.map((category, index) => (
                 <li key={index} className='w-full sm:w-auto'>
                   <button
-                    className={`${selectedCategory === category.link ? 'underline' : ''} text-sm sm:text-base  rounded-md hover:bg-gray-200 hover:text-black duration-200`}
+                    className={`${selectedCategory === category.link ? '' : ''} p-2 text-sm sm:text-base  rounded-md hover:bg-gray-200 hover:text-black duration-200`}
                     onClick={() => setSelectedCategory(category.link)}
                   >
                     {category.name}
