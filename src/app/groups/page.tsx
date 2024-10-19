@@ -11,6 +11,7 @@ import React, { useEffect, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { toast } from 'sonner';
 import Cookies from 'js-cookie'
+import { useRouter } from 'next/navigation'; 
 
 type Props = {};
 
@@ -30,6 +31,16 @@ function Groups({ }: Props) {
   const [filteredGroups, setFilteredGroups] = useState<GroupTypes[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  const router = useRouter(); // Initialize router
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams();
+    if (searchQuery) queryParams.set('search', searchQuery);
+    if (selectedCategory && selectedCategory !== 'All') queryParams.set('category', selectedCategory);
+
+    const newUrl = queryParams.toString() ? `?${queryParams.toString()}` : '';
+    router.replace(newUrl);  // Update the URL without reloading
+  }, [searchQuery, selectedCategory, router]);
 
   useEffect(() => {
     if (currentUser && !currentUser?.is_complete) {
