@@ -5,13 +5,14 @@ import { useGetGroupList, useJoinGroup } from '@/api/group';
 import { Button } from '@/components/ui/button';
 import { GroupTypes } from '@/types';
 import { EyeClosedIcon } from '@radix-ui/react-icons';
-import { Eye, Search } from 'lucide-react';
+import { Eye, Menu, Search } from 'lucide-react';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { toast } from 'sonner';
 import Cookies from 'js-cookie'
-import { useRouter } from 'next/navigation'; 
+import { useRouter } from 'next/navigation';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 type Props = {};
 
@@ -124,16 +125,42 @@ function Groups({ }: Props) {
     <div className='flex flex-col w-full h-screen overflow-hidden'>
       {/* Sticky Header */}
       <div className='w-full bg-[#202234] text-neutral-200 sticky top-0 left-0 z-20'>
-        <div className='flex items-center justify-between p-5 w-full'>
-          <h1 className='text-[2rem] font-bold'>Discover</h1>
+        <div className='flex flex-col sm:flex-row items-center justify-between p-5 w-full gap-3'>
+          <div className="flex items-center gap-4">
+            <Popover>
+              <PopoverTrigger className="flex md:hidden">
+                <Menu />
+              </PopoverTrigger>
 
-          {/* Category Menu */}
-          <ul className='flex gap-3'>
+              <PopoverContent className='bg-blue-500 shadow-lg'>
+                          <ul className='gap-3 flex-col flex items-start justify-normal'>
             {
               categoryList.map((category, index) => (
-                <li key={index}>
+                <li key={index} className='w-full block '>
                   <button
-                    className={`${selectedCategory === category.link ? 'underline' : ''}`}
+                    className={`${selectedCategory === category.link ? 'underline' : ''} p-2 w-full rounded-md hover:bg-gray-200 hover:text-black duration-200`}
+                    onClick={() => setSelectedCategory(category.link)}
+                  >
+                    {category.name}
+                  </button>
+                </li>
+              ))
+            }
+          </ul>
+
+              </PopoverContent>
+            </Popover>
+
+            <h1 className='text-[2rem] font-bold'>Discover</h1>
+          </div>
+
+          {/* Category Menu */}
+          <ul className='hidden gap-3 flex-wrap md:flex'>
+            {
+              categoryList.map((category, index) => (
+                <li key={index} className='w-full sm:w-auto'>
+                  <button
+                    className={`${selectedCategory === category.link ? 'underline' : ''} text-sm sm:text-base  rounded-md hover:bg-gray-200 hover:text-black duration-200`}
                     onClick={() => setSelectedCategory(category.link)}
                   >
                     {category.name}
@@ -158,7 +185,7 @@ function Groups({ }: Props) {
 
       <div className='h-full overflow-auto flex flex-col'>
         <div className='flex flex-col bg-[#202234] p-5 text-neutral-200'>
-          <h1 className="text-[4rem] uppercase font-bold">Find Your Community</h1>
+          <h1 className="sm:text-[4rem] text-[1rem] uppercase font-bold">Find Your Community</h1>
           <p>From Social, Educational, Professional, and many more!</p>
         </div>
 
@@ -174,7 +201,7 @@ function Groups({ }: Props) {
           )}
 
           {/* No Groups Found */}
-          {formattedGroups && filteredGroups?.length! <= 0  && (
+          {formattedGroups && filteredGroups?.length! <= 0 && (
             <div className='w-full p-5 grid place-content-center'>
               <h1>No Groups Found</h1>
             </div>
