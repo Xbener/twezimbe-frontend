@@ -15,54 +15,78 @@ import Cookies from 'js-cookie'
 type Props = {};
 
 const categoryList = [
-  { name: "Social", link: "" },
-  { name: "Educational", link: "" },
-  { name: "Professional", link: "" },
-  { name: "Others", link: "" },
+  { name: "Social", link: "Social" },
+  { name: "Educational", link: "Educational" },
+  { name: "Professional", link: "Professional" },
+  { name: "Others", link: "Others" },
 ];
 
 function Groups({ }: Props) {
-  const { groups, isLoading } = useGetGroupList()
-  const { currentUser } = useGetProfileData()
-  const { joinGroup, isLoading: joinLoading, isError: joinError } = useJoinGroup()
-  const [formattedGroups, setFormattedGroups] = useState(groups)
-  const [requestLoading, setRequestLoading] = useState(false)
+  const { groups, isLoading } = useGetGroupList();
+  const { currentUser } = useGetProfileData();
+  const { joinGroup, isLoading: joinLoading, isError: joinError } = useJoinGroup();
+
+  const [formattedGroups, setFormattedGroups] = useState<GroupTypes[]>(groups);
+  const [filteredGroups, setFilteredGroups] = useState<GroupTypes[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
 
   useEffect(() => {
     if (currentUser && !currentUser?.is_complete) {
-      toast.error('Please complete your profile to join groups')
+      toast.error('Please complete your profile to join groups');
       const timeout = setTimeout(() => {
-        window.location.href = '/public_pages/Profile'
-      }, 3000)
+        window.location.href = '/public_pages/Profile';
+      }, 3000);
 
-      return () => clearTimeout(timeout)
+      return () => clearTimeout(timeout);
     }
-  }, [currentUser])
+  }, [currentUser]);
 
   useEffect(() => {
-    setFormattedGroups(groups)
-  }, [groups])
+    setFormattedGroups(groups);
+  }, [groups]);
 
+  useEffect(() => {
+    filterGroups();
+  }, [formattedGroups, searchQuery, selectedCategory]);
+
+  const filterGroups = () => {
+    let filtered = formattedGroups;
+
+    // Filter by search query
+    if (searchQuery) {
+      filtered = filtered.filter(group =>
+        group.group_name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    // Filter by selected category
+    if (selectedCategory) {
+      filtered = filtered.filter(group =>
+        group.group_type === selectedCategory
+      );
+    }
+
+    setFilteredGroups(filtered);
+  };
 
   const joinPublicGroup = async (group: GroupTypes) => {
     try {
-      if(!currentUser?.is_complete) return toast.error("Complete your profile first to join.")
-      const res = await joinGroup({ user_id: currentUser?._id, group_id: group?._id })
+      if (!currentUser?.is_complete) return toast.error("Complete your profile first to join.");
+      const res = await joinGroup({ user_id: currentUser?._id, group_id: group?._id });
 
       if (res._id !== null) {
-        window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups/${group?._id}`
+        window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups/${group?._id}`;
       } else {
-        toast.error(res.message || res.errors)
+        toast.error(res.message || res.errors);
       }
     } catch (error) {
-      toast.error("An error occurred. Please try again")
+      toast.error("An error occurred. Please try again");
     }
-  }
-
+  };
 
   const sendRequestToJoin = async (group: GroupTypes) => {
     try {
-      setRequestLoading(true)
       const accessToken = Cookies.get('access-token');
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/groups/requests`, {
         method: 'POST',
@@ -71,41 +95,51 @@ function Groups({ }: Props) {
           "Authorization": `Bearer ${accessToken}`
         },
         body: JSON.stringify({ groupId: group?._id, userId: currentUser?._id })
-      })
-      const data = await res.json()
+      });
+      const data = await res.json();
 
       if (data.status) {
-        toast.success('request sent successfully. Wait for approval from admins')
-        setFormattedGroups(prev => {
-          return prev?.filter(prevGroup => prevGroup?._id === group._id)
-        })
+        toast.success('Request sent successfully. Wait for approval from admins');
+        setFormattedGroups(prev => prev?.filter(prevGroup => prevGroup?._id !== group._id));
       } else {
-        toast.error(data.errors || data.message)
+        toast.error(data.errors || data.message);
       }
     } catch (error) {
-      toast.error("An error occurred. Please try again")
-    } finally {
-      setRequestLoading(false)
+      toast.error("An error occurred. Please try again");
     }
-  }
+  };
+
   return (
     <div className='flex flex-col w-full h-screen overflow-hidden'>
       {/* Sticky Header */}
       <div className='w-full bg-[#202234] text-neutral-200 sticky top-0 left-0 z-20'>
         <div className='flex items-center justify-between p-5 w-full'>
           <h1 className='text-[2rem] font-bold'>Discover</h1>
+
+          {/* Category Menu */}
           <ul className='flex gap-3'>
             {
               categoryList.map((category, index) => (
-                <Link key={index} href={category.link}>
-                  {category.name}
-                </Link>
+                <li key={index}>
+                  <button
+                    className={`${selectedCategory === category.link ? 'underline' : ''}`}
+                    onClick={() => setSelectedCategory(category.link)}
+                  >
+                    {category.name}
+                  </button>
+                </li>
               ))
             }
           </ul>
 
-          <div className="flex items-center bg-gray-200 p-2 text-neutral-700">
-            <input className='bg-transparent outline-none' placeholder='Search ...' />
+          {/* Search Input */}
+          <div className="flex items-center bg-gray-200 p-2 rounded-full text-neutral-700">
+            <input
+              className='bg-transparent outline-none'
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder='Search ...'
+            />
             <Search />
           </div>
         </div>
@@ -118,24 +152,27 @@ function Groups({ }: Props) {
         </div>
 
         <div className="mt-5">
-
           <h1 className='p-5 text-[2rem] text-neutral-800'>Browse Groups</h1>
-          {
-            isLoading && <Skeleton
-              containerClassName='flex gap-4'
-              inline height={300} count={5} className='h-[300px sm:w-[45%] md:w-[30%] lg:w-[23%]' />
-          }
 
-          {
-            formattedGroups?.length! <= 0 && (
-              <div className='w-full p-5 grid place-content-center'>
-                <h1>No Groups Found</h1>
-              </div>
-            )
-          }
+          {/* Loading State */}
+          {isLoading && (
+            <Skeleton
+              containerClassName='flex gap-4'
+              inline height={300} count={5} className='h-[300px] sm:w-[45%] md:w-[30%] lg:w-[23%]'
+            />
+          )}
+
+          {/* No Groups Found */}
+          {formattedGroups && filteredGroups?.length! <= 0  && (
+            <div className='w-full p-5 grid place-content-center'>
+              <h1>No Groups Found</h1>
+            </div>
+          )}
+
+          {/* Group List */}
           <div className='flex p-5 mt-5 items-start justify-start gap-5 flex-wrap w-full'>
             {
-              formattedGroups?.map((group: GroupTypes, key) => (
+              filteredGroups?.map((group: GroupTypes, key) => (
                 <div
                   key={key}
                   className='flex flex-col p-5 bg-[#66acee39] h-[300px] shadow-lg rounded-md sm:w-[45%] md:w-[30%] lg:w-[23%] gap-3 overflow-hidden'
@@ -149,15 +186,19 @@ function Groups({ }: Props) {
                   </div>
 
                   {/* Content */}
-                  <h1 className='flex-grow flex items-center gap-2'>{group.group_name} {group.group_state === 'Public' ? <Eye /> : <EyeClosedIcon />}</h1>
+                  <h1 className='flex-grow flex items-center gap-2'>
+                    {group.group_name} {group.group_state === 'Public' ? <Eye /> : <EyeClosedIcon />}
+                  </h1>
                   <p className='flex-grow'>
                     {group.description.length < 50 ? group.description : `${group.description.substring(0, 50)} ...`}
                   </p>
                   <p>{group.memberCount} {group.memberCount > 1 ? "members" : 'member'}</p>
-                  {/* Link Button */}
-                  <Button className='w-full px-5 py-2 rounded-md bg-[#013a6f] text-white mt-auto' disabled={requestLoading} onClick={() => {
-                    group.group_state === "Public" ? joinPublicGroup(group) : sendRequestToJoin(group)
-                  }}>
+
+                  {/* Join/Request Button */}
+                  <Button
+                    className='w-full px-5 py-2 rounded-md bg-[#013a6f] text-white mt-auto'
+                    onClick={() => group.group_state === "Public" ? joinPublicGroup(group) : sendRequestToJoin(group)}
+                  >
                     {group.group_state === "Public" ? "Join Group" : "Request To join"}
                   </Button>
                 </div>

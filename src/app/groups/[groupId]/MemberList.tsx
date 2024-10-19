@@ -8,46 +8,17 @@ import { toast } from 'sonner'
 import Cookies from 'js-cookie'
 import GroupMemberItem from '@/components/groups/GroupMemberItem'
 
-type Props = {}
+type Props = {
+    isLoading:boolean;
+    admins: User[];
+    moderators:User[];
+    members: User[];
+}
 
-function MemberList({ }: Props) {
+function MemberList({ admins, moderators, members, isLoading }: Props) {
 
     const { group } = useContext(GroupContext)
-    const [isLoading, setIsLoading] = useState(false)
-    const [admins, setAdmins] = useState<User[]>([]);
-    const [moderators, setModerators] = useState<User[]>([]);
-    const [members, setMembers] = useState<User[]>([]);
 
-    const handleGetMembers = async () => {
-        const token = Cookies.get('access-token')
-        try {
-            setIsLoading(true)
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/groups/members/${group?._id}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-            const data = await res.json()
-
-            console.log('members', data)
-            // Assuming the API returns the correct structure
-            setAdmins(data.members.filter((member: any) => member.role === "GroupManager"));
-            setModerators(data.members.filter((member: any) => member.role === "GroupModerator"));
-            setMembers(data.members.filter((member: any) => member.role === "GroupUser"));
-
-        } catch (error) {
-            toast.error("Something went wrong")
-            console.error(error)
-        } finally {
-            setIsLoading(false)
-        }
-    }
-
-    useEffect(() => {
-        if (group) {
-            handleGetMembers()
-        }
-    }, [group]);
 
     return (
         <div className='w-[25%] bg-[#013a6fa6] overflow-auto'>
@@ -61,7 +32,7 @@ function MemberList({ }: Props) {
             <>
                 {
                     isLoading ? (
-                        <div className="w-full p-2 grid place-content-center"> 
+                        <div className="w-full p-2 grid place-content-center">
                             loading ...
                         </div>
 

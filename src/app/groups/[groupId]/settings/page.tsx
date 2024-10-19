@@ -7,7 +7,7 @@ import React, { ChangeEvent, useContext, useState } from 'react'
 import Cookies from 'js-cookie'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
-import { DoorOpen, MessageCircleWarning, XCircle } from 'lucide-react'
+import { DoorOpen, MessageCircleWarning, Search, XCircle } from 'lucide-react'
 import { useUpdateGroup } from '@/api/group'
 import { useRouter } from 'next/navigation'
 import { useGetProfileData } from '@/api/auth'
@@ -17,7 +17,7 @@ import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTrigger } from 
 type Props = {}
 
 function GroupSettings({ }: Props) {
-    const { group } = useContext(GroupContext)
+    const { group, admins, moderators, members } = useContext(GroupContext)
     const [file, setFile] = useState<File | null>(null)
     const [uploading, setUploading] = useState(false)
     const { isLoading, updateGroup } = useUpdateGroup()
@@ -314,6 +314,124 @@ function GroupSettings({ }: Props) {
                             </Select>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div className='p-3 border-b  w-full'>
+                <h1 className='p-2 text-[1.2rem] font-extrabold uppercase'>Quick Actions</h1>
+                <div className="w-full flex items-center gap-3">
+                    <Dialog>
+                        <DialogTrigger>
+                            <Button className="w-full bg-orange-700 text-white">Manage admins</Button>
+                        </DialogTrigger>
+                        <DialogContent className="bg-white text-black">
+                            <DialogHeader>
+                                Manage Group Admins
+                            </DialogHeader>
+
+                            <div className="w-full flex flex-col gap-2">
+                                <div className="flex items-center bg-[#013a6fae] sticky top-0 z-20 p-2 justify-between text-neutral-200 w-full">
+                                    <input className='bg-transparent outline-none w-full' placeholder='Search ...' />
+                                    <Search />
+                                </div>
+
+                                {
+                                    members?.map((member) => (
+                                        <div className="w-full flex items-center justify-between hover:bg-gray-50">
+                                            <h1>{member.firstName} {member.lastName}</h1>
+
+                                            <input
+                                                type="checkbox"
+                                                checked={member.role === 'GroupManager'}
+                                            />
+                                        </div>
+                                    ))
+                                }
+                            </div>
+
+                            <DialogClose>
+                                <Button>Close</Button>
+                            </DialogClose> 
+                             <DialogClose>
+                                <Button>Confirm</Button>
+                            </DialogClose>
+                        </DialogContent>
+                    </Dialog>
+
+                    <Dialog>
+                        <DialogTrigger>
+                            <Button className="w-full bg-orange-700 text-white">Manage Moderators</Button>
+                        </DialogTrigger>
+                        <DialogContent className="bg-white text-black">
+                            <DialogHeader>
+                                Manage Group Moderators
+                            </DialogHeader>
+
+                            <div className="w-full flex flex-col gap-2">
+                                <div className="flex items-center bg-[#013a6fae] sticky top-0 z-20 p-2 justify-between text-neutral-200 w-full">
+                                    <input className='bg-transparent outline-none w-full' placeholder='Search ...' />
+                                    <Search />
+                                </div>
+
+                                {
+                                    members?.map((member) => (
+                                        <div className="w-full flex items-center justify-between hover:bg-gray-50">
+                                            <h1>{member.firstName} {member.lastName}</h1>
+
+                                            <input
+                                                type="checkbox"
+                                                checked={member.role === 'GroupModerator'}
+                                            />
+                                        </div>
+                                    ))
+                                }
+                            </div>
+
+                            <DialogClose>
+                                <Button>Close</Button>
+                            </DialogClose>
+                            <DialogClose>
+                                <Button>Confirm</Button>
+                            </DialogClose>
+                        </DialogContent>
+                    </Dialog>
+
+                    <Dialog>
+                        <DialogTrigger>
+                            <Button className="w-full bg-orange-700 text-white">Manage Users</Button>
+                        </DialogTrigger>
+                        <DialogContent className="bg-white text-black">
+                            <DialogHeader>
+                                Manage Group Members
+                            </DialogHeader>
+
+                            <div className="w-full flex flex-col gap-2">
+                                <div className="flex items-center bg-[#013a6fae] sticky top-0 z-20 p-2 justify-between text-neutral-200 w-full">
+                                    <input className='bg-transparent outline-none w-full' placeholder='Search ...' />
+                                    <Search />
+                                </div>
+
+                                {
+                                    members?.map((member) => (
+                                       member?.role != "GroupManager" && (
+                                            <div className="w-full flex items-center justify-between hover:bg-gray-50">
+                                                <h1>{member.firstName} {member.lastName}</h1>
+
+                                                <Button className="bg-red-500 text-white">Kick</Button>
+                                            </div>
+                                       )
+                                    ))
+                                }
+                            </div>
+
+                            <DialogClose>
+                                <Button>Close</Button>
+                            </DialogClose>
+                            <DialogClose>
+                                <Button>Confirm</Button>
+                            </DialogClose>
+                        </DialogContent>
+                    </Dialog>
                 </div>
             </div>
 

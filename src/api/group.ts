@@ -68,7 +68,7 @@ export const useGetGroupList = () => {
     };
 
     const { data: groups, isLoading } = useQuery("allGroupList", () => getAllGroupList());
-    return { groups, isLoading }
+    return { groups: groups as GroupTypes[], isLoading }
 };
 
 

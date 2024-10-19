@@ -3,20 +3,24 @@ import React, { useContext, useEffect, useState } from 'react'
 import Aside from './Aside'
 import { useParams } from 'next/navigation'
 import { useGetGroup } from '@/api/group'
-import { GroupTypes } from '@/types'
+import { GroupTypes, User } from '@/types'
 import { GroupContext } from '@/context/GroupContext'
 import MemberList from './MemberList'
 import MainLoader from '@/components/MainLoader'
 import Error from '@/components/Error'
+import { toast } from 'sonner'
+import Cookies from 'js-cookie'
 
 type Props = {
     children: React.ReactNode
 }
 
 function GroupIdLayout({ children }: Props) {
-    const { getGroup, isError, isSuccess, isLoading } = useGetGroup()
+    const { getGroup, isError, isSuccess, isLoading: groupsLoading } = useGetGroup()
     const { groupId } = useParams()
-    const { group, setGroup } = useContext(GroupContext)
+    const { group, setGroup, admins, moderators, members, isLoading } = useContext(GroupContext)
+
+
     useEffect(() => {
         const fetchGroup = async () => {
             const res = await getGroup(groupId as string)
@@ -31,7 +35,7 @@ function GroupIdLayout({ children }: Props) {
 
 
     if (!group?._id) return <MainLoader />
-    if (isLoading) return <MainLoader />
+    if (groupsLoading) return <MainLoader />
     if (isError) return <Error />
     return (
         <div className='flex w-full text-neutral-200'>
@@ -40,7 +44,12 @@ function GroupIdLayout({ children }: Props) {
                 <div className="w-[75%] overflow-auto">
                     {children}
                 </div>
-                <MemberList />
+                <MemberList
+                    isLoading={isLoading}
+                    admins={admins}
+                    moderators={moderators}
+                    members={members}
+                />
             </div>
         </div>
     )

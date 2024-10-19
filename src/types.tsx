@@ -18,7 +18,7 @@ export type User = {
     del_falg: number;
     verified: boolean;
     salt: string;
-    role: "User" | "Manager" | "Admin";
+    role: "GroupUser" | "GroupModerator" | "GroupManager";
     otp: number;
     otpExpiryTime: Date;
     profile_pic?: string;
@@ -277,7 +277,7 @@ export type GroupTypes = {
     invite_link: string;
     group_state: string;
     upgraded: boolean;
-    tags:string;
+    tags: string;
 };
 
 export type CreateGroupTypes = {
