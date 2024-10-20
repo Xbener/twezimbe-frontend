@@ -44,20 +44,20 @@ export default function RootLayout({
       <title>Welcome to Twezimbe</title>
       <body className={inter.className}>
         <Suspense fallback={<MainLoader />}>
-          <StoreContext>
-            <QueryClientProvider client={queryClient} >
-              <AutoLogin>
-                <MyProvider>
+          <QueryClientProvider client={queryClient} >
+            <MyProvider>
+              <StoreContext>
+                <AutoLogin>
                   <HelmetProvider context={helmetContext}>
                     <Toaster />
                     {children}
                   </HelmetProvider>
-                </MyProvider>
-              </AutoLogin>
-            </QueryClientProvider>
-          </StoreContext>
+                </AutoLogin>
+              </StoreContext>
+            </MyProvider>
+          </QueryClientProvider>
         </Suspense>
       </body>
-    </html>
+    </html >
   );
 }

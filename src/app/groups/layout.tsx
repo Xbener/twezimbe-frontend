@@ -25,7 +25,6 @@ export default function GroupLayout({
     const router = useRouter()
     const access_token = Cookies.get('access-token')
     const { joinedGroupList } = useGetjoinedGroupList();
-    const { userEnter } = useMyContext()
     const { currentUser } = useGetProfileData();
     const [userInfo, setUserInfo] = useState<User>();
     const params = useParams()
