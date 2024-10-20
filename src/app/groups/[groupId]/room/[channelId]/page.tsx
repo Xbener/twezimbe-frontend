@@ -11,13 +11,15 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import moment from 'moment'
 import { useGetProfileData } from '@/api/auth'
+import PacmanLoader from 'react-spinners/PacmanLoader'
 
 type Props = {}
 
 
 function Page({ }: Props) {
     const { channelId } = useParams()
-    const { getChannel, isError, isLoading } = useGetSingleChannel()
+    const { getChannel, isError } = useGetSingleChannel()
+    const [isLoading, setLoading] = useState(true)
     const { currentUser } = useGetProfileData()
     const { group } = useContext(GroupContext)
     const [channel, setChannel] = useState<ChannelTypes | null>(null)
@@ -69,10 +71,26 @@ function Page({ }: Props) {
             setChannel(data.channel)
         } catch (error) {
             console.error('Error fetching data', error)
+        }finally{
+            setLoading(false)
         }
     }
 
+    const getChannelMessages = async () => {
+        try {
+            const token = Cookies.get('access-token')
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/${channel?.chatroom._id}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
 
+            })
+            const data = await response.json()
+            setMessages(data.messages)
+        } catch (error) {
+            console.error('Error fetching data', error)
+        }
+    }
 
     useEffect(() => {
         if (channelId) {
@@ -80,6 +98,11 @@ function Page({ }: Props) {
         }
     }, [channelId])
 
+    useEffect(() => {
+        if (channel) {
+            getChannelMessages()
+        }
+    }, [channel])
 
     const handleKeyPress = async (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter' && message.trim()) {
@@ -140,6 +163,12 @@ function Page({ }: Props) {
             return msgDate.format('MM/DD/YYYY'); // Adjust this format as needed
         }
     };
+
+    if (isLoading) return (
+        <div className='w-full h-full grid place-content-center'>
+            <PacmanLoader color='white w-2' size={'small'} />
+        </div>
+    )
     return (
         <div className="w-full h-screen flex flex-col bg-[#013a6fd3] text-white">
             {/* Header */}
