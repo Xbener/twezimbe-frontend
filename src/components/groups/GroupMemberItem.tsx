@@ -37,7 +37,7 @@ function GroupMemberItem(member: Props) {
                     <StatusDot status={checkIsActive(onlineUsers, member) ? 'online' : "offline"} />
                 </PopoverTrigger>
                 <PopoverTrigger>
-                    <h1>{member.firstName} {member.lastName}</h1>
+                    <h1 className='text-[.9rem]'>{member.firstName} {member.lastName}</h1>
                 </PopoverTrigger>
                 <PopoverContent className="bg-[#013a6f] text-white flex flex-col items-center gap-2 border-transparent shadow-lg rounded-lg">
                     <Avatar className='w-[100px] h-[100px]'>

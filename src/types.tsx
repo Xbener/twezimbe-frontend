@@ -349,9 +349,17 @@ export type CreateChannelTypes = {
 }
 
 export type ChannelTypes = {
+    _id: string;
     name: string;
     description: string;
     state: string;
     created_by: User;
     createdAt: Date;
+    chatroom: ChatRoomTypes;
 }
+
+export type ChatRoomTypes = {
+    _id: string;
+    name: string;
+    ref: string
+}   

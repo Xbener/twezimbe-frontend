@@ -77,3 +77,37 @@ export const useGetGroupChannels = () => {
         isSuccess
     }
 }
+
+
+export const useGetSingleChannel = () => {
+    const accessToken = Cookies.get('access-token');
+    const getChannelData = async ({ groupId, channelId }: { groupId: string, channelId: string }): Promise<any> => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/channels/${groupId}/${channelId}`, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+            }
+        });
+
+        const responseData = await response.json();
+
+        if (!response.ok) {
+            throw new Error(responseData.errors || responseData.message);
+        }
+        return responseData
+    };
+
+    const { mutateAsync: getChannel, isLoading, isError, isSuccess, error, reset } = useMutation(getChannelData);
+
+
+    if (error) {
+        toast.error(error.toString());
+        reset();
+    }
+
+    return {
+        getChannel,
+        isLoading,
+        isError,
+        isSuccess
+    }
+}
