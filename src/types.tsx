@@ -379,7 +379,7 @@ export type Message = {
     messageType?: 'text' | 'image' | 'video' | 'sticker' | 'gif';
     attachmentUrl?: string;
     read?: boolean;
-    status?: 'sent' | 'delivered' | 'seen';
+    status?: 'sending' | 'sent' | 'delivered' | 'seen';
     reactions?: Reaction[];
     replyingTo?: string;
     edited?: boolean;

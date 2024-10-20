@@ -34,7 +34,7 @@ function Page({ }: Props) {
     });
 
     const scrollToBottom = () => {
-        if(messagesEndRef.current){
+        if (messagesEndRef.current) {
             messagesEndRef.current?.scrollIntoView({
                 behavior: "smooth"
             })
@@ -135,7 +135,7 @@ function Page({ }: Props) {
                     })
                 });
                 const data = await response.json();
-                setMessages((prev: any) => ([...prev, { ...data.message, sender: currentUser }])); // Update local state with the new message
+                setMessages((prev: any) => ([...prev, { ...data.message, createdAt: new Date(), sender: currentUser, status: "sending" }]));
                 socket.emit('new-message', { sender: currentUser, receiver: channel?.members, message: { ...data.message, sender: currentUser } })
                 setMessage('')
                 scrollToBottom();
@@ -216,7 +216,7 @@ function Page({ }: Props) {
                                     <div
                                         key={msg._id}
                                         onContextMenu={handleContextMenu}
-                                        className={`flex gap-4 hover:bg-[#cbcbcb2e] cursor-pointer rounded-md items-start justify-normal p-1 ${index === msgs.length && "mb-5"}`} // Reduced margin between consecutive messages
+                                        className={`flex gap-4 hover:bg-[#cbcbcb2e] cursor-pointer rounded-md items-start justify-normal p-1 ${index === msgs.length && "mb-5"} group`} // Reduced margin between consecutive messages
                                     >
                                         {showAvatarAndName ? (
                                             <Avatar className='w-[40px] h-[40px] bg-neutral-200 rounded-full'>
@@ -224,7 +224,9 @@ function Page({ }: Props) {
                                                 <AvatarFallback />
                                             </Avatar>
                                         ) : (
-                                            <div className='w-[40px] h-[0px]' />
+                                            <div className='w-[40px] text-[.5rem] items-center invisible group-hover:visible' >
+                                                    {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
+                                            </div>
                                             // Placeholder for alignment
                                         )}
 
