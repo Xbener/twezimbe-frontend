@@ -1,10 +1,10 @@
 import { useGetProfileData } from "@/api/auth";
-import { ChannelTypes, FriendTypes, JoinedGroupTypes, User } from "@/types";
+import { ChannelTypes, FriendTypes, JoinedGroupTypes, Message, User } from "@/types";
 import Cookies from 'js-cookie';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import io, { Socket } from 'socket.io-client';
 
-let socket: Socket;
+export let socket: Socket;
 
 type Props = {
     children: React.ReactNode;
@@ -21,6 +21,8 @@ type MyContextType = {
     setSendMsgGroupId: (value: string) => void;
     onlineUsers: User[] | null;
     setOnlineUsers: (vl: User[]) => void;
+    messages: Message[];
+    setMessages: React.Dispatch<React.SetStateAction<Message[]>>
 
 };
 
@@ -33,6 +35,9 @@ export const MyProvider = ({ children }: Props) => {
     const [groupNotificationFlag, setGroupNotificationFlag] = useState<boolean>(false)
     const [onlineUsers, setOnlineUsers] = useState<User[] | null>(null)
     const [sendMsgGroupId, setSendMsgGroupId] = useState<string>('')
+    const [messages, setMessages] = useState<Message[]>([
+
+    ])
     const { currentUser } = useGetProfileData()
 
     useEffect(() => {
@@ -46,6 +51,10 @@ export const MyProvider = ({ children }: Props) => {
             socket.on('user-logged-out', ({ user, onlineUsers }) => {
                 setOnlineUsers(onlineUsers);
             });
+
+            socket.on('new-message-added', vl => {
+                setMessages(prev => ([...prev, vl.message]))
+            })
         }
 
         return () => {
@@ -67,7 +76,9 @@ export const MyProvider = ({ children }: Props) => {
                 sendMsgGroupId,
                 setSendMsgGroupId,
                 onlineUsers,
-                setOnlineUsers
+                setOnlineUsers,
+                messages,
+                setMessages
             }}
         >
             {children}

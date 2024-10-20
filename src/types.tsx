@@ -356,6 +356,7 @@ export type ChannelTypes = {
     created_by: User;
     createdAt: Date;
     chatroom: ChatRoomTypes;
+    members: string[] | string;
 }
 
 export type ChatRoomTypes = {

@@ -12,12 +12,14 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import moment from 'moment'
 import { useGetProfileData } from '@/api/auth'
 import PacmanLoader from 'react-spinners/PacmanLoader'
+import { socket, useMyContext } from '@/context/MyContext'
 
 type Props = {}
 
 
 function Page({ }: Props) {
     const { channelId } = useParams()
+    const { messages, setMessages } = useMyContext()
     const { getChannel, isError } = useGetSingleChannel()
     const [isLoading, setLoading] = useState(true)
     const { currentUser } = useGetProfileData()
@@ -29,9 +31,7 @@ function Page({ }: Props) {
         x: 0,
         y: 0,
     });
-    const [messages, setMessages] = useState<Message[]>([
 
-    ])
 
     const handleContextMenu = (e: any) => {
         e.preventDefault(); // Prevent the default context menu from appearing
@@ -71,7 +71,7 @@ function Page({ }: Props) {
             setChannel(data.channel)
         } catch (error) {
             console.error('Error fetching data', error)
-        }finally{
+        } finally {
             setLoading(false)
         }
     }
@@ -120,11 +120,13 @@ function Page({ }: Props) {
                         content: message,
                         messageType: "text",
                         attachmentUrl: "none",
+                        receiver_id: channel?.members
                     })
                 });
                 const data = await response.json();
-                setMessages((prev) => [...prev, { ...data.message, sender: currentUser }]); // Update local state with the new message
-                setMessage(''); // Clear the input
+                setMessages((prev: any) => ([...prev, { ...data.message, sender: currentUser }])); // Update local state with the new message
+                socket.emit('new-message', { sender: currentUser, receiver: channel?.members, message: { ...data.message, sender: currentUser } })
+                setMessage('')
             } catch (error) {
                 console.error('Error sending message', error);
             }
