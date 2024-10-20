@@ -10,6 +10,8 @@ import MainLoader from '@/components/MainLoader'
 import Error from '@/components/Error'
 import { toast } from 'sonner'
 import Cookies from 'js-cookie'
+import { useGetGroupChannels } from '@/api/channel'
+import { useMyContext } from '@/context/MyContext'
 
 type Props = {
     children: React.ReactNode
@@ -17,8 +19,10 @@ type Props = {
 
 function GroupIdLayout({ children }: Props) {
     const { getGroup, isError, isSuccess, isLoading: groupsLoading } = useGetGroup()
+    const { getChannels, isError: channelsError, isLoading: channelsLoading, isSuccess: channelsSuccess } = useGetGroupChannels()
     const { groupId } = useParams()
     const { group, setGroup, admins, moderators, members, isLoading } = useContext(GroupContext)
+    const { setChannelList } = useMyContext()
 
 
     useEffect(() => {
@@ -33,6 +37,15 @@ function GroupIdLayout({ children }: Props) {
         fetchGroup()
     }, [groupId])
 
+    useEffect(() => {
+        const getChannelsList = async (groupId: string) => {
+            const res = await getChannels(groupId)
+            if (!res.status) toast.error(res.errors || res.message)
+            setChannelList(res.channels)
+        }
+
+        if (group) getChannelsList(group?._id)
+    }, [group])
 
     if (!group?._id) return <MainLoader />
     if (groupsLoading) return <MainLoader />

@@ -6,11 +6,14 @@ import { GroupContext } from '@/context/GroupContext'
 import { iconTextGenerator } from '@/lib/iconTextGenerator'
 import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar'
 import { CaretDownIcon } from '@radix-ui/react-icons'
-import { Bell, Edit, LogOut, MessageCirclePlus, PlusIcon, Settings, Upload } from 'lucide-react'
+import { Bell, Edit, Lock, LogOut, MessageCirclePlus, PlusIcon, Settings, Upload } from 'lucide-react'
 import Link from 'next/link'
 import { userInfo } from 'os'
 import React, { useContext } from 'react'
 import Cookies from 'js-cookie'
+import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog'
+import { useMyContext } from '@/context/MyContext'
+import { channel } from 'diagnostics_channel'
 
 type Props = {
 
@@ -20,6 +23,7 @@ type Props = {
 
 function ChannelDetails({ }: Props) {
     const { group } = useContext(GroupContext)
+    const { channelList } = useMyContext()
     const { currentUser } = useGetProfileData()
 
 
@@ -124,10 +128,41 @@ function ChannelDetails({ }: Props) {
             <div className='w-full p-2 flex flex-col mt-5'>
                 <span className='flex items-center justify-between uppercase font-extrabold text-[0.9rem]'>
                     Channels
-                    <span className='cursor-pointer'>
-                        <PlusIcon />
-                    </span>
+                    <Dialog>
+                        <DialogTrigger>
+                            <Button
+                                className='cursor-pointer hover:bg-gray-50 rounded-full hover:text-black'>
+                                <PlusIcon />
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="bg-white">
+                            <DialogHeader className='font-bold text-[1.2rem]'>
+                                Create a new channel
+                            </DialogHeader>
+                            <div className="flex gap-2">
+                                <DialogClose>
+                                    <Button className='border border-orange-500 text-orange-500'>
+                                        Cancel
+                                    </Button>
+                                </DialogClose>
+                                <Button className='bg-orange-500'>
+                                    Continue
+                                </Button>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
                 </span>
+
+                <div className='w-full p-2 flex flex-col'>
+                    {
+                        channelList?.map((channel, index) => (
+                            <div key={index} className='flex items-center text-[1rem] gap-2 w-full hover:bg-neutral-50 hover:text-gray-700 duration-100 cursor-pointer p-2 rounded-md'>
+                                <span>{channel?.state === 'public' ? "#" : <Lock className='' />}</span>
+                                {channel.name}
+                            </div>
+                        ))
+                    }
+                </div>
             </div>
 
             <div className='absolute bottom-0 w-full bg-[#013a6f] h-auto flex items-center justify-start gap-2  p-2'>

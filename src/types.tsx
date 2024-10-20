@@ -12,7 +12,6 @@ export type User = {
     current_challenges?: string;
     is_demo: number;
     preferred_date?: string;
-    is_active: boolean;
     last_login: Date;
     date_joined: Date;
     del_falg: number;
@@ -58,6 +57,7 @@ export type User = {
     }[];
     is_complete: boolean;
     socketId?: string;
+    isActive?: boolean;
 };
 
 
@@ -292,6 +292,7 @@ export type CreateGroupTypes = {
     created_by?: string;
 };
 
+
 export type UpdateGroupTypes = {
     name?: string;
     group_type?: string;
@@ -337,3 +338,20 @@ export type GroupJoinRequestTypes = {
 
 // flutterwave.d.ts
 declare var FlutterwaveCheckout: (options: any) => void;
+
+
+
+export type CreateChannelTypes = {
+    name: string;
+    description: string;
+    state: string;
+
+}
+
+export type ChannelTypes = {
+    name: string;
+    description: string;
+    state: string;
+    created_by: User;
+    createdAt: Date;
+}

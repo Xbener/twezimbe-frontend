@@ -267,7 +267,7 @@ const GroupCreateDialog = ({ }: Props) => {
                                             }}
                                         >
                                             <Avatar className="overflow-visible">
-                                                {user?.is_active && (
+                                                {user?.isActive && (
                                                     <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-foreground" />
                                                 )}
 

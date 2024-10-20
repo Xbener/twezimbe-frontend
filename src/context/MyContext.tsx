@@ -1,5 +1,5 @@
 import { useGetProfileData } from "@/api/auth";
-import { FriendTypes, JoinedGroupTypes, User } from "@/types";
+import { ChannelTypes, FriendTypes, JoinedGroupTypes, User } from "@/types";
 import Cookies from 'js-cookie';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import io, { Socket } from 'socket.io-client';
@@ -13,6 +13,8 @@ type Props = {
 type MyContextType = {
     groupList: JoinedGroupTypes[] | undefined
     setGroupList: (value: JoinedGroupTypes[] | undefined) => void
+    channelList: ChannelTypes[] | undefined
+    setChannelList: (value: ChannelTypes[] | undefined) => void
     groupNotificationFlag: boolean;
     setGroupNotificationFlag: (value: boolean) => void;
     sendMsgGroupId: string;
@@ -27,6 +29,7 @@ const MyContext = createContext<MyContextType | undefined>(undefined);
 
 export const MyProvider = ({ children }: Props) => {
     const [groupList, setGroupList] = useState<JoinedGroupTypes[] | undefined>([]);
+    const [channelList, setChannelList] = useState<ChannelTypes[] | undefined>([]);
     const [groupNotificationFlag, setGroupNotificationFlag] = useState<boolean>(false)
     const [onlineUsers, setOnlineUsers] = useState<User[] | null>(null)
     const [sendMsgGroupId, setSendMsgGroupId] = useState<string>('')
@@ -37,7 +40,7 @@ export const MyProvider = ({ children }: Props) => {
             socket = io(`${process.env.NEXT_PUBLIC_API_BASE_URL}`)
             socket.emit('add-online-user', currentUser)
             socket.on('user-logged-in', ({ user, onlineUsers }) => {
-                setOnlineUsers(onlineUsers); 
+                setOnlineUsers(prev => ([...onlineUsers, { ...user, isActive: true }]));
             });
 
             socket.on('user-logged-out', ({ user, onlineUsers }) => {
@@ -56,7 +59,9 @@ export const MyProvider = ({ children }: Props) => {
         <MyContext.Provider
             value={{
                 setGroupList,
+                setChannelList,
                 groupList,
+                channelList,
                 groupNotificationFlag,
                 setGroupNotificationFlag,
                 sendMsgGroupId,

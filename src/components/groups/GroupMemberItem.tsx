@@ -4,6 +4,7 @@ import React, { useEffect } from 'react'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { useMyContext } from '@/context/MyContext';
 import StatusDot from '../ui/StatusDot';
+import { User } from '@/types';
 
 type Props = {
     profile_pic?: string;
@@ -13,6 +14,10 @@ type Props = {
     email?: string;
     role?: string;
     socketId?: string;
+}
+
+export const checkIsActive = (onlineUsers: User[] | null, member: Props) => {
+    return onlineUsers?.find(user => user._id === member.userId)
 }
 
 function GroupMemberItem(member: Props) {
@@ -29,7 +34,7 @@ function GroupMemberItem(member: Props) {
                         <AvatarImage src={member.profile_pic} className="bg-black" />
                         <AvatarFallback>{iconTextGenerator(member?.firstName as string, member?.lastName as string)}</AvatarFallback>
                     </Avatar>
-                    <StatusDot status={onlineUsers?.find(user=> user._id === member.userId) ? 'online' : "offline"} />
+                    <StatusDot status={checkIsActive(onlineUsers, member) ? 'online' : "offline"} />
                 </PopoverTrigger>
                 <PopoverTrigger>
                     <h1>{member.firstName} {member.lastName}</h1>
