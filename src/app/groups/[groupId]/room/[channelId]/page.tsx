@@ -4,7 +4,7 @@ import { useGetSingleChannel } from '@/api/channel'
 import { GroupContext } from '@/context/GroupContext'
 import { ChannelTypes, Message } from '@/types'
 import { useParams } from 'next/navigation'
-import React, { MouseEventHandler, useContext, useEffect, useState } from 'react'
+import React, { MouseEventHandler, useContext, useEffect, useRef, useState } from 'react'
 import Cookies from 'js-cookie'
 import { Lock, Bell, Pin, Smile, Image as Sticker, Plus, StickerIcon, DeleteIcon, Reply } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -26,13 +26,23 @@ function Page({ }: Props) {
     const { group } = useContext(GroupContext)
     const [channel, setChannel] = useState<ChannelTypes | null>(null)
     const [message, setMessage] = useState<string>("")
+    const messagesEndRef = useRef<HTMLDivElement | null>(null);
     const [contextMenu, setContextMenu] = useState<{ visible: boolean; x: number; y: number }>({
         visible: false,
         x: 0,
         y: 0,
     });
 
+    const scrollToBottom = () => {
+        window.scrollTo({
+            top: document.documentElement.scrollHeight,
+            behavior: 'smooth', // Smooth scrolling
+        });
+    };
 
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
     const handleContextMenu = (e: any) => {
         e.preventDefault(); // Prevent the default context menu from appearing
         setContextMenu({ visible: true, x: e.pageX, y: e.pageY });
@@ -127,6 +137,7 @@ function Page({ }: Props) {
                 setMessages((prev: any) => ([...prev, { ...data.message, sender: currentUser }])); // Update local state with the new message
                 socket.emit('new-message', { sender: currentUser, receiver: channel?.members, message: { ...data.message, sender: currentUser } })
                 setMessage('')
+                scrollToBottom();
             } catch (error) {
                 console.error('Error sending message', error);
             }
@@ -197,39 +208,57 @@ function Page({ }: Props) {
                             </div>
 
 
-                            {msgs.map((msg) => (
-                                <div key={msg._id} onContextMenu={handleContextMenu} className={`flex items-center gap-4 hover:bg-[#cbcbcb2e] cursor-pointer p-2 rounded-md`}>
-                                    <Avatar className='w-[40px] h-[40px] bg-neutral-200 rounded-full'>
-                                        <AvatarImage src={msg.sender?.profile_pic} />
-                                        <AvatarFallback />
-                                    </Avatar>
-                                    <div className='flex flex-col'>
-                                        <div className="flex gap-2 items-center">
-                                            <span>{msg?.sender?.lastName} {msg?.sender?.firstName}</span>
-                                            <span className="text-[.7rem] text-neutral-400">{formatMessageDate(msg.createdAt)}</span>
-                                        </div>
-                                        <div className='text-[#d8d8d8]'>{msg.content}</div>
-                                    </div>
-                                    {/* Context Menu */}
-                                    {contextMenu.visible && (
-                                        <div
-                                            className="absolute bg-gray-700 text-white rounded-md shadow-lg w-[200px]"
-                                            style={{ left: contextMenu.x, top: contextMenu.y }}
-                                            onMouseLeave={closeContextMenu} // Close on mouse leave
-                                        >
-                                            {
-                                                instantActions.map((action, index) => (
-                                                    <button className={`w-full text-left p-2 hover:bg-blue-600 ${action.name === "Delete" && "text-red-500 hover:text-white hover:bg-red-500"} flex items-center gap-2`} onClick={() => action.action(msg)}>
+                            {msgs.map((msg, index) => {
+                                const showAvatarAndName = index === 0 || msgs[index - 1]?.sender?._id !== msg?.sender?._id;
 
+                                return (
+                                    <div
+                                        key={msg._id}
+                                        onContextMenu={handleContextMenu}
+                                        className={`flex gap-4 hover:bg-[#cbcbcb2e] cursor-pointer p-2 rounded-md $ items-start justify-normal{!showAvatarAndName ? 'mt-0' : ''
+                                            }`} // Reduced margin between consecutive messages
+                                    >
+                                        {showAvatarAndName ? (
+                                            <Avatar className='w-[40px] h-[40px] bg-neutral-200 rounded-full'>
+                                                <AvatarImage src={msg.sender?.profile_pic} />
+                                                <AvatarFallback />
+                                            </Avatar>
+                                        ) : (
+                                            <div className='w-[40px] h-[40px]' /> // Placeholder for alignment
+                                        )}
+
+                                        <div className='flex flex-col w-full items-start justify-normal'>
+                                            {showAvatarAndName && (
+                                                <div className="flex gap-2 items-center">
+                                                    <span>{msg?.sender?.lastName} {msg?.sender?.firstName}</span>
+                                                    <span className="text-[.7rem] text-neutral-400">{formatMessageDate(msg.createdAt)}</span>
+                                                </div>
+                                            )}
+                                            <div className='text-[#c4c4c4] text-[.9rem] w-full text-wrap break-words'>{msg.content}</div>
+                                        </div>
+
+                                        {/* Context Menu */}
+                                        {contextMenu.visible && (
+                                            <div
+                                                className="absolute bg-gray-700 text-white rounded-md shadow-lg w-[200px]"
+                                                style={{ left: contextMenu.x, top: contextMenu.y }}
+                                                onMouseLeave={closeContextMenu} // Close on mouse leave
+                                            >
+                                                {instantActions.map((action, index) => (
+                                                    <button
+                                                        key={index}
+                                                        className={`w-full text-left p-2 hover:bg-blue-600 ${action.name === "Delete" && "text-red-500 hover:text-white hover:bg-red-500"} flex items-center gap-2`}
+                                                        onClick={() => action.action(msg)}
+                                                    >
                                                         {action.icon}
                                                         {action.name}
                                                     </button>
-                                                ))
-                                            }
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
                         </div>
                     ))
                 }
@@ -263,6 +292,7 @@ function Page({ }: Props) {
                     </div>
                 </div>
             </div>
+            <div ref={messagesEndRef} />
         </div>
     )
 }

@@ -3,6 +3,7 @@ import { ChannelTypes, FriendTypes, JoinedGroupTypes, Message, User } from "@/ty
 import Cookies from 'js-cookie';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import io, { Socket } from 'socket.io-client';
+import  addNotification  from 'react-push-notification'
 
 export let socket: Socket;
 
@@ -53,7 +54,14 @@ export const MyProvider = ({ children }: Props) => {
             });
 
             socket.on('new-message-added', vl => {
-                setMessages(prev => ([...prev, vl.message]))
+                setMessages(prev => ([...prev, vl.message as Message]))
+                addNotification({
+                    title: 'New Message',
+                    subtitle: 'You have a new message',
+                    message: vl.message.content,
+                    theme: 'darkblue',
+                    native: true, 
+                })
             })
         }
 
