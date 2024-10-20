@@ -34,10 +34,11 @@ function Page({ }: Props) {
     });
 
     const scrollToBottom = () => {
-        window.scrollTo({
-            top: document.documentElement.scrollHeight,
-            behavior: 'smooth', // Smooth scrolling
-        });
+        if(messagesEndRef.current){
+            messagesEndRef.current?.scrollIntoView({
+                behavior: "smooth"
+            })
+        }
     };
 
     useEffect(() => {
@@ -215,7 +216,7 @@ function Page({ }: Props) {
                                     <div
                                         key={msg._id}
                                         onContextMenu={handleContextMenu}
-                                        className={`flex gap-4 hover:bg-[#cbcbcb2e] cursor-pointer rounded-md items-start justify-normal p-1 ${index===msgs.length && "mb-5"}`} // Reduced margin between consecutive messages
+                                        className={`flex gap-4 hover:bg-[#cbcbcb2e] cursor-pointer rounded-md items-start justify-normal p-1 ${index === msgs.length && "mb-5"}`} // Reduced margin between consecutive messages
                                     >
                                         {showAvatarAndName ? (
                                             <Avatar className='w-[40px] h-[40px] bg-neutral-200 rounded-full'>
@@ -262,6 +263,7 @@ function Page({ }: Props) {
                         </div>
                     ))
                 }
+                <div ref={messagesEndRef} />
             </div>
 
             {/* Footer */}
@@ -292,7 +294,6 @@ function Page({ }: Props) {
                     </div>
                 </div>
             </div>
-            <div ref={messagesEndRef} />
         </div>
     )
 }
