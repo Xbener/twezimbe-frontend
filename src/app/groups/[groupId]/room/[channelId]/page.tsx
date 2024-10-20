@@ -4,9 +4,9 @@ import { useGetSingleChannel } from '@/api/channel'
 import { GroupContext } from '@/context/GroupContext'
 import { ChannelTypes } from '@/types'
 import { useParams } from 'next/navigation'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { MouseEventHandler, useContext, useEffect, useState } from 'react'
 import Cookies from 'js-cookie'
-import { Lock, Bell, Pin, Smile, Image as Sticker, Plus, StickerIcon } from 'lucide-react'
+import { Lock, Bell, Pin, Smile, Image as Sticker, Plus, StickerIcon, DeleteIcon, Reply } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import moment from 'moment'
@@ -22,12 +22,19 @@ interface Message {
     updatedAt: Date;
 }
 
+
+
 function Page({ }: Props) {
     const { channelId } = useParams()
     const { getChannel, isError, isLoading } = useGetSingleChannel()
     const { group } = useContext(GroupContext)
     const [channel, setChannel] = useState<ChannelTypes | null>(null)
     const [message, setMessage] = useState('')
+    const [contextMenu, setContextMenu] = useState<{ visible: boolean; x: number; y: number }>({
+        visible: false,
+        x: 0,
+        y: 0,
+    });
     const [messages, setMessages] = useState<Message[]>([
         {
             _id: '1',
@@ -62,6 +69,31 @@ function Page({ }: Props) {
             updatedAt: new Date(Date.now() - 86400000)
         },
     ])
+
+    const handleContextMenu = (e: any) => {
+        e.preventDefault(); // Prevent the default context menu from appearing
+        setContextMenu({ visible: true, x: e.pageX, y: e.pageY });
+    };
+
+    const handleDelete = (message: Message) => {
+        console.log('Delete message:', message._id);
+        // Implement delete logic here
+        closeContextMenu();
+    };
+
+    const handleReply = (message: Message) => {
+        console.log('Reply to message:', message._id);
+        // Implement reply logic here
+        closeContextMenu();
+    };
+    const closeContextMenu = () => {
+        setContextMenu({ visible: false, x: 0, y: 0 });
+    };
+
+    const instantActions = [
+        { name: "Reply", action: (msg: Message) => handleReply(msg), icon: <Reply /> },
+        { name: "Delete", action: (msg: Message) => handleDelete(msg), icon: <DeleteIcon /> }
+    ]
 
     const getChatRoomData = async () => {
         try {
@@ -110,7 +142,7 @@ function Page({ }: Props) {
 
     const groupedMessages = groupMessagesByDate(messages)
 
-    const formatMessageDate = (date:Date) => {
+    const formatMessageDate = (date: Date) => {
         const msgDate = moment(date);
         const today = moment().startOf('day');
         const yesterday = moment().subtract(1, 'day').startOf('day');
@@ -150,7 +182,7 @@ function Page({ }: Props) {
 
 
                             {msgs.map((msg) => (
-                                <div key={msg._id} className={`flex items-center gap-4 hover:bg-[#cbcbcb5e] cursor-pointer p-2`}>
+                                <div key={msg._id} onContextMenu={handleContextMenu} className={`flex items-center gap-4 hover:bg-[#cbcbcb2e] cursor-pointer p-2 rounded-md`}>
                                     <Avatar className='w-[40px] h-[40px] bg-neutral-200 rounded-full'>
                                         <AvatarImage />
                                         <AvatarFallback />
@@ -162,6 +194,24 @@ function Page({ }: Props) {
                                         </div>
                                         <div className='text-[#d8d8d8]'>{msg.message}</div>
                                     </div>
+                                    {/* Context Menu */}
+                                    {contextMenu.visible && (
+                                        <div
+                                            className="absolute bg-gray-700 text-white rounded-md shadow-lg w-[200px]"
+                                            style={{ left: contextMenu.x, top: contextMenu.y }}
+                                            onMouseLeave={closeContextMenu} // Close on mouse leave
+                                        >
+                                            {
+                                                instantActions.map((action, index) => (
+                                                    <button className={`w-full text-left p-2 hover:bg-blue-600 ${action.name === "Delete" && "text-red-500 hover:text-white hover:bg-red-500"} flex items-center gap-2`} onClick={() => action.action(msg)}>
+
+                                                        {action.icon}
+                                                        {action.name}
+                                                    </button>
+                                                ))
+                                            }
+                                        </div>
+                                    )}
                                 </div>
                             ))}
                         </div>
