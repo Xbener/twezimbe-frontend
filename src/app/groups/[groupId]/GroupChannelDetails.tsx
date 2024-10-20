@@ -9,11 +9,16 @@ import { CaretDownIcon } from '@radix-ui/react-icons'
 import { Bell, Edit, Lock, LogOut, MessageCirclePlus, PlusIcon, Settings, Upload } from 'lucide-react'
 import Link from 'next/link'
 import { userInfo } from 'os'
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import Cookies from 'js-cookie'
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog'
 import { useMyContext } from '@/context/MyContext'
 import { channel } from 'diagnostics_channel'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useAddChannel } from '@/api/channel'
+import { toast } from 'sonner'
 
 type Props = {
 
@@ -23,9 +28,31 @@ type Props = {
 
 function ChannelDetails({ }: Props) {
     const { group } = useContext(GroupContext)
-    const { channelList } = useMyContext()
+    const { channelList, setChannelList } = useMyContext()
     const { currentUser } = useGetProfileData()
+    const { addChannel, isError, isLoading, isSuccess } = useAddChannel()
+    const [channelFields, setChannelFields] = useState({
+        name: '',
+        description: '',
+        state: '',
+    })
 
+    const handleChannelFieldChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+        setChannelFields((prev: any) => ({ ...prev, [e.target.name]: e.target.value }))
+    }
+
+    const handleAddChannel = async () => {
+        try {
+            const res = await addChannel({ ...channelFields, groupId: group?._id })
+            if (isError) return toast.error(res.errors || res.message)
+            if (res.status) {
+                window.location.reload()
+            }
+        } catch (error) {
+            toast.error("Something went wrong")
+            console.log(error)
+        }
+    }
 
     // function makePayment() {
     //     FlutterwaveCheckout({
@@ -130,7 +157,7 @@ function ChannelDetails({ }: Props) {
                     Channels
                     <Dialog>
                         <DialogTrigger>
-                            <Button
+                            <Button disabled={isLoading}
                                 className='cursor-pointer hover:bg-gray-50 rounded-full hover:text-black'>
                                 <PlusIcon />
                             </Button>
@@ -139,13 +166,26 @@ function ChannelDetails({ }: Props) {
                             <DialogHeader className='font-bold text-[1.2rem]'>
                                 Create a new channel
                             </DialogHeader>
+                            <div className='w-full flex flex-col gap-2'>
+                                <Input value={channelFields.name} onChange={handleChannelFieldChange} name="name" placeholder='Enter channel name' />
+                                <Textarea value={channelFields.description} onChange={handleChannelFieldChange} name="name" placeholder='Enter channel description ...' />
+                                <Select value={channelFields.state} name='state' onValueChange={(v) => setChannelFields(prev => ({ ...prev, state: v }))}>
+                                    <SelectTrigger className="bg-white w-full">
+                                        <SelectValue placeholder="Select Privacy" />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-white">
+                                        <SelectItem className="cursor-pointer" value="public">Public</SelectItem>
+                                        <SelectItem className="cursor-pointer" value="private">Private</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
                             <div className="flex gap-2">
                                 <DialogClose>
-                                    <Button className='border border-orange-500 text-orange-500'>
+                                    <Button disabled={isLoading} className='border border-orange-500 text-orange-500'>
                                         Cancel
                                     </Button>
                                 </DialogClose>
-                                <Button className='bg-orange-500'>
+                                <Button disabled={isLoading} className='bg-orange-500 text-white' onClick={handleAddChannel}>
                                     Continue
                                 </Button>
                             </div>
@@ -153,15 +193,35 @@ function ChannelDetails({ }: Props) {
                     </Dialog>
                 </span>
 
-                <div className='w-full p-2 flex flex-col'>
-                    {
-                        channelList?.map((channel, index) => (
-                            <div key={index} className='flex items-center text-[1rem] gap-2 w-full hover:bg-neutral-50 hover:text-gray-700 duration-100 cursor-pointer p-2 rounded-md'>
-                                <span>{channel?.state === 'public' ? "#" : <Lock className='' />}</span>
-                                {channel.name}
-                            </div>
-                        ))
-                    }
+                <div className="flex flex-col gap-4">
+                    <div className='w-full p-2 flex flex-col gap-2'>
+                        <h1 className='font-bold text-[1.1rem]'>Public channels</h1>
+                        <div className='w-full flex flex-col'>
+                            {
+                                channelList?.map((channel, index) => channel.state === 'public' && (
+                                    <div key={index} className='flex items-center text-[1rem] gap-2 w-full hover:bg-neutral-50 hover:text-gray-700 duration-100 cursor-pointer p-2 rounded-md'>
+                                        <span>{channel?.state === 'public' ? "#" : <Lock className='' />}</span>
+                                        {channel.name}
+                                    </div>
+                                ))
+                            }
+                        </div>
+                    </div>
+
+                    <div className='w-full p-2 flex flex-col'>
+                        <h1 className='font-bold text-[1.1rem]'>Private channels</h1>
+                        <div className='w-full flex flex-col'>
+
+                            {
+                                channelList?.map((channel, index) => channel.state === 'private' && (
+                                    <div key={index} className='flex items-center text-[1rem] gap-2 w-full hover:bg-neutral-50 hover:text-gray-700 duration-100 cursor-pointer p-2 rounded-md'>
+                                        <span><Lock /></span>
+                                        {channel.name}
+                                    </div>
+                                ))
+                            }
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -174,7 +234,7 @@ function ChannelDetails({ }: Props) {
                     <h1>{currentUser?.firstName} {currentUser?.lastName}</h1>
                     <Popover>
                         <PopoverTrigger>
-                            <Button>
+                            <Button disabled={isLoading}>
                                 <Settings />
                             </Button>
                         </PopoverTrigger>

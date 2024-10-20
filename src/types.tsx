@@ -345,7 +345,7 @@ export type CreateChannelTypes = {
     name: string;
     description: string;
     state: string;
-
+    groupId?: string;
 }
 
 export type ChannelTypes = {
