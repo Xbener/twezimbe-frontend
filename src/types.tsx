@@ -362,4 +362,26 @@ export type ChatRoomTypes = {
     _id: string;
     name: string;
     ref: string
-}   
+}
+
+export type Reaction = {
+    user_id: string;
+    type: 'like' | 'love' | 'laugh' | 'sad' | 'angry';
+};
+
+export type Message = {
+    _id?: string;
+    sender?: User;
+    receiver_id?: User[];
+    chatroom?: string;
+    content?: string;
+    messageType?: 'text' | 'image' | 'video' | 'sticker' | 'gif';
+    attachmentUrl?: string;
+    read?: boolean;
+    status?: 'sent' | 'delivered' | 'seen';
+    reactions?: Reaction[];
+    replyingTo?: string;
+    edited?: boolean;
+    editedAt?: Date;
+    createdAt: Date;
+};

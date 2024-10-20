@@ -2,7 +2,7 @@
 
 import { useGetSingleChannel } from '@/api/channel'
 import { GroupContext } from '@/context/GroupContext'
-import { ChannelTypes } from '@/types'
+import { ChannelTypes, Message } from '@/types'
 import { useParams } from 'next/navigation'
 import React, { MouseEventHandler, useContext, useEffect, useState } from 'react'
 import Cookies from 'js-cookie'
@@ -10,64 +10,25 @@ import { Lock, Bell, Pin, Smile, Image as Sticker, Plus, StickerIcon, DeleteIcon
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import moment from 'moment'
+import { useGetProfileData } from '@/api/auth'
 
 type Props = {}
-
-interface Message {
-    _id: string;
-    user_id: string;
-    username: string;
-    message: string;
-    createdAt: Date;
-    updatedAt: Date;
-}
-
 
 
 function Page({ }: Props) {
     const { channelId } = useParams()
     const { getChannel, isError, isLoading } = useGetSingleChannel()
+    const { currentUser } = useGetProfileData()
     const { group } = useContext(GroupContext)
     const [channel, setChannel] = useState<ChannelTypes | null>(null)
-    const [message, setMessage] = useState('')
+    const [message, setMessage] = useState<string>("")
     const [contextMenu, setContextMenu] = useState<{ visible: boolean; x: number; y: number }>({
         visible: false,
         x: 0,
         y: 0,
     });
     const [messages, setMessages] = useState<Message[]>([
-        {
-            _id: '1',
-            user_id: '1',
-            username: 'User 1',
-            message: 'Hello, this is a test message!',
-            createdAt: new Date(),
-            updatedAt: new Date()
-        },
-        {
-            _id: '2',
-            user_id: '2',
-            username: 'User 2',
-            message: 'This is a second test message!',
-            createdAt: new Date(),
-            updatedAt: new Date()
-        },
-        {
-            _id: '3',
-            user_id: '3',
-            username: 'User 3',
-            message: 'This is a third test message!',
-            createdAt: new Date(Date.now() - 3600000), // 1 hour ago
-            updatedAt: new Date(Date.now() - 3600000)
-        },
-        {
-            _id: '4',
-            user_id: '4',
-            username: 'User 4',
-            message: 'This is a fourth test message!',
-            createdAt: new Date(Date.now() - 86400000), // 1 day ago
-            updatedAt: new Date(Date.now() - 86400000)
-        },
+
     ])
 
     const handleContextMenu = (e: any) => {
@@ -101,7 +62,8 @@ function Page({ }: Props) {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/channels/${group?._id}/${channelId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
-                }
+                },
+
             })
             const data = await response.json()
             setChannel(data.channel)
@@ -110,33 +72,56 @@ function Page({ }: Props) {
         }
     }
 
+
+
     useEffect(() => {
-        if (channelId && group) {
+        if (channelId) {
             getChatRoomData()
         }
     }, [channelId])
 
-    // Handle Enter to send message
-    const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+
+    const handleKeyPress = async (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter' && message.trim()) {
-            // Implement send message logic here
-            console.log('Message sent:', message)
-            setMessage('') // Clear the input
+            try {
+                const token = Cookies.get('access-token');
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/${channel?.chatroom._id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        sender_id: currentUser?._id,
+                        chatroom: channel?.chatroom?._id,
+                        content: message,
+                        messageType: "text",
+                        attachmentUrl: "none",
+                    })
+                });
+                const data = await response.json();
+                setMessages((prev) => [...prev, { ...data.message, sender: currentUser }]); // Update local state with the new message
+                setMessage(''); // Clear the input
+            } catch (error) {
+                console.error('Error sending message', error);
+            }
         }
     }
 
     // Group messages by date
     const groupMessagesByDate = (messages: Message[]) => {
         const groupedMessages: { [date: string]: Message[] } = {}
+        if (messages) {
 
-        messages.forEach((msg) => {
-            const formattedDate = moment(msg.createdAt).format('MMMM D, YYYY')
-            if (!groupedMessages[formattedDate]) {
-                groupedMessages[formattedDate] = []
-            }
-            groupedMessages[formattedDate].push(msg)
-        })
+            messages.forEach((msg) => {
+                const formattedDate = moment(msg.createdAt).format('MMMM D, YYYY')
+                if (!groupedMessages[formattedDate]) {
+                    groupedMessages[formattedDate] = []
+                }
+                groupedMessages[formattedDate].push(msg)
+            })
 
+        }
         return groupedMessages
     }
 
@@ -184,15 +169,15 @@ function Page({ }: Props) {
                             {msgs.map((msg) => (
                                 <div key={msg._id} onContextMenu={handleContextMenu} className={`flex items-center gap-4 hover:bg-[#cbcbcb2e] cursor-pointer p-2 rounded-md`}>
                                     <Avatar className='w-[40px] h-[40px] bg-neutral-200 rounded-full'>
-                                        <AvatarImage />
+                                        <AvatarImage src={msg.sender?.profile_pic} />
                                         <AvatarFallback />
                                     </Avatar>
                                     <div className='flex flex-col'>
                                         <div className="flex gap-2 items-center">
-                                            <span>{msg.username}</span>
+                                            <span>{msg?.sender?.lastName} {msg?.sender?.firstName}</span>
                                             <span className="text-[.7rem] text-neutral-400">{formatMessageDate(msg.createdAt)}</span>
                                         </div>
-                                        <div className='text-[#d8d8d8]'>{msg.message}</div>
+                                        <div className='text-[#d8d8d8]'>{msg.content}</div>
                                     </div>
                                     {/* Context Menu */}
                                     {contextMenu.visible && (
