@@ -17,6 +17,8 @@ type MyContextType = {
     setGroupNotificationFlag: (value: boolean) => void;
     sendMsgGroupId: string;
     setSendMsgGroupId: (value: string) => void;
+    onlineUsers: User[] | null;
+    setOnlineUsers: (vl: User[]) => void;
 
 };
 
@@ -26,18 +28,28 @@ const MyContext = createContext<MyContextType | undefined>(undefined);
 export const MyProvider = ({ children }: Props) => {
     const [groupList, setGroupList] = useState<JoinedGroupTypes[] | undefined>([]);
     const [groupNotificationFlag, setGroupNotificationFlag] = useState<boolean>(false)
-    const [onlineUsers, setOnlineUsers] = useState<Map<string, User>>()
+    const [onlineUsers, setOnlineUsers] = useState<User[] | null>(null)
     const [sendMsgGroupId, setSendMsgGroupId] = useState<string>('')
     const { currentUser } = useGetProfileData()
 
     useEffect(() => {
-        if(currentUser?._id){
+        if (currentUser?._id) {
             socket = io(`${process.env.NEXT_PUBLIC_API_BASE_URL}`)
             socket.emit('add-online-user', currentUser)
-            if(socket.id){
-                onlineUsers?.set(socket.id, currentUser)
-            }
+            socket.on('user-logged-in', ({ user, onlineUsers }) => {
+                setOnlineUsers(onlineUsers); 
+            });
+
+            socket.on('user-logged-out', ({ user, onlineUsers }) => {
+                setOnlineUsers(onlineUsers);
+            });
         }
+
+        return () => {
+            if (socket) {
+                socket.disconnect();
+            }
+        };
     }, [currentUser])
 
     return (
@@ -49,6 +61,8 @@ export const MyProvider = ({ children }: Props) => {
                 setGroupNotificationFlag,
                 sendMsgGroupId,
                 setSendMsgGroupId,
+                onlineUsers,
+                setOnlineUsers
             }}
         >
             {children}

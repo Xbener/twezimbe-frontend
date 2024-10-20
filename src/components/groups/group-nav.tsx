@@ -13,11 +13,18 @@ import { PopoverTrigger, Popover, PopoverContent } from '../ui/popover';
 import { iconTextGenerator } from '@/lib/iconTextGenerator';
 import { Edit, LogOut } from 'lucide-react';
 import Cookies from 'js-cookie'
+import { Badge } from '../ui/badge';
+import StatusDot from '../ui/StatusDot';
 
 const GroupNav = () => {
     // const { joinedGroupList } = useGetjoinedGroupList(userId as string);
     const { currentUser } = useGetProfileData()
-    const { groupNotificationFlag, sendMsgGroupId, groupList } = useMyContext()
+    const {
+        groupNotificationFlag,
+        sendMsgGroupId,
+        groupList,
+        onlineUsers
+    } = useMyContext()
     const { group: currentGroup, setGroup } = useContext(GroupContext)
 
     const settingsItems = [
@@ -75,25 +82,26 @@ const GroupNav = () => {
             </NavLink> */}
 
             <div className='absolute bottom-0 mb-5 mb-2'>
-                    <Popover>
-                        <PopoverTrigger>
-                            <Avatar>
-                                <AvatarImage src={currentUser?.profile_pic} className="bg-black w-[50px] h-[50px] rounded-full" />
-                                <AvatarFallback>{iconTextGenerator(currentUser?.firstName as string, currentUser?.lastName as string)}</AvatarFallback>
-                            </Avatar>
-                        </PopoverTrigger>
+                <Popover>
+                    <PopoverTrigger>
+                        <Avatar>
+                            <AvatarImage src={currentUser?.profile_pic} className="bg-black w-[50px] h-[50px] rounded-full" />
+                            <AvatarFallback>{iconTextGenerator(currentUser?.firstName as string, currentUser?.lastName as string)}</AvatarFallback>
+                        </Avatar>
+                        <StatusDot status={"online"} />
+                    </PopoverTrigger>
 
-                        <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-40 gap-1 flex flex-col border-transparent border-l-8 border-l-neutral-400 pl-3 ">
-                            {
-                                settingsItems.map((item, index) => (
-                                    <Link href={item.link} key={index} className="text-white flex p-2 w-full text-[1.1rem] hover:bg-[#6bb7ff73] cursor-pointer rounded-md items-center gap-2 duration-100" onClick={item?.action}>
-                                        {item.icon}
-                                        {item.name}
-                                    </Link>
-                                ))
-                            }
-                        </PopoverContent>
-                    </Popover>
+                    <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-40 gap-1 flex flex-col border-transparent border-l-8 border-l-neutral-400 pl-3 ">
+                        {
+                            settingsItems.map((item, index) => (
+                                <Link href={item.link} key={index} className="text-white flex p-2 w-full text-[1.1rem] hover:bg-[#6bb7ff73] cursor-pointer rounded-md items-center gap-2 duration-100" onClick={item?.action}>
+                                    {item.icon}
+                                    {item.name}
+                                </Link>
+                            ))
+                        }
+                    </PopoverContent>
+                </Popover>
             </div>
         </nav>
     );

@@ -57,6 +57,7 @@ export type User = {
         answer: string;
     }[];
     is_complete: boolean;
+    socketId?: string;
 };
 
 

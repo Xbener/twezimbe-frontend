@@ -9,9 +9,9 @@ import Cookies from 'js-cookie'
 import GroupMemberItem from '@/components/groups/GroupMemberItem'
 
 type Props = {
-    isLoading:boolean;
+    isLoading: boolean;
     admins: User[];
-    moderators:User[];
+    moderators: User[];
     members: User[];
 }
 
@@ -22,7 +22,7 @@ function MemberList({ admins, moderators, members, isLoading }: Props) {
 
     return (
         <div className='w-[25%] bg-[#013a6fa6] overflow-auto'>
-
+a
             {/* Search Bar */}
             <div className="flex items-center bg-[#013a6fae] sticky top-0 z-20 p-2 justify-between text-neutral-200 w-full">
                 <input className='bg-transparent outline-none w-full' placeholder='Search ...' />
@@ -52,7 +52,6 @@ function MemberList({ admins, moderators, members, isLoading }: Props) {
                                 {
                                     moderators.length === 0 ? "No moderators" : moderators.map((moderator, index) => (
                                         <GroupMemberItem key={index} {...moderator} />
-
                                     ))
                                 }
                             </div>
