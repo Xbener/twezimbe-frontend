@@ -215,8 +215,7 @@ function Page({ }: Props) {
                                     <div
                                         key={msg._id}
                                         onContextMenu={handleContextMenu}
-                                        className={`flex gap-4 hover:bg-[#cbcbcb2e] cursor-pointer p-2 rounded-md $ items-start justify-normal{!showAvatarAndName ? 'mt-0' : ''
-                                            }`} // Reduced margin between consecutive messages
+                                        className={`flex gap-4 hover:bg-[#cbcbcb2e] cursor-pointer rounded-md items-start justify-normal p-1 ${index===msgs.length && "mb-5"}`} // Reduced margin between consecutive messages
                                     >
                                         {showAvatarAndName ? (
                                             <Avatar className='w-[40px] h-[40px] bg-neutral-200 rounded-full'>
@@ -224,23 +223,24 @@ function Page({ }: Props) {
                                                 <AvatarFallback />
                                             </Avatar>
                                         ) : (
-                                            <div className='w-[40px] h-[40px]' /> // Placeholder for alignment
+                                            <div className='w-[40px] h-[0px]' />
+                                            // Placeholder for alignment
                                         )}
 
-                                        <div className='flex flex-col w-full items-start justify-normal'>
+                                        <div className='flex flex-col w-full items-start justify-center'>
                                             {showAvatarAndName && (
                                                 <div className="flex gap-2 items-center">
                                                     <span>{msg?.sender?.lastName} {msg?.sender?.firstName}</span>
                                                     <span className="text-[.7rem] text-neutral-400">{formatMessageDate(msg.createdAt)}</span>
                                                 </div>
                                             )}
-                                            <div className='text-[#c4c4c4] text-[.9rem] w-full text-wrap break-words'>{msg.content}</div>
+                                            <div className='text-[#c4c4c4] text-[.9rem] w-full text-wrap break-words p-0 m-0'>{msg.content}</div>
                                         </div>
 
                                         {/* Context Menu */}
                                         {contextMenu.visible && (
                                             <div
-                                                className="absolute bg-gray-700 text-white rounded-md shadow-lg w-[200px]"
+                                                className="absolute bg-gray-700 text-white rounded-md shadow-sm w-[200px]"
                                                 style={{ left: contextMenu.x, top: contextMenu.y }}
                                                 onMouseLeave={closeContextMenu} // Close on mouse leave
                                             >
