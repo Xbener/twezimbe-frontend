@@ -356,7 +356,7 @@ function Page({ }: Props) {
                                                 </Button>
                                             </DialogTrigger>
                                             <DialogContent className="bg-white text-black">
-                                                <DialogHeader>
+                                                <DialogHeader className="text-[1.3rem]">
                                                     {/* <Warn */}
                                                     Choose among the group members
                                                 </DialogHeader>
@@ -364,14 +364,19 @@ function Page({ }: Props) {
                                                     {
                                                         group?.members.map((member, index) => {
                                                             console.log('members channel gorup', channel?.members, group?.members)
-                                                            if (channel?.members.find((mmbr: string) => mmbr === member?._id)) return null
-                                                            else (
-                                                                <div className="w-full flex items-center justify-between">
-                                                                    {member.lastName} {member.firstName}
-                                                                </div>
-                                                            )
-                                                        })
-                                                    }
+                                                            return channel?.members?.map((mbr: string) => mbr === member?._id ? null :
+                                                                (<div className="w-full flex items-center justify-between">
+                                                                    <div className='flex items-center gap-2'>
+                                                                        <Avatar className='w-[40px] h-[40px] bg-neutral-200 rounded-full'>
+                                                                            <AvatarImage src={member?.profile_pic} />
+                                                                            <AvatarFallback />
+                                                                        </Avatar>
+                                                                        <h1>{member?.firstName} {member.lastName}</h1>
+                                                                    </div>
+                                                                    <Button className="bg-blue-500 text-white">Add</Button>
+                                                                </div>))
+                                                        }
+                                                        )}
                                                 </div>
                                                 <div>
                                                     <DialogClose>
