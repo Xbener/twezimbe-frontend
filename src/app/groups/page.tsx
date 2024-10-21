@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import Cookies from 'js-cookie'
 import { useRouter } from 'next/navigation';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { socket } from '@/context/MyContext';
 
 type Props = {};
 
@@ -78,6 +79,7 @@ function Groups({ }: Props) {
       const res = await joinGroup({ user_id: currentUser?._id, group_id: group?._id });
 
       if (res._id !== null) {
+        socket.emit("new-group-join", ({ receiver: group.members, joined_user: currentUser }))
         window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups/${group?._id}`;
       } else {
         toast.error(res.message || res.errors);
@@ -123,20 +125,20 @@ function Groups({ }: Props) {
               </PopoverTrigger>
 
               <PopoverContent className='bg-blue-500 shadow-lg'>
-                          <ul className='gap-3 flex-col flex items-start justify-normal'>
-            {
-              categoryList.map((category, index) => (
-                <li key={index} className='w-full block '>
-                  <button
-                    className={`${selectedCategory === category.link ? '' : ''} p-2 w-full rounded-md hover:bg-gray-200 hover:text-black duration-200`}
-                    onClick={() => setSelectedCategory(category.link)}
-                  >
-                    {category.name}
-                  </button>
-                </li>
-              ))
-            }
-          </ul>
+                <ul className='gap-3 flex-col flex items-start justify-normal'>
+                  {
+                    categoryList.map((category, index) => (
+                      <li key={index} className='w-full block '>
+                        <button
+                          className={`${selectedCategory === category.link ? '' : ''} p-2 w-full rounded-md hover:bg-gray-200 hover:text-black duration-200`}
+                          onClick={() => setSelectedCategory(category.link)}
+                        >
+                          {category.name}
+                        </button>
+                      </li>
+                    ))
+                  }
+                </ul>
 
               </PopoverContent>
             </Popover>

@@ -4,6 +4,7 @@ import { GroupTypes, User } from '@/types'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import Cookies from 'js-cookie'
+import { useMyContext } from './MyContext'
 
 type Props = {
     children: React.ReactNode
@@ -30,11 +31,9 @@ export const GroupContext = React.createContext<GroupContextTypes>({
 function GroupProvider({ children }: Props) {
 
     const [group, setGroup] = useState<GroupTypes | null>(null)
-
+    const { admins, setAdmins, moderators, setModerators, members, setMembers } = useMyContext()
     const [isLoading, setIsLoading] = useState(false)
-    const [admins, setAdmins] = useState<User[]>([]);
-    const [moderators, setModerators] = useState<User[]>([]);
-    const [members, setMembers] = useState<User[]>([]);
+
 
     const handleGetMembers = async () => {
         const token = Cookies.get('access-token')

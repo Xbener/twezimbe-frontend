@@ -14,10 +14,11 @@ type Props = {
     email?: string;
     role?: string;
     socketId?: string;
+    _id?: string;
 }
 
 export const checkIsActive = (onlineUsers: User[] | null, member: Props) => {
-    return onlineUsers?.find(user => user._id === member.userId)
+    return onlineUsers?.find(user => user._id === member.userId || user._id === member._id)
 }
 
 function GroupMemberItem(member: Props) {

@@ -3,7 +3,7 @@ import { ChannelTypes, FriendTypes, JoinedGroupTypes, Message, User } from "@/ty
 import Cookies from 'js-cookie';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import io, { Socket } from 'socket.io-client';
-import  addNotification  from 'react-push-notification'
+import addNotification from 'react-push-notification'
 
 export let socket: Socket;
 
@@ -24,6 +24,12 @@ type MyContextType = {
     setOnlineUsers: (vl: User[]) => void;
     messages: Message[];
     setMessages: React.Dispatch<React.SetStateAction<Message[]>>
+    admins: User[]
+    setAdmins: React.Dispatch<React.SetStateAction<User[]>>
+    moderators: User[]
+    setModerators: React.Dispatch<React.SetStateAction<User[]>>
+    members: User[]
+    setMembers: React.Dispatch<React.SetStateAction<User[]>>
 
 };
 
@@ -39,6 +45,9 @@ export const MyProvider = ({ children }: Props) => {
     const [messages, setMessages] = useState<Message[]>([
 
     ])
+    const [admins, setAdmins] = useState<User[]>([]);
+    const [moderators, setModerators] = useState<User[]>([]);
+    const [members, setMembers] = useState<User[]>([]);
     const { currentUser } = useGetProfileData()
 
     useEffect(() => {
@@ -60,8 +69,20 @@ export const MyProvider = ({ children }: Props) => {
                     subtitle: 'You have a new message',
                     message: vl.message.content,
                     theme: 'darkblue',
-                    native: true, 
+                    native: true,
                 })
+            })
+
+            socket.on('new-user-joined-group', ({ joined_user }) => {
+                addNotification({
+                    title: 'New group join',
+                    subtitle: 'You have a new group member',
+                    message: `${joined_user?.lastName} joined your community!`,
+                    theme: 'darkblue',
+                    native: true,
+                })
+                console.log("joined_user", joined_user)
+                setMembers(prev => ([...prev, { ...joined_user }]))
             })
         }
 
@@ -86,7 +107,13 @@ export const MyProvider = ({ children }: Props) => {
                 onlineUsers,
                 setOnlineUsers,
                 messages,
-                setMessages
+                setMessages,
+                admins,
+                setAdmins,
+                moderators,
+                setModerators,
+                members,
+                setMembers
             }}
         >
             {children}
