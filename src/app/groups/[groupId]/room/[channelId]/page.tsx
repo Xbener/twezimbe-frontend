@@ -6,7 +6,7 @@ import { ChannelTypes, Message } from '@/types'
 import { useParams } from 'next/navigation'
 import React, { MouseEventHandler, useContext, useEffect, useRef, useState } from 'react'
 import Cookies from 'js-cookie'
-import { Lock, Bell, Pin, Smile, Image as Sticker, Plus, StickerIcon, DeleteIcon, Reply, Edit, ReplyAllIcon, XIcon } from 'lucide-react'
+import { Lock, Bell, Pin, Smile, Image as Sticker, Plus, StickerIcon, DeleteIcon, Reply, Edit, ReplyAllIcon, XIcon, Settings, MessageCircleWarning, Delete } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import moment from 'moment'
@@ -16,6 +16,9 @@ import { socket, useMyContext } from '@/context/MyContext'
 import { toast } from 'sonner'
 import { throttle } from 'lodash'
 import { Button } from '@/components/ui/button'
+import Link from 'next/link'
+import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog'
+import { AlertDialogHeader } from '@/components/ui/alert-dialog'
 
 type Props = {}
 
@@ -321,7 +324,6 @@ function Page({ }: Props) {
         </div>
     )
 
-
     return (
         <div className="w-full h-screen flex flex-col bg-[#013a6fd3] text-white">
             {/* Header */}
@@ -333,6 +335,120 @@ function Page({ }: Props) {
                 <div className='flex items-center gap-4'>
                     <Bell className="cursor-pointer" />
                     <Pin className="cursor-pointer" />
+                    <Dialog>
+                        <DialogTrigger>
+                            <Settings className="cursor-pointer" />
+                        </DialogTrigger>
+                        <DialogContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col pl-3 ">
+                            <DialogHeader className="text-[1.2rem]">
+                                {channel?.name} settings
+                            </DialogHeader>
+
+                            <div className='flex flex-col gap-2 mt-5'>
+                                {((currentUser?._id === channel?.created_by?._id) && (channel?.state !== 'public')) && (
+                                    <div className='flex w-full justify-between items-center border rounded-md p-2'>
+                                        <h1>Add member </h1>
+                                        <Dialog>
+                                            <DialogTrigger disabled={sending}>
+                                                <Button disabled={sending} className='bg-red-500 text-white flex items-center gap-1'>
+                                                    <MessageCircleWarning />
+                                                    Add
+                                                </Button>
+                                            </DialogTrigger>
+                                            <DialogContent className="bg-white text-black">
+                                                <DialogHeader>
+                                                    {/* <Warn */}
+                                                    Choose among the group members
+                                                </DialogHeader>
+                                                <div className="p-2">
+                                                    {
+                                                        group?.members.map((member, index) => {
+                                                            console.log('members channel gorup', channel?.members, group?.members)
+                                                            if (channel?.members.find((mmbr: string) => mmbr === member?._id)) return null
+                                                            else (
+                                                                <div className="w-full flex items-center justify-between">
+                                                                    {member.lastName} {member.firstName}
+                                                                </div>
+                                                            )
+                                                        })
+                                                    }
+                                                </div>
+                                                <div>
+                                                    <DialogClose>
+                                                        <Button disabled={sending}>
+                                                            Cancel
+                                                        </Button>
+                                                    </DialogClose>
+                                                    <Button disabled={sending} className="bg-red-500 text-white" >
+                                                        Confirm
+                                                    </Button>
+                                                </div>
+                                            </DialogContent>
+                                        </Dialog>
+                                    </div>
+                                )}
+                                <div className='flex w-full justify-between items-center border rounded-md p-2'>
+                                    <h1>Leave channel </h1>
+                                    <Dialog>
+                                        <DialogTrigger disabled={sending}>
+                                            <Button disabled={sending} className='bg-red-500 text-white flex items-center gap-1'>
+                                                <MessageCircleWarning />
+                                                Leave
+                                            </Button>
+                                        </DialogTrigger>
+                                        <DialogContent className="bg-white text-black">
+                                            <DialogHeader>
+                                                {/* <Warn */}
+                                                Confirm Leaving this channel
+                                            </DialogHeader>
+                                            <div>
+                                                <DialogClose>
+                                                    <Button disabled={sending}>
+                                                        Cancel
+                                                    </Button>
+                                                </DialogClose>
+                                                <Button disabled={sending} className="bg-red-500 text-white" >
+                                                    Confirm
+                                                </Button>
+                                            </div>
+                                        </DialogContent>
+                                    </Dialog>
+                                </div>
+
+                                {
+                                    currentUser?._id === channel?.created_by?._id && (
+                                        <div className='flex w-full justify-between items-center border border-red-500 rounded-md p-2 text-red-500'>
+                                            <h1>Delete channel </h1>
+                                            <Dialog>
+                                                <DialogTrigger disabled={sending}>
+                                                    <Button disabled={sending} className='bg-red-500 text-white flex items-center gap-1'>
+                                                        <Delete />
+                                                        Delete
+                                                    </Button>
+                                                </DialogTrigger>
+                                                <DialogContent className="bg-white text-black">
+                                                    <DialogHeader>
+                                                        {/* <Warn */}
+                                                        Confirm Deleting this channel
+                                                    </DialogHeader>
+                                                    <div>
+                                                        <DialogClose>
+                                                            <Button disabled={sending}>
+                                                                Cancel
+                                                            </Button>
+                                                        </DialogClose>
+                                                        <Button disabled={sending} className="bg-red-500 text-white" >
+                                                            Confirm
+                                                        </Button>
+                                                    </div>
+                                                </DialogContent>
+                                            </Dialog>
+                                        </div>
+                                    )
+                                }
+                            </div>
+                        </DialogContent>
+                    </Dialog>
                 </div>
             </div>
 
@@ -402,12 +518,12 @@ function Page({ }: Props) {
                                                         <Button onClick={() => setIsEditing({ state: false, content: "", message: {} })} className="underline text-[.7rem]">cancel</Button>
                                                     </div>
                                                 ) : (
-                                                        <div className='text-[#c4c4c4] text-[.9rem] w-[90%] break-words p-0 m-0'>
+                                                    <div className='text-[#c4c4c4] text-[.9rem] w-[90%] break-words p-0 m-0'>
                                                         {msg.replyingTo ? (
                                                             <div className='bg-gray-800 p-2 rounded-md mb-1'>
                                                                 <div className="flex items-start justify-start gap-2 overflow-hidden italic text-gray-300 ">
                                                                     <ReplyAllIcon className="rotate-180" />
-                                                                        <span>{(msg.replyingTo && msg.replyingTo.content?.slice(0, 150))}</span>
+                                                                    <span>{(msg.replyingTo && msg.replyingTo.content?.slice(0, 150))}</span>
                                                                 </div>
                                                             </div>
                                                         ) : null}
@@ -469,7 +585,7 @@ function Page({ }: Props) {
                     <div className='w-full p-2 rounded-md '>
                         <div className=" overflow-hidden flex items-center justify-between gap-2">
                             <div className="flex items-start justify-normal text-[.7rem] gap-2">
-                                <ReplyAllIcon className="rotate-180" /> {isReplying.message.content?.slice(0,150)}
+                                <ReplyAllIcon className="rotate-180" /> {isReplying.message.content?.slice(0, 150)}
                             </div>
                             <Button onClick={() => setIsReplying({ state: false, replyingTo: "", message: {} })}>
                                 <XIcon />
