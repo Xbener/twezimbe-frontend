@@ -270,10 +270,7 @@ export type GroupTypes = {
     del_flag: number;
     createdAt: Date;
     memberCount: number;
-    members: {
-        users: User[];
-        role: string;
-    }[];
+    members: User[];
     isSacco?: boolean;
     invite_link: string;
     group_state: string;
@@ -346,6 +343,7 @@ export type CreateChannelTypes = {
     description: string;
     state: string;
     groupId?: string;
+    members?: User[]
 }
 
 export type ChannelTypes = {

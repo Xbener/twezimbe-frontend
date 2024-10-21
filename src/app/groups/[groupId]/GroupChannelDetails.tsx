@@ -29,7 +29,7 @@ type Props = {
 
 function ChannelDetails({ }: Props) {
     const { group } = useContext(GroupContext)
-    const { channelList, setChannelList } = useMyContext()
+    const { channelList, setChannelList, members } = useMyContext()
     const router = useRouter()
     const { currentUser } = useGetProfileData()
     const { addChannel, isError, isLoading, isSuccess } = useAddChannel()
@@ -45,7 +45,7 @@ function ChannelDetails({ }: Props) {
 
     const handleAddChannel = async () => {
         try {
-            const res = await addChannel({ ...channelFields, groupId: group?._id })
+            const res = await addChannel({ ...channelFields, groupId: group?._id, members })
             if (isError) return toast.error(res.errors || res.message)
             if (res.status) {
                 window.location.reload()
@@ -170,7 +170,7 @@ function ChannelDetails({ }: Props) {
                             </DialogHeader>
                             <div className='w-full flex flex-col gap-2'>
                                 <Input value={channelFields.name} onChange={handleChannelFieldChange} name="name" placeholder='Enter channel name' />
-                                <Textarea value={channelFields.description} onChange={handleChannelFieldChange} name="name" placeholder='Enter channel description ...' />
+                                <Textarea value={channelFields.description} onChange={handleChannelFieldChange} name="description" placeholder='Enter channel description ...' />
                                 <Select value={channelFields.state} name='state' onValueChange={(v) => setChannelFields(prev => ({ ...prev, state: v }))}>
                                     <SelectTrigger className="bg-white w-full">
                                         <SelectValue placeholder="Select Privacy" />

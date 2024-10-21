@@ -63,13 +63,17 @@ export const MyProvider = ({ children }: Props) => {
             });
 
             socket.on('new-message-added', vl => {
-                setMessages(prev => ([...prev, vl.message as Message]))
+                setMessages(prev => {
+                    return [...prev.filter(message => message._id !== vl.message._id), vl.message]
+                })
                 addNotification({
                     title: 'New Message',
                     subtitle: 'You have a new message',
                     message: vl.message.content,
                     theme: 'darkblue',
                     native: true,
+                    onClick: () => window.focus()
+
                 })
             })
 
