@@ -43,16 +43,6 @@ function Groups({ }: Props) {
     router.replace(newUrl);  // Update the URL without reloading
   }, [searchQuery, selectedCategory, router]);
 
-  useEffect(() => {
-    if (currentUser && !currentUser?.is_complete) {
-      toast.error('Please complete your profile to join groups');
-      const timeout = setTimeout(() => {
-        window.location.href = '/public_pages/Profile';
-      }, 3000);
-
-      return () => clearTimeout(timeout);
-    }
-  }, [currentUser]);
 
   useEffect(() => {
     setFormattedGroups(groups);

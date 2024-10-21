@@ -200,6 +200,11 @@ function Page({ }: Props) {
             {/* Body */}
             <div className="flex-grow overflow-y-auto p-4 space-y-3">
                 {
+                    messages.length <= 0 && (
+                        "no message"
+                    )
+                }
+                {
                     Object.entries(groupedMessages).map(([date, msgs]) => (
                         <div key={date}>
                             <div className="text-neutral-400 text-sm my-2 text-center flex items-center">
@@ -225,7 +230,7 @@ function Page({ }: Props) {
                                             </Avatar>
                                         ) : (
                                             <div className='w-[40px] text-[.5rem] items-center invisible group-hover:visible' >
-                                                    {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
+                                                {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
                                             </div>
                                             // Placeholder for alignment
                                         )}
