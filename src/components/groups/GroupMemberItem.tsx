@@ -5,6 +5,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { useMyContext } from '@/context/MyContext';
 import StatusDot from '../ui/StatusDot';
 import { User } from '@/types';
+import { useGetProfileData } from '@/api/auth';
+import { Button } from '../ui/button';
 
 type Props = {
     profile_pic?: string;
@@ -23,7 +25,7 @@ export const checkIsActive = (onlineUsers: User[] | null, member: Props) => {
 
 function GroupMemberItem(member: Props) {
     const { onlineUsers } = useMyContext()
-
+    const { currentUser } = useGetProfileData()
     useEffect(() => {
         console.log('onlineUsers', onlineUsers, "members", member)
     }, [member, onlineUsers])
@@ -40,14 +42,27 @@ function GroupMemberItem(member: Props) {
                 <PopoverTrigger>
                     <h1 className='text-[.9rem]'>{member.firstName} {member.lastName}</h1>
                 </PopoverTrigger>
-                <PopoverContent className="bg-[#013a6f] text-white flex flex-col items-center gap-2 border-transparent shadow-lg rounded-lg">
+                <PopoverContent className="bg-[#013a6f] text-white flex flex-col items-center p-5 gap-2 border-transparent shadow-lg rounded-lg">
                     <Avatar className='w-[100px] h-[100px]'>
                         <AvatarImage src={member.profile_pic} className="bg-black" />
                         <AvatarFallback>{iconTextGenerator(member?.firstName as string, member?.lastName as string)}</AvatarFallback>
                     </Avatar>
                     <h1 className="text-[1.4rem] font-bold">{member.firstName} {member.lastName}</h1>
-                    <h1>{member.role === "GroupManager" ? "Admin" : member.role === "GroupModerator" ? "Moderator" : "Member"}</h1>
-                    <h1>{member.email}</h1>
+                    <h1 className='text-[.9rem]'>{member.role === "GroupManager" ? "Admin" : member.role === "GroupModerator" ? "Moderator" : "Member"}</h1>
+                    <div>{checkIsActive(onlineUsers, member) ?
+                        <div className="flex items-center gap-2"><span className='w-3 h-3 border rounded-full bg-green-500'></span> online</div> :
+                        <div className="flex items-center gap-2"><span className='w-3 h-3 border rounded-full bg-gray-500'></span> offline</div>}
+                    </div>
+                    {/* <h1>{member.email}</h1> */}
+                    {
+                        currentUser?._id === member.userId || currentUser?._id === member._id ? 
+                        null : (
+                            <Button className="bg-orange-500 text-white  place-self-start w-full">
+                                Send message
+                            </Button>
+
+                        ) 
+                    }
                 </PopoverContent>
             </Popover>
         </div>
