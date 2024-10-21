@@ -383,4 +383,5 @@ export type Message = {
     edited?: boolean;
     editedAt?: Date;
     createdAt: Date;
+    sender_id?: string;
 };

@@ -29,7 +29,7 @@ type Props = {
 
 function ChannelDetails({ }: Props) {
     const { group } = useContext(GroupContext)
-    const { channelList, setChannelList, members } = useMyContext()
+    const { channelList, setChannelList, members, setCurrentChannel } = useMyContext()
     const router = useRouter()
     const { currentUser } = useGetProfileData()
     const { addChannel, isError, isLoading, isSuccess } = useAddChannel()
@@ -203,7 +203,10 @@ function ChannelDetails({ }: Props) {
                                 channelList?.map((channel, index) => channel.state === 'public' && (
                                     <div
                                         key={index}
-                                        onClick={() => router.push(`/groups/${group?._id}/room/${channel._id}`)}
+                                        onClick={() => {
+                                            setCurrentChannel(channel)
+                                            router.push(`/groups/${group?._id}/room/${channel._id}`)
+                                        }}
                                         className='flex text-[.9rem] items-center gap-2 w-full hover:bg-neutral-50 hover:text-gray-700 duration-100 cursor-pointer p-2 rounded-md'>
                                         <span>{channel?.state === 'public' ? "#" : <Lock className='' />}</span>
                                         {channel.name}

@@ -4,6 +4,7 @@ import Cookies from 'js-cookie';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import io, { Socket } from 'socket.io-client';
 import addNotification from 'react-push-notification'
+import { useParams } from "next/navigation";
 
 export let socket: Socket;
 
@@ -30,6 +31,8 @@ type MyContextType = {
     setModerators: React.Dispatch<React.SetStateAction<User[]>>
     members: User[]
     setMembers: React.Dispatch<React.SetStateAction<User[]>>
+    currentChannel: ChannelTypes | null
+    setCurrentChannel: React.Dispatch<React.SetStateAction<ChannelTypes | null>>
 
 };
 
@@ -38,8 +41,10 @@ const MyContext = createContext<MyContextType | undefined>(undefined);
 
 export const MyProvider = ({ children }: Props) => {
     const [groupList, setGroupList] = useState<JoinedGroupTypes[] | undefined>([]);
+    const { channelId } = useParams()
     const [channelList, setChannelList] = useState<ChannelTypes[] | undefined>([]);
     const [groupNotificationFlag, setGroupNotificationFlag] = useState<boolean>(false)
+    const [currentChannel, setCurrentChannel] = useState<ChannelTypes | null>(null)
     const [onlineUsers, setOnlineUsers] = useState<User[] | null>(null)
     const [sendMsgGroupId, setSendMsgGroupId] = useState<string>('')
     const [messages, setMessages] = useState<Message[]>([
@@ -63,9 +68,10 @@ export const MyProvider = ({ children }: Props) => {
             });
 
             socket.on('new-message-added', vl => {
-                setMessages(prev => {
-                    return [...prev.filter(message => message._id !== vl.message._id), vl.message]
-                })
+                console.log(vl)
+                    setMessages(prev => {
+                        return [...prev.filter(message => message._id !== vl.message._id), vl.message]
+                    })
                 addNotification({
                     title: 'New Message',
                     subtitle: 'You have a new message',
@@ -119,7 +125,9 @@ export const MyProvider = ({ children }: Props) => {
                 moderators,
                 setModerators,
                 members,
-                setMembers
+                setMembers,
+                currentChannel,
+                setCurrentChannel
             }}
         >
             {children}

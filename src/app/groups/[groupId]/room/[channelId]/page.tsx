@@ -6,13 +6,14 @@ import { ChannelTypes, Message } from '@/types'
 import { useParams } from 'next/navigation'
 import React, { MouseEventHandler, useContext, useEffect, useRef, useState } from 'react'
 import Cookies from 'js-cookie'
-import { Lock, Bell, Pin, Smile, Image as Sticker, Plus, StickerIcon, DeleteIcon, Reply } from 'lucide-react'
+import { Lock, Bell, Pin, Smile, Image as Sticker, Plus, StickerIcon, DeleteIcon, Reply, Edit } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import moment from 'moment'
 import { useGetProfileData } from '@/api/auth'
 import PacmanLoader from 'react-spinners/PacmanLoader'
 import { socket, useMyContext } from '@/context/MyContext'
+import { toast } from 'sonner'
 
 type Props = {}
 
@@ -27,11 +28,23 @@ function Page({ }: Props) {
     const { group } = useContext(GroupContext)
     const [channel, setChannel] = useState<ChannelTypes | null>(null)
     const [message, setMessage] = useState<string>("")
+    const editingInputRef = useRef<HTMLInputElement | null>(null)
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
-    const [contextMenu, setContextMenu] = useState<{ visible: boolean; x: number; y: number }>({
+    const [isEditing, setIsEditing] = useState({
+        state: false,
+        content: "",
+        message: {} as Message
+    })
+    const [contextMenu, setContextMenu] = useState<{
+        visible: boolean;
+        x: number;
+        y: number;
+        message: any | null; // Add the message object to the state
+    }>({
         visible: false,
         x: 0,
         y: 0,
+        message: null, // Initialize with null
     });
 
     const scrollToBottom = () => {
@@ -45,9 +58,14 @@ function Page({ }: Props) {
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
-    const handleContextMenu = (e: any) => {
+    const handleContextMenu = (e: any, msg: any) => {
         e.preventDefault(); // Prevent the default context menu from appearing
-        setContextMenu({ visible: true, x: e.pageX, y: e.pageY });
+        setContextMenu({
+            visible: true,
+            x: e.pageX,
+            y: e.pageY,
+            message: msg, // Store the clicked message
+        });
     };
 
     const handleDelete = (message: Message) => {
@@ -62,12 +80,51 @@ function Page({ }: Props) {
         closeContextMenu();
     };
     const closeContextMenu = () => {
-        setContextMenu({ visible: false, x: 0, y: 0 });
+        setContextMenu({
+            visible: false,
+            x: 0,
+            y: 0,
+            message: null, // Reset the message field to null
+        });
     };
+
+
+    const handleEdit = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            const token = Cookies.get('access-token')
+            try {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/${isEditing?.message?._id}`, {
+                    method:"PUT",
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ content: isEditing.content })
+                })
+                const data = await res.json()
+                if(data.status){
+                    setMessages(prev => {
+                        return prev.map(msg => msg._id === isEditing.message._id ? { ...msg, content: isEditing.content, edited: true, editedAt: new Date() } : msg)
+                    })
+                    setIsEditing(prev => ({ ...prev, state: false }))
+                }else{
+                    toast.error(data.errors)
+                }
+            } catch (error) {
+                // toast.error('try again')
+                console.log("error", error)
+            }
+        }
+    }
+    const handleStartEdit = (message: Message, content: string) => {
+        if (editingInputRef.current) editingInputRef.current.focus()
+        setIsEditing(prev => ({ content, state: true, message }))
+    }
 
     const instantActions = [
         { name: "Reply", action: (msg: Message) => handleReply(msg), icon: <Reply /> },
-        { name: "Delete", action: (msg: Message) => handleDelete(msg), icon: <DeleteIcon /> }
+        { name: "Edit", action: (msg: Message, content?: string) => handleStartEdit(msg, content as string), icon: <Edit /> },
+        { name: "Delete", action: (msg: Message) => handleDelete(msg), icon: <DeleteIcon /> },
     ]
 
     const getChatRoomData = async () => {
@@ -224,7 +281,7 @@ function Page({ }: Props) {
                                 return (
                                     <div
                                         key={msg._id}
-                                        onContextMenu={handleContextMenu}
+                                        onContextMenu={(e) => handleContextMenu(e, msg)} // Pass the message to the context menu handler
                                         className={`flex gap-4 hover:bg-[#cbcbcb2e] cursor-pointer rounded-md items-start justify-normal p-1 ${index === msgs.length && "mb-5"} group`} // Reduced margin between consecutive messages
                                     >
                                         {showAvatarAndName ? (
@@ -236,7 +293,6 @@ function Page({ }: Props) {
                                             <div className='w-[40px] text-[.5rem] items-center invisible group-hover:visible' >
                                                 {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
                                             </div>
-                                            // Placeholder for alignment
                                         )}
 
                                         <div className='flex flex-col w-full items-start justify-center'>
@@ -246,31 +302,60 @@ function Page({ }: Props) {
                                                     <span className="text-[.7rem] text-neutral-400">{formatMessageDate(msg.createdAt)}</span>
                                                 </div>
                                             )}
-                                            <div className='text-[#c4c4c4] text-[.9rem] w-full text-wrap break-words p-0 m-0'>{msg.content}</div>
+                                            {
+                                                isEditing.state && isEditing.message._id === msg._id ? (
+                                                    <input
+                                                        ref={editingInputRef}
+                                                        disabled={sending}
+                                                        className="flex-grow bg-gray-700 p-2 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed w-full"
+                                                        value={isEditing.content}
+                                                        onChange={(e) => setIsEditing(prev => ({ ...prev, content: e.target.value }))}
+                                                        onKeyPress={handleEdit}
+                                                    />
+                                                ) : (
+                                                    <div className='text-[#c4c4c4] text-[.9rem] w-full text-wrap break-words p-0 m-0'>
+                                                        {msg.content} <span>{msg.edited && <span className='text-[.7rem] text-gray-200'>(edited)</span>}</span>
+                                                    </div>
+                                                )
+                                            }
                                         </div>
 
                                         {/* Context Menu */}
-                                        {contextMenu.visible && (
+                                        {contextMenu.visible && contextMenu.message?._id === msg._id && ( // Show the context menu for the correct message
                                             <div
                                                 className="absolute bg-gray-700 text-white rounded-md shadow-sm w-[200px]"
                                                 style={{ left: contextMenu.x, top: contextMenu.y }}
-                                                onMouseLeave={closeContextMenu} // Close on mouse leave
+                                                onMouseLeave={closeContextMenu}
                                             >
-                                                {instantActions.map((action, index) => (
-                                                    <button
-                                                        key={index}
-                                                        className={`w-full text-left p-2 hover:bg-blue-600 ${action.name === "Delete" && "text-red-500 hover:text-white hover:bg-red-500"} flex items-center gap-2`}
-                                                        onClick={() => action.action(msg)}
-                                                    >
-                                                        {action.icon}
-                                                        {action.name}
-                                                    </button>
-                                                ))}
+                                                {instantActions.map((action, index) => {
+                                                    // Only display "Edit" button if the current user is the sender of the message
+                                                    if (action.name === "Edit" && `${msg.sender_id}` !== `${currentUser?._id}`) {
+                                                        return null;
+                                                    }
+
+                                                    return (
+                                                        <button
+                                                            key={index}
+                                                            className={`w-full text-left p-2 hover:bg-blue-600 ${action.name === "Delete" ? "text-red-500 hover:text-white hover:bg-red-500" : ""} flex items-center gap-2`}
+                                                            onClick={() => {
+                                                                if (action.name === "Edit") {
+                                                                    action.action(msg, msg.content);
+                                                                } else {
+                                                                    action.action(msg);
+                                                                }
+                                                            }}
+                                                        >
+                                                            {action.icon}
+                                                            {action.name}
+                                                        </button>
+                                                    );
+                                                })}
                                             </div>
                                         )}
                                     </div>
                                 );
                             })}
+
                         </div>
                     ))
                 }
