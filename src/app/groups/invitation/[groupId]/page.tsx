@@ -34,7 +34,6 @@ function InvitationPage({ }: Props) {
 
     const acceptInvitation = async () => {
         try {
-            if (!currentUser?.is_complete) return toast.error("Complete your profile first to join.")
             const res = await joinGroup({ user_id: currentUser?._id, group_id: group?._id })
 
             if (res._id !== null) {
