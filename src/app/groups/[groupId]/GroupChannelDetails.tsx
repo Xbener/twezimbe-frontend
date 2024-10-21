@@ -197,7 +197,7 @@ function ChannelDetails({ }: Props) {
 
                 <div className="flex flex-col gap-4">
                     <div className='w-full p-2 flex flex-col gap-2'>
-                        <h1 className='font-bold text-[1.1rem]'>Public channels</h1>
+                        <h1 className='text-[1.2rem]'>Public channels</h1>
                         <div className='w-full flex flex-col'>
                             {
                                 channelList?.map((channel, index) => channel.state === 'public' && (
@@ -217,7 +217,7 @@ function ChannelDetails({ }: Props) {
                     </div>
 
                     <div className='w-full p-2 flex flex-col mb-80'>
-                        <h1 className='font-bold text-[1.1rem]'>Private channels</h1>
+                        <h1 className='text-[1.2rem]'>Private channels</h1>
                         <div className='w-full flex flex-col'>
 
                             {

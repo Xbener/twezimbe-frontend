@@ -26,7 +26,7 @@ const PrimaryMenu = () => {
     return (
         <>
             {/* Desktop menu  */}
-            <div className="hidden md:block">
+            <div className="hidden lg:block">
                 <span className="flex gap-5">
                     <a href={'/'} className="text-[#2f578b]">Home</a>
                     <a href={'/'} className="text-[#2f578b]">About Us</a>

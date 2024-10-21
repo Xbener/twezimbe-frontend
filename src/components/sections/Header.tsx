@@ -15,8 +15,8 @@ const Header = () => {
 
   return (
     <>
-      <div className="bg-white sticky top-0 z-50">
-        <div className="py-2 md:py-4 px-5 md:container mx-auto flex justify-between items-center">
+      <div className="bg-white sticky top-0 z-50 w-full">
+        <div className="py-2 md:py-4 px-5 md:container mx-auto flex justify-between items-center w-full">
           <Link href={'/'}><Image src={'/logo.png'} className="bg-white" width={150} height={15} alt="logo" /></Link>
 
           <Menu onClick={handleClose} className="text-[#2f578b] text-xl cursor-pointer block md:hidden" />
