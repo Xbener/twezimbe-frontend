@@ -2,7 +2,7 @@
 
 import { useGetSingleChannel } from '@/api/channel'
 import { GroupContext } from '@/context/GroupContext'
-import { ChannelTypes, Message } from '@/types'
+import { ChannelTypes, Message, User } from '@/types'
 import { useParams } from 'next/navigation'
 import React, { MouseEventHandler, useContext, useEffect, useRef, useState } from 'react'
 import Cookies from 'js-cookie'
@@ -25,12 +25,12 @@ type Props = {}
 
 function Page({ }: Props) {
     const { channelId } = useParams()
-    const { messages, setMessages, isTyping, setIsTyping } = useMyContext()
+    const { messages, setMessages, isTyping, setIsTyping, setAdmins, setMembers, setModerators } = useMyContext()
     const { getChannel, isError } = useGetSingleChannel()
     const [isLoading, setLoading] = useState(true)
     const [sending, setSending] = useState(false)
     const { currentUser } = useGetProfileData()
-    const { group } = useContext(GroupContext)
+    const { group, } = useContext(GroupContext)
     const [channel, setChannel] = useState<ChannelTypes | null>(null)
     const [message, setMessage] = useState<string>("")
     const editingInputRef = useRef<HTMLInputElement | null>(null)
@@ -171,7 +171,11 @@ function Page({ }: Props) {
 
             })
             const data = await response.json()
+            console.log('channel data', data.channel)
             setChannel(data.channel)
+            // setAdmins(data.channel.members.filter((member: any) => member.role === "ChannelAdmin"));
+            // setModerators(data.members.filter((member: any) => member.role === "ChannelModerator"));
+            // setMembers(data.members.filter((member: any) => member.role === "ChannelMember"));
         } catch (error) {
             console.error('Error fetching data', error)
         } finally {
@@ -182,7 +186,7 @@ function Page({ }: Props) {
     const getChannelMessages = async () => {
         try {
             const token = Cookies.get('access-token')
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/${channel?.chatroom._id}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/${channel?.chatroom?._id}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 },
@@ -217,7 +221,7 @@ function Page({ }: Props) {
         try {
             setSending(true)
             const token = Cookies.get('access-token');
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/${channel?.chatroom._id}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/${channel?.chatroom?._id}`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -250,7 +254,7 @@ function Page({ }: Props) {
             try {
                 setSending(true)
                 const token = Cookies.get('access-token');
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/${channel?.chatroom._id}`, {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/${channel?.chatroom?._id}`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -318,11 +322,37 @@ function Page({ }: Props) {
         }
     };
 
+    const handleAddChannelMember = async (user: User) => {
+        try {
+            setSending(true)
+            const token = Cookies.get('access-token');
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/channels/${channel?._id}/add-member`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ userId: user?._id })
+            })
+
+            const data = await res.json()
+            if (!data.status) return toast.error(data.errors)
+            setChannel(prev => ({ ...prev, members: [...prev?.members, user?._id] }))
+            toast.success(data.message)
+        } catch (error) {
+            toast.error("Something went wrong")
+            console.log(error)
+        } finally {
+            setSending(false)
+        }
+    }
+
     if (isLoading) return (
         <div className='w-full h-full grid place-content-center'>
             <PacmanLoader color='white w-2' size={'small'} />
         </div>
     )
+
 
     return (
         <div className="w-full h-screen flex flex-col bg-[#013a6fd3] text-white">
@@ -363,20 +393,30 @@ function Page({ }: Props) {
                                                 <div className="p-2">
                                                     {
                                                         group?.members.map((member, index) => {
-                                                            console.log('members channel gorup', channel?.members, group?.members)
-                                                            return channel?.members?.map((mbr: string) => mbr === member?._id ? null :
-                                                                (<div className="w-full flex items-center justify-between mb-2">
-                                                                    <div className='flex items-center gap-2'>
-                                                                        <Avatar className='w-[40px] h-[40px] bg-neutral-200 rounded-full'>
-                                                                            <AvatarImage src={member?.profile_pic} />
-                                                                            <AvatarFallback />
-                                                                        </Avatar>
-                                                                        <h1>{member?.firstName} {member.lastName}</h1>
+                                                            // Check if the group member exists in channel members
+                                                            const isMemberInChannel = channel?.members?.includes(member?._id);
+
+                                                            if (!isMemberInChannel) {
+                                                                // Render the member who is not in the channel
+                                                                return (
+                                                                    <div className="w-full flex items-center justify-between mb-2" key={member._id}>
+                                                                        <div className="flex items-center gap-2">
+                                                                            <Avatar className="w-[40px] h-[40px] bg-neutral-200 rounded-full">
+                                                                                <AvatarImage src={member?.profile_pic} />
+                                                                                <AvatarFallback />
+                                                                            </Avatar>
+                                                                            <h1>{member?.firstName} {member?.lastName}</h1>
+                                                                        </div>
+                                                                        <Button onClick={() => handleAddChannelMember(member)} className="bg-blue-500 text-white">
+                                                                            Add
+                                                                        </Button>
                                                                     </div>
-                                                                    <Button className="bg-blue-500 text-white">Add</Button>
-                                                                </div>))
-                                                        }
-                                                        )}
+                                                                );
+                                                            }
+
+                                                            return null; // Don't render anything if the member is already in the channel
+                                                        })
+                                                    }
                                                 </div>
                                                 <div>
                                                     <DialogClose>

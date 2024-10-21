@@ -33,6 +33,8 @@ function MemberList({ admins, moderators, members, isLoading }: Props) {
                     q ? members?.map((member, index) => {
                         if (member.lastName.toLowerCase().includes(q.toLowerCase()) || member.firstName.toLowerCase().includes(q.toLowerCase())) {
                             return <GroupMemberItem key={index} {...member} />
+                        } else {
+                            return null
                         }
                     }) : isLoading ? (
                         <div className="w-full p-2 grid place-content-center">
