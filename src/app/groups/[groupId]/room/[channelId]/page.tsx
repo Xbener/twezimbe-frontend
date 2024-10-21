@@ -365,7 +365,7 @@ function Page({ }: Props) {
                                                         group?.members.map((member, index) => {
                                                             console.log('members channel gorup', channel?.members, group?.members)
                                                             return channel?.members?.map((mbr: string) => mbr === member?._id ? null :
-                                                                (<div className="w-full flex items-center justify-between">
+                                                                (<div className="w-full flex items-center justify-between mb-2">
                                                                     <div className='flex items-center gap-2'>
                                                                         <Avatar className='w-[40px] h-[40px] bg-neutral-200 rounded-full'>
                                                                             <AvatarImage src={member?.profile_pic} />
