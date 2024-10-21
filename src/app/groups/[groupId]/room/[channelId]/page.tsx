@@ -22,6 +22,7 @@ function Page({ }: Props) {
     const { messages, setMessages } = useMyContext()
     const { getChannel, isError } = useGetSingleChannel()
     const [isLoading, setLoading] = useState(true)
+    const [sending, setSending] = useState(false)
     const { currentUser } = useGetProfileData()
     const { group } = useContext(GroupContext)
     const [channel, setChannel] = useState<ChannelTypes | null>(null)
@@ -118,6 +119,7 @@ function Page({ }: Props) {
     const handleKeyPress = async (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter' && message.trim()) {
             try {
+                setSending(true)
                 const token = Cookies.get('access-token');
                 const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/${channel?.chatroom._id}`, {
                     method: 'POST',
@@ -141,6 +143,8 @@ function Page({ }: Props) {
                 scrollToBottom();
             } catch (error) {
                 console.error('Error sending message', error);
+            } finally {
+                setSending(false)
             }
         }
     }
@@ -288,7 +292,8 @@ function Page({ }: Props) {
 
                     </div>
                     <input
-                        className="flex-grow bg-gray-700 p-2 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        disabled={sending}
+                        className="flex-grow bg-gray-700 p-2 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed"
                         placeholder={`Message ${channel?.name}`}
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
