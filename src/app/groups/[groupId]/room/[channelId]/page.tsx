@@ -409,7 +409,41 @@ function Page({ }: Props) {
                 </div>
                 <div className='flex items-center gap-4'>
                     <Bell className="cursor-pointer" />
-                    <Pin className="cursor-pointer" />
+                    <Popover>
+                        <PopoverTrigger>
+                            <Pin className="cursor-pointer" />
+                        </PopoverTrigger>
+                        <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col pl-3 ">
+                            {
+                                messages.map((msg, index) => {
+                                    if (!msg.pinned) return null
+                                    return <div
+                                        key={msg._id}
+                                        onContextMenu={(e) => handleContextMenu(e, msg)} // Pass the message to the context menu handler
+                                        className={`flex gap-4 hover:bg-[#cbcbcb2e] cursor-pointer rounded-md items-start mb-1 justify-normal p-1 group`} // Reduced margin between consecutive messages
+                                    >
+                                        {msg.pinned && <Pin />}
+
+                                        <div className='flex flex-col w-full items-start justify-center'>
+                                            <div className="flex gap-2 items-center">
+                                                <Avatar className='w-[40px] h-[40px] bg-neutral-200 rounded-full'>
+                                                    <AvatarImage src={msg.sender?.profile_pic} />
+                                                    <AvatarFallback />
+                                                </Avatar>
+                                                <div className="flex flex-col">
+                                                    <span>{msg?.sender?.lastName} {msg?.sender?.firstName}</span>
+                                                    <span className="text-[.7rem] text-neutral-400">{formatMessageDate(msg?.createdAt as Date)}</span>
+                                                </div>
+                                            </div>
+                                           <span className="p-2 w-full mt-1 rounded-md">
+                                             {msg?.content}
+                                           </span>
+                                        </div>
+                                    </div>
+                                })
+                            }
+                        </PopoverContent>
+                    </Popover>
                     <Dialog>
                         <DialogTrigger>
                             <Settings className="cursor-pointer" />
@@ -574,9 +608,9 @@ function Page({ }: Props) {
                                     <div
                                         key={msg._id}
                                         onContextMenu={(e) => handleContextMenu(e, msg)} // Pass the message to the context menu handler
-                                        className={`flex gap-4 hover:bg-[#cbcbcb2e] cursor-pointer rounded-md items-start mb-1 justify-normal p-1 ${index === msgs.length && "mb-5"} ${msg.pinned? "bg-[rgba(255,193,59,0.42)]" : ' '} group`} // Reduced margin between consecutive messages
+                                        className={`flex gap-4 hover:bg-[#cbcbcb2e] cursor-pointer rounded-md items-start mb-1 justify-normal p-1 ${index === msgs.length && "mb-5"} ${msg.pinned ? "bg-[rgba(255,193,59,0.42)]" : ' '} group`} // Reduced margin between consecutive messages
                                     >
-                                        {msg.pinned && <Pin/>}
+                                        {msg.pinned && <Pin />}
                                         {showAvatarAndName ? (
                                             <Avatar className='w-[40px] h-[40px] bg-neutral-200 rounded-full'>
                                                 <AvatarImage src={msg.sender?.profile_pic} />
