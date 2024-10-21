@@ -384,4 +384,5 @@ export type Message = {
     editedAt?: Date;
     createdAt?: Date;
     sender_id?: string;
+    pinned?: boolean;
 };

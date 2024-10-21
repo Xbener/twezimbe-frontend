@@ -6,7 +6,7 @@ import { ChannelTypes, Message, User } from '@/types'
 import { useParams } from 'next/navigation'
 import React, { MouseEventHandler, useContext, useEffect, useRef, useState } from 'react'
 import Cookies from 'js-cookie'
-import { Lock, Bell, Pin, Smile, Image as Sticker, Plus, StickerIcon, DeleteIcon, Reply, Edit, ReplyAllIcon, XIcon, Settings, MessageCircleWarning, Delete } from 'lucide-react'
+import { Lock, Bell, Pin, Smile, Image as Sticker, Plus, StickerIcon, DeleteIcon, Reply, Edit, ReplyAllIcon, XIcon, Settings, MessageCircleWarning, Delete, File, FileIcon } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import moment from 'moment'
@@ -41,6 +41,7 @@ function Page({ }: Props) {
     const messagingInputRef = useRef<HTMLInputElement | null>(null)
     const emojiContainerRef = useRef<HTMLDivElement | null>(null)
     const [showPicker, setShowPicker] = useState(false);
+    const [attachments, setAttachments] = useState<File[] | any>(null)
     const [isEditing, setIsEditing] = useState({
         state: false,
         content: "",
@@ -173,8 +174,32 @@ function Page({ }: Props) {
         setIsEditing(prev => ({ content, state: true, message }))
     }
 
+    const handlePin = async (msg: Message) => {
+        try {
+            const token = Cookies.get('access-token')
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/pin`, {
+                method: "PUT",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ messageId: msg._id, pinned: msg.pinned })
+            })
+            setMessages(prev => {
+                return prev.map(prevMsg => {
+                    if (prevMsg._id === msg._id) return { ...prevMsg, pinned: !msg.pinned }
+                    else return prevMsg
+                })
+            })
+        } catch (error) {
+            toast.error('something went wrong')
+            console.log(error)
+        }
+    }
+
     const instantActions = [
         { name: "Reply", action: (msg: Message) => handleStartReplying(msg), icon: <Reply /> },
+        { name: "Pin", action: (msg: Message) => handlePin(msg), icon: <Pin /> },
         { name: "Edit", action: (msg: Message, content?: string) => handleStartEdit(msg, content as string), icon: <Edit /> },
         { name: "Delete", action: (msg: Message) => handleDelete(msg), icon: <DeleteIcon /> },
     ]
@@ -364,7 +389,9 @@ function Page({ }: Props) {
             setSending(false)
         }
     }
-
+    useEffect(() => {
+        console.log(attachments)
+    }, [attachments])
     if (isLoading) return (
         <div className='w-full h-full grid place-content-center'>
             <PacmanLoader color='white w-2' size={'small'} />
@@ -547,8 +574,9 @@ function Page({ }: Props) {
                                     <div
                                         key={msg._id}
                                         onContextMenu={(e) => handleContextMenu(e, msg)} // Pass the message to the context menu handler
-                                        className={`flex gap-4 hover:bg-[#cbcbcb2e] cursor-pointer rounded-md items-start justify-normal p-1 ${index === msgs.length && "mb-5"} group`} // Reduced margin between consecutive messages
+                                        className={`flex gap-4 hover:bg-[#cbcbcb2e] cursor-pointer rounded-md items-start mb-1 justify-normal p-1 ${index === msgs.length && "mb-5"} ${msg.pinned? "bg-[rgba(255,193,59,0.42)]" : ' '} group`} // Reduced margin between consecutive messages
                                     >
+                                        {msg.pinned && <Pin/>}
                                         {showAvatarAndName ? (
                                             <Avatar className='w-[40px] h-[40px] bg-neutral-200 rounded-full'>
                                                 <AvatarImage src={msg.sender?.profile_pic} />
@@ -612,6 +640,25 @@ function Page({ }: Props) {
                                                             return null;
                                                         }
 
+                                                        if (action.name === "Pin" && msg.pinned) {
+                                                            return (
+                                                                <button
+                                                                    key={index}
+                                                                    className={`w-full text-left p-2 hover:bg-blue-600 ${action.name === "Pin" ? "text-orange-500" : ""} flex items-center gap-2`}
+                                                                    onClick={() => {
+                                                                        if (action.name === "Edit") {
+                                                                            action.action(msg, msg.content);
+                                                                        } else {
+                                                                            action.action(msg);
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    {action.icon}
+                                                                    Unpin
+                                                                </button>
+                                                            )
+                                                        }
+
                                                         return (
                                                             <button
                                                                 key={index}
@@ -643,7 +690,7 @@ function Page({ }: Props) {
             </div>
 
             {/* Footer */}
-            <div className="bg-gray-800 p-4 border-t border-gray-700">
+            <div className="bg-gray-800 p-4 border-t border-gray-700 w-full">
                 {isReplying.state ? (
                     <div className='w-full p-2 rounded-md '>
                         <div className=" overflow-hidden flex items-center justify-between gap-2">
@@ -655,6 +702,14 @@ function Page({ }: Props) {
                             </Button>
                         </div>
                     </div>
+                ) : attachments?.length ? (
+                    <div className='w-full h-auto p-2 flex gap-2 overflow-auto flex-wrap'>
+                        {/* <div className='w-auto p-2 flex flex-col items-center justify-center gap-2 border rounded-md'>
+                            <span className='bg-neutral-50 text-black rounded-full place-self-end justify-self-end cursor-pointer'><XIcon /></span>
+                            <FileIcon className=" size-12" />
+                            <h1>filename.pdf</h1>
+                        </div> */}
+                    </div>
                 ) : null}
                 <div className="flex items-center space-x-3 relative">
                     <div className="flex items-center gap-2">
@@ -662,7 +717,21 @@ function Page({ }: Props) {
                             <PopoverTrigger>
                                 <Plus className="cursor-pointer bg-neutral-50 text-gray-700 rounded-full" />
                             </PopoverTrigger>
-                            <PopoverContent>
+                            <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col ">
+                                <input
+                                    type="file"
+                                    hidden
+                                    name="attachment"
+                                    id="attachment"
+                                    multiple
+                                    onChange={(e) => setAttachments(e.target.files as FileList)}
+                                />
+                                <Button className="flex items-center gap-2 hover:bg-[rgb(0,0,0,.5)]">
+                                    <label className="flex items-center gap-2" htmlFor="attachment">
+                                        <File />
+                                        Upload a file
+                                    </label>
+                                </Button>
 
                             </PopoverContent>
                         </Popover>
@@ -690,8 +759,8 @@ function Page({ }: Props) {
                     )}
                     <div className="flex items-center gap-2">
                         <Smile onClick={() => setShowPicker(prev => !prev)} className="cursor-pointer hover:text-blue-400" />
-                        <StickerIcon className="cursor-pointer hover:text-blue-400" />
-                        <Sticker className="cursor-pointer hover:text-blue-400" />
+                        {/* <StickerIcon className="cursor-pointer hover:text-blue-400" />
+                        <Sticker className="cursor-pointer hover:text-blue-400" /> */}
                     </div>
                 </div>
                 <div className='w-full h-1 text-[.7rem] p-1'>
