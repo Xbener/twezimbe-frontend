@@ -57,7 +57,7 @@ function GroupMemberItem(member: Props) {
                     {
                         currentUser?._id === member.userId || currentUser?._id === member._id ? 
                         null : (
-                            <Button className="bg-orange-500 text-white  place-self-start w-full">
+                            <Button className="bg-blue-500 text-white  place-self-start w-full">
                                 Send message
                             </Button>
 

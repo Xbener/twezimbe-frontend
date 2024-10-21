@@ -14,13 +14,14 @@ import { useGetProfileData } from '@/api/auth'
 import PacmanLoader from 'react-spinners/PacmanLoader'
 import { socket, useMyContext } from '@/context/MyContext'
 import { toast } from 'sonner'
+import { throttle } from 'lodash'
 
 type Props = {}
 
 
 function Page({ }: Props) {
     const { channelId } = useParams()
-    const { messages, setMessages } = useMyContext()
+    const { messages, setMessages, isTyping, setIsTyping } = useMyContext()
     const { getChannel, isError } = useGetSingleChannel()
     const [isLoading, setLoading] = useState(true)
     const [sending, setSending] = useState(false)
@@ -67,11 +68,25 @@ function Page({ }: Props) {
             message: msg, // Store the clicked message
         });
     };
+    const handleDelete = async (message: Message) => {
+        try {
+            const token = Cookies.get('access-token')
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/${message._id}`, {
+                method: "DELETE",
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            })
 
-    const handleDelete = (message: Message) => {
-        console.log('Delete message:', message._id);
-        // Implement delete logic here
-        closeContextMenu();
+            if (!res.ok) return toast.error("something went wrong")
+            setMessages(prev => prev.filter(msg => msg._id !== message._id))
+            socket.emit('delete-message', {message, receiver: channel?.members})
+            closeContextMenu();
+        } catch (error) {
+            toast.error('something went wrong')
+            console.log(error)
+        }
+
     };
 
     const handleReply = (message: Message) => {
@@ -114,7 +129,7 @@ function Page({ }: Props) {
             } catch (error) {
                 // toast.error('try again')
                 console.log("error", error)
-            }finally {
+            } finally {
                 setSending(false)
             }
         }
@@ -175,6 +190,13 @@ function Page({ }: Props) {
             getChannelMessages()
         }
     }, [channel])
+
+    useEffect(() => {
+        if (isTyping.message !== "") {
+            socket.emit('is-typing', { message: isTyping.message, currentUser, receiver: channel?.members })
+        }
+    }, [isTyping.message])
+
 
     const handleKeyPress = async (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter' && message.trim()) {
@@ -247,11 +269,13 @@ function Page({ }: Props) {
             <PacmanLoader color='white w-2' size={'small'} />
         </div>
     )
+
+
     return (
         <div className="w-full h-screen flex flex-col bg-[#013a6fd3] text-white">
             {/* Header */}
             <div className="flex justify-between p-4 bg-[#013a6fae] border-b border-gray-700">
-                <div className='flex items-center gap-2 font-bold text-xl'>
+                <div className='flex items-center gap-2 capitalize text-[1.2rem] text-xl'>
                     <span>{channel?.state === 'public' ? '#' : <Lock />}</span>
                     <h1 className="text-base md:text-xl">{channel?.name}</h1>
                 </div>
@@ -331,8 +355,7 @@ function Page({ }: Props) {
                                                 onMouseLeave={closeContextMenu}
                                             >
                                                 {instantActions.map((action, index) => {
-                                                    // Only display "Edit" button if the current user is the sender of the message
-                                                    if (action.name === "Edit" && `${msg.sender_id}` !== `${currentUser?._id}`) {
+                                                    if ((action.name === "Edit" && `${msg.sender_id}` !== `${currentUser?._id}`) || (action.name === "Delete" && `${msg.sender_id}` !== `${currentUser?._id}`)) {
                                                         return null;
                                                     }
 
@@ -381,10 +404,15 @@ function Page({ }: Props) {
                     </div>
                     <input
                         disabled={sending}
+                        onBlur={() => setIsTyping(prev => ({ message: "" }))}
+                        onFocus={() => setIsTyping(prev => ({ ...prev, message: `${currentUser?.firstName} is typing ...` }))}
                         className="flex-grow bg-gray-700 p-2 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed"
                         placeholder={`Message ${channel?.name}`}
                         value={message}
-                        onChange={(e) => setMessage(e.target.value)}
+                        onChange={(e) => {
+                            setMessage(e.target.value);
+
+                        }}
                         onKeyPress={handleKeyPress}
                     />
                     <div className="flex items-center gap-2">
@@ -392,6 +420,9 @@ function Page({ }: Props) {
                         <StickerIcon className="cursor-pointer hover:text-blue-400" />
                         <Sticker className="cursor-pointer hover:text-blue-400" />
                     </div>
+                </div>
+                <div className='w-full h-1 text-[.7rem] p-1'>
+                    {/* {isTyping.message !== "" && isTyping.message} */}
                 </div>
             </div>
         </div>

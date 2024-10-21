@@ -32,7 +32,9 @@ type MyContextType = {
     members: User[]
     setMembers: React.Dispatch<React.SetStateAction<User[]>>
     currentChannel: ChannelTypes | null
-    setCurrentChannel: React.Dispatch<React.SetStateAction<ChannelTypes | null>>
+    setCurrentChannel: React.Dispatch<React.SetStateAction<ChannelTypes | null>>;
+    isTyping: { message: string };
+    setIsTyping: React.Dispatch<React.SetStateAction<{ message: string }>>;
 
 };
 
@@ -53,6 +55,7 @@ export const MyProvider = ({ children }: Props) => {
     const [admins, setAdmins] = useState<User[]>([]);
     const [moderators, setModerators] = useState<User[]>([]);
     const [members, setMembers] = useState<User[]>([]);
+    const [isTyping, setIsTyping] = useState({ message: "" });
     const { currentUser } = useGetProfileData()
 
     useEffect(() => {
@@ -69,9 +72,9 @@ export const MyProvider = ({ children }: Props) => {
 
             socket.on('new-message-added', vl => {
                 console.log(vl)
-                    setMessages(prev => {
-                        return [...prev.filter(message => message._id !== vl.message._id), vl.message]
-                    })
+                setMessages(prev => {
+                    return [...prev.filter(message => message._id !== vl.message._id), vl.message]
+                })
                 addNotification({
                     title: 'New Message',
                     subtitle: 'You have a new message',
@@ -95,6 +98,15 @@ export const MyProvider = ({ children }: Props) => {
                 setMembers(prev => {
                     return [...prev.filter(member => member._id !== joined_user?._id), joined_user]
                 })
+            })
+
+            socket.on('is-typing', ({ message, currentUser }) => {
+                setIsTyping({ message: `${currentUser?.firstName} is typing ...` })
+            })
+
+            socket.on('deleted-message', message => {
+                console.log(message)
+                setMessages(prev => prev.filter(msg => msg._id !== message._id))
             })
         }
 
@@ -127,7 +139,9 @@ export const MyProvider = ({ children }: Props) => {
                 members,
                 setMembers,
                 currentChannel,
-                setCurrentChannel
+                setCurrentChannel,
+                isTyping,
+                setIsTyping
             }}
         >
             {children}
