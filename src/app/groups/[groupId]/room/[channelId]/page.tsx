@@ -6,7 +6,7 @@ import { ChannelTypes, Message } from '@/types'
 import { useParams } from 'next/navigation'
 import React, { MouseEventHandler, useContext, useEffect, useRef, useState } from 'react'
 import Cookies from 'js-cookie'
-import { Lock, Bell, Pin, Smile, Image as Sticker, Plus, StickerIcon, DeleteIcon, Reply, Edit } from 'lucide-react'
+import { Lock, Bell, Pin, Smile, Image as Sticker, Plus, StickerIcon, DeleteIcon, Reply, Edit, ReplyAllIcon } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import moment from 'moment'
@@ -37,6 +37,13 @@ function Page({ }: Props) {
         content: "",
         message: {} as Message
     })
+
+    const [isReplying, setIsReplying] = useState({
+        state: false,
+        replyingTo: "",
+        message: {} as Message
+    })
+
     const [contextMenu, setContextMenu] = useState<{
         visible: boolean;
         x: number;
@@ -90,6 +97,9 @@ function Page({ }: Props) {
 
     };
 
+    const handleStartReplying = (message: Message) => {
+        setIsReplying(prev => ({ state: true, replyingTo: message._id!, message }))
+    }
     const handleReply = (message: Message) => {
         console.log('Reply to message:', message._id);
         // Implement reply logic here
@@ -141,7 +151,7 @@ function Page({ }: Props) {
     }
 
     const instantActions = [
-        { name: "Reply", action: (msg: Message) => handleReply(msg), icon: <Reply /> },
+        { name: "Reply", action: (msg: Message) => handleStartReplying(msg), icon: <Reply /> },
         { name: "Edit", action: (msg: Message, content?: string) => handleStartEdit(msg, content as string), icon: <Edit /> },
         { name: "Delete", action: (msg: Message) => handleDelete(msg), icon: <DeleteIcon /> },
     ]
@@ -247,14 +257,16 @@ function Page({ }: Props) {
                         content: message,
                         messageType: "text",
                         attachmentUrl: "none",
-                        receiver_id: channel?.members
+                        receiver_id: channel?.members,
+                        replyingTo: isReplying.state ? isReplying.message._id : null
                     })
                 });
                 const data = await response.json();
-                setMessages((prev: any) => ([...prev, { ...data.message, createdAt: new Date(), sender: currentUser, status: "sending" }]));
-                socket.emit('new-message', { sender: currentUser, receiver: channel?.members, message: { ...data.message, sender: currentUser } })
+                setMessages((prev: any) => ([...prev, { ...data.message, createdAt: new Date(), sender: currentUser, replyedTo: isReplying.state ? isReplying.message : null }]));
+                socket.emit('new-message', { sender: currentUser, receiver: channel?.members, message: { ...data.message, sender: currentUser, replyedTo: isReplying.state ? isReplying.message : null } })
                 setMessage('')
                 scrollToBottom();
+                setIsReplying({ state: false, message: {}, replyingTo: "" })
             } catch (error) {
                 console.error('Error sending message', error);
             } finally {
@@ -262,6 +274,7 @@ function Page({ }: Props) {
             }
         }
     }
+
 
     // Group messages by date
     const groupMessagesByDate = (messages: Message[]) => {
@@ -280,7 +293,11 @@ function Page({ }: Props) {
         return groupedMessages
     }
 
-    const groupedMessages = groupMessagesByDate(messages)
+    let groupedMessages = groupMessagesByDate(messages)
+
+    useEffect(() => {
+        groupedMessages = groupMessagesByDate(messages)
+    }, [messages])
 
     const formatMessageDate = (date: Date) => {
         const msgDate = moment(date);
@@ -323,7 +340,7 @@ function Page({ }: Props) {
                     messages.length <= 0 && (
                         <div className="w-full h-full flex flex-col items-center justify-center gap-3">
                             Start Conversation
-                            <Button className="bg-blue-500 text-white"
+                            <Button disabled={sending} className="bg-blue-500 disabled:cursor-not-allowed text-white"
                                 onClick={() => {
                                     // setMessage("Hi!")
                                     sendBySendBtn("Hi!")
@@ -358,7 +375,7 @@ function Page({ }: Props) {
                                             </Avatar>
                                         ) : (
                                             <div className='w-[40px] text-[.5rem] items-center invisible group-hover:visible' >
-                                                {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
+                                                {new Date(msg?.createdAt as Date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
                                             </div>
                                         )}
 
@@ -366,7 +383,7 @@ function Page({ }: Props) {
                                             {showAvatarAndName && (
                                                 <div className="flex gap-2 items-center">
                                                     <span>{msg?.sender?.lastName} {msg?.sender?.firstName}</span>
-                                                    <span className="text-[.7rem] text-neutral-400">{formatMessageDate(msg.createdAt)}</span>
+                                                    <span className="text-[.7rem] text-neutral-400">{formatMessageDate(msg?.createdAt as Date)}</span>
                                                 </div>
                                             )}
                                             {
@@ -380,9 +397,21 @@ function Page({ }: Props) {
                                                         onKeyPress={handleEdit}
                                                     />
                                                 ) : (
-                                                    <div className='text-[#c4c4c4] text-[.9rem] w-full text-wrap break-words p-0 m-0'>
-                                                        {msg.content} <span>{msg.edited && <span className='text-[.7rem] text-gray-200'>(edited)</span>}</span>
+                                                    <div className='text-[#c4c4c4] text-[.9rem] w-full break-words p-0 m-0'>
+                                                        {msg?.replyedTo?.length! >= 1 || msg.replyedTo ? (
+                                                            <div className='bg-gray-800 p-2 rounded-md mb-1'>
+                                                                <div className="flex items-center gap-2 overflow-hidden h-5 italic text-gray-300">
+                                                                    <ReplyAllIcon className="rotate-180" />
+                                                                    <span>{(msg.replyedTo?.length && msg?.replyedTo[0]?.content) || (msg.replyedTo && msg.replyedTo.content)}</span>
+                                                                </div>
+                                                            </div>
+                                                        ) : null}
+                                                        <div className="text-white">
+                                                            {msg.content}
+                                                            <span>{msg.edited && <span className='text-[.7rem] text-gray-200'>(edited)</span>}</span>
+                                                        </div>
                                                     </div>
+
                                                 )
                                             }
                                         </div>
@@ -430,6 +459,13 @@ function Page({ }: Props) {
 
             {/* Footer */}
             <div className="bg-gray-800 p-4 border-t border-gray-700">
+                {isReplying.state ? (
+                    <div className='w-full p-2 rounded-md '>
+                        <div className="flex items-center gap-2 overflow-hidden h-5">
+                            <ReplyAllIcon className="rotate-180" /> {isReplying.message.content}
+                        </div>
+                    </div>
+                ) : null}
                 <div className="flex items-center space-x-3">
                     <div className="flex items-center gap-2">
                         <Popover>
@@ -442,6 +478,7 @@ function Page({ }: Props) {
                         </Popover>
 
                     </div>
+
                     <input
                         disabled={sending}
                         onBlur={() => setIsTyping(prev => ({ message: "" }))}

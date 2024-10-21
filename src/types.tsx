@@ -382,6 +382,7 @@ export type Message = {
     replyingTo?: string;
     edited?: boolean;
     editedAt?: Date;
-    createdAt: Date;
+    createdAt?: Date;
     sender_id?: string;
+    replyedTo?: Message[] | Message | any
 };
