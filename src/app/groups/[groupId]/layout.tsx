@@ -12,6 +12,7 @@ import { toast } from 'sonner'
 import Cookies from 'js-cookie'
 import { useGetGroupChannels } from '@/api/channel'
 import { useMyContext } from '@/context/MyContext'
+import { useGetProfileData } from '@/api/auth'
 
 type Props = {
     children: React.ReactNode
@@ -23,6 +24,7 @@ function GroupIdLayout({ children }: Props) {
     const { groupId } = useParams()
     const { group, setGroup, admins, moderators, members, isLoading } = useContext(GroupContext)
     const { setChannelList } = useMyContext()
+    const { currentUser } = useGetProfileData()
 
 
     useEffect(() => {
@@ -38,13 +40,14 @@ function GroupIdLayout({ children }: Props) {
     }, [groupId])
 
     useEffect(() => {
-        const getChannelsList = async (groupId: string) => {
-            const res = await getChannels(groupId)
+        const getChannelsList = async (userId: string) => {
+            const res = await getChannels(userId)
             if (!res.status) toast.error(res.errors || res.message)
+            console.log("res", res)
             setChannelList(res.channels)
         }
 
-        if (group) getChannelsList(group?._id)
+        if (group && currentUser) getChannelsList(currentUser?._id as string)
     }, [group])
 
     if (!group?._id) return <MainLoader />

@@ -12,7 +12,7 @@ function Aside({ }) {
 
     console.log("group", group)
     return (
-        <div className='w-[20%] bg-[#013a6fd8] text-neutral-200 capitalize relative'>
+        <div className='w-[20%] bg-[#013a6fd8] h-full text-neutral-200 capitalize relative'>
             <ChannelDetails />
         </div>
     )

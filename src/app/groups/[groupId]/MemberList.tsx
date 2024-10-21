@@ -38,7 +38,7 @@ function MemberList({ admins, moderators, members, isLoading }: Props) {
                     ) : (
                         <>
                             <div className="w-full p-2 mb-3 ">
-                                <h1 className='p-1 font-extrabold text-[0.9rem] mb-2 uppercase'>Admins ({admins.length})</h1>
+                                <h1 className='p-1 font-extrabold text-[0.9rem] mb-2 capitalize'>Admins ({admins.length})</h1>
                                 {
                                     admins.length === 0 ? "No admins" : admins.map((admin, index) => (
                                         <GroupMemberItem key={index} {...admin} />
@@ -47,7 +47,7 @@ function MemberList({ admins, moderators, members, isLoading }: Props) {
                             </div>
 
                             <div className="w-full p-2 mb-3 ">
-                                <h1 className='p-1 font-extrabold text-[0.9rem] mb-2 uppercase'>Moderators ({moderators.length})</h1>
+                                <h1 className='p-1 font-extrabold text-[0.9rem] mb-2 capitalize'>Moderators ({moderators.length})</h1>
                                 {
                                     moderators.length === 0 ? "No moderators" : moderators.map((moderator, index) => (
                                         <GroupMemberItem key={index} {...moderator} />
@@ -56,7 +56,7 @@ function MemberList({ admins, moderators, members, isLoading }: Props) {
                             </div>
 
                             <div className="w-full p-2 mb-3 ">
-                                <h1 className='p-1 font-extrabold text-[0.9rem] mb-2 uppercase'>All Members ({members.length})</h1>
+                                <h1 className='p-1 font-extrabold text-[0.9rem] mb-2 capitalize'>All Members ({members.length})</h1>
                                 {
                                     members.length === 0 ? "No other members" : members.map((member, index) => (
                                         <GroupMemberItem key={index} {...member} />

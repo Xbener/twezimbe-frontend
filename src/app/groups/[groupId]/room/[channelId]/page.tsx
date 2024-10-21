@@ -264,8 +264,8 @@ function Page({ }: Props) {
                     })
                 });
                 const data = await response.json();
-                setMessages((prev: any) => ([...prev, { ...data.message, createdAt: new Date(), sender: currentUser, replyedTo: isReplying.state ? isReplying.message : null }]));
-                socket.emit('new-message', { sender: currentUser, receiver: channel?.members, message: { ...data.message, sender: currentUser, replyedTo: isReplying.state ? isReplying.message : null } })
+                setMessages((prev: any) => ([...prev, { ...data.message, createdAt: new Date(), sender: currentUser, replyingTo: isReplying.state ? isReplying.message : null }]));
+                socket.emit('new-message', { sender: currentUser, receiver: channel?.members, message: { ...data.message, sender: currentUser, replyingTo: isReplying.state ? isReplying.message : null } })
                 setMessage('')
                 scrollToBottom();
                 setIsReplying({ state: false, message: {}, replyingTo: "" })
@@ -403,11 +403,11 @@ function Page({ }: Props) {
                                                     </div>
                                                 ) : (
                                                         <div className='text-[#c4c4c4] text-[.9rem] w-[90%] break-words p-0 m-0'>
-                                                        {msg?.replyedTo?.length! >= 1 || msg.replyedTo ? (
+                                                        {msg.replyingTo ? (
                                                             <div className='bg-gray-800 p-2 rounded-md mb-1'>
                                                                 <div className="flex items-start justify-start gap-2 overflow-hidden italic text-gray-300 ">
                                                                     <ReplyAllIcon className="rotate-180" />
-                                                                        <span>{(msg.replyedTo?.length && msg?.replyedTo[0]?.content?.slice(0, 150)) || (msg.replyedTo && msg.replyedTo.content?.slice(0, 150))}</span>
+                                                                        <span>{(msg.replyingTo && msg.replyingTo.content?.slice(0, 150))}</span>
                                                                 </div>
                                                             </div>
                                                         ) : null}

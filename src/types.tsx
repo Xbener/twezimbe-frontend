@@ -379,10 +379,9 @@ export type Message = {
     read?: boolean;
     status?: 'sending' | 'sent' | 'delivered' | 'seen';
     reactions?: Reaction[];
-    replyingTo?: string;
+    replyingTo?: Message;
     edited?: boolean;
     editedAt?: Date;
     createdAt?: Date;
     sender_id?: string;
-    replyedTo?: Message[] | Message | any
 };

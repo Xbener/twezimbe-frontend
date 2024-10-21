@@ -154,7 +154,7 @@ function ChannelDetails({ }: Props) {
 
             {/* channels */}
 
-            <div className='w-full p-2 flex flex-col mt-5'>
+            <div className='w-full p-2 flex flex-col mt-5 h-full overflow-y-auto absolute'>
                 <span className='flex items-center justify-between uppercase font-extrabold text-[0.9rem]'>
                     Channels
                     <Dialog>
@@ -216,7 +216,7 @@ function ChannelDetails({ }: Props) {
                         </div>
                     </div>
 
-                    <div className='w-full p-2 flex flex-col'>
+                    <div className='w-full p-2 flex flex-col mb-80'>
                         <h1 className='font-bold text-[1.1rem]'>Private channels</h1>
                         <div className='w-full flex flex-col'>
 
