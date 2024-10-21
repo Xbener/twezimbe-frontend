@@ -15,6 +15,7 @@ import PacmanLoader from 'react-spinners/PacmanLoader'
 import { socket, useMyContext } from '@/context/MyContext'
 import { toast } from 'sonner'
 import { throttle } from 'lodash'
+import { Button } from '@/components/ui/button'
 
 type Props = {}
 
@@ -80,7 +81,7 @@ function Page({ }: Props) {
 
             if (!res.ok) return toast.error("something went wrong")
             setMessages(prev => prev.filter(msg => msg._id !== message._id))
-            socket.emit('delete-message', {message, receiver: channel?.members})
+            socket.emit('delete-message', { message, receiver: channel?.members })
             closeContextMenu();
         } catch (error) {
             toast.error('something went wrong')
@@ -197,6 +198,37 @@ function Page({ }: Props) {
         }
     }, [isTyping.message])
 
+    const sendBySendBtn = async (content: string) => {
+        try {
+            setSending(true)
+            const token = Cookies.get('access-token');
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/${channel?.chatroom._id}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    sender_id: currentUser?._id,
+                    chatroom: channel?.chatroom?._id,
+                    content: content,
+                    messageType: "text",
+                    attachmentUrl: "none",
+                    receiver_id: channel?.members
+                })
+            });
+            const data = await response.json();
+            setMessages((prev: any) => ([...prev, { ...data.message, createdAt: new Date(), sender: currentUser, status: "sending" }]));
+            socket.emit('new-message', { sender: currentUser, receiver: channel?.members, message: { ...data.message, sender: currentUser } })
+            setMessage('')
+            scrollToBottom();
+        } catch (error) {
+            console.error('Error sending message', error);
+        } finally {
+            setSending(false)
+        }
+    }
+
 
     const handleKeyPress = async (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter' && message.trim()) {
@@ -289,7 +321,15 @@ function Page({ }: Props) {
             <div className="flex-grow overflow-y-auto p-4 space-y-3">
                 {
                     messages.length <= 0 && (
-                        "no message"
+                        <div className="w-full h-full flex flex-col items-center justify-center gap-3">
+                            Start Conversation
+                            <Button className="bg-blue-500 text-white"
+                                onClick={() => {
+                                    // setMessage("Hi!")
+                                    sendBySendBtn("Hi!")
+                                }}
+                            >Say Hi!</Button>
+                        </div>
                     )
                 }
                 {
