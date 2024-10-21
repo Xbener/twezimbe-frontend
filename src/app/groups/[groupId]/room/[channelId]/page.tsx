@@ -415,7 +415,7 @@ function Page({ }: Props) {
                         </PopoverTrigger>
                         <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col pl-3 ">
                             {
-                                messages.map((msg, index) => {
+                                !messages.find(msg => msg.pinned) ? <span className='text-center'>no pinned messages</span> : messages.map((msg, index) => {
                                     if (!msg.pinned) return null
                                     return <div
                                         key={msg._id}
@@ -435,9 +435,9 @@ function Page({ }: Props) {
                                                     <span className="text-[.7rem] text-neutral-400">{formatMessageDate(msg?.createdAt as Date)}</span>
                                                 </div>
                                             </div>
-                                           <span className="p-2 w-full mt-1 rounded-md">
-                                             {msg?.content}
-                                           </span>
+                                            <span className="p-2 w-full mt-1 rounded-md">
+                                                {msg?.content}
+                                            </span>
                                         </div>
                                     </div>
                                 })
