@@ -90,11 +90,12 @@ function Page({ }: Props) {
 
 
     const handleEdit = async (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' && isEditing.content !== '') {
             const token = Cookies.get('access-token')
+            setSending(true)
             try {
                 const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/${isEditing?.message?._id}`, {
-                    method:"PUT",
+                    method: "PUT",
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
@@ -102,17 +103,19 @@ function Page({ }: Props) {
                     body: JSON.stringify({ content: isEditing.content })
                 })
                 const data = await res.json()
-                if(data.status){
+                if (data.status) {
                     setMessages(prev => {
                         return prev.map(msg => msg._id === isEditing.message._id ? { ...msg, content: isEditing.content, edited: true, editedAt: new Date() } : msg)
                     })
                     setIsEditing(prev => ({ ...prev, state: false }))
-                }else{
+                } else {
                     toast.error(data.errors)
                 }
             } catch (error) {
                 // toast.error('try again')
                 console.log("error", error)
+            }finally {
+                setSending(false)
             }
         }
     }
