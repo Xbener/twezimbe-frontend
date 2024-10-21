@@ -419,11 +419,11 @@ function Page({ }: Props) {
                                     if (!msg.pinned) return null
                                     return <div
                                         key={msg._id}
-                                        onContextMenu={(e) => handleContextMenu(e, msg)} // Pass the message to the context menu handler
-                                        className={`flex gap-4 hover:bg-[#cbcbcb2e] cursor-pointer rounded-md items-start mb-1 justify-normal p-1 group`} // Reduced margin between consecutive messages
+                                        className={`flex flex-co gap-4 hover:bg-[#cbcbcb2e] cursor-pointer rounded-md items-start mb-1 justify-normal p-1 group`} // Reduced margin between consecutive messages
                                     >
-                                        {msg.pinned && <Pin />}
-
+                                        <span onClick={()=>handlePin(msg)} className="border rounded-full p-2 hover:bg-neutral-50 hover:text-black duration-75">
+                                            <Pin className='size-3' />
+                                        </span>
                                         <div className='flex flex-col w-full items-start justify-center'>
                                             <div className="flex gap-2 items-center">
                                                 <Avatar className='w-[40px] h-[40px] bg-neutral-200 rounded-full'>
@@ -435,8 +435,8 @@ function Page({ }: Props) {
                                                     <span className="text-[.7rem] text-neutral-400">{formatMessageDate(msg?.createdAt as Date)}</span>
                                                 </div>
                                             </div>
-                                            <span className="p-2 w-full mt-1 rounded-md">
-                                                {msg?.content}
+                                            <span className="p-2 w-full mt-1 rounded-md break-words text-wrap">
+                                                {msg?.content?.slice(0, 100)}
                                             </span>
                                         </div>
                                     </div>
