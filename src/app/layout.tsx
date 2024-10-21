@@ -13,6 +13,7 @@ import AutoLogin from "@/context/AutoLogin";
 import { MyProvider } from "@/context/MyContext";
 import MainLoader from "@/components/MainLoader";
 import 'react-loading-skeleton/dist/skeleton.css'
+// import 'emoji-mart/css/emoji-mart.css';
 
 const inter = Inter({ subsets: ["latin"] });
 

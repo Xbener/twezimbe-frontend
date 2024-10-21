@@ -19,6 +19,9 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog'
 import { AlertDialogHeader } from '@/components/ui/alert-dialog'
+import data from '@emoji-mart/data'
+import Picker from '@emoji-mart/react'
+
 
 type Props = {}
 
@@ -36,6 +39,8 @@ function Page({ }: Props) {
     const editingInputRef = useRef<HTMLInputElement | null>(null)
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
     const messagingInputRef = useRef<HTMLInputElement | null>(null)
+    const emojiContainerRef = useRef<HTMLDivElement | null>(null)
+    const [showPicker, setShowPicker] = useState(false);
     const [isEditing, setIsEditing] = useState({
         state: false,
         content: "",
@@ -67,6 +72,19 @@ function Page({ }: Props) {
             })
         }
     };
+    const handleClickOutside = (event: MouseEvent) => {
+        if (emojiContainerRef.current && !emojiContainerRef.current.contains(event.target as Node)) {
+            setShowPicker(false);
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [])
 
     useEffect(() => {
         scrollToBottom();
@@ -638,7 +656,7 @@ function Page({ }: Props) {
                         </div>
                     </div>
                 ) : null}
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-3 relative">
                     <div className="flex items-center gap-2">
                         <Popover>
                             <PopoverTrigger>
@@ -665,8 +683,13 @@ function Page({ }: Props) {
                         }}
                         onKeyPress={handleKeyPress}
                     />
+                    {showPicker && (
+                        <div ref={emojiContainerRef} className="absolute z-50 bottom-9 right-0">
+                            <Picker data={data} onEmojiSelect={(emoji: any) => setMessage(prev => prev + emoji.native)} />
+                        </div>
+                    )}
                     <div className="flex items-center gap-2">
-                        <Smile className="cursor-pointer hover:text-blue-400" />
+                        <Smile onClick={() => setShowPicker(prev => !prev)} className="cursor-pointer hover:text-blue-400" />
                         <StickerIcon className="cursor-pointer hover:text-blue-400" />
                         <Sticker className="cursor-pointer hover:text-blue-400" />
                     </div>
