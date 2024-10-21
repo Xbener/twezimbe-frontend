@@ -6,7 +6,7 @@ import { ChannelTypes, Message } from '@/types'
 import { useParams } from 'next/navigation'
 import React, { MouseEventHandler, useContext, useEffect, useRef, useState } from 'react'
 import Cookies from 'js-cookie'
-import { Lock, Bell, Pin, Smile, Image as Sticker, Plus, StickerIcon, DeleteIcon, Reply, Edit, ReplyAllIcon } from 'lucide-react'
+import { Lock, Bell, Pin, Smile, Image as Sticker, Plus, StickerIcon, DeleteIcon, Reply, Edit, ReplyAllIcon, XIcon } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import moment from 'moment'
@@ -32,6 +32,7 @@ function Page({ }: Props) {
     const [message, setMessage] = useState<string>("")
     const editingInputRef = useRef<HTMLInputElement | null>(null)
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
+    const messagingInputRef = useRef<HTMLInputElement | null>(null)
     const [isEditing, setIsEditing] = useState({
         state: false,
         content: "",
@@ -98,6 +99,7 @@ function Page({ }: Props) {
     };
 
     const handleStartReplying = (message: Message) => {
+        if (messagingInputRef.current) messagingInputRef.current.focus()
         setIsReplying(prev => ({ state: true, replyingTo: message._id!, message }))
     }
     const handleReply = (message: Message) => {
@@ -388,121 +390,132 @@ function Page({ }: Props) {
                                             )}
                                             {
                                                 isEditing.state && isEditing.message._id === msg._id ? (
-                                                    <input
-                                                        ref={editingInputRef}
-                                                        disabled={sending}
-                                                        className="flex-grow bg-gray-700 p-2 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed w-full"
-                                                        value={isEditing.content}
-                                                        onChange={(e) => setIsEditing(prev => ({ ...prev, content: e.target.value }))}
-                                                        onKeyPress={handleEdit}
-                                                    />
-                                                ) : (
-                                                    <div className='text-[#c4c4c4] text-[.9rem] w-full break-words p-0 m-0'>
-                                                        {msg?.replyedTo?.length! >= 1 || msg.replyedTo ? (
-                                                            <div className='bg-gray-800 p-2 rounded-md mb-1'>
-                                                                <div className="flex items-center gap-2 overflow-hidden h-5 italic text-gray-300">
-                                                                    <ReplyAllIcon className="rotate-180" />
-                                                                    <span>{(msg.replyedTo?.length && msg?.replyedTo[0]?.content) || (msg.replyedTo && msg.replyedTo.content)}</span>
-                                                                </div>
-                                                            </div>
-                                                        ) : null}
-                                                        <div className="text-white">
-                                                            {msg.content}
-                                                            <span>{msg.edited && <span className='text-[.7rem] text-gray-200'>(edited)</span>}</span>
-                                                        </div>
+                                                    <div className="w-full flex flex-col items-start">
+                                                        <input
+                                                            ref={editingInputRef}
+                                                            disabled={sending}
+                                                            className="flex-grow bg-gray-700 p-2 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed w-full"
+                                                            value={isEditing.content}
+                                                            onChange={(e) => setIsEditing(prev => ({ ...prev, content: e.target.value }))}
+                                                            onKeyPress={handleEdit}
+                                                        />
+                                                        <Button onClick={() => setIsEditing({state:false, content:"", message:{}})} className="underline text-[.7rem]">cancel</Button>
+                                                   </div>
+                                        ) : (
+                                        <div className='text-[#c4c4c4] text-[.9rem] w-full break-words p-0 m-0'>
+                                            {msg?.replyedTo?.length! >= 1 || msg.replyedTo ? (
+                                                <div className='bg-gray-800 p-2 rounded-md mb-1'>
+                                                    <div className="flex items-center gap-2 overflow-hidden h-5 italic text-gray-300">
+                                                        <ReplyAllIcon className="rotate-180" />
+                                                        <span>{(msg.replyedTo?.length && msg?.replyedTo[0]?.content) || (msg.replyedTo && msg.replyedTo.content)}</span>
                                                     </div>
-
-                                                )
-                                            }
+                                                </div>
+                                            ) : null}
+                                            <div className="text-white">
+                                                {msg.content}
+                                                <span>{msg.edited && <span className='text-[.7rem] text-gray-200'>(edited)</span>}</span>
+                                            </div>
                                         </div>
 
-                                        {/* Context Menu */}
-                                        {contextMenu.visible && contextMenu.message?._id === msg._id && ( // Show the context menu for the correct message
-                                            <div
-                                                className="absolute bg-gray-700 text-white rounded-md shadow-sm w-[200px]"
-                                                style={{ left: contextMenu.x, top: contextMenu.y }}
-                                                onMouseLeave={closeContextMenu}
-                                            >
-                                                {instantActions.map((action, index) => {
-                                                    if ((action.name === "Edit" && `${msg.sender_id}` !== `${currentUser?._id}`) || (action.name === "Delete" && `${msg.sender_id}` !== `${currentUser?._id}`)) {
-                                                        return null;
-                                                    }
-
-                                                    return (
-                                                        <button
-                                                            key={index}
-                                                            className={`w-full text-left p-2 hover:bg-blue-600 ${action.name === "Delete" ? "text-red-500 hover:text-white hover:bg-red-500" : ""} flex items-center gap-2`}
-                                                            onClick={() => {
-                                                                if (action.name === "Edit") {
-                                                                    action.action(msg, msg.content);
-                                                                } else {
-                                                                    action.action(msg);
-                                                                }
-                                                            }}
-                                                        >
-                                                            {action.icon}
-                                                            {action.name}
-                                                        </button>
-                                                    );
-                                                })}
-                                            </div>
-                                        )}
+                                        )
+                                            }
                                     </div>
-                                );
+
+                                        {/* Context Menu */ }
+                                {
+                                    contextMenu.visible && contextMenu.message?._id === msg._id && ( // Show the context menu for the correct message
+                                        <div
+                                            className="absolute bg-gray-700 text-white rounded-md shadow-sm w-[200px]"
+                                            style={{ left: contextMenu.x, top: contextMenu.y }}
+                                            onMouseLeave={closeContextMenu}
+                                        >
+                                            {instantActions.map((action, index) => {
+                                                if ((action.name === "Edit" && `${msg.sender_id}` !== `${currentUser?._id}`) || (action.name === "Delete" && `${msg.sender_id}` !== `${currentUser?._id}`)) {
+                                                    return null;
+                                                }
+
+                                                return (
+                                                    <button
+                                                        key={index}
+                                                        className={`w-full text-left p-2 hover:bg-blue-600 ${action.name === "Delete" ? "text-red-500 hover:text-white hover:bg-red-500" : ""} flex items-center gap-2`}
+                                                        onClick={() => {
+                                                            if (action.name === "Edit") {
+                                                                action.action(msg, msg.content);
+                                                            } else {
+                                                                action.action(msg);
+                                                            }
+                                                        }}
+                                                    >
+                                                        {action.icon}
+                                                        {action.name}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    )
+                                }
+                                    </div>
+                    );
                             })}
 
-                        </div>
-                    ))
+            </div>
+            ))
                 }
-                <div ref={messagesEndRef} />
+            <div ref={messagesEndRef} />
+        </div>
+
+            {/* Footer */ }
+    <div className="bg-gray-800 p-4 border-t border-gray-700">
+        {isReplying.state ? (
+            <div className='w-full p-2 rounded-md '>
+                <div className=" overflow-hidden h-5 flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                        <ReplyAllIcon className="rotate-180" /> {isReplying.message.content}
+                    </div>
+                    <Button onClick={() => setIsReplying({ state: false, replyingTo: "", message: {} })}>
+                        <XIcon />
+                    </Button>
+                </div>
+            </div>
+        ) : null}
+        <div className="flex items-center space-x-3">
+            <div className="flex items-center gap-2">
+                <Popover>
+                    <PopoverTrigger>
+                        <Plus className="cursor-pointer bg-neutral-50 text-gray-700 rounded-full" />
+                    </PopoverTrigger>
+                    <PopoverContent>
+
+                    </PopoverContent>
+                </Popover>
+
             </div>
 
-            {/* Footer */}
-            <div className="bg-gray-800 p-4 border-t border-gray-700">
-                {isReplying.state ? (
-                    <div className='w-full p-2 rounded-md '>
-                        <div className="flex items-center gap-2 overflow-hidden h-5">
-                            <ReplyAllIcon className="rotate-180" /> {isReplying.message.content}
-                        </div>
-                    </div>
-                ) : null}
-                <div className="flex items-center space-x-3">
-                    <div className="flex items-center gap-2">
-                        <Popover>
-                            <PopoverTrigger>
-                                <Plus className="cursor-pointer bg-neutral-50 text-gray-700 rounded-full" />
-                            </PopoverTrigger>
-                            <PopoverContent>
+            <input
+                ref={messagingInputRef}
+                disabled={sending}
+                onBlur={() => setIsTyping(prev => ({ message: "" }))}
+                onFocus={() => setIsTyping(prev => ({ ...prev, message: `${currentUser?.firstName} is typing ...` }))}
+                className="flex-grow bg-gray-700 p-2 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed"
+                placeholder={`Message ${channel?.name}`}
+                value={message}
+                onChange={(e) => {
+                    setMessage(e.target.value);
 
-                            </PopoverContent>
-                        </Popover>
-
-                    </div>
-
-                    <input
-                        disabled={sending}
-                        onBlur={() => setIsTyping(prev => ({ message: "" }))}
-                        onFocus={() => setIsTyping(prev => ({ ...prev, message: `${currentUser?.firstName} is typing ...` }))}
-                        className="flex-grow bg-gray-700 p-2 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed"
-                        placeholder={`Message ${channel?.name}`}
-                        value={message}
-                        onChange={(e) => {
-                            setMessage(e.target.value);
-
-                        }}
-                        onKeyPress={handleKeyPress}
-                    />
-                    <div className="flex items-center gap-2">
-                        <Smile className="cursor-pointer hover:text-blue-400" />
-                        <StickerIcon className="cursor-pointer hover:text-blue-400" />
-                        <Sticker className="cursor-pointer hover:text-blue-400" />
-                    </div>
-                </div>
-                <div className='w-full h-1 text-[.7rem] p-1'>
-                    {/* {isTyping.message !== "" && isTyping.message} */}
-                </div>
+                }}
+                onKeyPress={handleKeyPress}
+            />
+            <div className="flex items-center gap-2">
+                <Smile className="cursor-pointer hover:text-blue-400" />
+                <StickerIcon className="cursor-pointer hover:text-blue-400" />
+                <Sticker className="cursor-pointer hover:text-blue-400" />
             </div>
         </div>
+        <div className='w-full h-1 text-[.7rem] p-1'>
+            {/* {isTyping.message !== "" && isTyping.message} */}
+        </div>
+    </div>
+        </div >
     )
 }
 
