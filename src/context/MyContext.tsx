@@ -82,7 +82,9 @@ export const MyProvider = ({ children }: Props) => {
                     native: true,
                 })
                 console.log("joined_user", joined_user)
-                setMembers(prev => ([...prev, { ...joined_user }]))
+                setMembers(prev => {
+                    return [...prev.filter(member => member._id !== joined_user?._id), joined_user]
+                })
             })
         }
 
