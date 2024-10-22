@@ -13,6 +13,7 @@ import { useGetGroupChannels } from '@/api/channel'
 import { useMyContext } from '@/context/MyContext'
 import { useGetProfileData } from '@/api/auth'
 import DMProfile from './DMProfile'
+import DMContextProvider from '@/context/DMContext'
 
 type Props = {
     children: React.ReactNode
@@ -21,15 +22,17 @@ type Props = {
 function DMLayout({ children }: Props) {
 
     return (
-        <div className='flex w-full text-neutral-200'>
-            <Aside />
-            <div className='w-[83%] bg-[#013a6fae] flex'>
-                <div className="w-[75%] overflow-auto">
-                    {children}
+        <DMContextProvider>
+            <div className='flex w-full text-neutral-200'>
+                <Aside />
+                <div className='w-[83%] bg-[#013a6fae] flex'>
+                    <div className="w-[75%] overflow-auto">
+                        {children}
+                    </div>
+                    <DMProfile />
                 </div>
-                <DMProfile />
             </div>
-        </div>
+        </DMContextProvider>
     )
 }
 

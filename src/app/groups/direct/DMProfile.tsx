@@ -1,15 +1,16 @@
 import { useGetProfileData } from '@/api/auth'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
+import { DMContext } from '@/context/DMContext'
 import { iconTextGenerator } from '@/lib/iconTextGenerator'
 import { ChevronRight } from 'lucide-react'
 import moment from 'moment'
-import React from 'react'
+import React, { useContext } from 'react'
 
 type Props = {}
 
 function DMProfile({ }: Props) {
-    const { currentUser } = useGetProfileData()
+    const { currentUser } = useContext(DMContext)
     return (
         <div className="w-[25%] bg-[#013a6fa6] overflow-auto p-2">
             <div className="flex flex-col p-3 items-center text-center gap-4">

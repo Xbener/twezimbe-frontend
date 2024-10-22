@@ -390,3 +390,23 @@ export type Message = {
     sender_id?: string;
     pinned?: boolean;
 };
+
+
+
+
+export interface ChatroomMember {
+    _id: string;          
+    profileID: string;    
+    email: string;        
+    firstName: string;    
+    lastName: string;     
+    profile_pic?: string;
+}
+
+export interface Chatroom {
+    _id: string;         
+    name: string;         
+    type: "dm" | "channel";  
+    members: string[];     
+    memberDetails: ChatroomMember[];  
+}
