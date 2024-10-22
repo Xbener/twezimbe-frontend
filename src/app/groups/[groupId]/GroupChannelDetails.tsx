@@ -48,7 +48,8 @@ function ChannelDetails({ }: Props) {
             const res = await addChannel({ ...channelFields, groupId: group?._id, members })
             if (isError) return toast.error(res.errors || res.message)
             if (res.status) {
-                window.location.reload()
+                console.log('created channel', res.channel)
+                window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups/${group?._id}/room/${res.channel._id}`
             }
         } catch (error) {
             toast.error("Something went wrong")
@@ -155,7 +156,7 @@ function ChannelDetails({ }: Props) {
             {/* channels */}
 
             <div className='w-full p-2 flex flex-col mt-5 h-full overflow-y-auto absolute'>
-                <span className='flex items-center justify-between uppercase font-extrabold text-[0.9rem]'>
+                <span className='flex items-center justify-between font-extrabold text-[0.9rem]'>
                     Channels
                     <Dialog>
                         <DialogTrigger>

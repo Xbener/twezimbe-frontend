@@ -255,7 +255,7 @@ const GroupCreateDialog = ({ }: Props) => {
                                             key={user?._id}
                                             className={`flex gap-3 items-center p-2 rounded cursor-pointer active:scale-95 
 								transition-all ease-in-out duration-300
-							${selectedUsersId.includes(`${user?._id}`) ? "bg-[#00a884]" : ""}`}
+							${selectedUsersId.includes(`${user?._id}`) ? "bg-[#00a884] text-white" : ""}`}
                                             onClick={() => {
                                                 if (selectedUsersId.includes(`${user?._id}`)) {
                                                     setSelectedUsersId(
@@ -272,7 +272,7 @@ const GroupCreateDialog = ({ }: Props) => {
                                                 )}
 
                                                 <AvatarImage
-                                                    // src={(user?.photograph === 'default' || !user?.photograph) ? '/assets/user.png' : `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/${user?.photograph}`}
+                                                    src={user?.profile_pic}
                                                     className="rounded-full object-cover"
                                                 />
                                                 <AvatarFallback>
@@ -292,11 +292,11 @@ const GroupCreateDialog = ({ }: Props) => {
                                 </div>
                                 <div className="flex justify-between text-white">
                                     <DialogClose>
-                                        <Button variant={"outline"} type="button" className="bg-[#0f172a] hover:bg-gray-500">Cancel</Button>
+                                        <Button variant={"outline"} type="button" className="bg-transparent border-orange-500 text-orange-500">Cancel</Button>
                                     </DialogClose>
                                     <Button
                                         variant={"outline"}
-                                        className="bg-[#0f172a] hover:bg-gray-500"
+                                        className="bg-blue-500 text-white hover:bg-gray-500"
                                         disabled={
                                             selectedUsersId.length === 0 ||
                                             (selectedUsersId.length > 1 && !groupName) ||
@@ -422,7 +422,7 @@ const GroupCreateDialog = ({ }: Props) => {
                                     {/* {isLoading ? <LoadingButton /> : <Button type='submit' className='text-white px-4 py-2 rounded-xl text-sm bg-blue-500 hover:bg-blue-400 font-bold'>Create</Button>} */}
                                 </div>
                                 <div className="flex justify-between text-white">
-                                    <Button variant={"outline"} type="button" className="bg-[#0f172a] hover:bg-gray-500" onClick={() => setStep(1)}>Prev</Button>
+                                    <Button variant={"outline"} type="button" className="bg-transparent border-orange-500 text-orange-500" onClick={() => setStep(1)}>Prev</Button>
                                     <Button
                                         // onClick={handlCreateConversation}
                                         type='submit'
@@ -431,7 +431,7 @@ const GroupCreateDialog = ({ }: Props) => {
                                             (selectedUsersId.length > 1 && !groupName) ||
                                             isLoading
                                         }
-                                        className="bg-[#0f172a] hover:bg-gray-500"
+                                        className="bg-blue-500  text-white"
                                     >
                                         {isLoading ? (
                                             <div className="w-5 h-5 border-t-2 border-b-2  rounded-full animate-spin" />

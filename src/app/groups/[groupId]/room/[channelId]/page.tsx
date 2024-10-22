@@ -620,7 +620,7 @@ function Page({ }: Props) {
                                                         Cancel
                                                     </Button>
                                                 </DialogClose>
-                                                <Button disabled={sending} className="bg-red-500 text-white" >
+                                                <Button disabled={sending} className="bg-orange-500 text-white" >
                                                     Confirm
                                                 </Button>
                                             </div>

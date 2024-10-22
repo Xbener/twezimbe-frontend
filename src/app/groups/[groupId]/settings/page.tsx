@@ -163,7 +163,7 @@ function GroupSettings({ }: Props) {
                 <Button disabled={uploading} onClick={() => router.back()}>
                     <XCircle color={"white"} />
                 </Button>
-                <h1 className='font-bold uppercase'>Settings</h1>
+                <h1 className='font-bold'>Settings</h1>
             </div>
 
             {
@@ -262,7 +262,7 @@ function GroupSettings({ }: Props) {
                 )
             }
             <div className='p-3 border-b  w-full'>
-                <h1 className='p-2 text-[1.2rem] font-extrabold uppercase'>notification Settings</h1>
+                <h1 className='p-2 text-[1.2rem] font-extrabold'>notification Settings</h1>
 
                 <div className='flex flex-col gap-3 w-full mt-5'>
 
@@ -318,7 +318,7 @@ function GroupSettings({ }: Props) {
             </div>
 
             {/* <div className='p-3 border-b  w-full'>
-                <h1 className='p-2 text-[1.2rem] font-extrabold uppercase'>Quick Actions</h1>
+                <h1 className='p-2 text-[1.2rem] font-extrabold'>Quick Actions</h1>
                 <div className="w-full flex items-center gap-3">
                     <Dialog>
                         <DialogTrigger>
@@ -436,7 +436,7 @@ function GroupSettings({ }: Props) {
             </div> */}
 
             <div className='p-3 border-b  w-full'>
-                <h1 className='p-2 text-[1.2rem] font-extrabold uppercase'>Privacy Settings</h1>
+                <h1 className='p-2 text-[1.2rem] font-extrabold'>Privacy Settings</h1>
 
                 <div className='flex flex-col gap-3 w-full mt-5'>
 
@@ -583,7 +583,7 @@ function GroupSettings({ }: Props) {
             </div>
 
             <div className='p-3 border-b  w-full '>
-                <h1 className='p-2 text-[1.2rem] font-extrabold uppercase'>About</h1>
+                <h1 className='p-2 text-[1.2rem] font-extrabold'>About</h1>
                 <div className='flex flex-col gap-3 w-full mt-5 mb-11'>
                     <div>
                         <h1><span className='font-bold'>Name:</span> {group?.group_name}</h1>
