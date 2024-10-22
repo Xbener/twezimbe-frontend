@@ -31,7 +31,6 @@ function GroupRequests({ }: Props) {
 
             const data = await res.json()
             if (!data.status) return toast.error(data.message || data.errors)
-            console.log(data)
             setGroupRequests(data.groupRequests)
         } catch (error) {
             toast.error("Something went wrong. Please refresh the page")
@@ -47,7 +46,6 @@ function GroupRequests({ }: Props) {
     const acceptRequest = async (request: GroupJoinRequestTypes) => {
         try {
             setLoading(true)
-            console.log(request)
             const accessToken = Cookies.get('access-token');
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/groups/requests`, {
                 method: 'PUT',

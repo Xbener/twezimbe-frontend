@@ -29,7 +29,7 @@ type Props = {
 
 function ChannelDetails({ }: Props) {
     const { group } = useContext(GroupContext)
-    const { channelList, setChannelList, members, setCurrentChannel } = useMyContext()
+    const { channelList, setChannelList, members, setCurrentChannel, setChId, setRoomId } = useMyContext()
     const router = useRouter()
     const { currentUser } = useGetProfileData()
     const { addChannel, isError, isLoading, isSuccess } = useAddChannel()
@@ -48,7 +48,6 @@ function ChannelDetails({ }: Props) {
             const res = await addChannel({ ...channelFields, groupId: group?._id, members })
             if (isError) return toast.error(res.errors || res.message)
             if (res.status) {
-                console.log('created channel', res.channel)
                 window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups/${group?._id}/room/${res.channel._id}`
             }
         } catch (error) {
@@ -206,7 +205,10 @@ function ChannelDetails({ }: Props) {
                                         key={index}
                                         onClick={() => {
                                             setCurrentChannel(channel)
+                                            setRoomId(channel?.chatroom?._id!)
                                             router.push(`/groups/${group?._id}/room/${channel._id}`)
+                                            // setChId(channel?._id)
+                                            
                                         }}
                                         className='flex text-[.9rem] items-center gap-2 w-full hover:bg-neutral-50 hover:text-gray-700 duration-100 cursor-pointer p-2 rounded-md'>
                                         <span>{channel?.state === 'public' ? "#" : <Lock className='' />}</span>
@@ -225,7 +227,13 @@ function ChannelDetails({ }: Props) {
                                 channelList?.map((channel, index) => channel?.state?.toLowerCase() === 'private' && (
                                     <div
                                         key={index}
-                                        onClick={() => router.push(`/groups/${group?._id}/room/${channel._id}`)}
+                                        onClick={() => {
+                                            setCurrentChannel(channel)
+                                            setRoomId(channel?.chatroom?._id!)
+                                            router.push(`/groups/${group?._id}/room/${channel._id}`)
+                                            // setChId(channel?._id)
+                                        }
+                                        }
                                         className='flex items-center text-[.9rem] gap-2 w-full hover:bg-neutral-50 hover:text-gray-700 duration-100 cursor-pointer p-2 rounded-md'>
                                         <span><Lock /></span>
                                         {channel.name}

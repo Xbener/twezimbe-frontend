@@ -22,6 +22,7 @@ import { AlertDialogHeader } from '@/components/ui/alert-dialog'
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import addNotification from 'react-push-notification'
 
 
 type Props = {}
@@ -29,7 +30,7 @@ type Props = {}
 
 function Page({ }: Props) {
     const { channelId } = useParams()
-    const { messages, setMessages, isTyping, setIsTyping, setAdmins, setMembers, setModerators } = useMyContext()
+    const { messages, setMessages, isTyping, setIsTyping, setCurrentChannel, setChId, setRoomId } = useMyContext()
     const { getChannel, isError } = useGetSingleChannel()
     const [isLoading, setLoading] = useState(true)
     const [sending, setSending] = useState(false)
@@ -189,7 +190,6 @@ function Page({ }: Props) {
         setIsReplying(prev => ({ state: true, replyingTo: message._id!, message }))
     }
     const handleReply = (message: Message) => {
-        console.log('Reply to message:', message._id);
         // Implement reply logic here
         closeContextMenu();
     };
@@ -262,7 +262,6 @@ function Page({ }: Props) {
     }
 
     const handleReactWithEmoji = (msg?: Message, emoji?: string) => {
-        console.log(`Reacting to message ${msg?._id} with emoji ${emoji}`);
         setMessages(prev => {
             return prev.map(prevMsg => {
                 console.log(prevMsg)
@@ -298,8 +297,11 @@ function Page({ }: Props) {
 
             })
             const data = await response.json()
-            console.log('channel data', data)
             setChannel(data.channel)
+            setCurrentChannel(channel)
+            setChId(channel?._id!)
+            setMessages([]);
+            setRoomId(channel?.chatroom?._id!)
             // setAdmins(data.channel.members.filter((member: any) => member.role === "ChannelAdmin"));
             // setModerators(data.members.filter((member: any) => member.role === "ChannelModerator"));
             // setMembers(data.members.filter((member: any) => member.role === "ChannelMember"));
@@ -321,16 +323,37 @@ function Page({ }: Props) {
             })
             const data = await response.json()
             setMessages(data.messages)
+            setRoomId(channel?.chatroom?._id!)
         } catch (error) {
             console.error('Error fetching data', error)
         }
     }
 
     useEffect(() => {
-        if (channelId) {
-            getChatRoomData()
-        }
-    }, [channelId])
+        getChatRoomData();
+    }, [channelId]);
+
+
+    useEffect(() => {
+        const handleNewMessage = (vl: { message: Message }) => {
+            setMessages((prev) => [...prev.filter(message => message._id !== vl.message._id), vl.message]);
+            addNotification({
+                title: 'New Message',
+                subtitle: 'You have a new message',
+                message: vl.message.content,
+                theme: 'darkblue',
+                native: true,
+                onClick: () => window.focus()
+            });
+        };
+
+        socket.on('new-message-added', handleNewMessage);
+
+        return () => {
+            socket.off('new-message-added', handleNewMessage); // Clean up listener on unmount
+        };
+    }, [channelId]);
+
 
     useEffect(() => {
         if (channel) {
@@ -345,10 +368,12 @@ function Page({ }: Props) {
     }, [isTyping.message])
 
     const sendBySendBtn = async (content: string) => {
+        if (!channel) return; // Make sure there's a channel context
+
         try {
-            setSending(true)
+            setSending(true);
             const token = Cookies.get('access-token');
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/${channel?.chatroom?._id}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/${channel.chatroom?._id}`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -356,32 +381,36 @@ function Page({ }: Props) {
                 },
                 body: JSON.stringify({
                     sender_id: currentUser?._id,
-                    chatroom: channel?.chatroom?._id,
+                    chatroom: channel.chatroom?._id,
                     content: content,
                     messageType: "text",
                     attachmentUrl: "none",
-                    receiver_id: channel?.members
+                    receiver_id: channel.members, // Ensure you're sending to the right members
                 })
             });
+
             const data = await response.json();
-            setMessages((prev: any) => ([...prev, { ...data.message, createdAt: new Date(), sender: currentUser, status: "sending" }]));
-            socket.emit('new-message', { sender: currentUser, receiver: channel?.members, message: { ...data.message, sender: currentUser } })
-            setMessage('')
+            setMessages((prev) => [...prev, { ...data.message, createdAt: new Date(), sender: currentUser, status: "sending" }]);
+            socket.emit('new-message', { sender: currentUser, chatroomId: channel.chatroom?._id, sentTo: channel.chatroom?._id, receiver: channel.members, message: { ...data.message, sender: currentUser } });
+            setMessage('');
+            setRoomId(channel?.chatroom?._id!)
             scrollToBottom();
+            setIsReplying({ state: false, message: {}, replyingTo: "" });
         } catch (error) {
             console.error('Error sending message', error);
         } finally {
-            setSending(false)
+            setSending(false);
         }
-    }
-
+    };
 
     const handleKeyPress = async (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter' && message.trim()) {
+            if (!channel) return; // Make sure there's a channel context
+
             try {
-                setSending(true)
+                setSending(true);
                 const token = Cookies.get('access-token');
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/${channel?.chatroom?._id}`, {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/${channel.chatroom?._id}`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -389,27 +418,30 @@ function Page({ }: Props) {
                     },
                     body: JSON.stringify({
                         sender_id: currentUser?._id,
-                        chatroom: channel?.chatroom?._id,
+                        chatroom: channel.chatroom?._id,
                         content: message,
                         messageType: "text",
                         attachmentUrl: "none",
-                        receiver_id: channel?.members,
-                        replyingTo: isReplying.state ? isReplying.message._id : null
+                        receiver_id: channel.members, // Ensure you're sending to the right members
+                        replyingTo: isReplying.state ? isReplying.message._id : null,
                     })
                 });
+
                 const data = await response.json();
-                setMessages((prev: any) => ([...prev, { ...data.message, createdAt: new Date(), sender: currentUser, replyingTo: isReplying.state ? isReplying.message : null }]));
-                socket.emit('new-message', { sender: currentUser, receiver: channel?.members, message: { ...data.message, sender: currentUser, replyingTo: isReplying.state ? isReplying.message : null } })
-                setMessage('')
+                setMessages((prev) => [...prev, { ...data.message, createdAt: new Date(), sender: currentUser, replyingTo: isReplying.state ? isReplying.message : null }]);
+                socket.emit('new-message', { sender: currentUser, chatroomId: channel.chatroom?._id, sentTo: channel.chatroom?._id, receiver: channel.members, message: { ...data.message, sender: currentUser, replyingTo: isReplying.state ? isReplying.message : null } });
+                setMessage('');
+                setRoomId(channel?.chatroom?._id!)
                 scrollToBottom();
-                setIsReplying({ state: false, message: {}, replyingTo: "" })
+                setIsReplying({ state: false, message: {}, replyingTo: "" });
             } catch (error) {
                 console.error('Error sending message', error);
             } finally {
-                setSending(false)
+                setSending(false);
             }
         }
-    }
+    };
+
 
 
     // Group messages by date
@@ -430,6 +462,10 @@ function Page({ }: Props) {
     }
 
     let groupedMessages = groupMessagesByDate(messages)
+
+    useEffect(() => {
+        setRoomId(channel?.chatroom?._id!)
+    }, [channel])
 
     useEffect(() => {
         groupedMessages = groupMessagesByDate(messages)
@@ -459,7 +495,7 @@ function Page({ }: Props) {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ userId: user?._id })
+                body: JSON.stringify({ userId: user?._id, groupId: group?._id })
             })
 
             const data = await res.json()
@@ -640,9 +676,6 @@ function Page({ }: Props) {
                                                             Cancel
                                                         </Button>
                                                     </DialogClose>
-                                                    <Button disabled={sending} className="bg-orange-500 text-white" >
-                                                        Confirm
-                                                    </Button>
                                                 </div>
                                             </DialogContent>
                                         </Dialog>

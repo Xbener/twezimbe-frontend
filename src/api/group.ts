@@ -63,7 +63,6 @@ export const useGetGroupList = () => {
             throw new Error(responseData.errors || responseData.message);
         }
         const { groups } = responseData
-        console.log('groups dfs', groups)
         return groups;
     };
 

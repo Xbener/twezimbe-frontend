@@ -27,7 +27,6 @@ function GroupMemberItem(member: Props) {
     const { onlineUsers } = useMyContext()
     const { currentUser } = useGetProfileData()
     useEffect(() => {
-        console.log('onlineUsers', onlineUsers, "members", member)
     }, [member, onlineUsers])
     return (
         <div className='flex items-center justify-normal gap-5 p-3 w-full cursor-pointer hover:bg-[#6bb7ff73] duration-150 rounded-lg'>

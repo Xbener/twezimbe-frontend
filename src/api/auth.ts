@@ -45,7 +45,6 @@ export const useSignUp = () => {
 
 export const useSignIn = () => {
     const SignInRequest = async (user: SignInTypes) => {
-        console.log('userSignIn', JSON.stringify(user));
 
         const response = await fetch(`${API_BASE_URL}/api/v1/auth/signin`, {
             method: 'POST',
@@ -99,7 +98,6 @@ export const useForgotPassword = () => {
 
         const responseData = await response.json();
 
-        console.log(responseData)
         if (!response.ok) {
             throw new Error(responseData.errors);
         }
@@ -226,7 +224,6 @@ export const useGetProfileData = () => {
         });
 
         const responseData = await response.json();
-        console.log('profile', responseData)
 
         if (!response.ok) {
             throw new Error(responseData.errors);
@@ -290,7 +287,6 @@ export const useGetAllUsers = () => {
         const responseData = await response.json();
 
         const { allUsers } = responseData
-        console.log(allUsers)
         if (!response.ok) {
             throw new Error(responseData.errors || responseData.message);
         }

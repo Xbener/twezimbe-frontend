@@ -31,7 +31,6 @@ function GroupIdLayout({ children }: Props) {
         const fetchGroup = async () => {
             const res = await getGroup(groupId as string)
             if (res._id !== null) {
-                console.log('res', res)
                 setGroup(res)
             }
         }
@@ -43,7 +42,6 @@ function GroupIdLayout({ children }: Props) {
         const getChannelsList = async (userId: string) => {
             const res = await getChannels({userId, groupId: groupId as string})
             if (!res.status) toast.error(res.errors || res.message)
-            console.log("res", res)
             setChannelList(res.channels)
         }
 

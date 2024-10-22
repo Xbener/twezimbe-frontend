@@ -175,7 +175,6 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
         try {
             setIsUpdating(true)
             const res = await updateAccount({ securityQuestions })
-            console.log("res", res)
         } catch (err: any) {
             toast.error("Something went wrong. Please try again")
             console.log(err.message)
