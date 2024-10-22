@@ -838,16 +838,16 @@ function Page({ }: Props) {
                                     <div
                                         key={msg._id}
                                         onContextMenu={(e) => handleContextMenu(e, msg)} // Pass the message to the context menu handler
-                                        className={`flex gap-4 hover:bg-[#cbcbcb2e] cursor-pointer rounded-md items-start mb-1 justify-normal p-1 ${index === msgs.length && "mb-5"} ${msg.pinned ? "bg-[rgba(255,193,59,0.42)]" : ' '} group`} // Reduced margin between consecutive messages
+                                        className={`flex gap-4 hover:bg-[#cbcbcb2e] cursor-pointer rounded-md items-start mb-1 justify-normal ${index === msgs.length && "mb-5"} ${msg.pinned ? "bg-[rgba(255,193,59,0.42)]" : ' '} group`} // Reduced margin between consecutive messages
                                     >
                                         {msg.pinned && <Pin />}
                                         {showAvatarAndName ? (
-                                            <Avatar className='w-[40px] h-[40px] bg-neutral-200 rounded-full'>
+                                            <Avatar className=' bg-neutral-200 rounded-full'>
                                                 <AvatarImage src={msg.sender?.profile_pic} />
                                                 <AvatarFallback />
                                             </Avatar>
                                         ) : (
-                                            <div className='w-[40px] text-[.5rem] items-center invisible group-hover:visible' >
+                                            <div className='w-[40px] p-0 h-0 text-[.5rem] items-center invisible group-hover:visible' >
                                                 {new Date(msg?.createdAt as Date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
                                             </div>
                                         )}
@@ -882,7 +882,7 @@ function Page({ }: Props) {
                                                                 </div>
                                                             </div>
                                                         ) : null}
-                                                        <div className="text-white">
+                                                        <div className="text-white flex items-center gap-2">
                                                             {msg.content}
                                                             <span>{msg.edited && <span className='text-[.7rem] text-gray-200'>(edited)</span>}</span>
                                                         </div>
