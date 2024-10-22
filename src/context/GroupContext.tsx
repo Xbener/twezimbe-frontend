@@ -17,6 +17,8 @@ type GroupContextTypes = {
     moderators: User[];
     members: User[];
     isLoading: boolean
+    privateChannelMembers: User[]
+    setPrivateChannelMembers: (vl: User[]) => void
 }
 
 export const GroupContext = React.createContext<GroupContextTypes>({
@@ -25,13 +27,16 @@ export const GroupContext = React.createContext<GroupContextTypes>({
     admins: [],
     moderators: [],
     members: [],
-    isLoading: true
+    isLoading: true,
+    privateChannelMembers: [],
+    setPrivateChannelMembers: () => { }
 })
 
 function GroupProvider({ children }: Props) {
 
     const [group, setGroup] = useState<GroupTypes | null>(null)
     const { admins, setAdmins, moderators, setModerators, members, setMembers } = useMyContext()
+    const [privateChannelMembers, setPrivateChannelMembers] = useState<User[]>([])
     const [isLoading, setIsLoading] = useState(false)
 
 
@@ -63,11 +68,12 @@ function GroupProvider({ children }: Props) {
     useEffect(() => {
         if (group) {
             handleGetMembers()
+            setPrivateChannelMembers([])
         }
     }, [group]);
 
     return (
-        <GroupContext.Provider value={{ group, setGroup, admins, moderators, members, isLoading }}>
+        <GroupContext.Provider value={{ group, setGroup, admins, moderators, members, isLoading, privateChannelMembers, setPrivateChannelMembers }}>
             {children}
         </GroupContext.Provider>
     )

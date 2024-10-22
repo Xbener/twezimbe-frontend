@@ -35,7 +35,7 @@ function Page({ }: Props) {
     const [isLoading, setLoading] = useState(true)
     const [sending, setSending] = useState(false)
     const { currentUser } = useGetProfileData()
-    const { group, } = useContext(GroupContext)
+    const { group, setPrivateChannelMembers } = useContext(GroupContext)
     const [channel, setChannel] = useState<ChannelTypes | null>(null)
     const [message, setMessage] = useState<string>("")
     const editingInputRef = useRef<HTMLInputElement | null>(null)
@@ -362,6 +362,7 @@ function Page({ }: Props) {
             setChId(channel?._id!)
             setMessages([]);
             setRoomId(channel?.chatroom?._id!)
+            setPrivateChannelMembers(channel?.membersDetails as User[])
             // setAdmins(data.channel.members.filter((member: any) => member.role === "ChannelAdmin"));
             // setModerators(data.members.filter((member: any) => member.role === "ChannelModerator"));
             // setMembers(data.members.filter((member: any) => member.role === "ChannelMember"));
@@ -525,6 +526,9 @@ function Page({ }: Props) {
 
     useEffect(() => {
         setRoomId(channel?.chatroom?._id!)
+        if (channel?.membersDetails) {
+            setPrivateChannelMembers(channel?.membersDetails as User[])
+        }
     }, [channel])
 
     useEffect(() => {
@@ -950,9 +954,9 @@ function Page({ }: Props) {
                                                                             </span>
                                                                         ))
                                                                     }
-                                                                    
+
                                                                     <span className="border p-1 rounded-md hover:bg-[rgba(255,255,255,0.24)] cursor-pointer"
-                                                                    onClick={()=>setQuickEmojiSelector(prev=>!prev)}
+                                                                        onClick={() => setQuickEmojiSelector(prev => !prev)}
                                                                     >
                                                                         <SmileIcon />
                                                                     </span>
@@ -1078,7 +1082,7 @@ function Page({ }: Props) {
                         }}
                         onKeyPress={handleKeyPress}
                     />
-                   
+
                     {showPicker && (
                         <div ref={emojiContainerRef} className="absolute z-50 bottom-9 right-0">
                             <Picker data={data} onEmojiSelect={(emoji: any) => setMessage(prev => prev + emoji.native)} />

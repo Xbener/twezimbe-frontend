@@ -17,7 +17,7 @@ type Props = {
 
 function MemberList({ admins, moderators, members, isLoading }: Props) {
 
-    const { group } = useContext(GroupContext)
+    const { group, privateChannelMembers } = useContext(GroupContext)
     const [q, setQ] = useState('')
 
     return (
@@ -41,6 +41,15 @@ function MemberList({ admins, moderators, members, isLoading }: Props) {
                             loading ...
                         </div>
 
+                    ) :  privateChannelMembers?.length > 0 ? (
+                        <div>
+                            <h1 className='p-1 font-extrabold text-[0.9rem] mb-2 capitalize'>Channel members ({privateChannelMembers.length})</h1>
+                            {
+                                privateChannelMembers?.length === 0 ? "No members" : privateChannelMembers.map((admin, index) => (
+                                    <GroupMemberItem key={index} {...admin} />
+                                ))
+                            }
+                        </div>
                     ) : (
                         <>
                             <div className="w-full p-2 mb-3 ">
