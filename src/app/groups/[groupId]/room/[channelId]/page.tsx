@@ -291,13 +291,14 @@ function Page({ }: Props) {
         try {
             const token = Cookies.get('access-token')
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/channels/${group?._id}/${channelId}`, {
+                method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`
                 },
 
             })
             const data = await response.json()
-            console.log('channel data', data.channel)
+            console.log('channel data', data)
             setChannel(data.channel)
             // setAdmins(data.channel.members.filter((member: any) => member.role === "ChannelAdmin"));
             // setModerators(data.members.filter((member: any) => member.role === "ChannelModerator"));
