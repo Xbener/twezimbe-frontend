@@ -1,5 +1,5 @@
 import { useGetProfileData } from "@/api/auth";
-import { ChannelTypes, FriendTypes, JoinedGroupTypes, Message, User } from "@/types";
+import { ChannelTypes, FriendTypes, JoinedGroupTypes, Message, Reaction, User } from "@/types";
 import Cookies from 'js-cookie';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import io, { Socket } from 'socket.io-client';
@@ -132,6 +132,24 @@ export const MyProvider = ({ children }: Props) => {
             };
 
             socket.on('new-message-added', handleNewMessage);
+            socket.on('reacted-with-emoji', ({ msg, emoji, userId }) => {
+                setMessages(prev => {
+                    return prev.map(prevMsg => {
+                        if (prevMsg._id === msg?._id) {
+                            const existingReaction = prevMsg.reactions?.find(reaction => reaction.emoji === emoji && reaction.user_id === userId);
+
+                            if (!existingReaction) {
+                                return {
+                                    ...prevMsg,
+                                    reactions: [...prevMsg.reactions as any, { user_id: userId, emoji }]
+                                };
+                            }
+                        }
+                        return prevMsg;
+                    });
+                });
+            });
+
             socket.on('is-typing', ({ message, currentUser }) => {
                 setIsTyping({ message: `${currentUser?.firstName} is typing ...` });
             });

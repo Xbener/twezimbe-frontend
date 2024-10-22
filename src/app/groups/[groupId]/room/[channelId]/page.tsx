@@ -263,8 +263,7 @@ function Page({ }: Props) {
 
     const handleReactWithEmoji = async (msg?: Message, emoji?: string) => {
         try {
-
-            const token = Cookies.get('access-token')
+            const token = Cookies.get('access-token');
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/add-reaction`, {
                 method: 'PUT',
                 headers: {
@@ -272,20 +271,33 @@ function Page({ }: Props) {
                     'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({ messageId: msg?._id, userId: currentUser?._id, emoji })
-            })
+            });
 
-            const data = await res.json()
-            if (!data.status) return toast.error(data.errors)
+            const data = await res.json();
+            if (!data.status) return toast.error(data.errors);
+
+            // Emit to other users
+            socket.emit('react-with-emoji', { msg, receiver: channel?.members, emoji, _id: currentUser?._id });
+
+            // Update message with new reaction
             setMessages(prev => {
                 return prev.map(prevMsg => {
-                    console.log(prevMsg)
-                    if (prevMsg._id === msg?._id) return { ...prevMsg, reactions: prevMsg.reactions?.find(emj => emj.emoji === emoji) ? [...prevMsg.reactions] : [...prevMsg.reactions as Reaction[], { _id: currentUser?._id as string, emoji: emoji as string }] }
-                    return prevMsg
-                })
-            })
+                    if (prevMsg._id === msg?._id) {
+                        const existingReaction = prevMsg.reactions?.find(emj => emj.emoji === emoji && emj.user_id === currentUser?._id);
+                        if (!existingReaction) {
+                            return {
+                                ...prevMsg,
+                                reactions: [...prevMsg.reactions as any, { user_id: currentUser?._id, emoji }]
+                            };
+                        }
+                    }
+                    return prevMsg;
+                });
+            });
+
         } catch (error) {
-            toast.error('unable to react')
-            console.log(error)
+            toast.error('Unable to react');
+            console.error(error);
         }
     };
 
@@ -844,10 +856,9 @@ function Page({ }: Props) {
                                                             {msg.content}
                                                             <span>{msg.edited && <span className='text-[.7rem] text-gray-200'>(edited)</span>}</span>
                                                         </div>
-                                                            <div className="flex items-center w-full justify-start p-1 gap-1">
+                                                        <div className="flex items-center w-full justify-start p-1 gap-1">
                                                                 {
                                                                     msg.reactions?.length! > 0 && (
-                                                                        // Group reactions by emoji and count occurrences
                                                                         (() => {
                                                                             const emojiCounts = msg.reactions!.reduce((acc, reaction: Reaction) => {
                                                                                 const emoji = reaction.emoji;
@@ -857,7 +868,6 @@ function Page({ }: Props) {
                                                                                 return acc;
                                                                             }, {} as Record<string, number>);
 
-                                                                            // Render grouped emojis with their count
                                                                             return Object.entries(emojiCounts).map(([emoji, count], index) => (
                                                                                 <span
                                                                                     key={index}
@@ -869,7 +879,8 @@ function Page({ }: Props) {
                                                                         })()
                                                                     )
                                                                 }
-                                                            </div>
+
+                                                        </div>
 
                                                     </div>
                                                 )
