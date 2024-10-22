@@ -365,7 +365,7 @@ export type ChatRoomTypes = {
 }
 
 export type Reaction = {
-    user_id: string;
+    _id: string;
     emoji: string;
 };
 

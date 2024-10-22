@@ -261,14 +261,32 @@ function Page({ }: Props) {
         }
     }
 
-    const handleReactWithEmoji = (msg?: Message, emoji?: string) => {
-        setMessages(prev => {
-            return prev.map(prevMsg => {
-                console.log(prevMsg)
-                if (prevMsg._id === msg?._id) return { ...prevMsg, reactions: prevMsg.reactions?.find(emj => emj.emoji === emoji) ? [...prevMsg.reactions] : [...prevMsg.reactions as Reaction[], { user_id: currentUser?._id as string, emoji: emoji as string }] }
-                return prevMsg
+    const handleReactWithEmoji = async (msg?: Message, emoji?: string) => {
+        try {
+
+            const token = Cookies.get('access-token')
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/add-reaction`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ messageId: msg?._id, userId: currentUser?._id, emoji })
             })
-        })
+
+            const data = await res.json()
+            if (!data.status) return toast.error(data.errors)
+            setMessages(prev => {
+                return prev.map(prevMsg => {
+                    console.log(prevMsg)
+                    if (prevMsg._id === msg?._id) return { ...prevMsg, reactions: prevMsg.reactions?.find(emj => emj.emoji === emoji) ? [...prevMsg.reactions] : [...prevMsg.reactions as Reaction[], { _id: currentUser?._id as string, emoji: emoji as string }] }
+                    return prevMsg
+                })
+            })
+        } catch (error) {
+            toast.error('unable to react')
+            console.log(error)
+        }
     };
 
 
@@ -826,17 +844,33 @@ function Page({ }: Props) {
                                                             {msg.content}
                                                             <span>{msg.edited && <span className='text-[.7rem] text-gray-200'>(edited)</span>}</span>
                                                         </div>
-                                                        <div className="flex items-center w-full  justify-start p-1 gap-1">
-                                                            {
-                                                                msg.reactions?.length! > 0 && msg.reactions?.map((reaction: Reaction, index: number) => {
-                                                                    return (
-                                                                        <span key={index} className="border p-1 rounded-md hover:bg-[rgba(255,255,255,0.24)] cursor-pointer">
-                                                                            {reaction.emoji != '0' && reaction.emoji}
-                                                                        </span>
+                                                            <div className="flex items-center w-full justify-start p-1 gap-1">
+                                                                {
+                                                                    msg.reactions?.length! > 0 && (
+                                                                        // Group reactions by emoji and count occurrences
+                                                                        (() => {
+                                                                            const emojiCounts = msg.reactions!.reduce((acc, reaction: Reaction) => {
+                                                                                const emoji = reaction.emoji;
+                                                                                if (emoji !== '0') {
+                                                                                    acc[emoji] = (acc[emoji] || 0) + 1;
+                                                                                }
+                                                                                return acc;
+                                                                            }, {} as Record<string, number>);
+
+                                                                            // Render grouped emojis with their count
+                                                                            return Object.entries(emojiCounts).map(([emoji, count], index) => (
+                                                                                <span
+                                                                                    key={index}
+                                                                                    className="border p-1 rounded-md hover:bg-[rgba(255,255,255,0.24)] cursor-pointer"
+                                                                                >
+                                                                                    {emoji} {count > 1 && <span className="ml-1">x{count}</span>}
+                                                                                </span>
+                                                                            ));
+                                                                        })()
                                                                     )
-                                                                })
-                                                            }
-                                                        </div>
+                                                                }
+                                                            </div>
+
                                                     </div>
                                                 )
                                             }
@@ -846,7 +880,7 @@ function Page({ }: Props) {
                                         {
                                             contextMenu.visible && contextMenu.message?._id === msg._id && ( // Show the context menu for the correct message
                                                 <div
-                                                    className="absolute bg-gray-700 text-white rounded-md shadow-sm w-[200px]"
+                                                    className="absolute bg-gray-700 text-white rounded-md shadow-sm w-[200px] z-50"
                                                     style={{ left: contextMenu.x, top: contextMenu.y }}
                                                     onMouseLeave={closeContextMenu}
                                                 >
@@ -859,7 +893,8 @@ function Page({ }: Props) {
                                                                 <div className="flex items-center w-full justify-around p-2">
                                                                     {
                                                                         action.emojis!.map((emoji, index) => (
-                                                                            <span key={index} className="border p-1 rounded-md hover:bg-[rgba(255,255,255,0.24)] cursor-pointer" onClick={() => action.action(msg, emoji)}>
+                                                                            <span key={index} className="border p-1 rounded-md hover:bg-[rgba(255,255,255,0.24)] cursor-pointer"
+                                                                                onClick={() => handleReactWithEmoji(msg, emoji)}>
                                                                                 {emoji}
                                                                             </span>
                                                                         ))
