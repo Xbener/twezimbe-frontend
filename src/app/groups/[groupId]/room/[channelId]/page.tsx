@@ -43,6 +43,7 @@ function Page({ }: Props) {
     const messagingInputRef = useRef<HTMLInputElement | null>(null)
     const emojiContainerRef = useRef<HTMLDivElement | null>(null)
     const [showPicker, setShowPicker] = useState(false);
+    const [quickEmojiSelector, setQuickEmojiSelector] = useState(false)
     const [attachments, setAttachments] = useState<File[] | any>(null)
     const [channelUpdateData, setChannelUpdateData] = useState({
         name: channel?.name,
@@ -141,7 +142,9 @@ function Page({ }: Props) {
     const handleClickOutside = (event: MouseEvent) => {
         if (emojiContainerRef.current && !emojiContainerRef.current.contains(event.target as Node)) {
             setShowPicker(false);
+            setQuickEmojiSelector(false)
         }
+
     };
 
     useEffect(() => {
@@ -268,38 +271,65 @@ function Page({ }: Props) {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
                 },
-                body: JSON.stringify({ messageId: msg?._id, userId: currentUser?._id, emoji })
+                body: JSON.stringify({ messageId: msg?._id, userId: currentUser?._id, emoji }),
             });
 
             const data = await res.json();
             if (!data.status) return toast.error(data.errors);
 
-            // Emit to other users
+            // Emit socket event for real-time updates
             socket.emit('react-with-emoji', { msg, receiver: channel?.members, emoji, _id: currentUser?._id });
 
-            // Update message with new reaction
+            // Update local state
             setMessages(prev => {
                 return prev.map(prevMsg => {
                     if (prevMsg._id === msg?._id) {
-                        const existingReaction = prevMsg.reactions?.find(emj => emj.emoji === emoji && emj.user_id === currentUser?._id);
-                        if (!existingReaction) {
-                            return {
-                                ...prevMsg,
-                                reactions: [...prevMsg.reactions as any, { user_id: currentUser?._id, emoji }]
-                            };
+                        const existingReactionIndex = prevMsg.reactions?.findIndex(r => r.emoji === emoji && r.user_id === currentUser?._id);
+
+                        if (existingReactionIndex !== -1) {
+                            // If the reaction exists, remove it
+                            const newReactions = [...prevMsg.reactions as any];
+                            newReactions.splice(existingReactionIndex!, 1); // Remove the reaction
+                            socket.emit('remove-emoji', { msg, receiver: channel?.members, emoji, _id: currentUser?._id });
+                            return { ...prevMsg, reactions: newReactions };
+                        } else {
+                            // If the reaction doesn't exist, add it
+                            socket.emit('react-with-emoji', { msg, receiver: channel?.members, emoji, _id: currentUser?._id });
+                            return { ...prevMsg, reactions: [...(prevMsg.reactions || []), { user_id: currentUser?._id, emoji }] };
                         }
                     }
                     return prevMsg;
                 });
             });
-
         } catch (error) {
-            toast.error('Unable to react');
-            console.error(error);
+            toast.error('unable to react');
+            console.log(error);
         }
     };
+
+    // Listen for real-time updates from other users
+    socket.on('react-with-emoji', ({ msg, emoji, _id }) => {
+        setMessages(prev => {
+            return prev.map(prevMsg => {
+                if (prevMsg._id === msg?._id) {
+                    const existingReactionIndex = prevMsg.reactions?.findIndex(r => r.emoji === emoji && r.user_id === _id);
+
+                    if (existingReactionIndex !== -1) {
+                        // If the reaction exists, remove it
+                        const newReactions = [...prevMsg.reactions as any];
+                        newReactions.splice(existingReactionIndex!, 1);
+                        return { ...prevMsg, reactions: newReactions };
+                    } else {
+                        // If the reaction doesn't exist, add it
+                        return { ...prevMsg, reactions: [...(prevMsg.reactions || []), { user_id: _id, emoji }] };
+                    }
+                }
+                return prevMsg;
+            });
+        });
+    });
 
 
     const instantActions = [{
@@ -857,28 +887,38 @@ function Page({ }: Props) {
                                                             <span>{msg.edited && <span className='text-[.7rem] text-gray-200'>(edited)</span>}</span>
                                                         </div>
                                                         <div className="flex items-center w-full justify-start p-1 gap-1">
-                                                                {
-                                                                    msg.reactions?.length! > 0 && (
-                                                                        (() => {
-                                                                            const emojiCounts = msg.reactions!.reduce((acc, reaction: Reaction) => {
-                                                                                const emoji = reaction.emoji;
-                                                                                if (emoji !== '0') {
-                                                                                    acc[emoji] = (acc[emoji] || 0) + 1;
-                                                                                }
-                                                                                return acc;
-                                                                            }, {} as Record<string, number>);
+                                                            {
+                                                                msg.reactions?.length! > 0 && (
+                                                                    (() => {
+                                                                        const emojiCounts = msg.reactions!.reduce((acc, reaction: Reaction) => {
+                                                                            const emoji = reaction.emoji!;
+                                                                            if (emoji !== '0') {
+                                                                                acc[emoji] = (acc[emoji] || 0) + 1;
+                                                                            }
+                                                                            return acc;
+                                                                        }, {} as Record<string, number>);
 
-                                                                            return Object.entries(emojiCounts).map(([emoji, count], index) => (
+                                                                        return Object.entries(emojiCounts).map(([emoji, count], index) => {
+                                                                            // Check if the current user has reacted with this emoji
+                                                                            const hasUserReacted = msg.reactions?.some(
+                                                                                (reaction) => reaction.emoji === emoji && reaction.user_id === currentUser?._id
+                                                                            );
+
+                                                                            return (
                                                                                 <span
                                                                                     key={index}
-                                                                                    className="border p-1 rounded-md hover:bg-[rgba(255,255,255,0.24)] cursor-pointer"
+                                                                                    // If the user has reacted, add a background color
+                                                                                    className={`${hasUserReacted ? "bg-[rgba(255,255,255,0.19)] " : ""
+                                                                                        } border p-1 rounded-md hover:bg-[rgba(255,255,255,0.24)] cursor-pointer`}
+                                                                                    onClick={() => handleReactWithEmoji(msg, emoji)} // Add react/remove logic here
                                                                                 >
                                                                                     {emoji} {count > 1 && <span className="ml-1">x{count}</span>}
                                                                                 </span>
-                                                                            ));
-                                                                        })()
-                                                                    )
-                                                                }
+                                                                            );
+                                                                        });
+                                                                    })()
+                                                                )
+                                                            }
 
                                                         </div>
 
@@ -910,6 +950,12 @@ function Page({ }: Props) {
                                                                             </span>
                                                                         ))
                                                                     }
+                                                                    
+                                                                    <span className="border p-1 rounded-md hover:bg-[rgba(255,255,255,0.24)] cursor-pointer"
+                                                                    onClick={()=>setQuickEmojiSelector(prev=>!prev)}
+                                                                    >
+                                                                        <SmileIcon />
+                                                                    </span>
                                                                 </div>
                                                             );
                                                         }
@@ -952,10 +998,17 @@ function Page({ }: Props) {
                                                 </div>
                                             )
                                         }
+                                        {quickEmojiSelector && (
+                                            <div ref={emojiContainerRef} className="absolute z-50 bottom-9 right-0">
+                                                <Picker data={data} onEmojiSelect={(emoji: any) => {
+                                                    handleReactWithEmoji(msg, emoji.native)
+                                                    setQuickEmojiSelector(false)
+                                                }} />
+                                            </div>
+                                        )}
                                     </div>
                                 );
                             })}
-
                         </div>
                     ))
                 }
@@ -1025,6 +1078,7 @@ function Page({ }: Props) {
                         }}
                         onKeyPress={handleKeyPress}
                     />
+                   
                     {showPicker && (
                         <div ref={emojiContainerRef} className="absolute z-50 bottom-9 right-0">
                             <Picker data={data} onEmojiSelect={(emoji: any) => setMessage(prev => prev + emoji.native)} />

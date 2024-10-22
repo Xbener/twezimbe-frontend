@@ -150,6 +150,27 @@ export const MyProvider = ({ children }: Props) => {
                 });
             });
 
+            socket.on('removed-emoji', ({ msg, emoji, userId }) => {
+                setMessages(prev => {
+                    return prev.map((prevMsg: Message) => {
+                        if (prevMsg._id === msg?._id) {
+                            // Filter out the reaction from the reactions array where emoji and userId match
+                            const updatedReactions = prevMsg.reactions?.filter(
+                                reaction => !(reaction.emoji === emoji && reaction.user_id === userId)
+                            );
+
+                            // Return the updated message with filtered reactions
+                            return {
+                                ...prevMsg,
+                                reactions: updatedReactions // Set the updated reactions array
+                            };
+                        }
+                        return prevMsg;
+                    });
+                });
+            });
+
+
             socket.on('is-typing', ({ message, currentUser }) => {
                 setIsTyping({ message: `${currentUser?.firstName} is typing ...` });
             });
