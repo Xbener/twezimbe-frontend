@@ -40,3 +40,13 @@ body {
 button{
   @apply disabled:cursor-not-allowed
 }
+
+::-webkit-scrollbar{
+  width: 7px;
+  background: rgb(0, 128, 255);
+}
+
+::-webkit-scrollbar-thumb{
+  background: rgb(255, 255, 255);
+  border-radius:10px  ;
+}
