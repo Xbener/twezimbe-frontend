@@ -336,7 +336,7 @@ function Page({ }: Props) {
         if (channel) {
             getChannelMessages()
         }
-    }, [channel])
+    }, [channelId, channel])
 
     useEffect(() => {
         if (isTyping.message !== "") {
