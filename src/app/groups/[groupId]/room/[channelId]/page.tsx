@@ -83,6 +83,29 @@ function Page({ }: Props) {
             setSending(false)
         }
     }
+
+    const handleDeleteChannel = async () => {
+        const token = Cookies.get('access-token')
+        try {
+            setSending(true)
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/channels/${channel?._id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            })
+
+            const data = await res.json()
+            if (!data.status) return toast.error(data.errors)
+            window.location.href= `${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups/${channel?.groupId}`
+        } catch (error) {
+            toast.error('something went wrong')
+            console.log(error)
+        } finally {
+            setSending(false)
+        }
+    }
+
     const [isEditing, setIsEditing] = useState({
         state: false,
         content: "",
@@ -655,7 +678,7 @@ function Page({ }: Props) {
                                                             Cancel
                                                         </Button>
                                                     </DialogClose>
-                                                    <Button disabled={sending} className="bg-red-500 text-white" >
+                                                    <Button onClick={handleDeleteChannel} disabled={sending} className="bg-red-500 text-white" >
                                                         Confirm
                                                     </Button>
                                                 </div>

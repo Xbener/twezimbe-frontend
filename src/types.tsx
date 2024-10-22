@@ -355,6 +355,7 @@ export type ChannelTypes = {
     createdAt?: Date;
     chatroom?: ChatRoomTypes;
     members?: string[] | string | any;
+    groupId?: string;
 }
 
 export type ChatRoomTypes = {
