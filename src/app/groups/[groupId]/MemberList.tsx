@@ -21,7 +21,7 @@ function MemberList({ admins, moderators, members, isLoading }: Props) {
     const [q, setQ] = useState('')
 
     return (
-        <div className='w-[25%] bg-[#013a6fa6] overflow-auto'>
+        <div className='w-[20%] bg-[#013a6fa6] overflow-auto'>
             {/* Search Bar */}
             <div className="flex items-center bg-[#013a6fae] sticky top-0 z-20 p-2 justify-between text-neutral-200 w-full">
                 <input name="q" onChange={(e) => setQ(e.target.value)} className='bg-transparent outline-none w-full' placeholder='Search ...' />

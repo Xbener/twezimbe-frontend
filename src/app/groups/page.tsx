@@ -5,7 +5,7 @@ import { useGetGroupList, useJoinGroup } from '@/api/group';
 import { Button } from '@/components/ui/button';
 import { GroupTypes } from '@/types';
 import { EyeClosedIcon } from '@radix-ui/react-icons';
-import { Eye, Menu, Search } from 'lucide-react';
+import { Eye, Home, Menu, Search } from 'lucide-react';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
@@ -143,7 +143,10 @@ function Groups({ }: Props) {
               </PopoverContent>
             </Popover>
 
-            <h1 className='text-[2rem] font-bold'>Discover</h1>
+            <div className="flex items-center gap-2 cursor-pointer">
+              <span onClick={()=>router.push('/')}><Home /></span>
+              <h1 className='text-[2rem] font-bold'>Discover</h1>
+            </div>
           </div>
 
           {/* Category Menu */}
@@ -177,7 +180,7 @@ function Groups({ }: Props) {
 
       <div className='h-full overflow-auto flex flex-col'>
         <div className='flex flex-col bg-[#202234] p-5 text-neutral-200'>
-          <h1 className="sm:text-[4rem] text-[1rem] uppercase font-bold">Find Your Community</h1>
+          <h1 className="sm:text-[4rem] text-[1rem] font-bold">Find your community</h1>
           <p>From Social, Educational, Professional, and many more!</p>
         </div>
 
