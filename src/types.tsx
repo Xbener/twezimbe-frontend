@@ -58,6 +58,7 @@ export type User = {
     is_complete: boolean;
     socketId?: string;
     isActive?: boolean;
+    createdAt?: Date;
 };
 
 
