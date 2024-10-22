@@ -47,8 +47,8 @@ export const useAddChannel = () => {
 
 export const useGetGroupChannels = () => {
     const accessToken = Cookies.get('access-token');
-    const getChannelList = async (userId: string): Promise<any> => {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/channels/${userId}`, {
+    const getChannelList = async ({ userId, groupId }: { userId: string, groupId: string }): Promise<any> => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/channels/${groupId}/${userId}`, {
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
             }

@@ -41,7 +41,7 @@ function GroupIdLayout({ children }: Props) {
 
     useEffect(() => {
         const getChannelsList = async (userId: string) => {
-            const res = await getChannels(userId)
+            const res = await getChannels({userId, groupId: groupId as string})
             if (!res.status) toast.error(res.errors || res.message)
             console.log("res", res)
             setChannelList(res.channels)
