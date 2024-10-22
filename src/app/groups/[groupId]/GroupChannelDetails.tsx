@@ -200,7 +200,7 @@ function ChannelDetails({ }: Props) {
                         <h1 className='text-[1.2rem]'>Public channels</h1>
                         <div className='w-full flex flex-col'>
                             {
-                                channelList?.map((channel, index) => channel.state === 'public' && (
+                                channelList?.map((channel, index) => channel.state?.toLowerCase() === 'public' && (
                                     <div
                                         key={index}
                                         onClick={() => {
@@ -221,7 +221,7 @@ function ChannelDetails({ }: Props) {
                         <div className='w-full flex flex-col'>
 
                             {
-                                channelList?.map((channel, index) => channel.state === 'private' && (
+                                channelList?.map((channel, index) => channel?.state?.toLowerCase() === 'private' && (
                                     <div
                                         key={index}
                                         onClick={() => router.push(`/groups/${group?._id}/room/${channel._id}`)}
