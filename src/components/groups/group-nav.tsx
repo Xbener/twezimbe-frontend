@@ -11,7 +11,7 @@ import { GroupContext } from '@/context/GroupContext';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { PopoverTrigger, Popover, PopoverContent } from '../ui/popover';
 import { iconTextGenerator } from '@/lib/iconTextGenerator';
-import { Edit, LogOut } from 'lucide-react';
+import { Edit, Home, LogOut } from 'lucide-react';
 import Cookies from 'js-cookie'
 import { Badge } from '../ui/badge';
 import StatusDot from '../ui/StatusDot';
@@ -74,7 +74,10 @@ const GroupNav = () => {
             </GeneralLink>
 
             <NavLink href='/groups/direct'> 
-                <span className='text-black'>DMs</span>
+                <span className='text-green-700'>DMs</span>
+            </NavLink>
+             <NavLink href='/'> 
+                <Home className='h-5 w-7 text-green-700' />
             </NavLink>
              <NavLink href='/groups/'>
                 <Eye className='h-5 w-7' />
