@@ -14,18 +14,46 @@ type DMContextTypes = {
     userDMs: ChatRoomTypes[]
     setUserDMs: (vl: ChatRoomTypes[]) => void
     currentUser?: User
+    allUsers?: User[]
+    currentDM: ChatRoomTypes | null
+    setCurrentDM: (vl: ChatRoomTypes) => void
 }
 
 export const DMContext = React.createContext<DMContextTypes>({
     userDMs: [],
     setUserDMs: (vl) => { },
     // currentUser: {},
+    currentDM: null,
+    setCurrentDM: (vl)=>{}
 })
 
 function DMContextProvider({ children }: Props) {
-    const [currentDM, setCurrentDM] = useState()
     const [userDMs, setUserDMs] = useState<ChatRoomTypes[]>([])
     const { currentUser } = useGetProfileData()
+    const [allUsers, setAllUsers] = useState([])
+    const [currentDM, setCurrentDM] = useState<ChatRoomTypes | null>(null)
+
+    useEffect(() => {
+        const getAllUsers = async () => {
+            try {
+                const token = Cookies.get('access-token')
+                const headers = {
+                    'Authorization': `Bearer ${token}`
+                }
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/auth/users`, {
+                    headers
+                })
+                const data = await res.json()
+                if (!data.status) return
+                setAllUsers(data.users)
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        if (currentUser) {
+            getAllUsers()
+        }
+    }, [currentUser])
     useEffect(() => {
         const getUserChatRooms = async () => {
             try {
@@ -54,7 +82,10 @@ function DMContextProvider({ children }: Props) {
         <DMContext.Provider value={{
             userDMs,
             setUserDMs,
-            currentUser: currentUser!
+            currentUser: currentUser!,
+            allUsers,
+            currentDM,
+            setCurrentDM
         }}>
             {children}
         </DMContext.Provider>

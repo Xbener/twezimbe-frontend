@@ -363,9 +363,11 @@ export type ChannelTypes = {
 }
 
 export type ChatRoomTypes = {
-    _id: string;
-    name: string;
-    ref: string
+    _id?: string;
+    name?: string;
+    ref?: string;
+    members: string[];
+    memberDetails: User[]
 }
 
 export type Reaction = {

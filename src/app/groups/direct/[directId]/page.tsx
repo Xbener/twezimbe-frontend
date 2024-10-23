@@ -1,125 +1,43 @@
 'use client'
-
-import { useGetSingleChannel } from '@/api/channel'
-import { GroupContext } from '@/context/GroupContext'
-import { ChannelTypes, Message, Reaction, User } from '@/types'
 import { useParams } from 'next/navigation'
-import React, { MouseEventHandler, useContext, useEffect, useRef, useState } from 'react'
-import Cookies from 'js-cookie'
-import { Lock, Bell, Pin, Smile, Image as Sticker, Plus, StickerIcon, DeleteIcon, Reply, Edit, ReplyAllIcon, XIcon, Settings, MessageCircleWarning, Delete, File, FileIcon, SmileIcon } from 'lucide-react'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import moment from 'moment'
-import { useGetProfileData } from '@/api/auth'
-import PacmanLoader from 'react-spinners/PacmanLoader'
-import { socket, useMyContext } from '@/context/MyContext'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { throttle } from 'lodash'
+import Cookies from 'js-cookie'
+import { DMContext } from '@/context/DMContext'
+import { ChatRoomTypes, Message, Reaction, User } from '@/types' // Assuming you have these types
+import { Bell, DeleteIcon, Edit, File, Pin, Plus, Reply, ReplyAllIcon, Smile, SmileIcon, XIcon } from 'lucide-react'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import moment from 'moment'
 import { Button } from '@/components/ui/button'
-import Link from 'next/link'
-import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog'
-import { AlertDialogHeader } from '@/components/ui/alert-dialog'
-import data from '@emoji-mart/data'
+import { data } from '@/components/charts/Applications'
 import Picker from '@emoji-mart/react'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import addNotification from 'react-push-notification'
-
+import { socket, useMyContext } from '@/context/MyContext'
 
 type Props = {}
 
-
 function Page({ }: Props) {
-    const { channelId } = useParams()
-    const { messages, setMessages, isTyping, setIsTyping, setCurrentChannel, setChId, setRoomId } = useMyContext()
-    const { getChannel, isError } = useGetSingleChannel()
-    const [isLoading, setLoading] = useState(true)
-    const [sending, setSending] = useState(false)
-    const { currentUser } = useGetProfileData()
-    const { group, setPrivateChannelMembers } = useContext(GroupContext)
-    const [channel, setChannel] = useState<ChannelTypes | null>(null)
+    const { directId } = useParams()
     const [message, setMessage] = useState<string>("")
-    const editingInputRef = useRef<HTMLInputElement | null>(null)
-    const messagesEndRef = useRef<HTMLDivElement | null>(null);
-    const messagingInputRef = useRef<HTMLInputElement | null>(null)
-    const emojiContainerRef = useRef<HTMLDivElement | null>(null)
-    const [showPicker, setShowPicker] = useState(false);
-    const [quickEmojiSelector, setQuickEmojiSelector] = useState(false)
+    const { setCurrentDM, currentUser, currentDM } = useContext(DMContext)
+    const [currentPatners, setCurrentPatners] = useState<User[]>([])
+    const currentUserId = Cookies.get('current-user-id') // Assuming you store the current user ID in cookies
+    const { setRoomId, messages, setMessages } = useMyContext()
+    const [sending, setSending] = useState(false)
     const [attachments, setAttachments] = useState<File[] | any>(null)
-    const [channelUpdateData, setChannelUpdateData] = useState({
-        name: channel?.name,
-        description: channel?.description,
-        state: channel?.state
-
-    })
-
-    useEffect(() => {
-        if (channel) {
-            setChannelUpdateData(prev => ({ ...prev, name: channel.name, description: channel.description, state: channel.state }))
-        }
-    }, [channel])
-
-    const handleUpdateChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setChannelUpdateData(prev => ({ ...prev, [e.target.name]: e.target.value }))
-    }
-
-    const handleUpdateChannel = async () => {
-        const token = Cookies.get('access-token')
-        try {
-            setSending(true)
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/channels/${channel?._id}`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': "application/json"
-                },
-                body: JSON.stringify({ ...channelUpdateData, members: channelUpdateData.state === 'public' && channel?.state === 'private' ? channel?.members : null })
-            })
-
-            const data = await res.json()
-            if (!data.status) return toast.error(data.errors)
-            window.location.reload()
-        } catch (error) {
-            toast.error('something went wrong')
-            console.log(error)
-        } finally {
-            setSending(false)
-        }
-    }
-
-    const handleDeleteChannel = async () => {
-        const token = Cookies.get('access-token')
-        try {
-            setSending(true)
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/channels/${channel?._id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-            })
-
-            const data = await res.json()
-            if (!data.status) return toast.error(data.errors)
-            window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups/${channel?.groupId}`
-        } catch (error) {
-            toast.error('something went wrong')
-            console.log(error)
-        } finally {
-            setSending(false)
-        }
-    }
-
-    const [isEditing, setIsEditing] = useState({
-        state: false,
-        content: "",
-        message: {} as Message
-    })
-
     const [isReplying, setIsReplying] = useState({
         state: false,
         replyingTo: "",
         message: {} as Message
     })
 
+
+    const editingInputRef = useRef<HTMLInputElement | null>(null)
+    const messagesEndRef = useRef<HTMLDivElement | null>(null);
+    const messagingInputRef = useRef<HTMLInputElement | null>(null)
+    const emojiContainerRef = useRef<HTMLDivElement | null>(null)
+    const [showPicker, setShowPicker] = useState(false);
+    const [quickEmojiSelector, setQuickEmojiSelector] = useState(false)
     const [contextMenu, setContextMenu] = useState<{
         visible: boolean;
         x: number;
@@ -132,28 +50,13 @@ function Page({ }: Props) {
         message: null, // Initialize with null
     });
 
-        const handleRightClick = (event: React.MouseEvent) => {
-        event.preventDefault();
+    const [isEditing, setIsEditing] = useState({
+        state: false,
+        content: "",
+        message: {} as Message
+    })
 
-        const { clientX, clientY } = event;
 
-        // Get the height of the viewport
-        const viewportHeight = window.innerHeight;
-        const menuHeight = 150; // Assuming the height of the context menu
-
-        // Calculate if there's enough space below the click point
-        const spaceBelow = viewportHeight - clientY;
-
-        // Determine new position based on available space
-        const newY = spaceBelow < menuHeight ? clientY - menuHeight : clientY;
-
-        setContextMenu({
-            visible: true,
-            x: clientX,
-            y: newY,
-            message: null,
-        });
-    };
 
     const scrollToBottom = () => {
         if (messagesEndRef.current) {
@@ -162,6 +65,7 @@ function Page({ }: Props) {
             })
         }
     };
+
     const handleClickOutside = (event: MouseEvent) => {
         if (emojiContainerRef.current && !emojiContainerRef.current.contains(event.target as Node)) {
             setShowPicker(false);
@@ -170,6 +74,7 @@ function Page({ }: Props) {
 
     };
 
+
     useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside);
 
@@ -177,19 +82,19 @@ function Page({ }: Props) {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, [])
-
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
-    const handleContextMenu = (e: any, msg: any) => {
-        e.preventDefault(); // Prevent the default context menu from appearing
+
+    const closeContextMenu = () => {
         setContextMenu({
-            visible: true,
-            x: e.pageX,
-            y: e.pageY,
-            message: msg, // Store the clicked message
+            visible: false,
+            x: 0,
+            y: 0,
+            message: null, // Reset the message field to null
         });
     };
+
     const handleDelete = async (message: Message) => {
         try {
             const token = Cookies.get('access-token')
@@ -202,7 +107,7 @@ function Page({ }: Props) {
 
             if (!res.ok) return toast.error("something went wrong")
             setMessages(prev => prev.filter(msg => msg._id !== message._id))
-            socket.emit('delete-message', { message, receiver: channel?.members })
+            socket.emit('delete-message', { message, receiver: currentDM?.members })
             closeContextMenu();
         } catch (error) {
             toast.error('something went wrong')
@@ -215,18 +120,6 @@ function Page({ }: Props) {
         if (messagingInputRef.current) messagingInputRef.current.focus()
         setIsReplying(prev => ({ state: true, replyingTo: message._id!, message }))
     }
-    const handleReply = (message: Message) => {
-        // Implement reply logic here
-        closeContextMenu();
-    };
-    const closeContextMenu = () => {
-        setContextMenu({
-            visible: false,
-            x: 0,
-            y: 0,
-            message: null, // Reset the message field to null
-        });
-    };
 
 
     const handleEdit = async (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -259,10 +152,147 @@ function Page({ }: Props) {
             }
         }
     }
+
+    const handleContextMenu = (e: any, msg: any) => {
+        e.preventDefault(); // Prevent the default context menu from appearing
+        setContextMenu({
+            visible: true,
+            x: e.pageX,
+            y: e.pageY,
+            message: msg, // Store the clicked message
+        });
+    };
+
+
+    const handleReactWithEmoji = async (msg?: Message, emoji?: string) => {
+        try {
+            const token = Cookies.get('access-token');
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/add-reaction`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({ messageId: msg?._id, userId: currentUser?._id, emoji }),
+            });
+
+            const data = await res.json();
+            if (!data.status) return toast.error(data.errors);
+
+            // Emit socket event for real-time updates
+            socket.emit('react-with-emoji', { msg, receiver: currentDM?.members, emoji, _id: currentUser?._id });
+
+            // Update local state
+            setMessages(prev => {
+                return prev.map(prevMsg => {
+                    if (prevMsg._id === msg?._id) {
+                        const existingReactionIndex = prevMsg.reactions?.findIndex(r => r.emoji === emoji && r.user_id === currentUser?._id);
+
+                        if (existingReactionIndex !== -1) {
+                            // If the reaction exists, remove it
+                            const newReactions = [...prevMsg.reactions as any];
+                            newReactions.splice(existingReactionIndex!, 1); // Remove the reaction
+                            socket.emit('remove-emoji', { msg, receiver: currentDM?.members, emoji, _id: currentUser?._id });
+                            return { ...prevMsg, reactions: newReactions };
+                        } else {
+                            // If the reaction doesn't exist, add it
+                            socket.emit('react-with-emoji', { msg, receiver: currentDM?.members, emoji, _id: currentUser?._id });
+                            return { ...prevMsg, reactions: [...(prevMsg.reactions || []), { user_id: currentUser?._id, emoji }] };
+                        }
+                    }
+                    return prevMsg;
+                });
+            });
+        } catch (error) {
+            toast.error('unable to react');
+            console.log(error);
+        }
+    };
+
+
+    if (socket) {
+        socket.on('react-with-emoji', ({ msg, emoji, _id }) => {
+            setMessages(prev => {
+                return prev.map(prevMsg => {
+                    if (prevMsg._id === msg?._id) {
+                        const existingReactionIndex = prevMsg.reactions?.findIndex(r => r.emoji === emoji && r.user_id === _id);
+
+                        if (existingReactionIndex !== -1) {
+                            // If the reaction exists, remove it
+                            const newReactions = [...prevMsg.reactions as any];
+                            newReactions.splice(existingReactionIndex!, 1);
+                            return { ...prevMsg, reactions: newReactions };
+                        } else {
+                            // If the reaction doesn't exist, add it
+                            return { ...prevMsg, reactions: [...(prevMsg.reactions || []), { user_id: _id, emoji }] };
+                        }
+                    }
+                    return prevMsg;
+                });
+            });
+        });
+    }
+
+    const getMessages = async () => {
+        try {
+            const token = Cookies.get('access-token')
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/${currentDM?._id}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+
+            })
+            const data = await response.json()
+            setMessages(data.messages)
+            setRoomId(currentDM?._id!)
+        } catch (error) {
+            console.error('Error fetching data', error)
+        }
+    }
+
+
+    useEffect(() => {
+        if (currentDM) {
+            getMessages()
+        }
+    }, [currentDM])
+
+    useEffect(() => {
+        setRoomId(currentDM?._id!)
+    }, [currentDM])
+
     const handleStartEdit = (message: Message, content: string) => {
         if (editingInputRef.current) editingInputRef.current.focus()
         setIsEditing(prev => ({ content, state: true, message }))
     }
+
+
+    const getChatRoomData = async () => {
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/chatrooms/${directId}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${Cookies.get('access-token')}`
+                }
+            })
+
+            const data = await res.json()
+            if (!data.status) return toast.error(data.errors)
+
+            // Set the current DM in context
+            setCurrentDM(data.chatroom)
+
+            const partners = data.chatroom.memberDetails.filter((member: User) => member._id !== currentUser?.id)
+            setCurrentPatners(partners)
+        } catch (error) {
+            toast.error("Failed to load chatroom")
+            console.error(error)
+        }
+    }
+
+    useEffect(() => {
+        getChatRoomData()
+    }, [directId])
 
     const handlePin = async (msg: Message) => {
         try {
@@ -287,71 +317,42 @@ function Page({ }: Props) {
         }
     }
 
-    const handleReactWithEmoji = async (msg?: Message, emoji?: string) => {
-        try {
-            const token = Cookies.get('access-token');
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/add-reaction`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({ messageId: msg?._id, userId: currentUser?._id, emoji }),
-            });
+    const formatMessageDate = (date: Date) => {
+        const msgDate = moment(date);
+        const today = moment().startOf('day');
+        const yesterday = moment().subtract(1, 'day').startOf('day');
 
-            const data = await res.json();
-            if (!data.status) return toast.error(data.errors);
-
-            // Emit socket event for real-time updates
-            socket.emit('react-with-emoji', { msg, receiver: channel?.members, emoji, _id: currentUser?._id });
-
-            // Update local state
-            setMessages(prev => {
-                return prev.map(prevMsg => {
-                    if (prevMsg._id === msg?._id) {
-                        const existingReactionIndex = prevMsg.reactions?.findIndex(r => r.emoji === emoji && r.user_id === currentUser?._id);
-
-                        if (existingReactionIndex !== -1) {
-                            // If the reaction exists, remove it
-                            const newReactions = [...prevMsg.reactions as any];
-                            newReactions.splice(existingReactionIndex!, 1); // Remove the reaction
-                            socket.emit('remove-emoji', { msg, receiver: channel?.members, emoji, _id: currentUser?._id });
-                            return { ...prevMsg, reactions: newReactions };
-                        } else {
-                            // If the reaction doesn't exist, add it
-                            socket.emit('react-with-emoji', { msg, receiver: channel?.members, emoji, _id: currentUser?._id });
-                            return { ...prevMsg, reactions: [...(prevMsg.reactions || []), { user_id: currentUser?._id, emoji }] };
-                        }
-                    }
-                    return prevMsg;
-                });
-            });
-        } catch (error) {
-            toast.error('unable to react');
-            console.log(error);
+        if (msgDate.isSame(today, 'd')) {
+            return `Today at ${msgDate.format('h:mm A')}`;
+        } else if (msgDate.isSame(yesterday, 'd')) {
+            return `Yesterday at ${msgDate.format('h:mm A')}`;
+        } else {
+            return msgDate.format('MM/DD/YYYY'); // Adjust this format as needed
         }
     };
 
-    socket.on('react-with-emoji', ({ msg, emoji, _id }) => {
-        setMessages(prev => {
-            return prev.map(prevMsg => {
-                if (prevMsg._id === msg?._id) {
-                    const existingReactionIndex = prevMsg.reactions?.findIndex(r => r.emoji === emoji && r.user_id === _id);
+    const handleRightClick = (event: React.MouseEvent) => {
+        event.preventDefault();
 
-                    if (existingReactionIndex !== -1) {
-                        // If the reaction exists, remove it
-                        const newReactions = [...prevMsg.reactions as any];
-                        newReactions.splice(existingReactionIndex!, 1);
-                        return { ...prevMsg, reactions: newReactions };
-                    } else {
-                        // If the reaction doesn't exist, add it
-                        return { ...prevMsg, reactions: [...(prevMsg.reactions || []), { user_id: _id, emoji }] };
-                    }
-                }
-                return prevMsg;
-            });
+        const { clientX, clientY } = event;
+
+        // Get the height of the viewport
+        const viewportHeight = window.innerHeight;
+        const menuHeight = 150; // Assuming the height of the context menu
+
+        // Calculate if there's enough space below the click point
+        const spaceBelow = viewportHeight - clientY;
+
+        // Determine new position based on available space
+        const newY = spaceBelow < menuHeight ? clientY - menuHeight : clientY;
+
+        setContextMenu({
+            visible: true,
+            x: clientX,
+            y: newY,
+            message: null,
         });
-    });
+    };
 
 
     const instantActions = [{
@@ -367,96 +368,13 @@ function Page({ }: Props) {
 
     ];
 
-
-    const getChatRoomData = async () => {
-        try {
-            const token = Cookies.get('access-token')
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/channels/${group?._id}/${channelId}`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-
-            })
-            const data = await response.json()
-            setChannel(data.channel)
-            setCurrentChannel(channel)
-            setChId(channel?._id!)
-            setMessages([]);
-            setRoomId(channel?.chatroom?._id!)
-            setPrivateChannelMembers(channel?.membersDetails as User[])
-            // setAdmins(data.channel.members.filter((member: any) => member.role === "ChannelAdmin"));
-            // setModerators(data.members.filter((member: any) => member.role === "ChannelModerator"));
-            // setMembers(data.members.filter((member: any) => member.role === "ChannelMember"));
-        } catch (error) {
-            console.error('Error fetching data', error)
-        } finally {
-            setLoading(false)
-        }
-    }
-
-    const getChannelMessages = async () => {
-        try {
-            const token = Cookies.get('access-token')
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/${channel?.chatroom?._id}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-
-            })
-            const data = await response.json()
-            setMessages(data.messages)
-            setRoomId(channel?.chatroom?._id!)
-        } catch (error) {
-            console.error('Error fetching data', error)
-        }
-    }
-
-    useEffect(() => {
-        getChatRoomData();
-    }, [channelId]);
-
-
-    useEffect(() => {
-        const handleNewMessage = (vl: { message: Message }) => {
-            setMessages((prev) => [...prev.filter(message => message._id !== vl.message._id), vl.message]);
-            addNotification({
-                title: 'New Message',
-                subtitle: 'You have a new message',
-                message: vl.message.content,
-                theme: 'darkblue',
-                native: true,
-                onClick: () => window.focus()
-            });
-        };
-
-        socket.on('new-message-added', handleNewMessage);
-
-        return () => {
-            socket.off('new-message-added', handleNewMessage); // Clean up listener on unmount
-        };
-    }, [channelId]);
-
-
-    useEffect(() => {
-        if (channel) {
-            getChannelMessages()
-        }
-    }, [channelId, channel])
-
-    useEffect(() => {
-        if (isTyping.message !== "") {
-            socket.emit('is-typing', { message: isTyping.message, currentUser, receiver: channel?.members })
-        }
-    }, [isTyping.message])
-
     const sendBySendBtn = async (content: string) => {
-        if (!channel) return; // Make sure there's a channel context
+        if (!currentDM) return;
 
         try {
             setSending(true);
             const token = Cookies.get('access-token');
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/${channel.chatroom?._id}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/${currentDM?._id}`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -464,19 +382,19 @@ function Page({ }: Props) {
                 },
                 body: JSON.stringify({
                     sender_id: currentUser?._id,
-                    chatroom: channel.chatroom?._id,
+                    chatroom: currentDM?._id,
                     content: content,
                     messageType: "text",
                     attachmentUrl: "none",
-                    receiver_id: channel.members, // Ensure you're sending to the right members
+                    receiver_id: currentDM?.members, // Ensure you're sending to the right members
                 })
             });
 
             const data = await response.json();
             setMessages((prev) => [...prev, { ...data.message, createdAt: new Date(), sender: currentUser, status: "sending" }]);
-            socket.emit('new-message', { sender: currentUser, chatroomId: channel.chatroom?._id, sentTo: channel.chatroom?._id, receiver: channel.members, message: { ...data.message, sender: currentUser } });
+            socket.emit('new-message', { sender: currentUser, chatroomId: currentDM?._id, sentTo: currentDM?._id, receiver: currentDM?.members, message: { ...data.message, sender: currentUser } });
             setMessage('');
-            setRoomId(channel?.chatroom?._id!)
+            setRoomId(currentDM?._id!)
             scrollToBottom();
             setIsReplying({ state: false, message: {}, replyingTo: "" });
         } catch (error) {
@@ -488,12 +406,12 @@ function Page({ }: Props) {
 
     const handleKeyPress = async (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter' && message.trim()) {
-            if (!channel) return; // Make sure there's a channel context
+            if (!currentDM) return; // Make sure there's a channel context
 
             try {
                 setSending(true);
                 const token = Cookies.get('access-token');
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/${channel.chatroom?._id}`, {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/${currentDM?._id}`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -501,20 +419,20 @@ function Page({ }: Props) {
                     },
                     body: JSON.stringify({
                         sender_id: currentUser?._id,
-                        chatroom: channel.chatroom?._id,
+                        chatroom: currentDM?._id,
                         content: message,
                         messageType: "text",
                         attachmentUrl: "none",
-                        receiver_id: channel.members, // Ensure you're sending to the right members
+                        receiver_id: currentDM?.members, // Ensure you're sending to the right members
                         replyingTo: isReplying.state ? isReplying.message._id : null,
                     })
                 });
 
                 const data = await response.json();
                 setMessages((prev) => [...prev, { ...data.message, createdAt: new Date(), sender: currentUser, replyingTo: isReplying.state ? isReplying.message : null }]);
-                socket.emit('new-message', { sender: currentUser, chatroomId: channel.chatroom?._id, sentTo: channel.chatroom?._id, receiver: channel.members, message: { ...data.message, sender: currentUser, replyingTo: isReplying.state ? isReplying.message : null } });
+                socket.emit('new-message', { sender: currentUser, chatroomId: currentDM?._id, sentTo: currentDM?._id, receiver: currentDM?.members, message: { ...data.message, sender: currentUser, replyingTo: isReplying.state ? isReplying.message : null } });
                 setMessage('');
-                setRoomId(channel?.chatroom?._id!)
+                setRoomId(currentDM?._id!)
                 scrollToBottom();
                 setIsReplying({ state: false, message: {}, replyingTo: "" });
             } catch (error) {
@@ -525,9 +443,6 @@ function Page({ }: Props) {
         }
     };
 
-
-
-    // Group messages by date
     const groupMessagesByDate = (messages: Message[]) => {
         const groupedMessages: { [date: string]: Message[] } = {}
         if (messages) {
@@ -546,74 +461,34 @@ function Page({ }: Props) {
 
     let groupedMessages = groupMessagesByDate(messages)
 
-    useEffect(() => {
-        setRoomId(channel?.chatroom?._id!)
-        if (channel?.membersDetails) {
-            setPrivateChannelMembers(channel?.membersDetails as User[])
-        }
-    }, [channel])
-
-    useEffect(() => {
-        groupedMessages = groupMessagesByDate(messages)
-    }, [messages])
-
-    const formatMessageDate = (date: Date) => {
-        const msgDate = moment(date);
-        const today = moment().startOf('day');
-        const yesterday = moment().subtract(1, 'day').startOf('day');
-
-        if (msgDate.isSame(today, 'd')) {
-            return `Today at ${msgDate.format('h:mm A')}`;
-        } else if (msgDate.isSame(yesterday, 'd')) {
-            return `Yesterday at ${msgDate.format('h:mm A')}`;
-        } else {
-            return msgDate.format('MM/DD/YYYY'); // Adjust this format as needed
-        }
-    };
-
-    const handleAddChannelMember = async (user: User) => {
-        try {
-            setSending(true)
-            const token = Cookies.get('access-token');
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/channels/${channel?._id}/add-member`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ userId: user?._id, groupId: group?._id })
-            })
-
-            const data = await res.json()
-            if (!data.status) return toast.error(data.errors)
-            setChannel(prev => ({ ...prev, members: [...prev?.members, user?._id] }))
-            toast.success(data.message)
-        } catch (error) {
-            toast.error("Something went wrong")
-            console.log(error)
-        } finally {
-            setSending(false)
-        }
-    }
-    useEffect(() => {
-        console.log(attachments)
-    }, [attachments])
-    if (isLoading) return (
-        <div className='w-full h-full grid place-content-center'>
-            <PacmanLoader color='white w-2' size={'small'} />
-        </div>
-    )
-
-
     return (
-        <div className="w-full h-screen flex flex-col bg-[#013a6fd3] text-white">
-            {/* Header */}
-            <div className="flex justify-between p-4 bg-[#013a6fae] border-b border-gray-700">
+        <div className='w-full h-screen flex flex-col bg-[#013a6fd3] text-white'>
+            <div className="flex justify-between p-4 bg-[#013a6fae] border-b border-gray-700 w-full">
                 <div className='flex items-center gap-2 capitalize text-[1.2rem] text-xl'>
-                    <span>{channel?.state === 'public' ? '#' : <Lock />}</span>
-                    <h1 className="text-base md:text-xl">{channel?.name}</h1>
+                    {/* If there's only one partner, display their avatar and name */}
+                    {currentPatners.length === 1 ? (
+                        <div className="flex items-center gap-2">
+                            <img
+                                src={currentPatners[0].profile_pic}
+                                alt={`${currentPatners[0].firstName} ${currentPatners[0].lastName}`}
+                                className="w-10 h-10 rounded-full"
+                            />
+                            <span>{currentPatners[0].firstName} {currentPatners[0].lastName}</span>
+                        </div>
+                    ) : (
+                        // If there are multiple partners, display their names
+                        <h1 className="text-base md:text-xl">
+                            {currentPatners.length > 0
+                                ? currentPatners.map((partner, index) => (
+                                    <span key={partner._id}>
+                                        {partner.firstName} {partner.lastName}{index < currentPatners.length - 1 ? ', ' : ''}
+                                    </span>
+                                ))
+                                : 'No partners found'}
+                        </h1>
+                    )}
                 </div>
-                <div className='flex items-center gap-4'>
+                <div className='flex items-center gap-2'>
                     <Bell className="cursor-pointer" />
                     <Popover>
                         <PopoverTrigger>
@@ -650,189 +525,10 @@ function Page({ }: Props) {
                             }
                         </PopoverContent>
                     </Popover>
-                    <Dialog>
-                        <DialogTrigger>
-                            <Settings className="cursor-pointer" />
-                        </DialogTrigger>
-                        <DialogContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col pl-3 ">
-                            <DialogHeader className="text-[1.2rem]">
-                                {channel?.name} settings
-                            </DialogHeader>
-
-                            <div className='flex flex-col gap-2 mt-5 w-full'>
-                                {
-                                    channel?.created_by?._id === currentUser?._id && (
-                                        <div className='p-3 border-b flex items-start justify-around w-full'>
-                                            <div className='w-full flex flex-col gap-2 items-end'>
-                                                <div className="w-full flex flex-col gap-2">
-                                                    <label className='font-extrabold text-[.8rem]' htmlFor="group_name">Channel name</label>
-                                                    <input
-                                                        id="name"
-                                                        name="name"
-                                                        value={channelUpdateData?.name}
-                                                        onChange={handleUpdateChange}
-                                                        className="bg-transparent p-2 border outline-none w-full" placeholder="Channel name" />
-                                                </div>
-                                                <div className="w-full flex flex-col gap-2">
-                                                    <label className='font-extrabold text-[.8rem]' htmlFor="description">Channel description</label>
-                                                    <textarea
-                                                        id="description"
-                                                        name="description"
-                                                        value={channelUpdateData?.description}
-                                                        onChange={handleUpdateChange}
-                                                        className="w-full bg-transparent p-2 border outline-none" placeholder="Channel description ..." />
-                                                </div>
-
-                                                <Select defaultValue={channelUpdateData?.state} onValueChange={(v) => setChannelUpdateData(prev => ({ ...prev, state: v }))}>
-                                                    <SelectTrigger className="bg-transparent w-full text-white">
-                                                        <SelectValue placeholder="Channel state" />
-                                                    </SelectTrigger>
-                                                    <SelectContent className="bg-white">
-                                                        <SelectItem className="cursor-pointer" value="private">Private</SelectItem>
-                                                        <SelectItem className="cursor-pointer" value="public">Public</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-
-                                                {/* {
-                                groupData.group_type && (
-                                    <input
-                                        name="group_type"
-                                        value={groupData?.group_type}
-                                        onChange={handleChange}
-                                        className="bg-transparent p-2 border outline-none w-full" placeholder="Justify Your answer" />
-                                )
-                            } */}
-
-                                                <div>
-                                                    <Button
-                                                        disabled={sending}
-                                                        onClick={handleUpdateChannel}
-                                                        className='bg-blue-500 text-white'>Update</Button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )
-                                }
-                                {((currentUser?._id === channel?.created_by?._id) && (channel?.state !== 'public')) && (
-                                    <div className='flex w-full justify-between items-center border rounded-md p-2'>
-                                        <h1>Add member </h1>
-                                        <Dialog>
-                                            <DialogTrigger disabled={sending}>
-                                                <Button disabled={sending} className='bg-red-500 text-white flex items-center gap-1'>
-                                                    <MessageCircleWarning />
-                                                    Add
-                                                </Button>
-                                            </DialogTrigger>
-                                            <DialogContent className="bg-white text-black">
-                                                <DialogHeader className="text-[1.3rem]">
-                                                    {/* <Warn */}
-                                                    Choose among the group members
-                                                </DialogHeader>
-                                                <div className="p-2">
-                                                    {
-                                                        group?.members.map((member, index) => {
-                                                            // Check if the group member exists in channel members
-                                                            const isMemberInChannel = channel?.members?.includes(member?._id);
-
-                                                            if (!isMemberInChannel) {
-                                                                // Render the member who is not in the channel
-                                                                return (
-                                                                    <div className="w-full flex items-center justify-between mb-2" key={member._id}>
-                                                                        <div className="flex items-center gap-2">
-                                                                            <Avatar className="w-[40px] h-[40px] bg-neutral-200 rounded-full">
-                                                                                <AvatarImage src={member?.profile_pic} />
-                                                                                <AvatarFallback />
-                                                                            </Avatar>
-                                                                            <h1>{member?.firstName} {member?.lastName}</h1>
-                                                                        </div>
-                                                                        <Button onClick={() => handleAddChannelMember(member)} className="bg-blue-500 text-white">
-                                                                            Add
-                                                                        </Button>
-                                                                    </div>
-                                                                );
-                                                            }
-
-                                                            return null; // Don't render anything if the member is already in the channel
-                                                        })
-                                                    }
-                                                </div>
-                                                <div>
-                                                    <DialogClose>
-                                                        <Button disabled={sending}>
-                                                            Cancel
-                                                        </Button>
-                                                    </DialogClose>
-                                                </div>
-                                            </DialogContent>
-                                        </Dialog>
-                                    </div>
-                                )}
-                                <div className='flex w-full justify-between items-center border rounded-md p-2'>
-                                    <h1>Leave channel </h1>
-                                    <Dialog>
-                                        <DialogTrigger disabled={sending}>
-                                            <Button disabled={sending} className='bg-red-500 text-white flex items-center gap-1'>
-                                                <MessageCircleWarning />
-                                                Leave
-                                            </Button>
-                                        </DialogTrigger>
-                                        <DialogContent className="bg-white text-black">
-                                            <DialogHeader>
-                                                {/* <Warn */}
-                                                Confirm Leaving this channel
-                                            </DialogHeader>
-                                            <div>
-                                                <DialogClose>
-                                                    <Button disabled={sending}>
-                                                        Cancel
-                                                    </Button>
-                                                </DialogClose>
-                                                <Button disabled={sending} className="bg-red-500 text-white" >
-                                                    Confirm
-                                                </Button>
-                                            </div>
-                                        </DialogContent>
-                                    </Dialog>
-                                </div>
-
-                                {
-                                    currentUser?._id === channel?.created_by?._id && (
-                                        <div className='flex w-full justify-between items-center border border-red-500 rounded-md p-2 text-red-500'>
-                                            <h1>Delete channel </h1>
-                                            <Dialog>
-                                                <DialogTrigger disabled={sending}>
-                                                    <Button disabled={sending} className='bg-red-500 text-white flex items-center gap-1'>
-                                                        <Delete />
-                                                        Delete
-                                                    </Button>
-                                                </DialogTrigger>
-                                                <DialogContent className="bg-white text-black">
-                                                    <DialogHeader>
-                                                        {/* <Warn */}
-                                                        Confirm Deleting this channel
-                                                    </DialogHeader>
-                                                    <div>
-                                                        <DialogClose>
-                                                            <Button disabled={sending}>
-                                                                Cancel
-                                                            </Button>
-                                                        </DialogClose>
-                                                        <Button onClick={handleDeleteChannel} disabled={sending} className="bg-red-500 text-white" >
-                                                            Confirm
-                                                        </Button>
-                                                    </div>
-                                                </DialogContent>
-                                            </Dialog>
-                                        </div>
-                                    )
-                                }
-                            </div>
-                        </DialogContent>
-                    </Dialog>
                 </div>
             </div>
 
-            {/* Body */}
+
             <div className="flex-grow overflow-y-auto p-4 space-y-3 overflow-x-hidden">
                 {
                     messages.length <= 0 && (
@@ -1041,7 +737,7 @@ function Page({ }: Props) {
                 <div ref={messagesEndRef} />
             </div>
 
-            {/* Footer */}
+
             <div className="bg-gray-800 p-4 border-t border-gray-700 w-full">
                 {isReplying.state ? (
                     <div className='w-full p-2 rounded-md '>
@@ -1093,10 +789,10 @@ function Page({ }: Props) {
                     <input
                         ref={messagingInputRef}
                         disabled={sending}
-                        onBlur={() => setIsTyping(prev => ({ message: "" }))}
-                        onFocus={() => setIsTyping(prev => ({ ...prev, message: `${currentUser?.firstName} is typing ...` }))}
+                        // onBlur={() => setIsTyping(prev => ({ message: "" }))}
+                        // onFocus={() => setIsTyping(prev => ({ ...prev, message: `${currentUser?.firstName} is typing ...` }))}
                         className="flex-grow bg-gray-700 p-2 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed"
-                        placeholder={`Message ${channel?.name}`}
+                        placeholder={`Send DM`}
                         value={message}
                         onChange={(e) => {
                             setMessage(e.target.value);
@@ -1120,7 +816,7 @@ function Page({ }: Props) {
                     {/* {isTyping.message !== "" && isTyping.message} */}
                 </div>
             </div>
-        </div >
+        </div>
     )
 }
 
