@@ -1,5 +1,6 @@
 export type User = {
     _id?: string;
+    userId?: string;
     firstName: string;
     lastName: string;
     email: string;
@@ -59,7 +60,7 @@ export type User = {
     socketId?: string;
     isActive?: boolean;
     createdAt?: Date;
-    id:string;
+    id: string;
 };
 
 
@@ -399,18 +400,18 @@ export type Message = {
 
 
 export interface ChatroomMember {
-    _id: string;          
-    profileID: string;    
-    email: string;        
-    firstName: string;    
-    lastName: string;     
+    _id: string;
+    profileID: string;
+    email: string;
+    firstName: string;
+    lastName: string;
     profile_pic?: string;
 }
 
 export interface Chatroom {
-    _id: string;         
-    name: string;         
-    type: "dm" | "channel";  
-    members: string[];     
-    memberDetails: ChatroomMember[];  
+    _id: string;
+    name: string;
+    type: "dm" | "channel";
+    members: string[];
+    memberDetails: ChatroomMember[];
 }

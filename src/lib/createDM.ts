@@ -16,7 +16,7 @@ const handlecreateDirectMessage = async (user: User, currentUser: User, router: 
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${Cookies.get('access-token')}`,
             },
-            body: JSON.stringify({ name: `${user?.lastName}-${currentUser?.firstName}'s room`, members: [`${user.id}`, `${currentUser?._id}`], type: 'dm' }),
+            body: JSON.stringify({ name: `${user?.lastName}-${currentUser?.firstName}'s room`, members: [`${user.id || user?._id || user?.userId}`, `${currentUser?._id}`], type: 'dm' }),
         })
 
         const data = await res.json()

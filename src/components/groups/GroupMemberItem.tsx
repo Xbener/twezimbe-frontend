@@ -7,6 +7,8 @@ import StatusDot from '../ui/StatusDot';
 import { User } from '@/types';
 import { useGetProfileData } from '@/api/auth';
 import { Button } from '../ui/button';
+import handlecreateDirectMessage from '@/lib/createDM';
+import { useRouter } from 'next/navigation';
 
 type Props = {
     profile_pic?: string;
@@ -26,6 +28,7 @@ export const checkIsActive = (onlineUsers: User[] | null, member: Props) => {
 function GroupMemberItem(member: Props) {
     const { onlineUsers } = useMyContext()
     const { currentUser } = useGetProfileData()
+    const router = useRouter()
     useEffect(() => {
     }, [member, onlineUsers])
     return (
@@ -56,7 +59,9 @@ function GroupMemberItem(member: Props) {
                     {
                         currentUser?._id === member.userId || currentUser?._id === member._id ? 
                         null : (
-                            <Button className="bg-blue-500 text-white  place-self-start w-full">
+                            <Button
+                                    onClick={() => handlecreateDirectMessage(member as User, currentUser as User, router)}
+                            className="bg-blue-500 text-white  place-self-start w-full">
                                 Send message
                             </Button>
 
