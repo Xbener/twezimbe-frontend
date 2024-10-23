@@ -5,14 +5,13 @@ import { ChatRoomTypes, User } from '@/types'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import Cookies from 'js-cookie'
+import { socket, useMyContext } from './MyContext'
 
 type Props = {
     children: React.ReactNode
 }
 
 type DMContextTypes = {
-    userDMs: ChatRoomTypes[]
-    setUserDMs: (vl: ChatRoomTypes[]) => void
     currentUser?: User
     allUsers?: User[]
     currentDM: ChatRoomTypes | null
@@ -20,18 +19,17 @@ type DMContextTypes = {
 }
 
 export const DMContext = React.createContext<DMContextTypes>({
-    userDMs: [],
-    setUserDMs: (vl) => { },
     // currentUser: {},
     currentDM: null,
-    setCurrentDM: (vl)=>{}
+    setCurrentDM: (vl) => { }
 })
 
 function DMContextProvider({ children }: Props) {
-    const [userDMs, setUserDMs] = useState<ChatRoomTypes[]>([])
     const { currentUser } = useGetProfileData()
-    const [allUsers, setAllUsers] = useState([])
     const [currentDM, setCurrentDM] = useState<ChatRoomTypes | null>(null)
+    const { userDMs, setUserDMs } = useMyContext()
+    const [allUsers, setAllUsers] = useState<User[]>([])
+
 
     useEffect(() => {
         const getAllUsers = async () => {
@@ -75,13 +73,12 @@ function DMContextProvider({ children }: Props) {
             }
         }
         if (currentUser) {
+            console.log('currentUser', currentUser)
             getUserChatRooms()
         }
     }, [currentUser])
     return (
         <DMContext.Provider value={{
-            userDMs,
-            setUserDMs,
             currentUser: currentUser!,
             allUsers,
             currentDM,

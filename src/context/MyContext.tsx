@@ -1,5 +1,5 @@
 import { useGetProfileData } from "@/api/auth";
-import { ChannelTypes, FriendTypes, JoinedGroupTypes, Message, Reaction, User } from "@/types";
+import { ChannelTypes, ChatRoomTypes, FriendTypes, JoinedGroupTypes, Message, Reaction, User } from "@/types";
 import Cookies from 'js-cookie';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import io, { Socket } from 'socket.io-client';
@@ -39,6 +39,8 @@ type MyContextType = {
     setChId: React.Dispatch<React.SetStateAction<string>>;
     roomId: string;
     setRoomId: (vl: string) => void;
+    userDMs: ChatRoomTypes[]
+    setUserDMs: (vl: ChatRoomTypes[]) => void
 };
 
 const MyContext = createContext<MyContextType | undefined>(undefined);
@@ -59,7 +61,9 @@ export const MyProvider = ({ children }: Props) => {
     const [isTyping, setIsTyping] = useState({ message: "" });
     const { currentUser } = useGetProfileData();
     const [userChatRooms, setUserChatRooms] = useState([])
+    const [userDMs, setUserDMs] = useState<ChatRoomTypes[]>([])
     const [roomId, setRoomId] = useState('')
+
 
     useEffect(() => {
         if (channelId) return setChId(channelId as string);
@@ -179,6 +183,7 @@ export const MyProvider = ({ children }: Props) => {
                 console.log(message);
                 setMessages(prev => prev.filter(msg => msg._id !== message._id));
             });
+
             return () => {
                 if (socket) {
                     socket.disconnect();
@@ -215,7 +220,9 @@ export const MyProvider = ({ children }: Props) => {
                 chId,
                 setChId,
                 roomId,
-                setRoomId
+                setRoomId,
+                userDMs,
+                setUserDMs,
             }}
         >
             {children}
