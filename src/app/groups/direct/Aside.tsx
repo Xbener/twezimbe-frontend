@@ -18,35 +18,19 @@ import { checkIsActive } from '@/components/groups/GroupMemberItem'
 import { toast } from 'sonner'
 import Cookies from 'js-cookie'
 import { useRouter } from 'next/navigation'
+import handlecreateDirectMessage from '@/lib/createDM'
 
 
 
 function Aside({ }) {
     const { group } = useContext(GroupContext)
     const [q, setQ] = useState('')
-    const { userDMs, allUsers, currentUser, setUserDMs, setCurrentDM, currentDM } = useContext(DMContext)
-    const { onlineUsers } = useMyContext()
+    const {  allUsers, currentUser, setCurrentDM, currentDM } = useContext(DMContext)
+    const { onlineUsers, setUserDMs, userDMs  } = useMyContext()
     const [loading, setLoading] = useState(false)
     const router = useRouter()
-    const handlecreateDirectMessage = async (user: User) => {
-        try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/chatrooms`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${Cookies.get('access-token')}`,
-                },
-                body: JSON.stringify({ name: `${user?.lastName}-${currentUser?.firstName}'s room`, members: [`${user.id}`, `${currentUser?._id}`], type: 'dm' }),
-            })
 
-            const data = await res.json()
-            if (!data.status) return toast.error(data.errors || data.messaga || "failed")
-            router.push(`/groups/direct/${data.chatroom?._id}`)
-        } catch (error) {
-            toast.error('failed')
-            console.log(error)
-        }
-    }
+
 
     const handleGetUserDms = async () => {
         try {
@@ -116,7 +100,7 @@ function Aside({ }) {
                                                         </div>
                                                         <Button
                                                             disabled={loading}
-                                                            onClick={() => handlecreateDirectMessage(user)}
+                                                            onClick={() => handlecreateDirectMessage(user, currentUser as User, router)}
                                                             className="bg-blue-500 text-white  place-self-start w-full">
                                                             Send message
                                                         </Button>
@@ -150,7 +134,7 @@ function Aside({ }) {
                                         setCurrentDM(dm)
                                         router.push(`/groups/direct/${dm?._id}`)
                                     }}
-                                    key={index} 
+                                    key={index}
                                     className={`dm-item flex items-center rounded-md p-2 hover:bg-[rgba(62,175,255,0.31)] cursor-pointer ${currentDM?._id === dm?._id && 'bg-[rgba(62,175,255,0.31)]'}`}>
                                     <img
                                         src={chatPartner?.profile_pic}

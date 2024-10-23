@@ -20,7 +20,7 @@ import Link from 'next/link'
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog'
 import { AlertDialogHeader } from '@/components/ui/alert-dialog'
 import data from '@emoji-mart/data'
-import Picker from '@emoji-mart/react'
+import EmojiPicker from 'emoji-picker-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import addNotification from 'react-push-notification'
 
@@ -398,6 +398,7 @@ function Page({ }: Props) {
     const getChannelMessages = async () => {
         try {
             const token = Cookies.get('access-token')
+            console.log("channel chatroom", channel)
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/${channel?.chatroom?._id}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -621,7 +622,7 @@ function Page({ }: Props) {
                         </PopoverTrigger>
                         <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col pl-3 ">
                             {
-                                !messages.find(msg => msg.pinned) ? <span className='text-center'>no pinned messages</span> : messages.map((msg, index) => {
+                               messages && !messages.find(msg => msg.pinned) ? <span className='text-center'>no pinned messages</span> : messages.map((msg, index) => {
                                     if (!msg.pinned) return null
                                     return <div
                                         key={msg._id}
@@ -1024,14 +1025,12 @@ function Page({ }: Props) {
                                                 </div>
                                             )
                                         }
-                                        {quickEmojiSelector && (
-                                            <div ref={emojiContainerRef} className="absolute z-50 bottom-9 right-0">
-                                                <Picker data={data} onEmojiSelect={(emoji: any) => {
-                                                    handleReactWithEmoji(msg, emoji.native)
-                                                    setQuickEmojiSelector(false)
-                                                }} />
-                                            </div>
-                                        )}
+                                        <div ref={emojiContainerRef} className="absolute z-50 bottom-9 right-5">
+                                            <EmojiPicker open={quickEmojiSelector} onEmojiClick={(emoji) => {
+                                                handleReactWithEmoji(msg, emoji.emoji)
+                                                setQuickEmojiSelector(false)
+                                            }} />
+                                        </div>
                                     </div>
                                 );
                             })}
@@ -1105,11 +1104,12 @@ function Page({ }: Props) {
                         onKeyPress={handleKeyPress}
                     />
 
-                    {showPicker && (
-                        <div ref={emojiContainerRef} className="absolute z-50 bottom-9 right-0">
-                            <Picker data={data} onEmojiSelect={(emoji: any) => setMessage(prev => prev + emoji.native)} />
-                        </div>
-                    )}
+
+                    <div ref={emojiContainerRef} className="absolute z-50 bottom-9 right-0">
+                        <EmojiPicker open={showPicker} onEmojiClick={(emoji) => {
+                            setMessage(prev => prev + emoji.emoji)
+                        }} />
+                    </div>
                     <div className="flex items-center gap-2">
                         <Smile onClick={() => setShowPicker(prev => !prev)} className="cursor-pointer hover:text-blue-400" />
                         {/* <StickerIcon className="cursor-pointer hover:text-blue-400" />

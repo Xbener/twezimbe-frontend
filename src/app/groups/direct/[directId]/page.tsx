@@ -11,7 +11,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import moment from 'moment'
 import { Button } from '@/components/ui/button'
 import { data } from '@/components/charts/Applications'
-import Picker from '@emoji-mart/react'
+import EmojiPicker from 'emoji-picker-react';
 import { socket, useMyContext } from '@/context/MyContext'
 
 type Props = {}
@@ -282,7 +282,8 @@ function Page({ }: Props) {
             // Set the current DM in context
             setCurrentDM(data.chatroom)
 
-            const partners = data.chatroom.memberDetails.filter((member: User) => member._id !== currentUser?.id)
+            console.log('patners', data.chatroom.memberDetails, 'currentUser', currentUser)
+            const partners = data.chatroom.memberDetails.filter((member: User) => member._id !== currentUser?._id)
             setCurrentPatners(partners)
         } catch (error) {
             toast.error("Failed to load chatroom")
@@ -290,9 +291,15 @@ function Page({ }: Props) {
         }
     }
 
+        useEffect(() => {
+        setRoomId(currentDM?._id!)
+    }, [currentDM])
+
     useEffect(() => {
-        getChatRoomData()
-    }, [directId])
+        if (currentUser) {
+            getChatRoomData()
+        }
+    }, [directId, currentUser])
 
     const handlePin = async (msg: Message) => {
         try {
@@ -720,14 +727,12 @@ function Page({ }: Props) {
                                                 </div>
                                             )
                                         }
-                                        {quickEmojiSelector && (
-                                            <div ref={emojiContainerRef} className="absolute z-50 bottom-9 right-0">
-                                                <Picker data={data} onEmojiSelect={(emoji: any) => {
-                                                    handleReactWithEmoji(msg, emoji.native)
-                                                    setQuickEmojiSelector(false)
-                                                }} />
-                                            </div>
-                                        )}
+                                        <div ref={emojiContainerRef} className="absolute z-50 bottom-9 right-5">
+                                            <EmojiPicker open={quickEmojiSelector} onEmojiClick={(emoji) => {
+                                                handleReactWithEmoji(msg, emoji.emoji)
+                                                setQuickEmojiSelector(false)
+                                            }} />
+                                        </div>
                                     </div>
                                 );
                             })}
@@ -801,11 +806,11 @@ function Page({ }: Props) {
                         onKeyPress={handleKeyPress}
                     />
 
-                    {showPicker && (
                         <div ref={emojiContainerRef} className="absolute z-50 bottom-9 right-0">
-                            <Picker data={data} onEmojiSelect={(emoji: any) => setMessage(prev => prev + emoji.native)} />
+                            <EmojiPicker open={showPicker} onEmojiClick={(emoji) => {
+                                setMessage(prev => prev + emoji.emoji)
+                            }} />
                         </div>
-                    )}
                     <div className="flex items-center gap-2">
                         <Smile onClick={() => setShowPicker(prev => !prev)} className="cursor-pointer hover:text-blue-400" />
                         {/* <StickerIcon className="cursor-pointer hover:text-blue-400" />
