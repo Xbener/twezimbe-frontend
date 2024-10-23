@@ -98,7 +98,7 @@ function GroupRequests({ }: Props) {
                 <Button disabled={loading} onClick={() => router.back()}>
                     <XCircle color={"white"} />
                 </Button>
-                <h1 className='font-bold uppercase'>Join Requests</h1>
+                <h1 className='font-bold capitalize'>Join requests</h1>
             </div>
 
             <div className='w-full flex flex-col gap-3'>
