@@ -53,7 +53,7 @@ function GroupRequests({ }: Props) {
                     'Authorization': `Bearer ${accessToken}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ requestId: request._id, userId: request.user._id, groupId: request.group._id })
+                body: JSON.stringify({ requestId: request._id, userId: request?.user.id, groupId: request.group._id })
             })
 
             const data = await res.json()

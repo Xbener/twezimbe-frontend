@@ -59,6 +59,7 @@ export type User = {
     socketId?: string;
     isActive?: boolean;
     createdAt?: Date;
+    id:string;
 };
 
 
@@ -326,7 +327,8 @@ export type JoinGroupTypes = {
 
 
 export type GroupJoinRequestTypes = {
-    user: User,
+    userId: any,
+    user: User
     group: GroupTypes,
     _id: string;
     createdAt?: string;
