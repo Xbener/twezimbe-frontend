@@ -275,12 +275,16 @@ function Page({ }: Props) {
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/chatrooms/${directId}`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${Cookies.get('access-token')}`
-                }
+                    'Authorization': `Bearer ${Cookies.get('access-token')}`,
+                    'Content-Type':'application/json'
+                },
+                body: JSON.stringify({ userId: currentUser?._id })
             })
 
             const data = await res.json()
-            if (!data.status) return toast.error(data.errors)
+            if (!data.status) {
+                return window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups`
+            }
 
             // Set the current DM in context
             setCurrentDM(data.chatroom)

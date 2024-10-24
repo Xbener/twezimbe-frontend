@@ -381,11 +381,16 @@ function Page({ }: Props) {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/channels/${group?._id}/${channelId}`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type':'application/json'
                 },
+                body: JSON.stringify({ userId: currentUser?._id })
 
             })
             const data = await response.json()
+            if (!data.status) {
+                return window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups`
+            }
             setChannel(data.channel)
             setCurrentChannel(channel)
             setChId(channel?._id!)
