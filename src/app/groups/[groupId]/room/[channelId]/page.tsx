@@ -39,9 +39,9 @@ function Page({ }: Props) {
     const { group, setPrivateChannelMembers, setIsSideBarOpen, setIsMemberListOpen } = useContext(GroupContext)
     const [channel, setChannel] = useState<ChannelTypes | null>(null)
     const [message, setMessage] = useState<string>("")
-    const editingInputRef = useRef<HTMLInputElement | null>(null)
+    const editingInputRef = useRef<HTMLTextAreaElement | null>(null)
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
-    const messagingInputRef = useRef<HTMLInputElement | null>(null)
+    const messagingInputRef = useRef<HTMLTextAreaElement | null>(null)
     const emojiContainerRef = useRef<HTMLDivElement | null>(null)
     const [showPicker, setShowPicker] = useState(false);
     const [quickEmojiSelector, setQuickEmojiSelector] = useState(false)
@@ -230,7 +230,11 @@ function Page({ }: Props) {
     };
 
 
-    const handleEdit = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const handleEdit = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.ctrlKey && e.key === "Enter") {
+            setIsEditing(prev => ({ ...prev, content: prev.content + '\n' }))
+            return
+        }
         if (e.key === 'Enter' && isEditing.content !== '') {
             const token = Cookies.get('access-token')
             setSending(true)
@@ -488,7 +492,11 @@ function Page({ }: Props) {
         }
     };
 
-    const handleKeyPress = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const handleKeyPress = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if(e.ctrlKey&&e.key==="Enter") {
+            setMessage(prev=>prev+'\n')
+            return
+        }
         if (e.key === 'Enter' && message.trim()) {
             if (!channel) return; // Make sure there's a channel context
 
@@ -920,13 +928,13 @@ function Page({ }: Props) {
 
                                                             </div>
                                                             <div className="">
-                                                                <input
+                                                                <textarea
                                                                     ref={editingInputRef}
                                                                     disabled={sending}
                                                                     className="flex-grow bg-transparent p-2 rounded-md text-white placeholder-gray-400 focus:outline-none disabled:cursor-not-allowed w-full"
                                                                     value={isEditing.content}
                                                                     onChange={(e) => setIsEditing(prev => ({ ...prev, content: e.target.value }))}
-                                                                    onKeyPress={handleEdit}
+                                                                    onKeyDown={handleEdit}
                                                                 />
                                                             </div>
                                                             <div className="w-full flex p-2">
@@ -974,7 +982,14 @@ function Page({ }: Props) {
                                                             </div>
                                                         ) : null}
                                                         <div className="text-white flex items-center gap-2">
-                                                            {msg.content}
+                                                                <p>
+                                                                    {msg?.content && msg?.content?.split('\n').map((line, index) => (
+                                                                        <span key={index}>
+                                                                            {line}
+                                                                            {msg?.content && index < msg?.content?.split('\n').length - 1 && <br />}
+                                                                        </span>
+                                                                    ))}
+                                                                </p>
                                                             <span>{msg.edited && <span className='text-[.7rem] text-gray-200'>(edited)</span>}</span>
                                                         </div>
                                                         <div className="flex items-center w-full justify-start p-1 gap-1">
@@ -1161,7 +1176,7 @@ function Page({ }: Props) {
 
                         </div>
                         <div className="">
-                            <input
+                            <textarea
                                 ref={messagingInputRef}
                                 disabled={sending}
                                 onBlur={() => setIsTyping(prev => ({ message: "" }))}
@@ -1173,7 +1188,7 @@ function Page({ }: Props) {
                                     setMessage(e.target.value);
 
                                 }}
-                                onKeyPress={handleKeyPress}
+                                onKeyDown={handleKeyPress}
                             />
                         </div>
                         <div className="w-full flex p-2">
@@ -1215,17 +1230,28 @@ function Page({ }: Props) {
                                     <SendHorizonal />
                                 </Button>
                             </div>
+                            
                             <div ref={emojiContainerRef} className="absolute z-50 bottom-9 right-0">
                                 <EmojiPicker open={showPicker} onEmojiClick={(emoji) => {
                                     setMessage(prev => prev + emoji.emoji)
                                 }} />
                             </div>
+                        
                         </div>
+                    
                     </div>
 
+
                 </div>
-                <div className='w-full h-1 text-[.7rem] p-1'>
+                <div className='w-full h-1 text-[.7rem] p-1 flex justify-between'>
                     {/* {isTyping.message !== "" && isTyping.message} */}
+                    <div></div>
+                    <div className="text-[.6rem] flex gap-1">
+                        <code className="rounded-md ">
+                            ctrl+enter
+                        </code>
+                            for new line
+                    </div>
                 </div>
             </div>
         </div >
