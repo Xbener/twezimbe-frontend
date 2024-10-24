@@ -151,7 +151,7 @@ export const MyProvider = ({ children }: Props) => {
                     return [...prev.filter(member => member._id !== joined_user?._id), joined_user];
                 });
             });
-            const handleNewMessage = (vl: { message: Message, sentTo: string }) => {
+            const handleNewMessage = (vl: { message: Message, chatroomId: string, sentTo: string }) => {
                 console.log(roomId, vl.sentTo)
                 if (vl.sentTo === roomId) setMessages((prev) => [...prev.filter(message => message._id !== vl.message._id), vl.message]);
                 addNotification({

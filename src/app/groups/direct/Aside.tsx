@@ -26,7 +26,7 @@ function Aside({ }) {
     const { group, isMemberListOpen, windowWidth, setIsMemberListOpen } = useContext(GroupContext)
     const [q, setQ] = useState('')
     const { allUsers, currentUser, setCurrentDM, currentDM } = useContext(DMContext)
-    const { onlineUsers, setUserDMs, userDMs, setMessages } = useMyContext()
+    const { onlineUsers, setUserDMs, userDMs, setMessages, setRoomId } = useMyContext()
     const [loading, setLoading] = useState(false)
     const router = useRouter()
 
@@ -107,7 +107,9 @@ function Aside({ }) {
                                                         </div>
                                                         <Button
                                                             disabled={loading}
-                                                            onClick={() => handlecreateDirectMessage(user, currentUser as User, router)}
+                                                            onClick={() => {
+                                                                handlecreateDirectMessage(user, currentUser as User, router, setRoomId)
+                                                            }}
                                                             className="bg-blue-500 text-white  place-self-start w-full">
                                                             Send message
                                                         </Button>
@@ -141,6 +143,7 @@ function Aside({ }) {
                                         if (currentDM?._id !== dm?._id) {
                                             setMessages([])
                                             setCurrentDM(dm)
+                                            setRoomId(currentDM?._id!)
                                             router.push(`/groups/direct/${dm?._id}`)
                                         }
                                     }}

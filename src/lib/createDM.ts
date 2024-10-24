@@ -4,7 +4,7 @@ import Cookies from "js-cookie"
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
 import { socket } from "@/context/MyContext"
 import { io, Socket } from "socket.io-client"
-const handlecreateDirectMessage = async (user: User, currentUser: User, router: AppRouterInstance) => {
+const handlecreateDirectMessage = async (user: User, currentUser: User, router: AppRouterInstance, setRoomId: (vl: any) => void) => {
     try {
         let newSocket: Socket = socket
         if (!socket.connected) {
@@ -21,7 +21,7 @@ const handlecreateDirectMessage = async (user: User, currentUser: User, router: 
 
         const data = await res.json()
         if (!data.status) return toast.error(data.errors || data.messaga || "failed")
-
+        setRoomId(data.chatroom?._id)
         newSocket?.emit('dm', { dm: data.chatroom })
         router.push(`/groups/direct/${data.chatroom?._id}`)
     } catch (error) {

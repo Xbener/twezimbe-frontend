@@ -288,7 +288,7 @@ function Page({ }: Props) {
 
             // Set the current DM in context
             setCurrentDM(data.chatroom)
-
+            setRoomId(data.chatroom?._id)
             console.log('patners', data.chatroom.memberDetails, 'currentUser', currentUser)
             const partners = data.chatroom.memberDetails.filter((member: User) => member._id !== currentUser?._id)
             setCurrentPatners(partners)
@@ -297,10 +297,6 @@ function Page({ }: Props) {
             console.error(error)
         }
     }
-
-    useEffect(() => {
-        setRoomId(currentDM?._id!)
-    }, [currentDM])
 
     useEffect(() => {
         if (currentUser) {
@@ -344,30 +340,6 @@ function Page({ }: Props) {
             return msgDate.format('MM/DD/YYYY'); // Adjust this format as needed
         }
     };
-
-    const handleRightClick = (event: React.MouseEvent) => {
-        event.preventDefault();
-
-        const { clientX, clientY } = event;
-
-        // Get the height of the viewport
-        const viewportHeight = window.innerHeight;
-        const menuHeight = 150; // Assuming the height of the context menu
-
-        // Calculate if there's enough space below the click point
-        const spaceBelow = viewportHeight - clientY;
-
-        // Determine new position based on available space
-        const newY = spaceBelow < menuHeight ? clientY - menuHeight : clientY;
-
-        setContextMenu({
-            visible: true,
-            x: clientX,
-            y: newY,
-            message: null,
-        });
-    };
-
 
     const instantActions = [{
         name: "React",
