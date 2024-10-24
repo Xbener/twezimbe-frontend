@@ -378,37 +378,39 @@ function Page({ }: Props) {
 
     const sendBySendBtn = async (content: string) => {
         if (!currentDM) return;
+        if(message){
 
-        try {
-            setSending(true);
-            const token = Cookies.get('access-token');
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/${currentDM?._id}`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    sender_id: currentUser?._id,
-                    chatroom: currentDM?._id,
-                    content: content,
-                    messageType: "text",
-                    attachmentUrl: "none",
-                    receiver_id: currentDM?.members, // Ensure you're sending to the right members
-                })
-            });
+            try {
+                setSending(true);
+                const token = Cookies.get('access-token');
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/${currentDM?._id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        sender_id: currentUser?._id,
+                        chatroom: currentDM?._id,
+                        content: content,
+                        messageType: "text",
+                        attachmentUrl: "none",
+                        receiver_id: currentDM?.members, // Ensure you're sending to the right members
+                    })
+                });
 
-            const data = await response.json();
-            setMessages((prev) => [...prev, { ...data.message, createdAt: new Date(), sender: currentUser, status: "sending" }]);
-            socket.emit('new-message', { sender: currentUser, chatroomId: currentDM?._id, sentTo: currentDM?._id, receiver: currentDM?.members, message: { ...data.message, sender: currentUser } });
-            setMessage('');
-            setRoomId(currentDM?._id!)
-            scrollToBottom();
-            setIsReplying({ state: false, message: {}, replyingTo: "" });
-        } catch (error) {
-            console.error('Error sending message', error);
-        } finally {
-            setSending(false);
+                const data = await response.json();
+                setMessages((prev) => [...prev, { ...data.message, createdAt: new Date(), sender: currentUser, status: "sending" }]);
+                socket.emit('new-message', { sender: currentUser, chatroomId: currentDM?._id, sentTo: currentDM?._id, receiver: currentDM?.members, message: { ...data.message, sender: currentUser } });
+                setMessage('');
+                setRoomId(currentDM?._id!)
+                scrollToBottom();
+                setIsReplying({ state: false, message: {}, replyingTo: "" });
+            } catch (error) {
+                console.error('Error sending message', error);
+            } finally {
+                setSending(false);
+            }
         }
     };
 
