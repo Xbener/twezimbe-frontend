@@ -31,7 +31,7 @@ type Props = {}
 
 function Page({ }: Props) {
     const { channelId } = useParams()
-    const { messages, setMessages, isTyping, setIsTyping, unreadMessages, setCurrentChannel, setChId, setRoomId } = useMyContext()
+    const { messages, setMessages, isTyping, setIsTyping, unreadMessages, setUnreadMessages, setCurrentChannel, setChId, setRoomId, roomId } = useMyContext()
     const { getChannel, isError } = useGetSingleChannel()
     const [isLoading, setLoading] = useState(true)
     const [sending, setSending] = useState(false)
@@ -408,7 +408,7 @@ function Page({ }: Props) {
     }
 
     useEffect(() => {
-        const currentDMUnreadMessages = unreadMessages.filter(msg => msg?.chatroom?._id === channel?.chatroom?._id && !msg.isRead)
+        const currentDMUnreadMessages = unreadMessages.filter(msg => msg?.chatroom?._id === channel?.chatroom?._id && !msg?.isRead!)
         const markAsRead = async () => {
             currentDMUnreadMessages.forEach(async (message) => {
                 await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/mark-as-read`, {
@@ -417,14 +417,26 @@ function Page({ }: Props) {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${Cookies.get('access-token')}`
                     },
-                    body: JSON.stringify({ messageId: message.messageId, userId: currentUser?._id }),
+                    body: JSON.stringify({ messageId: message?.messageId, userId: currentUser?._id }),
                 });
+
+
             });
         }
         if (currentDMUnreadMessages) {
             markAsRead()
+            // const timeout = setTimeout(() => {
+            //     setUnreadMessages((prev: UnreadMessage[]) => {
+            //         return prev.map((unreadmsg: UnreadMessage) => {
+            //             if (unreadmsg?.chatroom?._id === channel?.chatroom?._id) return null
+            //             return unreadmsg
+            //         })
+            //     })
+            // }, 5000)
+
+            // return () => clearTimeout(timeout)
         }
-    }, [channel])
+    }, [channel, channelId, roomId])
 
     const getChannelMessages = async () => {
         try {
@@ -640,7 +652,7 @@ function Page({ }: Props) {
         </div>
     )
     const getFirstUnreadMessageId = (unreadMessages: UnreadMessage[]): string | undefined => {
-        const firstUnreadMessage = unreadMessages.find((unreadMsg) => !unreadMsg.isRead);
+        const firstUnreadMessage = unreadMessages.find((unreadMsg) => !unreadMsg?.isRead!);
         return firstUnreadMessage?.messageId;
     };
 
@@ -909,17 +921,17 @@ function Page({ }: Props) {
                                 const showAvatarAndName = index === 0 || msgs[index - 1]?.sender?._id !== msg?.sender?._id;
                                 const isUnreadMessage = msg._id === firstUnreadMessageId;
                                 return (
-                                    
+
                                     <React.Fragment key={msg._id}>
-                                    { isUnreadMessage && (
-                                        <div className="w-full my-2 flex items-center">
-                                            <hr className="flex-grow border-t border-red-500" />
-                                            <span className="mx-2 text-red-500 text-xs">Unread Messages</span>
-                                            <hr className="flex-grow border-t border-red-500" />
-                                        </div>
-                                    )}
+                                        {isUnreadMessage && (
+                                            <div className="w-full my-2 flex items-center">
+                                                <hr className="flex-grow border-t border-red-500" />
+                                                <span className="mx-2 text-red-500 text-xs">Unread Messages</span>
+                                                <hr className="flex-grow border-t border-red-500" />
+                                            </div>
+                                        )}
                                         <div
-                                          
+
                                             onContextMenu={(e) => handleContextMenu(e, msg)} // Pass the message to the context menu handler
                                             className={`flex w-full gap-4 hover:bg-[#cbcbcb2e] cursor-pointer rounded-md items-start mb-1 justify-normal ${index === msgs.length && "mb-5"} ${msg.pinned ? "bg-[rgba(255,193,59,0.42)]" : ' '} group `} // Reduced margin between consecutive messages
                                         >

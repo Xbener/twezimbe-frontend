@@ -68,8 +68,8 @@ export const MyProvider = ({ children }: Props) => {
     const [unreadMessages, setUnreadMessages] = useState<UnreadMessage[]>([])
 
     useEffect(() => {
-        if (document && unreadMessages.filter(msg => !msg.isRead).length > 0) {
-            document.title = `${unreadMessages.filter(msg=>!msg.isRead).length} unread messages `
+        if (document && unreadMessages.filter(msg => !msg?.isRead!).length > 0) {
+            document.title = `${unreadMessages.filter(msg => !msg?.isRead!).length} unread messages `
         }
     }, [unreadMessages])
 
@@ -164,6 +164,10 @@ export const MyProvider = ({ children }: Props) => {
                     native: true,
                     onClick: () => window.focus()
                 });
+                setUnreadMessages(prev => {
+                    return [...prev, 
+                        { messageId: vl.message._id || vl.sentTo, isRead: false, message: vl.message, userId: currentUser?._id }]
+                })
             };
 
             socket.on('new-message-added', handleNewMessage);

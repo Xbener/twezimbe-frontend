@@ -24,7 +24,7 @@ function Page({ }: Props) {
     const { setCurrentDM, currentUser, currentDM } = useContext(DMContext)
     const [currentPatners, setCurrentPatners] = useState<User[]>([])
     const currentUserId = Cookies.get('current-user-id') // Assuming you store the current user ID in cookies
-    const { setRoomId, messages, setMessages, unreadMessages } = useMyContext()
+    const { setRoomId, messages, setMessages, unreadMessages, roomId } = useMyContext()
     const [sending, setSending] = useState(false)
     const { setIsSideBarOpen, setIsMemberListOpen } = useContext(GroupContext)
     const [attachments, setAttachments] = useState<File[] | any>(null)
@@ -300,7 +300,7 @@ function Page({ }: Props) {
 
 
     useEffect(() => {
-        const currentDMUnreadMessages = unreadMessages.filter(msg => msg?.chatroom?._id === currentDM?._id && !msg.isRead)
+        const currentDMUnreadMessages = unreadMessages.filter(msg => msg?.chatroom?._id === currentDM?._id && !msg?.isRead!)
         const markAsRead = async () => {
             currentDMUnreadMessages.forEach(async (message) => {
                 await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/mark-as-read`, {
@@ -309,14 +309,14 @@ function Page({ }: Props) {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${Cookies.get('access-token')}`
                     },
-                    body: JSON.stringify({ messageId: message.messageId, userId: currentUser?._id }),
+                    body: JSON.stringify({ messageId: message?.messageId, userId: currentUser?._id }),
                 });
             });
         }
         if (currentDMUnreadMessages) {
             markAsRead()
         }
-    }, [currentDM])
+    }, [currentDM, roomId])
 
     useEffect(() => {
         if (currentUser) {
@@ -476,7 +476,7 @@ function Page({ }: Props) {
     // )
 
     const getFirstUnreadMessageId = (unreadMessages: UnreadMessage[]): string | undefined => {
-        const firstUnreadMessage = unreadMessages.find((unreadMsg) => !unreadMsg.isRead);
+        const firstUnreadMessage = unreadMessages.find((unreadMsg) => !unreadMsg?.isRead!);
         return firstUnreadMessage?.messageId;
     };
 

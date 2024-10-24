@@ -126,9 +126,9 @@ function ChannelDetails({ }: Props) {
     });
 
     const countUnreadMessages = (channel: ChannelTypes) => {
-        const unreadCount = unreadMessages.filter(msg => msg?.chatroom?._id === channel?.chatroom?._id && !msg?.isRead);
+        const unreadCount = unreadMessages.filter(msg => msg?.chatroom?._id === channel?.chatroom?._id && !msg?.isRead).length;
         console.log('unreadcount', unreadMessages, channel)
-        return unreadCount.length;
+        // return unreadCount.length;
     }
 
     return (
@@ -237,7 +237,7 @@ function ChannelDetails({ }: Props) {
                                         <span className='block'>{channel?.state === 'public' ? "#" : <Lock className='' />} {channel.name}</span>
 
 
-                                        {countUnreadMessages(channel) > 0 ? <span className='bg-blue-500 p-1 rounded-full text-white block'>{countUnreadMessages(channel)}</span> : null}
+                                        {unreadMessages.filter(msg => msg?.chatroom?._id === channel?.chatroom?._id && !msg?.isRead).length > 0 ? <span className='bg-blue-500 p-1 rounded-full text-white block'>{unreadMessages.filter(msg => msg?.chatroom?._id === channel?.chatroom?._id && !msg?.isRead).length}</span> : null}
 
                                     </div>
                                 ))
@@ -264,7 +264,7 @@ function ChannelDetails({ }: Props) {
                                     >
                                         <span className="block"><Lock /> {channel.name}</span>
 
-                                        {countUnreadMessages(channel) > 0 ? <span className='bg-blue-500 p-1 rounded-full text-white block'>{countUnreadMessages(channel)}</span> : null}
+                                        {unreadMessages.filter(msg => msg?.chatroom?._id === channel?.chatroom?._id && !msg?.isRead).length > 0 ? <span className='bg-blue-500 p-1 rounded-full text-white block'>{unreadMessages.filter(msg => msg?.chatroom?._id === channel?.chatroom?._id && !msg?.isRead).length}</span> : null}
                                     </div>
                                 ))
                             }
