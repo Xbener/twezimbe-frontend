@@ -57,7 +57,7 @@ function Aside({ }) {
         if (currentUser) handleGetUserDms()
     }, [currentUser])
     return (
-        <div className='w-[20%] bg-[#013a6fd8] h-full text-neutral-200 capitalize relative'>
+        <div className='sm:w-[35%] w-[20%] bg-[#013a6fd8] h-full text-neutral-200 capitalize relative hidden sm:block'>
             <div className="flex items-center bg-[#013a6fae] sticky top-0 z-20 p-2 justify-between text-neutral-200 w-full">
                 <input name="q" onChange={(e) => setQ(e.target.value)} className='bg-transparent outline-none w-full' placeholder='Find a conversation ...' />
                 <Search />

@@ -62,7 +62,7 @@ function GroupIdLayout({ children }: Props) {
     return (
         <div className='flex w-full text-neutral-200'>
             <Aside />
-            <div className='md:w-[83%] flex-grow sm:w-[65%] bg-[#013a6fae] flex'>
+            <div className='md:w-[83%] sm:w-[65%] flex-grow bg-[#013a6fae] flex'>
                 <div className="w-[80%] overflow-auto flex-grow">
                     {children}
                 </div>

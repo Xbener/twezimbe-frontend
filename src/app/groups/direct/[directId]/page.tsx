@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import Cookies from 'js-cookie'
 import { DMContext } from '@/context/DMContext'
 import { ChatRoomTypes, Message, Reaction, User } from '@/types' // Assuming you have these types
-import { AtSign, Bell, Bold, DeleteIcon, Edit, File, Italic, Link2, List, ListOrdered, Pin, Plus, Reply, ReplyAllIcon, Smile, SmileIcon, Strikethrough, XIcon } from 'lucide-react'
+import { AtSign, Bell, Bold, DeleteIcon, Edit, File, Italic, Link2, List, ListOrdered, Pin, Plus, Reply, ReplyAllIcon, SidebarClose, SidebarOpen, Smile, SmileIcon, Strikethrough, XIcon } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import moment from 'moment'
@@ -508,6 +508,7 @@ function Page({ }: Props) {
                         <PopoverTrigger>
                             <Pin className="cursor-pointer" />
                         </PopoverTrigger>
+
                         <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col pl-3 ">
                             {
                                 !messages.find(msg => msg.pinned) ? <span className='text-center'>no pinned messages</span> : messages.map((msg, index) => {
@@ -539,6 +540,9 @@ function Page({ }: Props) {
                             }
                         </PopoverContent>
                     </Popover>
+                    <span className="md:hidden block">
+                        <SidebarOpen className="cursor-pointer" />
+                    </span>
                 </div>
             </div>
 

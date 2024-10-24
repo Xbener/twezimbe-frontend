@@ -12,7 +12,7 @@ type Props = {}
 function DMProfile({ }: Props) {
     const { currentUser } = useContext(DMContext)
     return (
-        <div className="w-[25%] bg-[#013a6fa6] overflow-auto p-2">
+        <div className="w-[25%] hidden lg:block bg-[#013a6fa6] overflow-auto p-2">
             <div className="flex flex-col p-3 items-center text-center gap-4">
                 <Avatar className="w-[100px] h-[100px]">
                     <AvatarImage src={currentUser?.profile_pic} className="bg-black rounded-full" />

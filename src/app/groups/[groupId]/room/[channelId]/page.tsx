@@ -6,7 +6,7 @@ import { ChannelTypes, Message, Reaction, User } from '@/types'
 import { useParams } from 'next/navigation'
 import React, { MouseEventHandler, useContext, useEffect, useRef, useState } from 'react'
 import Cookies from 'js-cookie'
-import { Lock, Bell, Pin, Smile, Image as Sticker, Plus, StickerIcon, DeleteIcon, Reply, Edit, ReplyAllIcon, XIcon, Settings, MessageCircleWarning, Delete, File, FileIcon, SmileIcon, Bold, Italic, Strikethrough, Link2, List, ListOrdered, AtSign } from 'lucide-react'
+import { Lock, Bell, Pin, Smile, Image as Sticker, Plus, StickerIcon, DeleteIcon, Reply, Edit, ReplyAllIcon, XIcon, Settings, MessageCircleWarning, Delete, File, FileIcon, SmileIcon, Bold, Italic, Strikethrough, Link2, List, ListOrdered, AtSign, SidebarOpen } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import moment from 'moment'
@@ -831,6 +831,10 @@ function Page({ }: Props) {
                             </div>
                         </DialogContent>
                     </Dialog>
+                    
+                <span className="lg:hidden block">
+                    <SidebarOpen className="cursor-pointer" />
+                </span>
                 </div>
             </div>
 
