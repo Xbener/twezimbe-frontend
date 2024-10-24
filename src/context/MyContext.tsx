@@ -68,8 +68,8 @@ export const MyProvider = ({ children }: Props) => {
     const [unreadMessages, setUnreadMessages] = useState<UnreadMessage[]>([])
 
     useEffect(() => {
-        if (document && unreadMessages.length > 0) {
-            document.title = `${unreadMessages.length} unread messages `
+        if (document && unreadMessages.filter(msg => !msg.isRead).length > 0) {
+            document.title = `${unreadMessages.filter(msg=>!msg.isRead).length} unread messages `
         }
     }, [unreadMessages])
 

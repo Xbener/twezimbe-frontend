@@ -411,8 +411,12 @@ function Page({ }: Props) {
         const currentDMUnreadMessages = unreadMessages.filter(msg => msg?.chatroom?._id === channel?.chatroom?._id && !msg.isRead)
         const markAsRead = async () => {
             currentDMUnreadMessages.forEach(async (message) => {
-                await fetch('/api/messages/mark-as-read', {
+                await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/mark-as-read`, {
                     method: 'POST',
+                    headers: {
+                        'Content-Type':'application/json',
+                        'Authorization': `Bearer ${Cookies.get('access-token')}`
+                    },
                     body: JSON.stringify({ messageId: message.messageId, userId: currentUser?._id }),
                 });
             });

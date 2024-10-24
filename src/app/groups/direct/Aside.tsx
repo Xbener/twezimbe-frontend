@@ -2,7 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '@/components
 import { Input } from '@/components/ui/input'
 import { DMContext } from '@/context/DMContext'
 import { GroupContext } from '@/context/GroupContext'
-import { GroupTypes } from '@/types'
+import { ChatRoomTypes, GroupTypes } from '@/types'
 import { CaretDownIcon } from '@radix-ui/react-icons'
 import { PlusIcon, Search, X } from 'lucide-react'
 import React, { useContext, useState, useEffect } from 'react'
@@ -26,7 +26,7 @@ function Aside({ }) {
     const { group, isMemberListOpen, windowWidth, setIsMemberListOpen } = useContext(GroupContext)
     const [q, setQ] = useState('')
     const { allUsers, currentUser, setCurrentDM, currentDM } = useContext(DMContext)
-    const { onlineUsers, setUserDMs, userDMs, setMessages, setRoomId } = useMyContext()
+    const { onlineUsers, setUserDMs, userDMs, setMessages, setRoomId, unreadMessages } = useMyContext()
     const [loading, setLoading] = useState(false)
     const router = useRouter()
 
@@ -56,6 +56,12 @@ function Aside({ }) {
     useEffect(() => {
         if (currentUser) handleGetUserDms()
     }, [currentUser])
+
+    const countUnreadMessages = (currentDM: ChatRoomTypes) => {
+        const unreadCount = unreadMessages.filter(msg => msg?.chatroom?._id === currentDM?._id && !msg?.isRead);
+        return unreadCount.length;
+    }
+
     return (
         <div className={` bg-[#013a6fd8] h-full text-neutral-200 capitalize ${isMemberListOpen && windowWidth! <= 1025 ? 'w-full absolute top-0 left-0 h-full bg-blue-500 z-50' : 'relative hidden md:w-[27%] w-[40%]'} sm:block`}>
             <div className="flex items-center bg-[#013a6fae] sticky top-0 z-20 p-2 justify-between text-neutral-200 w-full">
@@ -154,13 +160,11 @@ function Aside({ }) {
                                         alt={chatPartner?.firstName}
                                         className="profile-pic w-8 h-8 rounded-full mr-3"
                                     />
-                                    <div className="dm-details flex flex-col justify-center">
+                                    <div className="dm-details flex  justify-between items-center w-full">
                                         <span className="user-name text-white font-medium md:text-[1rem] text-[0.9rem]">
                                             {`${chatPartner?.firstName} ${chatPartner?.lastName}`}
                                         </span>
-                                        {/* <span className="last-message text-neutral-400 text-sm">
-                                            Last message preview here
-                                        </span> */}
+                                        {countUnreadMessages(dm) > 0 ? <span className='bg-blue-800 p-1 rounded-full text-white block'>{countUnreadMessages(dm)}</span> : null}
                                     </div>
                                 </div>
                             );

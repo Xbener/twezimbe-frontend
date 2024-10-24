@@ -24,7 +24,7 @@ function Page({ }: Props) {
     const { setCurrentDM, currentUser, currentDM } = useContext(DMContext)
     const [currentPatners, setCurrentPatners] = useState<User[]>([])
     const currentUserId = Cookies.get('current-user-id') // Assuming you store the current user ID in cookies
-    const { setRoomId, messages, setMessages } = useMyContext()
+    const { setRoomId, messages, setMessages, unreadMessages } = useMyContext()
     const [sending, setSending] = useState(false)
     const { setIsSideBarOpen, setIsMemberListOpen } = useContext(GroupContext)
     const [attachments, setAttachments] = useState<File[] | any>(null)
@@ -297,6 +297,26 @@ function Page({ }: Props) {
             console.error(error)
         }
     }
+
+
+    useEffect(() => {
+        const currentDMUnreadMessages = unreadMessages.filter(msg => msg?.chatroom?._id === currentDM?._id && !msg.isRead)
+        const markAsRead = async () => {
+            currentDMUnreadMessages.forEach(async (message) => {
+                await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/mark-as-read`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${Cookies.get('access-token')}`
+                    },
+                    body: JSON.stringify({ messageId: message.messageId, userId: currentUser?._id }),
+                });
+            });
+        }
+        if (currentDMUnreadMessages) {
+            markAsRead()
+        }
+    }, [currentDM])
 
     useEffect(() => {
         if (currentUser) {
