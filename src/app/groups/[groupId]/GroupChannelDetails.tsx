@@ -20,6 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useAddChannel } from '@/api/channel'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
+import { PopoverClose } from '@radix-ui/react-popover'
 
 type Props = {
 
@@ -28,7 +29,7 @@ type Props = {
 
 
 function ChannelDetails({ }: Props) {
-    const { group, isMemberListOpen, setIsMemberListOpen } = useContext(GroupContext)
+    const { group, isMemberListOpen, setIsMemberListOpen, windowWidth, setIsSideBarOpen } = useContext(GroupContext)
     const { channelList, setChannelList, members, setCurrentChannel, currentChannel, setChId, setRoomId } = useMyContext()
     const router = useRouter()
     const { currentUser } = useGetProfileData()
@@ -140,20 +141,26 @@ function ChannelDetails({ }: Props) {
                     </div>
                     <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-40 gap-1 flex flex-col border-transparent border-l-8 border-l-neutral-400 pl-3 ">
                         {filteredMenuItems.map((item, index) => (
-                            <Link
-                                onClick={(e) => {
-                                    if (item.onClick) {
-                                        e.preventDefault()
-                                        item.onClick()
-                                    }
-                                }}
-                                href={item.link}
-                                key={index}
-                                className="text-white flex p-2 w-full text-[1.1rem] hover:bg-[#6bb7ff73] cursor-pointer rounded-md items-center gap-2 duration-100"
-                            >
-                                {item.icon}
-                                {item.name}
-                            </Link>
+                           <PopoverClose>
+                                <Link
+                                    onClick={(e) => {
+                                        if (item.onClick) {
+                                            e.preventDefault()
+                                            item.onClick()
+                                        }
+                                        if (windowWidth! <= 1025) {
+                                            setIsMemberListOpen(false)
+                                            setIsSideBarOpen(false)
+                                        }
+                                    }}
+                                    href={item.link}
+                                    key={index}
+                                    className="text-white flex p-2 w-full text-[1.1rem] hover:bg-[#6bb7ff73] cursor-pointer rounded-md items-center gap-2 duration-100"
+                                >
+                                    {item.icon}
+                                    {item.name}
+                                </Link>
+                           </PopoverClose>
                         ))}
                     </PopoverContent>
                 </PopoverTrigger>

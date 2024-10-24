@@ -168,8 +168,8 @@ function GroupSettings({ }: Props) {
 
             {
                 group?.created_by[0]?._id === currentUser?._id && (
-                    <div className='p-3 border-b flex items-start justify-around'>
-                        <div className='flex justify-center text-center items-start gap-3'>
+                    <div className='p-3 border-b flex flex-col md:flex-row items-start justify-around'>
+                    <div className='flex justify-center text-center items-start gap-3 md:w-auto w-full'>
                             <div className="width-[200px] height-[200px] rounded-full">
                                 <img
                                     src={imagePreview || group?.group_picture}
@@ -202,7 +202,7 @@ function GroupSettings({ }: Props) {
                                 }
                             </div>
                         </div>
-                        <div className='w-1/2 flex flex-col gap-2 items-end'>
+                    <div className='flex flex-col gap-2 items-end md:w-auto w-full'>
                             <div className="w-full flex flex-col gap-2">
                                 <label className='font-extrabold text-[.8rem]' htmlFor="group_name">Group name</label>
                                 <input
