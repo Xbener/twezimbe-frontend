@@ -33,7 +33,6 @@ function GroupIdLayout({ children }: Props) {
             const res = await getGroup(groupId as string)
             if (res.group !== null) {
                 setGroup(res.group)
-                router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups/${res.group?._id}/room/${res.default_channel}`)
             }
         }
 
@@ -45,17 +44,18 @@ function GroupIdLayout({ children }: Props) {
             const res = await getChannels({ userId, groupId: groupId as string })
             if (!res.status) toast.error(res.errors || res.message)
             setChannelList(res.channels)
+            router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups/${groupId}/room/${res.channels[0]?._id}`)
         }
 
         if (group && currentUser) getChannelsList(currentUser?._id as string)
     }, [group])
 
-    useEffect(()=>{
-        if(channelList){
+    useEffect(() => {
+        if (channelList) {
             setCurrentChannel(channelList[0])
         }
-    },[channelList])
-    
+    }, [channelList])
+
     if (!group?._id) return <MainLoader />
     if (groupsLoading) return <MainLoader />
     if (isError) return <Error />
