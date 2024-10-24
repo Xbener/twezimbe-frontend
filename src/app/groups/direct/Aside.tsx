@@ -25,8 +25,8 @@ import handlecreateDirectMessage from '@/lib/createDM'
 function Aside({ }) {
     const { group } = useContext(GroupContext)
     const [q, setQ] = useState('')
-    const {  allUsers, currentUser, setCurrentDM, currentDM } = useContext(DMContext)
-    const { onlineUsers, setUserDMs, userDMs  } = useMyContext()
+    const { allUsers, currentUser, setCurrentDM, currentDM } = useContext(DMContext)
+    const { onlineUsers, setUserDMs, userDMs, setMessages } = useMyContext()
     const [loading, setLoading] = useState(false)
     const router = useRouter()
 
@@ -131,8 +131,11 @@ function Aside({ }) {
                             return (
                                 <div
                                     onClick={() => {
-                                        setCurrentDM(dm)
-                                        router.push(`/groups/direct/${dm?._id}`)
+                                       if(currentDM?._id!==dm?._id){
+                                           setMessages([])
+                                           setCurrentDM(dm)
+                                           router.push(`/groups/direct/${dm?._id}`)
+                                       }
                                     }}
                                     key={index}
                                     className={`dm-item flex items-center rounded-md p-2 hover:bg-[rgba(62,175,255,0.31)] cursor-pointer ${currentDM?._id === dm?._id && 'bg-[rgba(62,175,255,0.31)]'}`}>

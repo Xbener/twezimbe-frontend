@@ -26,7 +26,7 @@ const GroupNav = () => {
         onlineUsers
     } = useMyContext()
     const { group: currentGroup, setGroup } = useContext(GroupContext)
-
+    const pathname = usePathname()
     const settingsItems = [
         { name: "Edit profile", link: "/public_pages/Profile", icon: <Edit /> },
         {
@@ -73,13 +73,13 @@ const GroupNav = () => {
                 <GroupCreateDialog currentUser={currentUser} />
             </GeneralLink>
 
-            <NavLink href='/groups/direct'> 
+            <NavLink href='/groups/direct'>
                 <span className='text-green-700'>DMs</span>
             </NavLink>
-             <NavLink href='/'> 
+            <NavLink href='/'>
                 <Home className='h-5 w-7 text-green-700' />
             </NavLink>
-             <NavLink href='/groups/'>
+            <NavLink href='/groups/'>
                 <Eye className='h-5 w-7' />
             </NavLink>
             <hr className='mx-2 rounded border-t-2 border-t-white/[0.06]' />
