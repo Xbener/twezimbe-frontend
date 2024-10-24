@@ -337,26 +337,28 @@ function Page({ }: Props) {
         }
     };
 
-    socket.on('react-with-emoji', ({ msg, emoji, _id }) => {
-        setMessages(prev => {
-            return prev.map(prevMsg => {
-                if (prevMsg._id === msg?._id) {
-                    const existingReactionIndex = prevMsg.reactions?.findIndex(r => r.emoji === emoji && r.user_id === _id);
+    if (socket) {
+        socket.on('react-with-emoji', ({ msg, emoji, _id }) => {
+            setMessages(prev => {
+                return prev.map(prevMsg => {
+                    if (prevMsg._id === msg?._id) {
+                        const existingReactionIndex = prevMsg.reactions?.findIndex(r => r.emoji === emoji && r.user_id === _id);
 
-                    if (existingReactionIndex !== -1) {
-                        // If the reaction exists, remove it
-                        const newReactions = [...prevMsg.reactions as any];
-                        newReactions.splice(existingReactionIndex!, 1);
-                        return { ...prevMsg, reactions: newReactions };
-                    } else {
-                        // If the reaction doesn't exist, add it
-                        return { ...prevMsg, reactions: [...(prevMsg.reactions || []), { user_id: _id, emoji }] };
+                        if (existingReactionIndex !== -1) {
+                            // If the reaction exists, remove it
+                            const newReactions = [...prevMsg.reactions as any];
+                            newReactions.splice(existingReactionIndex!, 1);
+                            return { ...prevMsg, reactions: newReactions };
+                        } else {
+                            // If the reaction doesn't exist, add it
+                            return { ...prevMsg, reactions: [...(prevMsg.reactions || []), { user_id: _id, emoji }] };
+                        }
                     }
-                }
-                return prevMsg;
+                    return prevMsg;
+                });
             });
         });
-    });
+    }
 
 
     const instantActions = [{
@@ -493,8 +495,8 @@ function Page({ }: Props) {
     };
 
     const handleKeyPress = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if(e.ctrlKey&&e.key==="Enter") {
-            setMessage(prev=>prev+'\n')
+        if (e.ctrlKey && e.key === "Enter") {
+            setMessage(prev => prev + '\n')
             return
         }
         if (e.key === 'Enter' && message.trim()) {
@@ -982,14 +984,14 @@ function Page({ }: Props) {
                                                             </div>
                                                         ) : null}
                                                         <div className="text-white flex items-center gap-2">
-                                                                <p>
-                                                                    {msg?.content && msg?.content?.split('\n').map((line, index) => (
-                                                                        <span key={index}>
-                                                                            {line}
-                                                                            {msg?.content && index < msg?.content?.split('\n').length - 1 && <br />}
-                                                                        </span>
-                                                                    ))}
-                                                                </p>
+                                                            <p>
+                                                                {msg?.content && msg?.content?.split('\n').map((line, index) => (
+                                                                    <span key={index}>
+                                                                        {line}
+                                                                        {msg?.content && index < msg?.content?.split('\n').length - 1 && <br />}
+                                                                    </span>
+                                                                ))}
+                                                            </p>
                                                             <span>{msg.edited && <span className='text-[.7rem] text-gray-200'>(edited)</span>}</span>
                                                         </div>
                                                         <div className="flex items-center w-full justify-start p-1 gap-1">
@@ -1230,15 +1232,15 @@ function Page({ }: Props) {
                                     <SendHorizonal />
                                 </Button>
                             </div>
-                            
+
                             <div ref={emojiContainerRef} className="absolute z-50 bottom-9 right-0">
                                 <EmojiPicker open={showPicker} onEmojiClick={(emoji) => {
                                     setMessage(prev => prev + emoji.emoji)
                                 }} />
                             </div>
-                        
+
                         </div>
-                    
+
                     </div>
 
 
@@ -1250,7 +1252,7 @@ function Page({ }: Props) {
                         <code className="rounded-md ">
                             ctrl+enter
                         </code>
-                            for new line
+                        for new line
                     </div>
                 </div>
             </div>
