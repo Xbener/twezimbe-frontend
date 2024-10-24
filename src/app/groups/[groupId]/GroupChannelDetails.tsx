@@ -29,7 +29,7 @@ type Props = {
 
 function ChannelDetails({ }: Props) {
     const { group } = useContext(GroupContext)
-    const { channelList, setChannelList, members, setCurrentChannel, setChId, setRoomId } = useMyContext()
+    const { channelList, setChannelList, members, setCurrentChannel, currentChannel, setChId, setRoomId } = useMyContext()
     const router = useRouter()
     const { currentUser } = useGetProfileData()
     const { addChannel, isError, isLoading, isSuccess } = useAddChannel()
@@ -208,9 +208,10 @@ function ChannelDetails({ }: Props) {
                                             setRoomId(channel?.chatroom?._id!)
                                             router.push(`/groups/${group?._id}/room/${channel._id}`)
                                             // setChId(channel?._id)
-                                            
+
                                         }}
-                                        className='flex text-[.9rem] items-center gap-2 w-full hover:bg-neutral-50 hover:text-gray-700 duration-100 cursor-pointer p-2 rounded-md'>
+                                        className={`flex text-[.9rem] items-center gap-2 w-full hover:bg-neutral-50 hover:text-gray-700 duration-100 cursor-pointer p-2 rounded-md ${currentChannel?._id===channel?._id ? 'bg-white text-black hover:bg-[rgba(255,255,255,0.27)] hover:text-white' : ''}`}
+                                        >
                                         <span>{channel?.state === 'public' ? "#" : <Lock className='' />}</span>
                                         {channel.name}
                                     </div>
@@ -234,7 +235,8 @@ function ChannelDetails({ }: Props) {
                                             // setChId(channel?._id)
                                         }
                                         }
-                                        className='flex items-center text-[.9rem] gap-2 w-full hover:bg-neutral-50 hover:text-gray-700 duration-100 cursor-pointer p-2 rounded-md'>
+                                        className={`flex text-[.9rem] items-center gap-2 w-full hover:bg-neutral-50 hover:text-gray-700 duration-100 cursor-pointer p-2 rounded-md ${currentChannel?._id===channel?._id ? 'bg-white text-black hover:bg-[rgba(255,255,255,0.21)] hover:text-white' : ''}`}
+                                        >
                                         <span><Lock /></span>
                                         {channel.name}
                                     </div>

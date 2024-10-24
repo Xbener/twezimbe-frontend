@@ -35,7 +35,7 @@ export const GroupContext = React.createContext<GroupContextTypes>({
 function GroupProvider({ children }: Props) {
 
     const [group, setGroup] = useState<GroupTypes | null>(null)
-    const { admins, setAdmins, moderators, setModerators, members, setMembers } = useMyContext()
+    const { admins, setAdmins, moderators, setModerators, members, setMembers, setCurrentChannel } = useMyContext()
     const [privateChannelMembers, setPrivateChannelMembers] = useState<User[]>([])
     const [isLoading, setIsLoading] = useState(false)
 

@@ -23,7 +23,7 @@ function GroupIdLayout({ children }: Props) {
     const { getChannels, isError: channelsError, isLoading: channelsLoading, isSuccess: channelsSuccess } = useGetGroupChannels()
     const { groupId } = useParams()
     const { group, setGroup, admins, moderators, members, isLoading } = useContext(GroupContext)
-    const { setChannelList } = useMyContext()
+    const { setChannelList, setCurrentChannel, channelList } = useMyContext()
     const { currentUser } = useGetProfileData()
     const router = useRouter()
 
@@ -50,6 +50,12 @@ function GroupIdLayout({ children }: Props) {
         if (group && currentUser) getChannelsList(currentUser?._id as string)
     }, [group])
 
+    useEffect(()=>{
+        if(channelList){
+            setCurrentChannel(channelList[0])
+        }
+    },[channelList])
+    
     if (!group?._id) return <MainLoader />
     if (groupsLoading) return <MainLoader />
     if (isError) return <Error />
