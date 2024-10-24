@@ -748,7 +748,7 @@ function Page({ }: Props) {
                                                         }
                                                         if (action.name === "React") {
                                                             return (
-                                                                <div className="flex items-center w-full justify-around p-2">
+                                                                <div className="flex items-center w-full justify-around p-2 gap-1">
                                                                     {
                                                                         action.emojis!.map((emoji, index) => (
                                                                             <span key={index} className="border p-1 rounded-md hover:bg-[rgba(255,255,255,0.24)] cursor-pointer"

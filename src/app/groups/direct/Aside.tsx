@@ -151,13 +151,13 @@ function Aside({ }) {
                                         alt={chatPartner?.firstName}
                                         className="profile-pic w-8 h-8 rounded-full mr-3"
                                     />
-                                    <div className="dm-details flex flex-col">
+                                    <div className="dm-details flex flex-col justify-center">
                                         <span className="user-name text-white font-medium">
                                             {`${chatPartner?.firstName} ${chatPartner?.lastName}`}
                                         </span>
-                                        <span className="last-message text-neutral-400 text-sm">
+                                        {/* <span className="last-message text-neutral-400 text-sm">
                                             Last message preview here
-                                        </span>
+                                        </span> */}
                                     </div>
                                 </div>
                             );
