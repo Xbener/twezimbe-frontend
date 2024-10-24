@@ -126,9 +126,11 @@ function ChannelDetails({ }: Props) {
     });
 
     const countUnreadMessages = (channel: ChannelTypes) => {
-        const unreadCount = unreadMessages.map(msg => msg.chatroom?._id === channel?.chatroom?._id && !msg?.isRead!)
-        return unreadCount.length
+        const unreadCount = unreadMessages.filter(msg => msg?.chatroom?._id === channel?.chatroom?._id && !msg?.isRead);
+        console.log('unreadcount', unreadMessages, channel)
+        return unreadCount.length;
     }
+
     return (
         <>
 
@@ -232,11 +234,11 @@ function ChannelDetails({ }: Props) {
                                         }}
                                         className={`flex text-[.9rem] items-center gap-2 w-full hover:bg-neutral-50 hover:text-gray-700 duration-100 cursor-pointer p-2 rounded-md ${currentChannel?._id === channel?._id ? 'bg-white text-black hover:bg-[rgba(255,255,255,0.27)] hover:text-white' : ''} justify-between`}
                                     >
-                                        <span>{channel?.state === 'public' ? "#" : <Lock className='' />} {channel.name}</span>
-                                        
-                                        <span className='bg-blue-500 p-1 rounded-full text-white'>
-                                            {countUnreadMessages(channel) > 0 ? countUnreadMessages(channel) : null}
-                                        </span>
+                                        <span className='block'>{channel?.state === 'public' ? "#" : <Lock className='' />} {channel.name}</span>
+
+
+                                        {countUnreadMessages(channel) > 0 ? <span className='bg-blue-500 p-1 rounded-full text-white block'>{countUnreadMessages(channel)}</span> : null}
+
                                     </div>
                                 ))
                             }
@@ -258,13 +260,11 @@ function ChannelDetails({ }: Props) {
                                             // setChId(channel?._id)
                                         }
                                         }
-                                        className={`flex text-[.9rem] items-center gap-2 w-full hover:bg-neutral-50 hover:text-gray-700 duration-100 cursor-pointer p-2 rounded-md ${currentChannel?._id === channel?._id ? 'bg-white text-black hover:bg-[rgba(255,255,255,0.21)] hover:text-white' : ''} justify-between`}
+                                        className={`flex text-[.9rem] items-center gap-2 w-full hover:bg-neutral-50 hover:text-gray-700 duration-100 cursor-pointer p-2 rounded-md ${currentChannel?._id === channel?._id ? 'bg-white text-black hover:bg-[rgba(255,255,255,0.21)] hover:text-white' : ''} justify-between `}
                                     >
-                                        <span><Lock /> {channel.name}</span>
-                                        
-                                        <span className='bg-blue-500 p-1 rounded-full text-white'>
-                                            {countUnreadMessages(channel) > 0 ? countUnreadMessages(channel) : null}
-                                        </span>
+                                        <span className="block"><Lock /> {channel.name}</span>
+
+                                        {countUnreadMessages(channel) > 0 ? <span className='bg-blue-500 p-1 rounded-full text-white block'>{countUnreadMessages(channel)}</span> : null}
                                     </div>
                                 ))
                             }

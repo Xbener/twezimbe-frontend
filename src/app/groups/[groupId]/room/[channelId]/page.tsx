@@ -31,7 +31,7 @@ type Props = {}
 
 function Page({ }: Props) {
     const { channelId } = useParams()
-    const { messages, setMessages, isTyping, setIsTyping, setCurrentChannel, setChId, setRoomId } = useMyContext()
+    const { messages, setMessages, isTyping, setIsTyping, unreadMessages, setCurrentChannel, setChId, setRoomId } = useMyContext()
     const { getChannel, isError } = useGetSingleChannel()
     const [isLoading, setLoading] = useState(true)
     const [sending, setSending] = useState(false)
@@ -382,7 +382,7 @@ function Page({ }: Props) {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
-                    'Content-Type':'application/json'
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ userId: currentUser?._id })
 
@@ -406,6 +406,21 @@ function Page({ }: Props) {
             setLoading(false)
         }
     }
+
+    useEffect(() => {
+        const currentDMUnreadMessages = unreadMessages.filter(msg => msg?.chatroom?._id === channel?.chatroom?._id && !msg.isRead)
+        const markAsRead = async () => {
+            currentDMUnreadMessages.forEach(async (message) => {
+                await fetch('/api/messages/mark-as-read', {
+                    method: 'POST',
+                    body: JSON.stringify({ messageId: message.messageId, userId: currentUser?._id }),
+                });
+            });
+        }
+        if (currentDMUnreadMessages) {
+            markAsRead()
+        }
+    }, [channel])
 
     const getChannelMessages = async () => {
         try {

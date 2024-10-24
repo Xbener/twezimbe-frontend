@@ -86,7 +86,6 @@ export const MyProvider = ({ children }: Props) => {
                     body: JSON.stringify({ userId: currentUser?._id })
                 })
                 const data = await res.json()
-                console.log('unread data', data)
                 if (!data.status) return console.log('error getting unread messages', data)
                 setUnreadMessages(data.unreadMessages);
             }
