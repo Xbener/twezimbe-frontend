@@ -52,7 +52,9 @@ function GroupIdLayout({ children }: Props) {
     useEffect(() => {
         if (channelList) {
             setCurrentChannel(channelList[0])
-            router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups/${groupId}/room/${channelList[0]?._id}`)
+            if(channelList[0]){
+                router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups/${groupId}/room/${channelList[0]?._id}`)
+            }
         }
     }, [channelList])
 
