@@ -4,7 +4,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import Cookies from 'js-cookie'
 import { DMContext } from '@/context/DMContext'
-import { ChatRoomTypes, Message, Reaction, User } from '@/types' // Assuming you have these types
+import { ChatRoomTypes, Message, Reaction, UnreadMessage, User } from '@/types' // Assuming you have these types
 import { ArrowLeft, AtSign, Bell, Bold, DeleteIcon, Edit, File, Italic, Link2, List, ListOrdered, Pin, Plus, Reply, ReplyAllIcon, SendHorizonal, SidebarClose, SidebarOpen, Smile, SmileIcon, Strikethrough, XIcon } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
@@ -475,6 +475,13 @@ function Page({ }: Props) {
     //     </div>
     // )
 
+    const getFirstUnreadMessageId = (unreadMessages: UnreadMessage[]): string | undefined => {
+        const firstUnreadMessage = unreadMessages.find((unreadMsg) => !unreadMsg.isRead);
+        return firstUnreadMessage?.messageId;
+    };
+
+    const firstUnreadMessageId = getFirstUnreadMessageId(unreadMessages);
+
     return (
         <div className='w-full h-screen flex flex-col bg-[#013a6fd3] text-white'>
             <div className="flex justify-between p-4 bg-[#013a6fae] border-b border-gray-700 w-full">
@@ -576,193 +583,219 @@ function Page({ }: Props) {
 
                             {msgs.map((msg, index) => {
                                 const showAvatarAndName = index === 0 || msgs[index - 1]?.sender?._id !== msg?.sender?._id;
-
+                                const isUnreadMessage = msg._id === firstUnreadMessageId;
                                 return (
-                                    <div
-                                        key={msg._id}
-                                        onContextMenu={(e) => handleContextMenu(e, msg)} // Pass the message to the context menu handler
-                                        className={`flex gap-4 hover:bg-[#cbcbcb2e] cursor-pointer rounded-md items-start mb-1 justify-normal ${index === msgs.length && "mb-5"} ${msg.pinned ? "bg-[rgba(255,193,59,0.42)]" : ' '} group`} // Reduced margin between consecutive messages
-                                    >
-                                        {msg.pinned && <Pin />}
-                                        {showAvatarAndName ? (
-                                            <Avatar className=' bg-neutral-200 rounded-full'>
-                                                <AvatarImage src={msg.sender?.profile_pic} />
-                                                <AvatarFallback />
-                                            </Avatar>
-                                        ) : (
-                                            <div className='w-[40px] p-0 h-0 text-[.5rem] items-center invisible group-hover:visible' >
-                                                {new Date(msg?.createdAt as Date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
-                                            </div>
-                                        )}
-
-                                        <div className='flex flex-col w-full items-start justify-center'>
-                                            {showAvatarAndName && (
-                                                <div className="flex gap-2 items-center">
-                                                    <span>{msg?.sender?.lastName} {msg?.sender?.firstName}</span>
-                                                    <span className="text-[.7rem] text-neutral-400">{formatMessageDate(msg?.createdAt as Date)}</span>
+                                    <React.Fragment  key={msg._id}>
+                                    { isUnreadMessage && (
+                                        <div className="w-full my-2 flex items-center">
+                                            <hr className="flex-grow border-t border-red-500" />
+                                            <span className="mx-2 text-red-500 text-xs">Unread Messages</span>
+                                            <hr className="flex-grow border-t border-red-500" />
+                                        </div>
+                                    )}
+                                        <div
+                                           
+                                            onContextMenu={(e) => handleContextMenu(e, msg)} // Pass the message to the context menu handler
+                                            className={`flex gap-4 hover:bg-[#cbcbcb2e] cursor-pointer rounded-md items-start mb-1 justify-normal ${index === msgs.length && "mb-5"} ${msg.pinned ? "bg-[rgba(255,193,59,0.42)]" : ' '} group`} // Reduced margin between consecutive messages
+                                        >
+                                            {msg.pinned && <Pin />}
+                                            {showAvatarAndName ? (
+                                                <Avatar className=' bg-neutral-200 rounded-full'>
+                                                    <AvatarImage src={msg.sender?.profile_pic} />
+                                                    <AvatarFallback />
+                                                </Avatar>
+                                            ) : (
+                                                <div className='w-[40px] p-0 h-0 text-[.5rem] items-center invisible group-hover:visible' >
+                                                    {new Date(msg?.createdAt as Date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
                                                 </div>
                                             )}
-                                            {
-                                                isEditing.state && isEditing.message._id === msg._id ? (
-                                                    <div className="w-full flex flex-col items-start">
-                                                        <div className="W-full flex flex-col border-gray-700 border focus-within:border-white rounded-md">
-                                                            <div className='flex gap-2 group-focus-within:border-b-white border-b border-b-gray-500 p-2'>
-                                                                <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                                                    <Bold className="size-5" />
-                                                                </span>
-                                                                <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                                                    <Italic className="size-5" />
-                                                                </span>
-                                                                <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                                                    <Strikethrough className="size-5" />
-                                                                </span>
-                                                                <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                                                    <Link2 className="size-5" />
-                                                                </span>
-                                                                <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                                                    <List className="size-5" />
-                                                                </span>
-                                                                <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                                                    <ListOrdered className="size-5" />
-                                                                </span>
 
-                                                            </div>
-                                                            <div className="">
-                                                                <input
-                                                                    ref={editingInputRef}
-                                                                    disabled={sending}
-                                                                    className="flex-grow bg-transparent p-2 rounded-md text-white placeholder-gray-400 focus:outline-none disabled:cursor-not-allowed w-full"
-                                                                    value={isEditing.content}
-                                                                    onChange={(e) => setIsEditing(prev => ({ ...prev, content: e.target.value }))}
-                                                                    onKeyPress={handleEdit}
-                                                                />
-                                                            </div>
-                                                            <div className="w-full flex p-2">
-                                                                <div className="">
-                                                                    <Popover>
-                                                                        <PopoverTrigger className="p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75">
-                                                                            <Plus className="size-5" />
-                                                                        </PopoverTrigger>
-                                                                        <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col ">
-                                                                            <input
-                                                                                type="file"
-                                                                                hidden
-                                                                                name="attachment"
-                                                                                id="attachment"
-                                                                                multiple
-                                                                                onChange={(e) => setAttachments(e.target.files as FileList)}
-                                                                            />
-                                                                        </PopoverContent>
-                                                                    </Popover>
-
-                                                                </div>
-                                                                <div ref={emojiContainerRef} className="absolute z-50 bottom-9 right-0">
-                                                                    <EmojiPicker open={showPicker} onEmojiClick={(emoji) => {
-                                                                        setIsEditing(prev => ({ ...prev, content: prev.content + emoji.emoji }))
-                                                                    }} />
-                                                                </div>
-                                                                <div className="flex items-center gap-2">
-                                                                    <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                                                        <Smile onClick={() => setShowPicker(prev => !prev)} className="size-5" />
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <Button onClick={() => setIsEditing({ state: false, content: "", message: {} })} className="underline text-[.7rem]">cancel</Button>
+                                            <div className='flex flex-col w-full items-start justify-center'>
+                                                {showAvatarAndName && (
+                                                    <div className="flex gap-2 items-center">
+                                                        <span>{msg?.sender?.lastName} {msg?.sender?.firstName}</span>
+                                                        <span className="text-[.7rem] text-neutral-400">{formatMessageDate(msg?.createdAt as Date)}</span>
                                                     </div>
-                                                ) : (
-                                                    <div className='text-[#c4c4c4] text-[.9rem] w-[90%] break-words p-0 m-0'>
-                                                        {msg.replyingTo ? (
-                                                            <div className='bg-gray-800 p-2 rounded-md mb-1'>
-                                                                <div className="flex items-start justify-start gap-2 overflow-hidden italic text-gray-300 ">
-                                                                    <ReplyAllIcon className="rotate-180" />
-                                                                    <span>{(msg.replyingTo && msg.replyingTo.content?.slice(0, 150))}</span>
+                                                )}
+                                                {
+                                                    isEditing.state && isEditing.message._id === msg._id ? (
+                                                        <div className="w-full flex flex-col items-start">
+                                                            <div className="W-full flex flex-col border-gray-700 border focus-within:border-white rounded-md">
+                                                                <div className='flex gap-2 group-focus-within:border-b-white border-b border-b-gray-500 p-2'>
+                                                                    <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                                                        <Bold className="size-5" />
+                                                                    </span>
+                                                                    <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                                                        <Italic className="size-5" />
+                                                                    </span>
+                                                                    <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                                                        <Strikethrough className="size-5" />
+                                                                    </span>
+                                                                    <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                                                        <Link2 className="size-5" />
+                                                                    </span>
+                                                                    <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                                                        <List className="size-5" />
+                                                                    </span>
+                                                                    <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                                                        <ListOrdered className="size-5" />
+                                                                    </span>
+
+                                                                </div>
+                                                                <div className="">
+                                                                    <input
+                                                                        ref={editingInputRef}
+                                                                        disabled={sending}
+                                                                        className="flex-grow bg-transparent p-2 rounded-md text-white placeholder-gray-400 focus:outline-none disabled:cursor-not-allowed w-full"
+                                                                        value={isEditing.content}
+                                                                        onChange={(e) => setIsEditing(prev => ({ ...prev, content: e.target.value }))}
+                                                                        onKeyPress={handleEdit}
+                                                                    />
+                                                                </div>
+                                                                <div className="w-full flex p-2">
+                                                                    <div className="">
+                                                                        <Popover>
+                                                                            <PopoverTrigger className="p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75">
+                                                                                <Plus className="size-5" />
+                                                                            </PopoverTrigger>
+                                                                            <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col ">
+                                                                                <input
+                                                                                    type="file"
+                                                                                    hidden
+                                                                                    name="attachment"
+                                                                                    id="attachment"
+                                                                                    multiple
+                                                                                    onChange={(e) => setAttachments(e.target.files as FileList)}
+                                                                                />
+                                                                            </PopoverContent>
+                                                                        </Popover>
+
+                                                                    </div>
+                                                                    <div ref={emojiContainerRef} className="absolute z-50 bottom-9 right-0">
+                                                                        <EmojiPicker open={showPicker} onEmojiClick={(emoji) => {
+                                                                            setIsEditing(prev => ({ ...prev, content: prev.content + emoji.emoji }))
+                                                                        }} />
+                                                                    </div>
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                                                            <Smile onClick={() => setShowPicker(prev => !prev)} className="size-5" />
+                                                                        </span>
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                        ) : null}
-                                                        <div className="text-white flex items-center gap-2">
-                                                            {msg.content}
-                                                            <span>{msg.edited && <span className='text-[.7rem] text-gray-200'>(edited)</span>}</span>
+
+                                                            <Button onClick={() => setIsEditing({ state: false, content: "", message: {} })} className="underline text-[.7rem]">cancel</Button>
                                                         </div>
-                                                        <div className="flex items-center w-full justify-start p-1 gap-1">
-                                                            {
-                                                                msg.reactions?.length! > 0 && (
-                                                                    (() => {
-                                                                        const emojiCounts = msg.reactions!.reduce((acc, reaction: Reaction) => {
-                                                                            const emoji = reaction.emoji!;
-                                                                            if (emoji !== '0') {
-                                                                                acc[emoji] = (acc[emoji] || 0) + 1;
-                                                                            }
-                                                                            return acc;
-                                                                        }, {} as Record<string, number>);
+                                                    ) : (
+                                                        <div className='text-[#c4c4c4] text-[.9rem] w-[90%] break-words p-0 m-0'>
+                                                            {msg.replyingTo ? (
+                                                                <div className='bg-gray-800 p-2 rounded-md mb-1'>
+                                                                    <div className="flex items-start justify-start gap-2 overflow-hidden italic text-gray-300 ">
+                                                                        <ReplyAllIcon className="rotate-180" />
+                                                                        <span>{(msg.replyingTo && msg.replyingTo.content?.slice(0, 150))}</span>
+                                                                    </div>
+                                                                </div>
+                                                            ) : null}
+                                                            <div className="text-white flex items-center gap-2">
+                                                                {msg.content}
+                                                                <span>{msg.edited && <span className='text-[.7rem] text-gray-200'>(edited)</span>}</span>
+                                                            </div>
+                                                            <div className="flex items-center w-full justify-start p-1 gap-1">
+                                                                {
+                                                                    msg.reactions?.length! > 0 && (
+                                                                        (() => {
+                                                                            const emojiCounts = msg.reactions!.reduce((acc, reaction: Reaction) => {
+                                                                                const emoji = reaction.emoji!;
+                                                                                if (emoji !== '0') {
+                                                                                    acc[emoji] = (acc[emoji] || 0) + 1;
+                                                                                }
+                                                                                return acc;
+                                                                            }, {} as Record<string, number>);
 
-                                                                        return Object.entries(emojiCounts).map(([emoji, count], index) => {
-                                                                            // Check if the current user has reacted with this emoji
-                                                                            const hasUserReacted = msg.reactions?.some(
-                                                                                (reaction) => reaction.emoji === emoji && reaction.user_id === currentUser?._id
-                                                                            );
+                                                                            return Object.entries(emojiCounts).map(([emoji, count], index) => {
+                                                                                // Check if the current user has reacted with this emoji
+                                                                                const hasUserReacted = msg.reactions?.some(
+                                                                                    (reaction) => reaction.emoji === emoji && reaction.user_id === currentUser?._id
+                                                                                );
 
-                                                                            return (
-                                                                                <span
-                                                                                    key={index}
-                                                                                    // If the user has reacted, add a background color
-                                                                                    className={`${hasUserReacted ? "bg-[rgba(255,255,255,0.19)] " : ""
-                                                                                        } border p-1 rounded-md hover:bg-[rgba(255,255,255,0.24)] cursor-pointer`}
-                                                                                    onClick={() => handleReactWithEmoji(msg, emoji)} // Add react/remove logic here
-                                                                                >
-                                                                                    {emoji} {count > 1 && <span className="ml-1">x{count}</span>}
+                                                                                return (
+                                                                                    <span
+                                                                                        key={index}
+                                                                                        // If the user has reacted, add a background color
+                                                                                        className={`${hasUserReacted ? "bg-[rgba(255,255,255,0.19)] " : ""
+                                                                                            } border p-1 rounded-md hover:bg-[rgba(255,255,255,0.24)] cursor-pointer`}
+                                                                                        onClick={() => handleReactWithEmoji(msg, emoji)} // Add react/remove logic here
+                                                                                    >
+                                                                                        {emoji} {count > 1 && <span className="ml-1">x{count}</span>}
+                                                                                    </span>
+                                                                                );
+                                                                            });
+                                                                        })()
+                                                                    )
+                                                                }
+
+                                                            </div>
+
+                                                        </div>
+                                                    )
+                                                }
+                                            </div>
+
+                                            {/* Context Menu */}
+                                            {
+                                                contextMenu.visible && contextMenu.message?._id === msg._id && ( // Show the context menu for the correct message
+                                                    <div
+                                                        className="absolute bg-gray-700 text-white rounded-md shadow-sm w-[200px] z-50"
+                                                        style={{ left: contextMenu.x, top: contextMenu.y }}
+                                                        onMouseLeave={closeContextMenu}
+                                                    >
+                                                        {instantActions.map((action, index) => {
+                                                            if ((action.name === "Edit" && `${msg.sender_id}` !== `${currentUser?._id}`) || (action.name === "Delete" && `${msg.sender_id}` !== `${currentUser?._id}`)) {
+                                                                return null;
+                                                            }
+                                                            if (action.name === "React") {
+                                                                return (
+                                                                    <div className="flex items-center w-full justify-around p-2 gap-1">
+                                                                        {
+                                                                            action.emojis!.map((emoji, index) => (
+                                                                                <span key={index} className="border p-1 rounded-md hover:bg-[rgba(255,255,255,0.24)] cursor-pointer"
+                                                                                    onClick={() => handleReactWithEmoji(msg, emoji)}>
+                                                                                    {emoji}
                                                                                 </span>
-                                                                            );
-                                                                        });
-                                                                    })()
+                                                                            ))
+                                                                        }
+
+                                                                        <span className="border p-1 rounded-md hover:bg-[rgba(255,255,255,0.24)] cursor-pointer"
+                                                                            onClick={() => setQuickEmojiSelector(prev => !prev)}
+                                                                        >
+                                                                            <SmileIcon />
+                                                                        </span>
+                                                                    </div>
+                                                                );
+                                                            }
+                                                            if (action.name === "Pin" && msg.pinned) {
+                                                                return (
+                                                                    <button
+                                                                        key={index}
+                                                                        className={`w-full text-left p-2 hover:bg-blue-600 ${action.name === "Pin" ? "text-orange-500" : ""} flex items-center gap-2`}
+                                                                        onClick={() => {
+                                                                            if (action.name === "Edit") {
+                                                                                action.action(msg, msg.content);
+                                                                            } else {
+                                                                                action.action(msg);
+                                                                            }
+                                                                        }}
+                                                                    >
+                                                                        {action.icon}
+                                                                        Unpin
+                                                                    </button>
                                                                 )
                                                             }
 
-                                                        </div>
-
-                                                    </div>
-                                                )
-                                            }
-                                        </div>
-
-                                        {/* Context Menu */}
-                                        {
-                                            contextMenu.visible && contextMenu.message?._id === msg._id && ( // Show the context menu for the correct message
-                                                <div
-                                                    className="absolute bg-gray-700 text-white rounded-md shadow-sm w-[200px] z-50"
-                                                    style={{ left: contextMenu.x, top: contextMenu.y }}
-                                                    onMouseLeave={closeContextMenu}
-                                                >
-                                                    {instantActions.map((action, index) => {
-                                                        if ((action.name === "Edit" && `${msg.sender_id}` !== `${currentUser?._id}`) || (action.name === "Delete" && `${msg.sender_id}` !== `${currentUser?._id}`)) {
-                                                            return null;
-                                                        }
-                                                        if (action.name === "React") {
-                                                            return (
-                                                                <div className="flex items-center w-full justify-around p-2 gap-1">
-                                                                    {
-                                                                        action.emojis!.map((emoji, index) => (
-                                                                            <span key={index} className="border p-1 rounded-md hover:bg-[rgba(255,255,255,0.24)] cursor-pointer"
-                                                                                onClick={() => handleReactWithEmoji(msg, emoji)}>
-                                                                                {emoji}
-                                                                            </span>
-                                                                        ))
-                                                                    }
-
-                                                                    <span className="border p-1 rounded-md hover:bg-[rgba(255,255,255,0.24)] cursor-pointer"
-                                                                        onClick={() => setQuickEmojiSelector(prev => !prev)}
-                                                                    >
-                                                                        <SmileIcon />
-                                                                    </span>
-                                                                </div>
-                                                            );
-                                                        }
-                                                        if (action.name === "Pin" && msg.pinned) {
                                                             return (
                                                                 <button
                                                                     key={index}
-                                                                    className={`w-full text-left p-2 hover:bg-blue-600 ${action.name === "Pin" ? "text-orange-500" : ""} flex items-center gap-2`}
+                                                                    className={`w-full text-left p-2 hover:bg-blue-600 ${action.name === "Delete" ? "text-red-500 hover:text-white hover:bg-red-500" : ""} flex items-center gap-2`}
                                                                     onClick={() => {
                                                                         if (action.name === "Edit") {
                                                                             action.action(msg, msg.content);
@@ -772,38 +805,21 @@ function Page({ }: Props) {
                                                                     }}
                                                                 >
                                                                     {action.icon}
-                                                                    Unpin
+                                                                    {action.name}
                                                                 </button>
-                                                            )
-                                                        }
-
-                                                        return (
-                                                            <button
-                                                                key={index}
-                                                                className={`w-full text-left p-2 hover:bg-blue-600 ${action.name === "Delete" ? "text-red-500 hover:text-white hover:bg-red-500" : ""} flex items-center gap-2`}
-                                                                onClick={() => {
-                                                                    if (action.name === "Edit") {
-                                                                        action.action(msg, msg.content);
-                                                                    } else {
-                                                                        action.action(msg);
-                                                                    }
-                                                                }}
-                                                            >
-                                                                {action.icon}
-                                                                {action.name}
-                                                            </button>
-                                                        );
-                                                    })}
-                                                </div>
-                                            )
-                                        }
-                                        <div ref={emojiContainerRef} className="absolute z-50 bottom-9 right-5">
-                                            <EmojiPicker open={quickEmojiSelector} onEmojiClick={(emoji) => {
-                                                handleReactWithEmoji(msg, emoji.emoji)
-                                                setQuickEmojiSelector(false)
-                                            }} />
+                                                            );
+                                                        })}
+                                                    </div>
+                                                )
+                                            }
+                                            <div ref={emojiContainerRef} className="absolute z-50 bottom-9 right-5">
+                                                <EmojiPicker open={quickEmojiSelector} onEmojiClick={(emoji) => {
+                                                    handleReactWithEmoji(msg, emoji.emoji)
+                                                    setQuickEmojiSelector(false)
+                                                }} />
+                                            </div>
                                         </div>
-                                    </div>
+                                    </React.Fragment>
                                 );
                             })}
                         </div>
