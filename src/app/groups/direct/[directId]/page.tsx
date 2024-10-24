@@ -477,11 +477,11 @@ function Page({ }: Props) {
 
     let groupedMessages = groupMessagesByDate(messages)
 
-    if (!messages.length) return (
-        <div className="w-full h-full grid place-content-center ">
-            loading ...
-        </div>
-    )
+    // if (!messages.length) return (
+    //     <div className="w-full h-full grid place-content-center ">
+    //         loading ...
+    //     </div>
+    // )
 
     return (
         <div className='w-full h-screen flex flex-col bg-[#013a6fd3] text-white'>

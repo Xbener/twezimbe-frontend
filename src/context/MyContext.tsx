@@ -63,8 +63,37 @@ export const MyProvider = ({ children }: Props) => {
     const [userChatRooms, setUserChatRooms] = useState([])
     const [userDMs, setUserDMs] = useState<ChatRoomTypes[]>([])
     const [roomId, setRoomId] = useState('')
+    const [unreadMessages, setUnreadMessages] = useState([])
 
+    useEffect(() => {
+        if (document && unreadMessages.length > 0) {
+            document.title = `${unreadMessages.length} unread messages `
+        }
+    }, [unreadMessages])
 
+    useEffect(() => {
+        const getUnreadMessages = async () => {
+            try {
+                const token = Cookies.get('access-token')
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/unread`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ userId: currentUser?._id })
+                })
+                const data = await res.json()
+                if (!data.status) return console.log('error getting unread messages', data)
+                setUnreadMessages(data.unreadMessages);
+            }
+            catch (error) {
+                console.log(error)
+            }
+        }
+
+        getUnreadMessages()
+    }, [])
     useEffect(() => {
         if (channelId) return setChId(channelId as string);
     }, [channelId]);
