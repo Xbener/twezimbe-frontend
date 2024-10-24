@@ -591,14 +591,70 @@ function Page({ }: Props) {
                                             {
                                                 isEditing.state && isEditing.message._id === msg._id ? (
                                                     <div className="w-full flex flex-col items-start">
-                                                        <input
-                                                            ref={editingInputRef}
-                                                            disabled={sending}
-                                                            className="flex-grow bg-gray-700 p-2 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed w-full"
-                                                            value={isEditing.content}
-                                                            onChange={(e) => setIsEditing(prev => ({ ...prev, content: e.target.value }))}
-                                                            onKeyPress={handleEdit}
-                                                        />
+                                                        <div className="W-full flex flex-col border-gray-700 border focus-within:border-white rounded-md">
+                                                            <div className='flex gap-2 group-focus-within:border-b-white border-b border-b-gray-500 p-2'>
+                                                                <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                                                    <Bold className="size-5" />
+                                                                </span>
+                                                                <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                                                    <Italic className="size-5" />
+                                                                </span>
+                                                                <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                                                    <Strikethrough className="size-5" />
+                                                                </span>
+                                                                <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                                                    <Link2 className="size-5" />
+                                                                </span>
+                                                                <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                                                    <List className="size-5" />
+                                                                </span>
+                                                                <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                                                    <ListOrdered className="size-5" />
+                                                                </span>
+
+                                                            </div>
+                                                            <div className="">
+                                                                <input
+                                                                    ref={editingInputRef}
+                                                                    disabled={sending}
+                                                                    className="flex-grow bg-transparent p-2 rounded-md text-white placeholder-gray-400 focus:outline-none disabled:cursor-not-allowed w-full"
+                                                                    value={isEditing.content}
+                                                                    onChange={(e) => setIsEditing(prev => ({ ...prev, content: e.target.value }))}
+                                                                    onKeyPress={handleEdit}
+                                                                />
+                                                            </div>
+                                                            <div className="w-full flex p-2">
+                                                                <div className="">
+                                                                    <Popover>
+                                                                        <PopoverTrigger className="p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75">
+                                                                            <Plus className="size-5" />
+                                                                        </PopoverTrigger>
+                                                                        <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col ">
+                                                                            <input
+                                                                                type="file"
+                                                                                hidden
+                                                                                name="attachment"
+                                                                                id="attachment"
+                                                                                multiple
+                                                                                onChange={(e) => setAttachments(e.target.files as FileList)}
+                                                                            />
+                                                                        </PopoverContent>
+                                                                    </Popover>
+
+                                                                </div>
+                                                                <div ref={emojiContainerRef} className="absolute z-50 bottom-9 right-0">
+                                                                    <EmojiPicker open={showPicker} onEmojiClick={(emoji) => {
+                                                                        setIsEditing(prev => ({ ...prev, content: prev.content + emoji.emoji }))
+                                                                    }} />
+                                                                </div>
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                                                        <Smile onClick={() => setShowPicker(prev => !prev)} className="size-5" />
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
                                                         <Button onClick={() => setIsEditing({ state: false, content: "", message: {} })} className="underline text-[.7rem]">cancel</Button>
                                                     </div>
                                                 ) : (
