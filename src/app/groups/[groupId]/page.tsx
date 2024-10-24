@@ -1,4 +1,5 @@
 'use client'
+import MainLoader from '@/components/MainLoader'
 import { GroupContext } from '@/context/GroupContext'
 import { useParams } from 'next/navigation'
 import React, { useContext } from 'react'
@@ -10,9 +11,7 @@ function GroupId({ }: Props) {
     const { group } = useContext(GroupContext)
     return (
         <div className='w-[100%] flex items-center justify-center h-full'>
-            <h1 className='text-[3rem] text-center'>
-                Welcome to {group?.group_name} Group!
-            </h1>
+            <MainLoader />
         </div>
     )
 }

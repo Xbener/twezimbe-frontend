@@ -1,7 +1,7 @@
 'use client'
 import React, { useContext, useEffect, useState } from 'react'
 import Aside from './Aside'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { useGetGroup } from '@/api/group'
 import { GroupTypes, User } from '@/types'
 import { GroupContext } from '@/context/GroupContext'
@@ -25,13 +25,15 @@ function GroupIdLayout({ children }: Props) {
     const { group, setGroup, admins, moderators, members, isLoading } = useContext(GroupContext)
     const { setChannelList } = useMyContext()
     const { currentUser } = useGetProfileData()
+    const router = useRouter()
 
 
     useEffect(() => {
         const fetchGroup = async () => {
             const res = await getGroup(groupId as string)
-            if (res._id !== null) {
-                setGroup(res)
+            if (res.group !== null) {
+                setGroup(res.group)
+                router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups/${res.group?._id}/room/${res.default_channel}`)
             }
         }
 
@@ -40,7 +42,7 @@ function GroupIdLayout({ children }: Props) {
 
     useEffect(() => {
         const getChannelsList = async (userId: string) => {
-            const res = await getChannels({userId, groupId: groupId as string})
+            const res = await getChannels({ userId, groupId: groupId as string })
             if (!res.status) toast.error(res.errors || res.message)
             setChannelList(res.channels)
         }

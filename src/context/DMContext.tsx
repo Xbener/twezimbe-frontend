@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import Cookies from 'js-cookie'
 import { socket, useMyContext } from './MyContext'
+import { useRouter } from 'next/navigation'
 
 type Props = {
     children: React.ReactNode
@@ -29,6 +30,7 @@ function DMContextProvider({ children }: Props) {
     const [currentDM, setCurrentDM] = useState<ChatRoomTypes | null>(null)
     const { userDMs, setUserDMs } = useMyContext()
     const [allUsers, setAllUsers] = useState<User[]>([])
+    const router = useRouter()
 
 
     useEffect(() => {
@@ -67,6 +69,7 @@ function DMContextProvider({ children }: Props) {
                 const data = await res.json()
                 if (!data.status) return toast.error(data.errors || "something went wrong")
                 setUserDMs(data.chatrooms)
+                router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups/direct/${data.chatrooms[0]._id}`)
             } catch (error) {
                 toast.error('something went wrong')
                 console.log(error)

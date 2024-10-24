@@ -23,6 +23,7 @@ import data from '@emoji-mart/data'
 import EmojiPicker from 'emoji-picker-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import addNotification from 'react-push-notification'
+import ChatInput from '@/components/chatInput'
 
 
 type Props = {}
@@ -1119,7 +1120,17 @@ function Page({ }: Props) {
                     </div>
                 ) : null}
                 <div className="space-x-3 relative w-full ">
-
+                    
+                    {/* <ChatInput
+                    channel={channel as ChannelTypes}
+                    currentUser={currentUser}
+                    handleKeyPress={handleKeyPress}
+                    message={message}
+                    sending={sending}
+                    setAttachments={setAttachments}
+                    setIsTyping={setIsTyping}
+                    setMessage={setMessage}
+                    /> */}
                     <div className="W-full flex flex-col border-gray-700 border focus-within:border-white rounded-md">
                         <div className='flex gap-2 group-focus-within:border-b-white border-b border-b-gray-500 p-2'>
                             <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>

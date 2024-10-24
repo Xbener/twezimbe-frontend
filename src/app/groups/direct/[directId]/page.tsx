@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button'
 import { data } from '@/components/charts/Applications'
 import EmojiPicker from 'emoji-picker-react';
 import { socket, useMyContext } from '@/context/MyContext'
+import MainLoader from '@/components/MainLoader'
 
 type Props = {}
 
@@ -291,7 +292,7 @@ function Page({ }: Props) {
         }
     }
 
-        useEffect(() => {
+    useEffect(() => {
         setRoomId(currentDM?._id!)
     }, [currentDM])
 
@@ -467,6 +468,12 @@ function Page({ }: Props) {
     }
 
     let groupedMessages = groupMessagesByDate(messages)
+
+    if (!messages.length) return (
+        <div className="w-full h-full grid place-content-center ">
+            loading ...
+        </div>
+    )
 
     return (
         <div className='w-full h-screen flex flex-col bg-[#013a6fd3] text-white'>
@@ -850,7 +857,7 @@ function Page({ }: Props) {
                                 // onBlur={() => setIsTyping(prev => ({ message: "" }))}
                                 // onFocus={() => setIsTyping(prev => ({ ...prev, message: `${currentUser?.firstName} is typing ...` }))}
                                 className="flex-grow bg-transparent p-3 rounded-md text-white placeholder-gray-400 focus:outline-none disabled:cursor-not-allowed w-full"
-                                placeholder={`Message ${currentPatners[0]?.lastName!||'DM'}`}
+                                placeholder={`Message ${currentPatners[0]?.lastName! || 'DM'}`}
                                 value={message}
                                 onChange={(e) => {
                                     setMessage(e.target.value);

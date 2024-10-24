@@ -115,7 +115,7 @@ export const useGetGroup = () => {
             throw new Error(responseData.errors || responseData.message);
         }
 
-        return responseData.group
+        return { group: responseData.group, default_channel: responseData.default_channel }
     };
 
     const { mutateAsync: getGroup, isLoading, isError, isSuccess, error, reset } = useMutation(GroupRequest);

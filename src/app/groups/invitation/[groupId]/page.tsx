@@ -4,7 +4,7 @@ import { useGetProfileData } from '@/api/auth'
 import { useGetGroup, useJoinGroup } from '@/api/group'
 import { Button } from '@/components/ui/button'
 import { GroupTypes } from '@/types'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -17,12 +17,14 @@ function InvitationPage({ }: Props) {
     const [group, setGroup] = useState<GroupTypes | null>(null)
     const { currentUser } = useGetProfileData();
     const { joinGroup, isSuccess: joinSuccess, isLoading: joinLoading, isError: joinError } = useJoinGroup()
+    const router = useRouter()
     useEffect(() => {
         const fetchGroup = async () => {
             try {
                 const res = await getGroup(groupId as string)
-                if (res._id !== null) {
-                    setGroup(res)
+                if (res.group._id !== null) {
+                    setGroup(res.group)
+                    router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups/${res.group?._id}/room/${res.default_channel}`)
                 }
             } catch (error) {
                 toast.error("Error occurred. Please referesh the page.")
