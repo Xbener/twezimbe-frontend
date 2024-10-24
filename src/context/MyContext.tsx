@@ -1,5 +1,5 @@
 import { useGetProfileData } from "@/api/auth";
-import { ChannelTypes, ChatRoomTypes, FriendTypes, JoinedGroupTypes, Message, Reaction, User } from "@/types";
+import { ChannelTypes, ChatRoomTypes, FriendTypes, JoinedGroupTypes, Message, Reaction, UnreadMessage, User } from "@/types";
 import Cookies from 'js-cookie';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import io, { Socket } from 'socket.io-client';
@@ -41,6 +41,8 @@ type MyContextType = {
     setRoomId: (vl: string) => void;
     userDMs: ChatRoomTypes[]
     setUserDMs: (vl: ChatRoomTypes[]) => void
+    unreadMessages: UnreadMessage[]
+    setUnreadMessages: (vl: UnreadMessage[]) => void
 };
 
 const MyContext = createContext<MyContextType | undefined>(undefined);
@@ -63,7 +65,7 @@ export const MyProvider = ({ children }: Props) => {
     const [userChatRooms, setUserChatRooms] = useState([])
     const [userDMs, setUserDMs] = useState<ChatRoomTypes[]>([])
     const [roomId, setRoomId] = useState('')
-    const [unreadMessages, setUnreadMessages] = useState([])
+    const [unreadMessages, setUnreadMessages] = useState<UnreadMessage[]>([])
 
     useEffect(() => {
         if (document && unreadMessages.length > 0) {
@@ -76,7 +78,7 @@ export const MyProvider = ({ children }: Props) => {
             try {
                 const token = Cookies.get('access-token')
                 const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/unread`, {
-                    method: 'GET',
+                    method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
@@ -84,6 +86,7 @@ export const MyProvider = ({ children }: Props) => {
                     body: JSON.stringify({ userId: currentUser?._id })
                 })
                 const data = await res.json()
+                console.log('unread data', data)
                 if (!data.status) return console.log('error getting unread messages', data)
                 setUnreadMessages(data.unreadMessages);
             }
@@ -252,6 +255,8 @@ export const MyProvider = ({ children }: Props) => {
                 setRoomId,
                 userDMs,
                 setUserDMs,
+                unreadMessages,
+                setUnreadMessages
             }}
         >
             {children}

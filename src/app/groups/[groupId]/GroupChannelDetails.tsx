@@ -21,6 +21,7 @@ import { useAddChannel } from '@/api/channel'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { PopoverClose } from '@radix-ui/react-popover'
+import { ChannelTypes } from '@/types'
 
 type Props = {
 
@@ -30,7 +31,7 @@ type Props = {
 
 function ChannelDetails({ }: Props) {
     const { group, isMemberListOpen, setIsMemberListOpen, windowWidth, setIsSideBarOpen } = useContext(GroupContext)
-    const { channelList, setChannelList, members, setCurrentChannel, currentChannel, setChId, setRoomId } = useMyContext()
+    const { channelList, setChannelList, members, unreadMessages, setCurrentChannel, currentChannel, setChId, setRoomId } = useMyContext()
     const router = useRouter()
     const { currentUser } = useGetProfileData()
     const { addChannel, isError, isLoading, isSuccess } = useAddChannel()
@@ -123,6 +124,11 @@ function ChannelDetails({ }: Props) {
         }
         return item.privilege !== 'admin' || (currentUser?._id === group?.created_by[0]?._id);
     });
+
+    const countUnreadMessages = (channel: ChannelTypes) => {
+        const unreadCount = unreadMessages.map(msg => msg.chatroom?._id === channel?.chatroom?._id && !msg?.isRead!)
+        return unreadCount.length
+    }
     return (
         <>
 
@@ -141,7 +147,7 @@ function ChannelDetails({ }: Props) {
                     </div>
                     <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-40 gap-1 flex flex-col border-transparent border-l-8 border-l-neutral-400 pl-3 ">
                         {filteredMenuItems.map((item, index) => (
-                           <PopoverClose>
+                            <PopoverClose>
                                 <Link
                                     onClick={(e) => {
                                         if (item.onClick) {
@@ -160,7 +166,7 @@ function ChannelDetails({ }: Props) {
                                     {item.icon}
                                     {item.name}
                                 </Link>
-                           </PopoverClose>
+                            </PopoverClose>
                         ))}
                     </PopoverContent>
                 </PopoverTrigger>
@@ -224,10 +230,13 @@ function ChannelDetails({ }: Props) {
                                             // setChId(channel?._id)
 
                                         }}
-                                        className={`flex text-[.9rem] items-center gap-2 w-full hover:bg-neutral-50 hover:text-gray-700 duration-100 cursor-pointer p-2 rounded-md ${currentChannel?._id === channel?._id ? 'bg-white text-black hover:bg-[rgba(255,255,255,0.27)] hover:text-white' : ''}`}
+                                        className={`flex text-[.9rem] items-center gap-2 w-full hover:bg-neutral-50 hover:text-gray-700 duration-100 cursor-pointer p-2 rounded-md ${currentChannel?._id === channel?._id ? 'bg-white text-black hover:bg-[rgba(255,255,255,0.27)] hover:text-white' : ''} justify-between`}
                                     >
-                                        <span>{channel?.state === 'public' ? "#" : <Lock className='' />}</span>
-                                        {channel.name}
+                                        <span>{channel?.state === 'public' ? "#" : <Lock className='' />} {channel.name}</span>
+                                        
+                                        <span className='bg-blue-500 p-1 rounded-full text-white'>
+                                            {countUnreadMessages(channel) > 0 ? countUnreadMessages(channel) : null}
+                                        </span>
                                     </div>
                                 ))
                             }
@@ -249,10 +258,13 @@ function ChannelDetails({ }: Props) {
                                             // setChId(channel?._id)
                                         }
                                         }
-                                        className={`flex text-[.9rem] items-center gap-2 w-full hover:bg-neutral-50 hover:text-gray-700 duration-100 cursor-pointer p-2 rounded-md ${currentChannel?._id === channel?._id ? 'bg-white text-black hover:bg-[rgba(255,255,255,0.21)] hover:text-white' : ''}`}
+                                        className={`flex text-[.9rem] items-center gap-2 w-full hover:bg-neutral-50 hover:text-gray-700 duration-100 cursor-pointer p-2 rounded-md ${currentChannel?._id === channel?._id ? 'bg-white text-black hover:bg-[rgba(255,255,255,0.21)] hover:text-white' : ''} justify-between`}
                                     >
-                                        <span><Lock /></span>
-                                        {channel.name}
+                                        <span><Lock /> {channel.name}</span>
+                                        
+                                        <span className='bg-blue-500 p-1 rounded-full text-white'>
+                                            {countUnreadMessages(channel) > 0 ? countUnreadMessages(channel) : null}
+                                        </span>
                                     </div>
                                 ))
                             }

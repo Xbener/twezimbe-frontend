@@ -415,3 +415,13 @@ export interface Chatroom {
     members: string[];
     memberDetails: ChatroomMember[];
 }
+
+
+export interface UnreadMessage {
+    messageId?: string;
+    userId?: string;
+    isRead: boolean;
+    readAt: boolean;
+    message: Message;
+    chatroom: Chatroom;
+}
