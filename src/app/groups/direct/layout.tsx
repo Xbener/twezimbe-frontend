@@ -25,7 +25,7 @@ function DMLayout({ children }: Props) {
         <DMContextProvider>
             <div className='flex w-full text-neutral-200'>
                 <Aside />
-                <div className='md:w-[83%] sm:w-[65%] bg-[#013a6fae] flex flex-grow'>
+                <div className='md:w-[75%] sm:w-[65%] bg-[#013a6fae] flex flex-grow'>
                     <div className="w-[75%] flex-grow overflow-auto">
                         {children}
                     </div>

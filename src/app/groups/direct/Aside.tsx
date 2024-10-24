@@ -57,7 +57,7 @@ function Aside({ }) {
         if (currentUser) handleGetUserDms()
     }, [currentUser])
     return (
-        <div className={` bg-[#013a6fd8] h-full text-neutral-200 capitalize ${isMemberListOpen && windowWidth! <= 1025 ? 'w-full absolute top-0 left-0 h-full bg-blue-500 z-50' : 'relative hidden w-[35%] md:w-[20%]'} sm:block`}>
+        <div className={` bg-[#013a6fd8] h-full text-neutral-200 capitalize ${isMemberListOpen && windowWidth! <= 1025 ? 'w-full absolute top-0 left-0 h-full bg-blue-500 z-50' : 'relative hidden md:w-[27%] w-[40%]'} sm:block`}>
             <div className="flex items-center bg-[#013a6fae] sticky top-0 z-20 p-2 justify-between text-neutral-200 w-full">
                 {
                     isMemberListOpen && (
@@ -152,7 +152,7 @@ function Aside({ }) {
                                         className="profile-pic w-8 h-8 rounded-full mr-3"
                                     />
                                     <div className="dm-details flex flex-col justify-center">
-                                        <span className="user-name text-white font-medium">
+                                        <span className="user-name text-white font-medium md:text-[1rem] text-[0.9rem]">
                                             {`${chatPartner?.firstName} ${chatPartner?.lastName}`}
                                         </span>
                                         {/* <span className="last-message text-neutral-400 text-sm">
