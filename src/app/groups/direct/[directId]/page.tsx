@@ -14,6 +14,7 @@ import { data } from '@/components/charts/Applications'
 import EmojiPicker from 'emoji-picker-react';
 import { socket, useMyContext } from '@/context/MyContext'
 import MainLoader from '@/components/MainLoader'
+import { GroupContext } from '@/context/GroupContext'
 
 type Props = {}
 
@@ -25,6 +26,7 @@ function Page({ }: Props) {
     const currentUserId = Cookies.get('current-user-id') // Assuming you store the current user ID in cookies
     const { setRoomId, messages, setMessages } = useMyContext()
     const [sending, setSending] = useState(false)
+    const { setIsSideBarOpen } = useContext(GroupContext)
     const [attachments, setAttachments] = useState<File[] | any>(null)
     const [isReplying, setIsReplying] = useState({
         state: false,
@@ -378,7 +380,7 @@ function Page({ }: Props) {
 
     const sendBySendBtn = async (content: string) => {
         if (!currentDM) return;
-        if(message){
+        if (message) {
 
             try {
                 setSending(true);
@@ -542,7 +544,7 @@ function Page({ }: Props) {
                             }
                         </PopoverContent>
                     </Popover>
-                    <span className="md:hidden block">
+                    <span className="lg:hidden block" onClick={() => setIsSideBarOpen(true)}>
                         <SidebarOpen className="cursor-pointer" />
                     </span>
                 </div>

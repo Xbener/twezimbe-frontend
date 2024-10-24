@@ -197,7 +197,7 @@ function ChannelDetails({ }: Props) {
 
                 <div className="flex flex-col gap-4">
                     <div className='w-full p-2 flex flex-col gap-2'>
-                        <h1 className='text-[1.2rem]'>Public channels</h1>
+                        <h1 className='text-[1.2rem] sm:text-[1rem]'>Public channels</h1>
                         <div className='w-full flex flex-col'>
                             {
                                 channelList?.map((channel, index) => channel.state?.toLowerCase() === 'public' && (
@@ -210,8 +210,8 @@ function ChannelDetails({ }: Props) {
                                             // setChId(channel?._id)
 
                                         }}
-                                        className={`flex text-[.9rem] items-center gap-2 w-full hover:bg-neutral-50 hover:text-gray-700 duration-100 cursor-pointer p-2 rounded-md ${currentChannel?._id===channel?._id ? 'bg-white text-black hover:bg-[rgba(255,255,255,0.27)] hover:text-white' : ''}`}
-                                        >
+                                        className={`flex text-[.9rem] items-center gap-2 w-full hover:bg-neutral-50 hover:text-gray-700 duration-100 cursor-pointer p-2 rounded-md ${currentChannel?._id === channel?._id ? 'bg-white text-black hover:bg-[rgba(255,255,255,0.27)] hover:text-white' : ''}`}
+                                    >
                                         <span>{channel?.state === 'public' ? "#" : <Lock className='' />}</span>
                                         {channel.name}
                                     </div>
@@ -221,7 +221,7 @@ function ChannelDetails({ }: Props) {
                     </div>
 
                     <div className='w-full p-2 flex flex-col mb-80'>
-                        <h1 className='text-[1.2rem]'>Private channels</h1>
+                        <h1 className='text-[1.2rem] sm:text-[1rem]'>Private channels</h1>
                         <div className='w-full flex flex-col'>
 
                             {
@@ -235,8 +235,8 @@ function ChannelDetails({ }: Props) {
                                             // setChId(channel?._id)
                                         }
                                         }
-                                        className={`flex text-[.9rem] items-center gap-2 w-full hover:bg-neutral-50 hover:text-gray-700 duration-100 cursor-pointer p-2 rounded-md ${currentChannel?._id===channel?._id ? 'bg-white text-black hover:bg-[rgba(255,255,255,0.21)] hover:text-white' : ''}`}
-                                        >
+                                        className={`flex text-[.9rem] items-center gap-2 w-full hover:bg-neutral-50 hover:text-gray-700 duration-100 cursor-pointer p-2 rounded-md ${currentChannel?._id === channel?._id ? 'bg-white text-black hover:bg-[rgba(255,255,255,0.21)] hover:text-white' : ''}`}
+                                    >
                                         <span><Lock /></span>
                                         {channel.name}
                                     </div>

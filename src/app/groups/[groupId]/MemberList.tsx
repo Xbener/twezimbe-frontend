@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { GroupContext } from '@/context/GroupContext'
 import { iconTextGenerator } from '@/lib/iconTextGenerator'
 import { User } from '@/types'
-import { Search } from 'lucide-react'
+import { Search, X } from 'lucide-react'
 import React, { useContext, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import Cookies from 'js-cookie'
@@ -17,13 +17,20 @@ type Props = {
 
 function MemberList({ admins, moderators, members, isLoading }: Props) {
 
-    const { group, privateChannelMembers } = useContext(GroupContext)
+    const { group, privateChannelMembers, isSideBarOpen, setIsSideBarOpen } = useContext(GroupContext)
     const [q, setQ] = useState('')
 
     return (
-        <div className='w-[20%] bg-[#013a6fa6] overflow-auto hidden lg:block'>
+        <div className={`w-[20%] bg-[#013a6fa6] overflow-hidden ${isSideBarOpen ? 'block absolute w-full top-0 left-0 bg-blue-500 h-full' : 'hidden'} lg:block`}>
             {/* Search Bar */}
             <div className="flex items-center bg-[#013a6fae] sticky top-0 z-20 p-2 justify-between text-neutral-200 w-full">
+             {
+                isSideBarOpen && (
+                        <span className="p-2 cursor-pointer" onClick={() => setIsSideBarOpen(false)}>
+                            <X />
+                        </span>   
+                )
+             }
                 <input name="q" onChange={(e) => setQ(e.target.value)} className='bg-transparent outline-none w-full' placeholder='Search ...' />
                 <Search />
             </div>
@@ -41,7 +48,7 @@ function MemberList({ admins, moderators, members, isLoading }: Props) {
                             loading ...
                         </div>
 
-                    ) :  privateChannelMembers?.length > 0 ? (
+                    ) : privateChannelMembers?.length > 0 ? (
                         <div>
                             <h1 className='p-1 font-extrabold text-[0.9rem] mb-2 capitalize'>Channel members ({privateChannelMembers.length})</h1>
                             {

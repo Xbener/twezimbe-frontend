@@ -19,6 +19,8 @@ type GroupContextTypes = {
     isLoading: boolean
     privateChannelMembers: User[]
     setPrivateChannelMembers: (vl: User[]) => void
+    isSideBarOpen?: boolean
+    setIsSideBarOpen: (vl: boolean) => void | boolean
 }
 
 export const GroupContext = React.createContext<GroupContextTypes>({
@@ -29,7 +31,10 @@ export const GroupContext = React.createContext<GroupContextTypes>({
     members: [],
     isLoading: true,
     privateChannelMembers: [],
-    setPrivateChannelMembers: () => { }
+    setPrivateChannelMembers: () => { },
+    setIsSideBarOpen(vl) {
+
+    },
 })
 
 function GroupProvider({ children }: Props) {
@@ -38,6 +43,7 @@ function GroupProvider({ children }: Props) {
     const { admins, setAdmins, moderators, setModerators, members, setMembers, setCurrentChannel } = useMyContext()
     const [privateChannelMembers, setPrivateChannelMembers] = useState<User[]>([])
     const [isLoading, setIsLoading] = useState(false)
+    const [isSideBarOpen, setIsSideBarOpen] = useState(false)
 
 
     const handleGetMembers = async () => {
@@ -73,7 +79,20 @@ function GroupProvider({ children }: Props) {
     }, [group]);
 
     return (
-        <GroupContext.Provider value={{ group, setGroup, admins, moderators, members, isLoading, privateChannelMembers, setPrivateChannelMembers }}>
+        <GroupContext.Provider value={{
+            group,
+            setGroup,
+            admins,
+            moderators,
+            members,
+            isLoading,
+            privateChannelMembers,
+            setPrivateChannelMembers,
+            isSideBarOpen,
+            setIsSideBarOpen
+
+        }}>
+
             {children}
         </GroupContext.Provider>
     )

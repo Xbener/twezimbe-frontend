@@ -36,7 +36,7 @@ function Page({ }: Props) {
     const [isLoading, setLoading] = useState(true)
     const [sending, setSending] = useState(false)
     const { currentUser } = useGetProfileData()
-    const { group, setPrivateChannelMembers } = useContext(GroupContext)
+    const { group, setPrivateChannelMembers, setIsSideBarOpen } = useContext(GroupContext)
     const [channel, setChannel] = useState<ChannelTypes | null>(null)
     const [message, setMessage] = useState<string>("")
     const editingInputRef = useRef<HTMLInputElement | null>(null)
@@ -832,7 +832,7 @@ function Page({ }: Props) {
                         </DialogContent>
                     </Dialog>
 
-                    <span className="lg:hidden block">
+                    <span className="lg:hidden block" onClick={() => setIsSideBarOpen(true)}>
                         <SidebarOpen className="cursor-pointer" />
                     </span>
                 </div>

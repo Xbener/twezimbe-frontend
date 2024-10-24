@@ -8,11 +8,12 @@ import ChannelDetails from './GroupChannelDetails'
 
 
 function Aside({ }) {
-    const { group } = useContext(GroupContext)
+    const { group, isSideBarOpen } = useContext(GroupContext)
 
     console.log("group", group)
     return (
-        <div className='w-[35%] md:w-[20%] bg-[#013a6fd8] h-full text-neutral-200 capitalize relative hidden sm:block'>
+        <div className={`w-[35%] md:w-[20%] bg-[#013a6fd8] h-full text-neutral-200 capitalize relative hidden sm:block`}>
+            d
             <ChannelDetails />
         </div>
     )
