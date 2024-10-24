@@ -204,7 +204,7 @@ function GroupSettings({ }: Props) {
                         </div>
                         <div className='w-1/2 flex flex-col gap-2 items-end'>
                             <div className="w-full flex flex-col gap-2">
-                                <label className='uppercase font-extrabold text-[.8rem]' htmlFor="group_name">Group Name</label>
+                                <label className='font-extrabold text-[.8rem]' htmlFor="group_name">Group name</label>
                                 <input
                                     id="group_name"
                                     name="name"
@@ -213,7 +213,7 @@ function GroupSettings({ }: Props) {
                                     className="bg-transparent p-2 border outline-none w-full" placeholder="Group Name" />
                             </div>
                             <div className="w-full flex flex-col gap-2">
-                                <label className='uppercase font-extrabold text-[.8rem]' htmlFor="description">Group Description</label>
+                                <label className='font-extrabold text-[.8rem]' htmlFor="description">Group description</label>
                                 <textarea
                                     id="description"
                                     name="description"
@@ -223,7 +223,7 @@ function GroupSettings({ }: Props) {
                             </div>
 
                             <div className="w-full flex flex-col gap-2">
-                                <label className='uppercase font-extrabold text-[.8rem]' htmlFor="tags">Group Tags (separate by comma)</label>
+                                <label className='font-extrabold text-[.8rem]' htmlFor="tags">Group tags (separate by comma)</label>
                                 <textarea
                                     id="tags"
                                     name="tags"
@@ -234,7 +234,7 @@ function GroupSettings({ }: Props) {
 
                             <Select onValueChange={(e) => setGroupData(prev => ({ ...prev, group_type: e }))} defaultValue={groupData.group_type}>
                                 <SelectTrigger className="bg-transparent w-full text-white">
-                                    <SelectValue placeholder="Group Category" />
+                                    <SelectValue placeholder="Group category" />
                                 </SelectTrigger>
                                 <SelectContent className="bg-white">
                                     <SelectItem className="cursor-pointer" value="Social">Social</SelectItem>
@@ -262,7 +262,7 @@ function GroupSettings({ }: Props) {
                 )
             }
             <div className='p-3 border-b  w-full'>
-                <h1 className='p-2 text-[1.2rem] font-extrabold'>notification Settings</h1>
+                <h1 className='p-2 text-[1.2rem] font-extrabold'>Notification Settings</h1>
 
                 <div className='flex flex-col gap-3 w-full mt-5'>
 

@@ -180,7 +180,7 @@ function Groups({ }: Props) {
 
       <div className='h-full overflow-auto flex flex-col'>
         <div className='flex flex-col bg-[#202234] p-5 text-neutral-200'>
-          <h1 className="sm:text-[4rem] text-[1rem] font-bold">Find your community</h1>
+          <h1 className="sm:text-[4rem] text-[1rem] font-bold">Join a community. Network.</h1>
           <p>Join or Form a Social, Educational, Professional or any group and connect</p>
         </div>
 
