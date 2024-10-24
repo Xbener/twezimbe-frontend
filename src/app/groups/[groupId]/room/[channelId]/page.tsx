@@ -6,7 +6,7 @@ import { ChannelTypes, Message, Reaction, User } from '@/types'
 import { useParams } from 'next/navigation'
 import React, { MouseEventHandler, useContext, useEffect, useRef, useState } from 'react'
 import Cookies from 'js-cookie'
-import { Lock, Bell, Pin, Smile, Image as Sticker, Plus, StickerIcon, DeleteIcon, Reply, Edit, ReplyAllIcon, XIcon, Settings, MessageCircleWarning, Delete, File, FileIcon, SmileIcon, Bold, Italic, Strikethrough, Link2, List, ListOrdered, AtSign, SidebarOpen, SendHorizonal } from 'lucide-react'
+import { Lock, Bell, Pin, Smile, Image as Sticker, Plus, StickerIcon, DeleteIcon, Reply, Edit, ReplyAllIcon, XIcon, Settings, MessageCircleWarning, Delete, File, FileIcon, SmileIcon, Bold, Italic, Strikethrough, Link2, List, ListOrdered, AtSign, SidebarOpen, SendHorizonal, ArrowLeft } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import moment from 'moment'
@@ -36,7 +36,7 @@ function Page({ }: Props) {
     const [isLoading, setLoading] = useState(true)
     const [sending, setSending] = useState(false)
     const { currentUser } = useGetProfileData()
-    const { group, setPrivateChannelMembers, setIsSideBarOpen } = useContext(GroupContext)
+    const { group, setPrivateChannelMembers, setIsSideBarOpen, setIsMemberListOpen } = useContext(GroupContext)
     const [channel, setChannel] = useState<ChannelTypes | null>(null)
     const [message, setMessage] = useState<string>("")
     const editingInputRef = useRef<HTMLInputElement | null>(null)
@@ -612,6 +612,9 @@ function Page({ }: Props) {
             {/* Header */}
             <div className="flex justify-between p-4 bg-[#013a6fae] border-b border-gray-700">
                 <div className='flex items-center gap-2 capitalize text-[1.2rem] text-xl'>
+                    <span className="lg:hidden block" onClick={() => setIsMemberListOpen(true)}>
+                        <ArrowLeft className="cursor-pointer" />
+                    </span>
                     <span>{channel?.state === 'public' ? '#' : <Lock />}</span>
                     <h1 className="text-base md:text-xl">{channel?.name}</h1>
                 </div>

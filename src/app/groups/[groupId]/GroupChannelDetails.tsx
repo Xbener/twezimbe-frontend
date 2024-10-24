@@ -6,7 +6,7 @@ import { GroupContext } from '@/context/GroupContext'
 import { iconTextGenerator } from '@/lib/iconTextGenerator'
 import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar'
 import { CaretDownIcon } from '@radix-ui/react-icons'
-import { Bell, Edit, Lock, LogOut, MessageCirclePlus, PlusIcon, Settings, Upload } from 'lucide-react'
+import { Bell, Edit, Lock, LogOut, MessageCirclePlus, PlusIcon, Settings, Upload, X } from 'lucide-react'
 import Link from 'next/link'
 import { userInfo } from 'os'
 import React, { useContext, useState } from 'react'
@@ -28,7 +28,7 @@ type Props = {
 
 
 function ChannelDetails({ }: Props) {
-    const { group } = useContext(GroupContext)
+    const { group, isMemberListOpen, setIsMemberListOpen } = useContext(GroupContext)
     const { channelList, setChannelList, members, setCurrentChannel, currentChannel, setChId, setRoomId } = useMyContext()
     const router = useRouter()
     const { currentUser } = useGetProfileData()
@@ -128,6 +128,13 @@ function ChannelDetails({ }: Props) {
             <Popover>
                 <PopoverTrigger className="w-full">
                     <div className='w-full shadow-md text-[1.2rem] cursor-pointer font-extrabold  p-2 flex items-center justify-between'>
+                        {
+                            isMemberListOpen && (
+                                <span className="p-2 cursor-pointer" onClick={() => setIsMemberListOpen(false)}>
+                                    <X />
+                                </span>
+                            )
+                        }
                         {group?.group_name}
                         <CaretDownIcon className='w-[20px] ' />
                     </div>

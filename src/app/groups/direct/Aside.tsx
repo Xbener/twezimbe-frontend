@@ -4,7 +4,7 @@ import { DMContext } from '@/context/DMContext'
 import { GroupContext } from '@/context/GroupContext'
 import { GroupTypes } from '@/types'
 import { CaretDownIcon } from '@radix-ui/react-icons'
-import { PlusIcon, Search } from 'lucide-react'
+import { PlusIcon, Search, X } from 'lucide-react'
 import React, { useContext, useState, useEffect } from 'react'
 import { iconTextGenerator } from '@/lib/iconTextGenerator';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -23,7 +23,7 @@ import handlecreateDirectMessage from '@/lib/createDM'
 
 
 function Aside({ }) {
-    const { group } = useContext(GroupContext)
+    const { group, isMemberListOpen, windowWidth, setIsMemberListOpen } = useContext(GroupContext)
     const [q, setQ] = useState('')
     const { allUsers, currentUser, setCurrentDM, currentDM } = useContext(DMContext)
     const { onlineUsers, setUserDMs, userDMs, setMessages } = useMyContext()
@@ -57,8 +57,15 @@ function Aside({ }) {
         if (currentUser) handleGetUserDms()
     }, [currentUser])
     return (
-        <div className='w-[35%] md:w-[20%] bg-[#013a6fd8] h-full text-neutral-200 capitalize relative hidden sm:block'>
+        <div className={` bg-[#013a6fd8] h-full text-neutral-200 capitalize ${isMemberListOpen && windowWidth! <= 1025 ? 'w-full absolute top-0 left-0 h-full bg-blue-500 z-50' : 'relative hidden w-[35%] md:w-[20%]'} sm:block`}>
             <div className="flex items-center bg-[#013a6fae] sticky top-0 z-20 p-2 justify-between text-neutral-200 w-full">
+                {
+                    isMemberListOpen && (
+                        <span className="p-2 cursor-pointer" onClick={() => setIsMemberListOpen(false)}>
+                            <X />
+                        </span>
+                    )
+                }
                 <input name="q" onChange={(e) => setQ(e.target.value)} className='bg-transparent outline-none w-full' placeholder='Find a conversation ...' />
                 <Search />
             </div>
@@ -131,11 +138,11 @@ function Aside({ }) {
                             return (
                                 <div
                                     onClick={() => {
-                                       if(currentDM?._id!==dm?._id){
-                                           setMessages([])
-                                           setCurrentDM(dm)
-                                           router.push(`/groups/direct/${dm?._id}`)
-                                       }
+                                        if (currentDM?._id !== dm?._id) {
+                                            setMessages([])
+                                            setCurrentDM(dm)
+                                            router.push(`/groups/direct/${dm?._id}`)
+                                        }
                                     }}
                                     key={index}
                                     className={`dm-item flex items-center rounded-md p-2 hover:bg-[rgba(62,175,255,0.31)] cursor-pointer ${currentDM?._id === dm?._id && 'bg-[rgba(62,175,255,0.31)]'}`}>

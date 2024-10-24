@@ -20,7 +20,10 @@ type GroupContextTypes = {
     privateChannelMembers: User[]
     setPrivateChannelMembers: (vl: User[]) => void
     isSideBarOpen?: boolean
+    isMemberListOpen?: boolean
     setIsSideBarOpen: (vl: boolean) => void | boolean
+    setIsMemberListOpen: (vl: boolean) => void | boolean
+    windowWidth?: number
 }
 
 export const GroupContext = React.createContext<GroupContextTypes>({
@@ -32,7 +35,8 @@ export const GroupContext = React.createContext<GroupContextTypes>({
     isLoading: true,
     privateChannelMembers: [],
     setPrivateChannelMembers: () => { },
-    setIsSideBarOpen(vl) {
+    setIsSideBarOpen(vl) { },
+    setIsMemberListOpen(vl) {
 
     },
 })
@@ -43,8 +47,23 @@ function GroupProvider({ children }: Props) {
     const { admins, setAdmins, moderators, setModerators, members, setMembers, setCurrentChannel } = useMyContext()
     const [privateChannelMembers, setPrivateChannelMembers] = useState<User[]>([])
     const [isLoading, setIsLoading] = useState(false)
+    const [windowWidth, setWindowWidth] = useState<Window['innerWidth']>(0)
     const [isSideBarOpen, setIsSideBarOpen] = useState(false)
+    const [isMemberListOpen, setIsMemberListOpen] = useState(false)
 
+    useEffect(() => {
+
+        const handleWindowChange = () => {
+            setWindowWidth(window.innerWidth)
+        }
+        window.addEventListener('resize', handleWindowChange)
+
+        return () => window.removeEventListener('resize', handleWindowChange)
+    }, [])
+
+    useEffect(() => {
+        console.log(windowWidth)
+    }, [windowWidth])
 
     const handleGetMembers = async () => {
         const token = Cookies.get('access-token')
@@ -89,7 +108,10 @@ function GroupProvider({ children }: Props) {
             privateChannelMembers,
             setPrivateChannelMembers,
             isSideBarOpen,
-            setIsSideBarOpen
+            setIsSideBarOpen,
+            windowWidth,
+            isMemberListOpen,
+            setIsMemberListOpen
 
         }}>
 

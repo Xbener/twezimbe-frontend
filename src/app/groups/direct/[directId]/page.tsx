@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import Cookies from 'js-cookie'
 import { DMContext } from '@/context/DMContext'
 import { ChatRoomTypes, Message, Reaction, User } from '@/types' // Assuming you have these types
-import { AtSign, Bell, Bold, DeleteIcon, Edit, File, Italic, Link2, List, ListOrdered, Pin, Plus, Reply, ReplyAllIcon, SendHorizonal, SidebarClose, SidebarOpen, Smile, SmileIcon, Strikethrough, XIcon } from 'lucide-react'
+import { ArrowLeft, AtSign, Bell, Bold, DeleteIcon, Edit, File, Italic, Link2, List, ListOrdered, Pin, Plus, Reply, ReplyAllIcon, SendHorizonal, SidebarClose, SidebarOpen, Smile, SmileIcon, Strikethrough, XIcon } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import moment from 'moment'
@@ -26,7 +26,7 @@ function Page({ }: Props) {
     const currentUserId = Cookies.get('current-user-id') // Assuming you store the current user ID in cookies
     const { setRoomId, messages, setMessages } = useMyContext()
     const [sending, setSending] = useState(false)
-    const { setIsSideBarOpen } = useContext(GroupContext)
+    const { setIsSideBarOpen, setIsMemberListOpen } = useContext(GroupContext)
     const [attachments, setAttachments] = useState<File[] | any>(null)
     const [isReplying, setIsReplying] = useState({
         state: false,
@@ -483,6 +483,9 @@ function Page({ }: Props) {
         <div className='w-full h-screen flex flex-col bg-[#013a6fd3] text-white'>
             <div className="flex justify-between p-4 bg-[#013a6fae] border-b border-gray-700 w-full">
                 <div className='flex items-center gap-2 capitalize text-[1.2rem] text-xl'>
+                    <span className="lg:hidden block" onClick={() => setIsMemberListOpen(true)}>
+                        <ArrowLeft className="cursor-pointer" />
+                    </span>
                     {/* If there's only one partner, display their avatar and name */}
                     {currentPatners.length === 1 ? (
                         <div className="flex items-center gap-2">

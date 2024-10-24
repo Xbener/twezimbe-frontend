@@ -12,17 +12,17 @@ type Props = {}
 
 function DMProfile({ }: Props) {
     const { currentUser } = useContext(DMContext)
-    const { setIsSideBarOpen, isSideBarOpen } = useContext(GroupContext)
+    const { setIsSideBarOpen, isSideBarOpen, windowWidth } = useContext(GroupContext)
     return (
-        <div className={`w-[25%] ${isSideBarOpen ? 'block w-full absolute top-0 left-0 h-full bg-blue-500' : 'hidden '} lg:block bg-[#013a6fa6] overflow-auto p-2`}>
-           {
-            isSideBarOpen && (
-                 <span className="p-2 cursor-pointer" onClick={() => setIsSideBarOpen(false)}>
-                <X />
-            </span>   
-            )
-           }
-            <div className="flex flex-col p-3 items-center text-center gap-4">
+        <div className={`w-[25%] ${isSideBarOpen && windowWidth! <= 1025 ? 'block w-full absolute top-0 left-0 h-full bg-blue-500' : 'hidden '} lg:block bg-[#013a6fa6] overflow-auto p-2 z-50`}>
+            {
+                isSideBarOpen && (
+                    <span className="p-2 cursor-pointer" onClick={() => setIsSideBarOpen(false)}>
+                        <X />
+                    </span>
+                )
+            }
+            <div className="flex flex-col p-3 items-center text-center gap-4 ">
                 <Avatar className="w-[100px] h-[100px]">
                     <AvatarImage src={currentUser?.profile_pic} className="bg-black rounded-full" />
                     <AvatarFallback>{iconTextGenerator(currentUser?.firstName as string, currentUser?.lastName as string)}</AvatarFallback>

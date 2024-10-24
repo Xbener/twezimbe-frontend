@@ -17,20 +17,20 @@ type Props = {
 
 function MemberList({ admins, moderators, members, isLoading }: Props) {
 
-    const { group, privateChannelMembers, isSideBarOpen, setIsSideBarOpen } = useContext(GroupContext)
+    const { group, privateChannelMembers, isSideBarOpen, setIsSideBarOpen, windowWidth } = useContext(GroupContext)
     const [q, setQ] = useState('')
 
     return (
-        <div className={`w-[20%] bg-[#013a6fa6] overflow-hidden ${isSideBarOpen ? 'block absolute w-full top-0 left-0 bg-blue-500 h-full' : 'hidden'} lg:block`}>
+        <div className={`w-[20%] bg-[#013a6fa6] overflow-hidden ${isSideBarOpen && windowWidth! <= 1025 ? 'block absolute w-full top-0 left-0 bg-blue-500 h-full' : 'hidden'} lg:block`}>
             {/* Search Bar */}
             <div className="flex items-center bg-[#013a6fae] sticky top-0 z-20 p-2 justify-between text-neutral-200 w-full">
-             {
-                isSideBarOpen && (
+                {
+                    isSideBarOpen && (
                         <span className="p-2 cursor-pointer" onClick={() => setIsSideBarOpen(false)}>
                             <X />
-                        </span>   
-                )
-             }
+                        </span>
+                    )
+                }
                 <input name="q" onChange={(e) => setQ(e.target.value)} className='bg-transparent outline-none w-full' placeholder='Search ...' />
                 <Search />
             </div>
