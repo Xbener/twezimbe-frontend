@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import Cookies from 'js-cookie'
 import { DMContext } from '@/context/DMContext'
 import { ChatRoomTypes, Message, Reaction, User } from '@/types' // Assuming you have these types
-import { AtSign, Bell, Bold, DeleteIcon, Edit, File, Italic, Link2, List, ListOrdered, Pin, Plus, Reply, ReplyAllIcon, SidebarClose, SidebarOpen, Smile, SmileIcon, Strikethrough, XIcon } from 'lucide-react'
+import { AtSign, Bell, Bold, DeleteIcon, Edit, File, Italic, Link2, List, ListOrdered, Pin, Plus, Reply, ReplyAllIcon, SendHorizonal, SidebarClose, SidebarOpen, Smile, SmileIcon, Strikethrough, XIcon } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import moment from 'moment'
@@ -871,43 +871,48 @@ function Page({ }: Props) {
                             />
                         </div>
                         <div className="w-full flex p-2">
-                            <div className="">
-                                <Popover>
-                                    <PopoverTrigger className="p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75">
-                                        <Plus className="size-5" />
-                                    </PopoverTrigger>
-                                    <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col ">
-                                        <input
-                                            type="file"
-                                            hidden
-                                            name="attachment"
-                                            id="attachment"
-                                            multiple
-                                            onChange={(e) => setAttachments(e.target.files as FileList)}
-                                        />
-                                        <Button className="flex items-center gap-2 hover:bg-[rgb(0,0,0,.5)]">
-                                            <label className="flex items-center gap-2" htmlFor="attachment">
-                                                <File />
-                                                Upload a file
-                                            </label>
-                                        </Button>
+                            <div className="flex w-full items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <Popover>
+                                        <PopoverTrigger className="p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75">
+                                            <Plus className="size-5" />
+                                        </PopoverTrigger>
+                                        <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col ">
+                                            <input
+                                                type="file"
+                                                hidden
+                                                name="attachment"
+                                                id="attachment"
+                                                multiple
+                                                onChange={(e) => setAttachments(e.target.files as FileList)}
+                                            />
+                                            <Button className="flex items-center gap-2 hover:bg-[rgb(0,0,0,.5)]">
+                                                <label className="flex items-center gap-2" htmlFor="attachment">
+                                                    <File />
+                                                    Upload a file
+                                                </label>
+                                            </Button>
 
-                                    </PopoverContent>
-                                </Popover>
+                                        </PopoverContent>
+                                    </Popover>
+                                    <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                        <Smile onClick={() => setShowPicker(prev => !prev)} className="size-5" />
+                                    </span>
+                                    <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                        <AtSign onClick={() => setShowPicker(prev => !prev)} className="size-5" />
+                                    </span>
+                                </div>
 
+                                <Button
+                                    onClick={() => sendBySendBtn(message)}
+                                >
+                                    <SendHorizonal />
+                                </Button>
                             </div>
                             <div ref={emojiContainerRef} className="absolute z-50 bottom-9 right-0">
                                 <EmojiPicker open={showPicker} onEmojiClick={(emoji) => {
                                     setMessage(prev => prev + emoji.emoji)
                                 }} />
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                    <Smile onClick={() => setShowPicker(prev => !prev)} className="size-5" />
-                                </span>
-                                <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                    <AtSign onClick={() => setShowPicker(prev => !prev)} className="size-5" />
-                                </span>
                             </div>
                         </div>
                     </div>

@@ -6,7 +6,7 @@ import { ChannelTypes, Message, Reaction, User } from '@/types'
 import { useParams } from 'next/navigation'
 import React, { MouseEventHandler, useContext, useEffect, useRef, useState } from 'react'
 import Cookies from 'js-cookie'
-import { Lock, Bell, Pin, Smile, Image as Sticker, Plus, StickerIcon, DeleteIcon, Reply, Edit, ReplyAllIcon, XIcon, Settings, MessageCircleWarning, Delete, File, FileIcon, SmileIcon, Bold, Italic, Strikethrough, Link2, List, ListOrdered, AtSign, SidebarOpen } from 'lucide-react'
+import { Lock, Bell, Pin, Smile, Image as Sticker, Plus, StickerIcon, DeleteIcon, Reply, Edit, ReplyAllIcon, XIcon, Settings, MessageCircleWarning, Delete, File, FileIcon, SmileIcon, Bold, Italic, Strikethrough, Link2, List, ListOrdered, AtSign, SidebarOpen, SendHorizonal } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import moment from 'moment'
@@ -831,10 +831,10 @@ function Page({ }: Props) {
                             </div>
                         </DialogContent>
                     </Dialog>
-                    
-                <span className="lg:hidden block">
-                    <SidebarOpen className="cursor-pointer" />
-                </span>
+
+                    <span className="lg:hidden block">
+                        <SidebarOpen className="cursor-pointer" />
+                    </span>
                 </div>
             </div>
 
@@ -947,7 +947,7 @@ function Page({ }: Props) {
                                                                 </div>
                                                                 <div ref={emojiContainerRef} className="absolute z-50 bottom-9 right-0">
                                                                     <EmojiPicker open={showPicker} onEmojiClick={(emoji) => {
-                                                                        setIsEditing(prev => ({ ...prev, content: prev.content+emoji.emoji }))
+                                                                        setIsEditing(prev => ({ ...prev, content: prev.content + emoji.emoji }))
                                                                     }} />
                                                                 </div>
                                                                 <div className="flex items-center gap-2">
@@ -957,7 +957,7 @@ function Page({ }: Props) {
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        
+
                                                         <Button onClick={() => setIsEditing({ state: false, content: "", message: {} })} className="underline text-[.7rem]">cancel</Button>
                                                     </div>
                                                 ) : (
@@ -1124,7 +1124,7 @@ function Page({ }: Props) {
                     </div>
                 ) : null}
                 <div className="space-x-3 relative w-full ">
-                    
+
                     {/* <ChatInput
                     channel={channel as ChannelTypes}
                     currentUser={currentUser}
@@ -1174,43 +1174,48 @@ function Page({ }: Props) {
                             />
                         </div>
                         <div className="w-full flex p-2">
-                            <div className="">
-                                <Popover>
-                                    <PopoverTrigger className="p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75">
+                            <div className="flex w-full items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <Popover>
+                                        <PopoverTrigger className="p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75">
                                             <Plus className="size-5" />
-                                    </PopoverTrigger>
-                                    <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col ">
-                                        <input
-                                            type="file"
-                                            hidden
-                                            name="attachment"
-                                            id="attachment"
-                                            multiple
-                                            onChange={(e) => setAttachments(e.target.files as FileList)}
-                                        />
-                                        <Button className="flex items-center gap-2 hover:bg-[rgb(0,0,0,.5)]">
-                                            <label className="flex items-center gap-2" htmlFor="attachment">
-                                                <File />
-                                                Upload a file
-                                            </label>
-                                        </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col ">
+                                            <input
+                                                type="file"
+                                                hidden
+                                                name="attachment"
+                                                id="attachment"
+                                                multiple
+                                                onChange={(e) => setAttachments(e.target.files as FileList)}
+                                            />
+                                            <Button className="flex items-center gap-2 hover:bg-[rgb(0,0,0,.5)]">
+                                                <label className="flex items-center gap-2" htmlFor="attachment">
+                                                    <File />
+                                                    Upload a file
+                                                </label>
+                                            </Button>
 
-                                    </PopoverContent>
-                                </Popover>
+                                        </PopoverContent>
+                                    </Popover>
+                                    <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                        <Smile onClick={() => setShowPicker(prev => !prev)} className="size-5" />
+                                    </span>
+                                    <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                        <AtSign onClick={() => setShowPicker(prev => !prev)} className="size-5" />
+                                    </span>
+                                </div>
 
+                                <Button
+                                    onClick={() => sendBySendBtn(message)}
+                                >
+                                    <SendHorizonal />
+                                </Button>
                             </div>
                             <div ref={emojiContainerRef} className="absolute z-50 bottom-9 right-0">
                                 <EmojiPicker open={showPicker} onEmojiClick={(emoji) => {
                                     setMessage(prev => prev + emoji.emoji)
                                 }} />
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                    <Smile onClick={() => setShowPicker(prev => !prev)} className="size-5" />
-                                </span>  
-                                 <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                    <AtSign onClick={() => setShowPicker(prev => !prev)} className="size-5" />
-                                </span>
                             </div>
                         </div>
                     </div>
