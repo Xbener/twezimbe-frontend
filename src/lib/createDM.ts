@@ -21,7 +21,6 @@ const handlecreateDirectMessage = async (user: User, currentUser: User, router: 
 
         const data = await res.json()
         if (!data.status) return toast.error(data.errors || data.messaga || "failed")
-        setRoomId(data.chatroom?._id)
         newSocket?.emit('dm', { dm: data.chatroom })
         router.push(`/groups/direct/${data.chatroom?._id}`)
     } catch (error) {

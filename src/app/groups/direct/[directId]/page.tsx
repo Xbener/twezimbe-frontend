@@ -19,12 +19,12 @@ import { GroupContext } from '@/context/GroupContext'
 type Props = {}
 
 function Page({ }: Props) {
-    const { directId } = useParams()
+    const params = useParams()
     const [message, setMessage] = useState<string>("")
     const { setCurrentDM, currentUser, currentDM } = useContext(DMContext)
     const [currentPatners, setCurrentPatners] = useState<User[]>([])
     const currentUserId = Cookies.get('current-user-id') // Assuming you store the current user ID in cookies
-    const { setRoomId, messages, setMessages, unreadMessages, roomId } = useMyContext()
+    const { setRoomId, messages, setMessages, unreadMessages, roomId, roomIdRef } = useMyContext()
     const [sending, setSending] = useState(false)
     const { setIsSideBarOpen, setIsMemberListOpen } = useContext(GroupContext)
     const [attachments, setAttachments] = useState<File[] | any>(null)
@@ -76,7 +76,12 @@ function Page({ }: Props) {
         }
 
     };
-
+    useEffect(() => {
+        if (params?.directId) {
+            setRoomId(params.directId as string)
+            roomIdRef.current = params.directId as string;
+        }
+    }, [params?.directId])
 
     useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside);
@@ -247,7 +252,6 @@ function Page({ }: Props) {
             })
             const data = await response.json()
             setMessages(data.messages)
-            setRoomId(currentDM?._id!)
         } catch (error) {
             console.error('Error fetching data', error)
         }
@@ -260,9 +264,6 @@ function Page({ }: Props) {
         }
     }, [currentDM])
 
-    useEffect(() => {
-        setRoomId(currentDM?._id!)
-    }, [currentDM])
 
     const handleStartEdit = (message: Message, content: string) => {
         if (editingInputRef.current) editingInputRef.current.focus()
@@ -272,11 +273,11 @@ function Page({ }: Props) {
 
     const getChatRoomData = async () => {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/chatrooms/${directId}`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/chatrooms/${roomId}`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${Cookies.get('access-token')}`,
-                    'Content-Type':'application/json'
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ userId: currentUser?._id })
             })
@@ -288,7 +289,6 @@ function Page({ }: Props) {
 
             // Set the current DM in context
             setCurrentDM(data.chatroom)
-            setRoomId(data.chatroom?._id)
             console.log('patners', data.chatroom.memberDetails, 'currentUser', currentUser)
             const partners = data.chatroom.memberDetails.filter((member: User) => member._id !== currentUser?._id)
             setCurrentPatners(partners)
@@ -319,10 +319,10 @@ function Page({ }: Props) {
     }, [currentDM, roomId])
 
     useEffect(() => {
-        if (currentUser) {
+        if (roomId) {
             getChatRoomData()
         }
-    }, [directId, currentUser])
+    }, [roomId])
 
     const handlePin = async (msg: Message) => {
         try {
@@ -401,7 +401,6 @@ function Page({ }: Props) {
                 setMessages((prev) => [...prev, { ...data.message, createdAt: new Date(), sender: currentUser, status: "sending" }]);
                 socket.emit('new-message', { sender: currentUser, chatroomId: currentDM?._id, sentTo: currentDM?._id, receiver: currentDM?.members, message: { ...data.message, sender: currentUser } });
                 setMessage('');
-                setRoomId(currentDM?._id!)
                 scrollToBottom();
                 setIsReplying({ state: false, message: {}, replyingTo: "" });
             } catch (error) {
@@ -440,7 +439,6 @@ function Page({ }: Props) {
                 setMessages((prev) => [...prev, { ...data.message, createdAt: new Date(), sender: currentUser, replyingTo: isReplying.state ? isReplying.message : null }]);
                 socket.emit('new-message', { sender: currentUser, chatroomId: currentDM?._id, sentTo: currentDM?._id, receiver: currentDM?.members, message: { ...data.message, sender: currentUser, replyingTo: isReplying.state ? isReplying.message : null } });
                 setMessage('');
-                setRoomId(currentDM?._id!)
                 scrollToBottom();
                 setIsReplying({ state: false, message: {}, replyingTo: "" });
             } catch (error) {
@@ -585,16 +583,16 @@ function Page({ }: Props) {
                                 const showAvatarAndName = index === 0 || msgs[index - 1]?.sender?._id !== msg?.sender?._id;
                                 const isUnreadMessage = msg._id === firstUnreadMessageId;
                                 return (
-                                    <React.Fragment  key={msg._id}>
-                                    { isUnreadMessage && (
-                                        <div className="w-full my-2 flex items-center">
-                                            <hr className="flex-grow border-t border-red-500" />
-                                            <span className="mx-2 text-red-500 text-xs">Unread Messages</span>
-                                            <hr className="flex-grow border-t border-red-500" />
-                                        </div>
-                                    )}
+                                    <React.Fragment key={msg._id}>
+                                        {isUnreadMessage && (
+                                            <div className="w-full my-2 flex items-center">
+                                                <hr className="flex-grow border-t border-red-500" />
+                                                <span className="mx-2 text-red-500 text-xs">Unread Messages</span>
+                                                <hr className="flex-grow border-t border-red-500" />
+                                            </div>
+                                        )}
                                         <div
-                                           
+
                                             onContextMenu={(e) => handleContextMenu(e, msg)} // Pass the message to the context menu handler
                                             className={`flex gap-4 hover:bg-[#cbcbcb2e] cursor-pointer rounded-md items-start mb-1 justify-normal ${index === msgs.length && "mb-5"} ${msg.pinned ? "bg-[rgba(255,193,59,0.42)]" : ' '} group`} // Reduced margin between consecutive messages
                                         >

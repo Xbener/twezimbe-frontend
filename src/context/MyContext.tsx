@@ -1,7 +1,7 @@
 import { useGetProfileData } from "@/api/auth";
 import { ChannelTypes, ChatRoomTypes, FriendTypes, JoinedGroupTypes, Message, Reaction, UnreadMessage, User } from "@/types";
 import Cookies from 'js-cookie';
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, Ref, useContext, useEffect, useRef, useState } from 'react';
 import io, { Socket } from 'socket.io-client';
 import addNotification from 'react-push-notification';
 import { useParams } from "next/navigation";
@@ -43,6 +43,7 @@ type MyContextType = {
     setUserDMs: (vl: ChatRoomTypes[]) => void
     unreadMessages: UnreadMessage[]
     setUnreadMessages: (vl: UnreadMessage[]) => void
+    roomIdRef: React.MutableRefObject<string>
 };
 
 const MyContext = createContext<MyContextType | undefined>(undefined);
@@ -65,6 +66,7 @@ export const MyProvider = ({ children }: Props) => {
     const [userChatRooms, setUserChatRooms] = useState([])
     const [userDMs, setUserDMs] = useState<ChatRoomTypes[]>([])
     const [roomId, setRoomId] = useState('')
+    const roomIdRef = useRef(roomId);
     const [unreadMessages, setUnreadMessages] = useState<UnreadMessage[]>([])
 
     useEffect(() => {
@@ -72,6 +74,14 @@ export const MyProvider = ({ children }: Props) => {
             document.title = `${unreadMessages.filter(msg => !msg?.isRead!).length} unread messages `
         }
     }, [unreadMessages])
+
+    useEffect(() => {
+        console.log("roomId", roomId)
+    }, [roomId])
+
+    useEffect(() => {
+        roomIdRef.current = roomId; // Keep ref updated
+    }, [roomId]);
 
     useEffect(() => {
         const getUnreadMessages = async () => {
@@ -96,9 +106,7 @@ export const MyProvider = ({ children }: Props) => {
 
         getUnreadMessages()
     }, [])
-    useEffect(() => {
-        if (channelId) return setChId(channelId as string);
-    }, [channelId]);
+
 
     useEffect(() => {
         if (currentUser?._id) {
@@ -154,8 +162,10 @@ export const MyProvider = ({ children }: Props) => {
                 });
             });
             const handleNewMessage = (vl: { message: Message, chatroomId: string, sentTo: string }) => {
-                console.log(roomId, vl.sentTo)
-                if (vl.sentTo === roomId) setMessages((prev) => [...prev.filter(message => message._id !== vl.message._id), vl.message]);
+                console.log( roomIdRef.current, vl.sentTo);
+                if (`${roomIdRef.current}`==`${vl.sentTo}`) {
+                    setMessages((prev) => [...prev.filter(message => message._id !== vl.message._id), vl.message]);
+                }
                 addNotification({
                     title: 'New Message',
                     subtitle: 'You have a new message',
@@ -165,8 +175,8 @@ export const MyProvider = ({ children }: Props) => {
                     onClick: () => window.focus()
                 });
                 setUnreadMessages(prev => {
-                    return [...prev, 
-                        { messageId: vl.message._id || vl.sentTo, isRead: false, message: vl.message, userId: currentUser?._id }]
+                    return [...prev,
+                    { messageId: vl.message._id || vl.sentTo, isRead: false, message: vl.message, userId: currentUser?._id }]
                 })
             };
 
@@ -259,7 +269,8 @@ export const MyProvider = ({ children }: Props) => {
                 userDMs,
                 setUserDMs,
                 unreadMessages,
-                setUnreadMessages
+                setUnreadMessages,
+                roomIdRef
             }}
         >
             {children}

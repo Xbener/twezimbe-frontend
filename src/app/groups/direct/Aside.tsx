@@ -147,9 +147,9 @@ function Aside({ }) {
                                 <div
                                     onClick={() => {
                                         if (currentDM?._id !== dm?._id) {
-                                            setMessages([])
+                                            setRoomId(dm?._id as string)
                                             setCurrentDM(dm)
-                                            setRoomId(currentDM?._id!)
+                                            setMessages([])
                                             router.push(`/groups/direct/${dm?._id}`)
                                         }
                                     }}

@@ -30,8 +30,8 @@ type Props = {}
 
 
 function Page({ }: Props) {
-    const { channelId } = useParams()
-    const { messages, setMessages, isTyping, setIsTyping, unreadMessages, setUnreadMessages, setCurrentChannel, setChId, setRoomId, roomId } = useMyContext()
+    const params = useParams()
+    const { messages, setMessages, isTyping, setIsTyping, unreadMessages, setUnreadMessages, roomIdRef, setCurrentChannel, setChId, setRoomId, roomId } = useMyContext()
     const { getChannel, isError } = useGetSingleChannel()
     const [isLoading, setLoading] = useState(true)
     const [sending, setSending] = useState(false)
@@ -86,6 +86,7 @@ function Page({ }: Props) {
             setSending(false)
         }
     }
+
 
     const handleDeleteChannel = async () => {
         const token = Cookies.get('access-token')
@@ -378,7 +379,7 @@ function Page({ }: Props) {
     const getChatRoomData = async () => {
         try {
             const token = Cookies.get('access-token')
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/channels/${group?._id}/${channelId}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/channels/${group?._id}/${params?.channelId}`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -395,7 +396,6 @@ function Page({ }: Props) {
             setCurrentChannel(channel)
             setChId(channel?._id!)
             setMessages([]);
-            setRoomId(channel?.chatroom?._id!)
             setPrivateChannelMembers(channel?.membersDetails as User[])
             // setAdmins(data.channel.members.filter((member: any) => member.role === "ChannelAdmin"));
             // setModerators(data.members.filter((member: any) => member.role === "ChannelModerator"));
@@ -406,6 +406,11 @@ function Page({ }: Props) {
             setLoading(false)
         }
     }
+
+    useEffect(() => {
+        setRoomId(channel?.chatroom?._id as string)
+        console.log('chanel chantroom id', channel?.chatroom)
+    }, [channel, params])
 
     useEffect(() => {
         const currentDMUnreadMessages = unreadMessages.filter(msg => msg?.chatroom?._id === channel?.chatroom?._id && !msg?.isRead!)
@@ -436,7 +441,7 @@ function Page({ }: Props) {
 
             // return () => clearTimeout(timeout)
         }
-    }, [channel, channelId, roomId])
+    }, [channel, params, roomId])
 
     const getChannelMessages = async () => {
         try {
@@ -450,7 +455,6 @@ function Page({ }: Props) {
             })
             const data = await response.json()
             setMessages(data.messages)
-            setRoomId(channel?.chatroom?._id!)
         } catch (error) {
             console.error('Error fetching data', error)
         }
@@ -458,7 +462,7 @@ function Page({ }: Props) {
 
     useEffect(() => {
         getChatRoomData();
-    }, [channelId]);
+    }, [params]);
 
 
     useEffect(() => {
@@ -479,14 +483,14 @@ function Page({ }: Props) {
         return () => {
             socket.off('new-message-added', handleNewMessage); // Clean up listener on unmount
         };
-    }, [channelId]);
+    }, [params]);
 
 
     useEffect(() => {
         if (channel) {
             getChannelMessages()
         }
-    }, [channelId, channel])
+    }, [params, channel])
 
     useEffect(() => {
         if (isTyping.message !== "") {
@@ -520,7 +524,6 @@ function Page({ }: Props) {
             setMessages((prev) => [...prev, { ...data.message, createdAt: new Date(), sender: currentUser, status: "sending" }]);
             socket.emit('new-message', { sender: currentUser, chatroomId: channel.chatroom?._id, sentTo: channel.chatroom?._id, receiver: channel.members, message: { ...data.message, sender: currentUser } });
             setMessage('');
-            setRoomId(channel?.chatroom?._id!)
             scrollToBottom();
             setIsReplying({ state: false, message: {}, replyingTo: "" });
         } catch (error) {
@@ -562,7 +565,6 @@ function Page({ }: Props) {
                 setMessages((prev) => [...prev, { ...data.message, createdAt: new Date(), sender: currentUser, replyingTo: isReplying.state ? isReplying.message : null }]);
                 socket.emit('new-message', { sender: currentUser, chatroomId: channel.chatroom?._id, sentTo: channel.chatroom?._id, receiver: channel.members, message: { ...data.message, sender: currentUser, replyingTo: isReplying.state ? isReplying.message : null } });
                 setMessage('');
-                setRoomId(channel?.chatroom?._id!)
                 scrollToBottom();
                 setIsReplying({ state: false, message: {}, replyingTo: "" });
             } catch (error) {
@@ -595,7 +597,6 @@ function Page({ }: Props) {
     let groupedMessages = groupMessagesByDate(messages)
 
     useEffect(() => {
-        setRoomId(channel?.chatroom?._id!)
         if (channel?.membersDetails) {
             setPrivateChannelMembers(channel?.membersDetails as User[])
         }

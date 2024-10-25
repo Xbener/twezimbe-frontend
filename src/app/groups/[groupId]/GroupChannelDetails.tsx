@@ -227,7 +227,7 @@ function ChannelDetails({ }: Props) {
                                         key={index}
                                         onClick={() => {
                                             setCurrentChannel(channel)
-                                            setRoomId(channel?.chatroom?._id!)
+                                            setRoomId(channel?.chatroom?._id as string)
                                             router.push(`/groups/${group?._id}/room/${channel._id}`)
                                             // setChId(channel?._id)
 
@@ -255,7 +255,7 @@ function ChannelDetails({ }: Props) {
                                         key={index}
                                         onClick={() => {
                                             setCurrentChannel(channel)
-                                            setRoomId(channel?.chatroom?._id!)
+                                            setRoomId(channel?.chatroom?._id as string)
                                             router.push(`/groups/${group?._id}/room/${channel._id}`)
                                             // setChId(channel?._id)
                                         }
