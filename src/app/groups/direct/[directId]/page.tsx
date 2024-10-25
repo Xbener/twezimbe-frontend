@@ -32,6 +32,7 @@ function Page({ }: Props) {
     const [sending, setSending] = useState(false)
     const { setIsSideBarOpen, setIsMemberListOpen } = useContext(GroupContext)
     const [attachments, setAttachments] = useState<File[] | any>(null)
+    const [validUserNames, setValidUserNames] = useState<string[]>([])
     const [isReplying, setIsReplying] = useState({
         state: false,
         replyingTo: "",
@@ -67,6 +68,10 @@ function Page({ }: Props) {
         content: "",
         message: {} as Message
     })
+
+        useEffect(() => {
+        setValidUserNames(currentDM?.memberDetails.map(member => `@${member.lastName}`) || [])
+    }, [currentDM])
     const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         const value = e.target.value;
         setMessage(value);
@@ -800,14 +805,35 @@ function Page({ }: Props) {
                                                                 </div>
                                                             ) : null}
                                                             <div className="text-white flex items-center gap-2">
-                                                                <p>
-                                                                    {msg?.content && msg?.content?.split('\n').map((line, index) => (
-                                                                        <span key={index}>
-                                                                            {line}
-                                                                            {msg?.content && index < msg?.content?.split('\n').length - 1 && <br />}
-                                                                        </span>
-                                                                    ))}
-                                                                </p>
+                                                                    <p>
+                                                                        {msg?.content &&
+                                                                            msg.content.split('\n').map((line, index) => (
+                                                                                <span key={index}>
+                                                                                    {line.split(/(@\w+)/g).map((part, i) => {
+                                                                                        const isMention = part.startsWith('@');
+                                                                                        const username = part.slice(1); // Remove "@" for validation
+
+                                                                                        // Check if it matches a valid username for highlighting
+                                                                                        const isValidMention = isMention && validUserNames.includes(`@${username}`);
+
+                                                                                        return (
+                                                                                            <span
+                                                                                                key={i}
+                                                                                                style={{
+                                                                                                    backgroundColor: isValidMention ? 'rgba(255, 165, 0, 0.4)' : 'transparent', // Only highlight valid mentions
+                                                                                                    transition: 'background-color 0.3s ease',
+                                                                                                    padding: "5px",
+                                                                                                    borderRadius: '10px'
+                                                                                                }}
+                                                                                            >
+                                                                                                {part}
+                                                                                            </span>
+                                                                                        );
+                                                                                    })}
+                                                                                    {msg?.content && index < msg.content.split('\n').length - 1 && <br />}
+                                                                                </span>
+                                                                            ))}
+                                                                    </p>
                                                                 <span>{msg.edited && <span className='text-[.7rem] text-gray-200'>(edited)</span>}</span>
                                                             </div>
                                                             <div className="flex items-center w-full justify-start p-1 gap-1">
