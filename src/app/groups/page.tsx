@@ -120,7 +120,7 @@ function Groups({ }: Props) {
         <div className='flex flex-col sm:flex-row items-center justify-between p-5 w-full gap-3'>
           <div className="flex items-center gap-4">
             <Popover>
-              <PopoverTrigger className="flex md:hidden">
+              <PopoverTrigger className="flex lg:hidden">
                 <Menu />
               </PopoverTrigger>
 
@@ -130,7 +130,7 @@ function Groups({ }: Props) {
                     categoryList.map((category, index) => (
                       <li key={index} className='w-full block '>
                         <button
-                          className={`${selectedCategory === category.link ? '' : ''} p-2 w-full rounded-md hover:bg-gray-200 hover:text-black duration-200`}
+                          className={`${selectedCategory === category.link ? '' : ''} p-2 w-full rounded-md hover:bg-gray-200 hover:text-black text-white duration-200`}
                           onClick={() => setSelectedCategory(category.link)}
                         >
                           {category.name}
@@ -150,7 +150,7 @@ function Groups({ }: Props) {
           </div>
 
           {/* Category Menu */}
-          <ul className='hidden gap-3 flex-wrap md:flex'>
+          <ul className='hidden gap-3 flex-wrap lg:flex'>
             {
               categoryList.map((category, index) => (
                 <li key={index} className='w-full sm:w-auto'>
