@@ -45,7 +45,7 @@ function Page({ }: Props) {
     const [showPicker, setShowPicker] = useState(false);
     const [quickEmojiSelector, setQuickEmojiSelector] = useState(false)
     const [isMentioning, setIsMentioning] = useState(false);
-      const [filteredUsers, setFilteredUsers] = useState<typeof currentPatners>([]);
+    const [filteredUsers, setFilteredUsers] = useState<typeof currentPatners>([]);
     const [contextMenu, setContextMenu] = useState<{
         visible: boolean;
         x: number;
@@ -74,7 +74,8 @@ function Page({ }: Props) {
             const searchTerm = mentionMatch[1].toLowerCase();
             setFilteredUsers(
                 currentPatners.filter((user) =>
-                    user.lastName.toLowerCase().startsWith(searchTerm)
+                    user.lastName.toLowerCase().startsWith(searchTerm)||
+                    user.firstName.toLowerCase().startsWith(searchTerm)
                 )
             );
         } else {
@@ -447,7 +448,7 @@ function Page({ }: Props) {
 
         if (e.ctrlKey && e.key === "Enter") {
             if (e.ctrlKey && e.key === "Enter") {
-                setMessage(prev => prev+'\n')
+                setMessage(prev => prev + '\n')
                 return
             }
         }
@@ -480,7 +481,7 @@ function Page({ }: Props) {
                 setMessage('');
                 scrollToBottom();
                 setIsReplying({ state: false, message: {}, replyingTo: "" });
-                setSuggestions([]); 
+                setSuggestions([]);
             } catch (error) {
                 console.error('Error sending message', error);
             } finally {
@@ -696,7 +697,7 @@ function Page({ }: Props) {
                                                                         onChange={(e) => setIsEditing(prev => ({ ...prev, content: e.target.value }))}
                                                                         onKeyDown={handleEdit}
                                                                     />
-                                                                 
+
                                                                 </div>
                                                                 <div className="w-full flex p-2">
                                                                     <div className="">
@@ -951,7 +952,7 @@ function Page({ }: Props) {
                                 onKeyDown={handleKeyPress}
                                 style={{ minHeight: '40px', overflowY: 'auto' }} // Adjust height as needed
                             />
-                            
+
                         </div>
                         <div className="w-full flex p-2">
                             <div className="flex w-full items-center justify-between">

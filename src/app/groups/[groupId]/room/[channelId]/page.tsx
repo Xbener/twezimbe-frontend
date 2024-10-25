@@ -46,12 +46,49 @@ function Page({ }: Props) {
     const [showPicker, setShowPicker] = useState(false);
     const [quickEmojiSelector, setQuickEmojiSelector] = useState(false)
     const [attachments, setAttachments] = useState<File[] | any>(null)
+    const [isMentioning, setIsMentioning] = useState(false);
+    const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+    const [validUserNames, setValidUserNames] = useState<string[]>([])
     const [channelUpdateData, setChannelUpdateData] = useState({
         name: channel?.name,
         description: channel?.description,
         state: channel?.state
 
     })
+    useEffect(() => {
+        setValidUserNames(group?.members.map(member => `@${member.lastName}`) || [])
+    }, [group])
+    
+    useEffect(()=>{
+        console.log(validUserNames)
+    },[validUserNames])
+    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const value = e.target.value;
+        setMessage(value);
+
+
+        const mentionMatch = value.match(/@(\w+)$/);
+        if (mentionMatch) {
+            setIsMentioning(true);
+            const searchTerm = mentionMatch[1].toLowerCase();
+            setFilteredUsers(
+                group?.members?.filter((user) =>
+                    user.lastName.toLowerCase().startsWith(searchTerm) ||
+                    user.firstName.toLowerCase().startsWith(searchTerm)
+                ) || []
+            );
+        } else {
+            setIsMentioning(false);
+        }
+    };
+
+    const handleUserSelect = (user: User) => {
+        const updatedMessage = message.replace(/@\w*$/, `@${user.lastName}`);
+        setMessage(updatedMessage);
+        setIsMentioning(false);
+        setFilteredUsers([]);
+    };
+
 
     useEffect(() => {
         if (channel) {
@@ -1037,13 +1074,35 @@ function Page({ }: Props) {
                                                             ) : null}
                                                             <div className="text-white flex items-center gap-2">
                                                                 <p>
-                                                                    {msg?.content && msg?.content?.split('\n').map((line, index) => (
-                                                                        <span key={index}>
-                                                                            {line}
-                                                                            {msg?.content && index < msg?.content?.split('\n').length - 1 && <br />}
-                                                                        </span>
-                                                                    ))}
+                                                                    {msg?.content &&
+                                                                        msg.content.split('\n').map((line, index) => (
+                                                                            <span key={index}>
+                                                                                {line.split(/(@\w+)/g).map((part, i) => {
+                                                                                    const isMention = part.startsWith('@');
+                                                                                    const username = part.slice(1); // Remove "@" for validation
+
+                                                                                    // Check if it matches a valid username for highlighting
+                                                                                    const isValidMention = isMention && validUserNames.includes(`@${username}`);
+
+                                                                                    return (
+                                                                                        <span
+                                                                                            key={i}
+                                                                                            style={{
+                                                                                                backgroundColor: isValidMention ? 'rgba(255, 165, 0, 0.4)' : 'transparent', // Only highlight valid mentions
+                                                                                                transition: 'background-color 0.3s ease',
+                                                                                                padding:"5px",
+                                                                                                borderRadius:'10px'
+                                                                                            }}
+                                                                                        >
+                                                                                            {part}
+                                                                                        </span>
+                                                                                    );
+                                                                                })}
+                                                                                {msg?.content && index < msg.content.split('\n').length - 1 && <br />}
+                                                                            </span>
+                                                                        ))}
                                                                 </p>
+
                                                                 <span>{msg.edited && <span className='text-[.7rem] text-gray-200'>(edited)</span>}</span>
                                                             </div>
                                                             <div className="flex items-center w-full justify-start p-1 gap-1">
@@ -1230,7 +1289,21 @@ function Page({ }: Props) {
                             </span>
 
                         </div>
-                        <div className="">
+                        {isMentioning && (
+                            <ul className="mention-dropdown absolute bg-white text-black w-1/2 rounded-md overflow-auto z-50 max-h-44 border-2 border-black shadow-md">
+                                {filteredUsers.map((user) => (
+                                    <>
+                                        <li
+                                            className="cursor-pointer hover:bg-gray-200 p-3"
+                                            key={user.id}
+                                            onClick={() => handleUserSelect(user)}>
+                                            @{user.lastName} {user.firstName}
+                                        </li>
+                                    </>
+                                ))}
+                            </ul>
+                        )}
+                        <div className="relative">
                             <textarea
                                 ref={messagingInputRef}
                                 disabled={sending}
@@ -1239,10 +1312,7 @@ function Page({ }: Props) {
                                 className="flex-grow bg-transparent p-3 rounded-md text-white placeholder-gray-400 focus:outline-none disabled:cursor-not-allowed w-full"
                                 placeholder={`Message ${channel?.name}`}
                                 value={message}
-                                onChange={(e) => {
-                                    setMessage(e.target.value);
-
-                                }}
+                                onChange={handleChange}
                                 onKeyDown={handleKeyPress}
                             />
                         </div>
