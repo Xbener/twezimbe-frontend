@@ -169,7 +169,7 @@ function GroupSettings({ }: Props) {
             {
                 group?.created_by[0]?._id === currentUser?._id && (
                     <div className='p-3 border-b flex flex-col md:flex-row items-start justify-around'>
-                    <div className='flex justify-center text-center items-start gap-3 md:w-1/2 w-full'>
+                        <div className='flex justify-center text-center items-start gap-3 md:w-1/2 w-full'>
                             <div className="width-[200px] height-[200px] rounded-full">
                                 <img
                                     src={imagePreview || group?.group_picture}
@@ -202,7 +202,7 @@ function GroupSettings({ }: Props) {
                                 }
                             </div>
                         </div>
-                    <div className='flex flex-col gap-2 items-end md:w-1/2 w-full'>
+                        <div className='flex flex-col gap-2 items-end md:w-1/2 w-full'>
                             <div className="w-full flex flex-col gap-2">
                                 <label className='font-extrabold text-[.8rem]' htmlFor="group_name">Group name</label>
                                 <input
@@ -439,27 +439,6 @@ function GroupSettings({ }: Props) {
                 <h1 className='p-2 text-[1.2rem] font-extrabold'>Privacy Settings</h1>
 
                 <div className='flex flex-col gap-3 w-full mt-5'>
-
-                    {
-                        group?.created_by[0]?._id === currentUser?._id && (
-                            <div className='flex w-full justify-between items-center'>
-                                <h1>Who can post? </h1>
-
-                                <div>
-                                    <Select>
-                                        <SelectTrigger className="bg-transparent w-full text-white">
-                                            <SelectValue placeholder="Choose Who can post" />
-                                        </SelectTrigger>
-                                        <SelectContent className="bg-white">
-                                            <SelectItem className="cursor-pointer" value="admins">Admins only</SelectItem>
-                                            <SelectItem className="cursor-pointer" value="moderators_admins">Moderators and Admins</SelectItem>
-                                            <SelectItem className="cursor-pointer" value="all_members">All </SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            </div>
-                        )
-                    }
 
                     {
                         group?.created_by[0]?._id === currentUser?._id && (

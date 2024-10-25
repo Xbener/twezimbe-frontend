@@ -720,7 +720,7 @@ function Page({ }: Props) {
                             <Search className="cursor-pointer" />
                         </DialogTrigger>
                         <DialogContent className="bg-white p-2 flex flex-col">
-                            
+
 
                             <div className="w-full">
                                 <Input
@@ -809,7 +809,7 @@ function Page({ }: Props) {
                             <div className='flex flex-col gap-2 mt-5 w-full'>
                                 {
                                     channel?.created_by?._id === currentUser?._id && (
-                                        <div className='p-3 border-b flex items-start justify-around w-full'>
+                                        <div className='p-3 border-b flex items-start justify-around w-full flex-col'>
                                             <div className='w-full flex flex-col gap-2 items-end'>
                                                 <div className="w-full flex flex-col gap-2">
                                                     <label className='font-extrabold text-[.8rem]' htmlFor="group_name">Channel name</label>
@@ -856,6 +856,31 @@ function Page({ }: Props) {
                                                         onClick={handleUpdateChannel}
                                                         className='bg-blue-500 text-white'>Update</Button>
                                                 </div>
+                                            </div>
+
+                                            <div className="mt-5 w-full">
+                                                <h1 className="font-extrabold text-[.8rem]">Manage channel members</h1>
+
+                                                <div className="mt-5 w-full">
+
+                                                    <div className='flex w-full justify-between items-center'>
+                                                        <h1>Who can post?</h1>
+
+                                                        <div>
+                                                            <Select>
+                                                                <SelectTrigger className="bg-transparent w-full text-white">
+                                                                    <SelectValue placeholder="Choose" />
+                                                                </SelectTrigger>
+                                                                <SelectContent className="bg-white">
+                                                                    <SelectItem className="cursor-pointer" value="anyone">Anyone</SelectItem>
+                                                                    <SelectItem className="cursor-pointer" value="moderators">Moderators</SelectItem>
+                                                                    <SelectItem className="cursor-pointer" value="admins">Admins</SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
                                             </div>
                                         </div>
                                     )
