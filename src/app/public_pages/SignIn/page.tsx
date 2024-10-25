@@ -11,7 +11,7 @@ const SignIn = () => {
   }
 
   return (
-    <div className="flex w-full flex-wrap items-center justify-center">
+    <div className="flex w-full flex-wrap justify-center">
       <HelmetComponent title="Sign in to your account" />
 
       <div className="mx-auto w-1/2 hidden lg:flex">
