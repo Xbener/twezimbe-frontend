@@ -26,7 +26,7 @@ export const checkIsActive = (onlineUsers: User[] | null, member: Props) => {
 }
 
 function GroupMemberItem(member: Props) {
-    const { onlineUsers } = useMyContext()
+    const { onlineUsers, setRoomId } = useMyContext()
     const { currentUser } = useGetProfileData()
     const router = useRouter()
     useEffect(() => {
@@ -60,7 +60,7 @@ function GroupMemberItem(member: Props) {
                         currentUser?._id === member.userId || currentUser?._id === member._id ? 
                         null : (
                             <Button
-                                    onClick={() => handlecreateDirectMessage(member as User, currentUser as User, router)}
+                                    onClick={() => handlecreateDirectMessage(member as User, currentUser as User, router, setRoomId)}
                             className="bg-blue-500 text-white  place-self-start w-full">
                                 Send message
                             </Button>
