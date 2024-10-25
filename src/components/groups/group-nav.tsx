@@ -99,7 +99,7 @@ const GroupNav = () => {
 
             {groupList?.map((group) => {
                 // Check if the group_id exists in the unread messages
-                if (unreadGroupIds.has(group.group_id)) {
+                if (unreadGroupIds.has(group.group_id || group?._id)) {
                     return null; // Skip rendering this group
                 }
 
