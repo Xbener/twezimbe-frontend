@@ -15,6 +15,7 @@ import { Edit, Home, LogOut } from 'lucide-react';
 import Cookies from 'js-cookie'
 import { Badge } from '../ui/badge';
 import StatusDot from '../ui/StatusDot';
+import { Chatroom, GroupTypes, User } from '@/types';
 
 const GroupNav = () => {
     // const { joinedGroupList } = useGetjoinedGroupList(userId as string);
@@ -26,6 +27,7 @@ const GroupNav = () => {
         onlineUsers
     } = useMyContext()
     const { group: currentGroup, setGroup } = useContext(GroupContext)
+    const { unreadMessages } = useMyContext()
     const pathname = usePathname()
     const settingsItems = [
         { name: "Edit profile", link: "/public_pages/Profile", icon: <Edit /> },
@@ -37,6 +39,24 @@ const GroupNav = () => {
             }
         },
     ]
+    const groupedUnreadMessages = unreadMessages.reduce((acc, message) => {
+        if (!message.isRead && message.chatroom?._id) {
+            const chatroomId = message.chatroom._id;
+            if (!acc[chatroomId]) {
+                acc[chatroomId] = {
+                    chatroom: message.chatroom,
+                    contact: message.contact, // Use 'contact' here instead of 'sender'
+                    count: 0,
+                };
+            }
+            acc[chatroomId].count += 1;
+        }
+        return acc;
+    }, {} as Record<string, { chatroom: Chatroom; contact?: GroupTypes | User | any; count: number }>);
+
+    const unreadMessageGroups = Object.values(groupedUnreadMessages);
+    const unreadGroupIds = new Set(unreadMessageGroups.map(msg => msg.contact._id));
+
 
     return (
         <nav className='space-y-2  bg-[#013a6f] p-3 overflow-y-auto overflow-x-hidden h-full mb-5' style={{ scrollbarWidth: 'none' }}>
@@ -53,21 +73,51 @@ const GroupNav = () => {
         </NavLink>
       ))} */}
 
-            {groupList?.map((group) => (
-                <NavLink
-                    // href={`/Groups/servers/${group.group_id}/channels/${server.categories[0].channels[0].id}`}
-                    href={`/groups/${group?.group_id}`}
-                    key={group.group_id}
-                // active={params.sid === group.group_id.toString()}
-                >
-                    {(sendMsgGroupId === group?.group_id) && groupNotificationFlag && (
-                        <div className="absolute top-0 right-0 w-4 h-4 bg-red-500 rounded-full border-2 border-[#d4d6f3]" />
-                    )}
-                    <img width={48} height={48} src={group?.group_picture} className='object-fill w-full h-full' alt='group' />
-                </NavLink>
-            ))}
+
+            {unreadMessageGroups.map((message) => {
+                const isChannel = message.chatroom.type === 'channel';
+                const profilePic = isChannel ? message.contact?.group_picture : message.contact?.profile_pic;
+                const name = isChannel ? message.contact?.name : message.contact?.username;
+
+                return (
+                    <NavLink key={message.chatroom._id} href={`${isChannel ? `/groups/${message.contact?._id}` : `/groups/direct/${message.chatroom._id}`}`}>
+                        <div className="flex items-center relative">
+                            <img
+                                width={48}
+                                height={48}
+                                src={profilePic || '/default-profile.png'} // Fallback to a default image
+                                className="object-fill w-full h-full"
+                                alt={isChannel ? 'channel' : 'dm'}
+                            />
+                        </div>
+                        <span className="absolute bottom-0 right-0 w-5 h-5 font-extrabold bg-orange-600 rounded-full grid place-content-center z-50">
+                            {message.count}
+                        </span>
+                    </NavLink>
+                );
+            })}
+
+            {groupList?.map((group) => {
+                // Check if the group_id exists in the unread messages
+                if (unreadGroupIds.has(group.group_id)) {
+                    return null; // Skip rendering this group
+                }
+
+                return (
+                    <NavLink
+                        href={`/groups/${group?.group_id}`}
+                        key={group.group_id}
+                    >
+                        {(sendMsgGroupId === group?.group_id) && groupNotificationFlag && (
+                            <div className="absolute top-0 right-0 w-4 h-4 bg-red-500 rounded-full border-2 border-[#d4d6f3]" />
+                        )}
+                        <img width={48} height={48} src={group?.group_picture} className='object-fill w-full h-full' alt='group' />
+                    </NavLink>
+                );
+            })}
 
             <hr className='mx-2 rounded border-t-2 border-t-white/[0.06]' />
+
 
             <GeneralLink>
                 <GroupCreateDialog currentUser={currentUser} />

@@ -424,4 +424,6 @@ export interface UnreadMessage {
     readAt?: boolean;
     message: Message;
     chatroom?: Chatroom;
+    sender?: User;
+    contact?: GroupTypes|User;
 }
