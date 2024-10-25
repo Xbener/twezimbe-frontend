@@ -517,7 +517,7 @@ function Page({ }: Props) {
                                         {partner.firstName} {partner.lastName}{index < currentPatners.length - 1 ? ', ' : ''}
                                     </span>
                                 ))
-                                : 'No partners found'}
+                                : ''}
                         </h1>
                     )}
                 </div>

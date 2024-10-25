@@ -3,9 +3,7 @@ import { GroupContext } from '@/context/GroupContext'
 import { iconTextGenerator } from '@/lib/iconTextGenerator'
 import { User } from '@/types'
 import { Search, X } from 'lucide-react'
-import React, { useContext, useEffect, useState } from 'react'
-import { toast } from 'sonner'
-import Cookies from 'js-cookie'
+import React, { useContext, useState } from 'react'
 import GroupMemberItem from '@/components/groups/GroupMemberItem'
 
 type Props = {
@@ -21,7 +19,7 @@ function MemberList({ admins, moderators, members, isLoading }: Props) {
     const [q, setQ] = useState('')
 
     return (
-        <div className={`w-[20%] bg-[#013a6fa6] overflow-hidden ${isSideBarOpen && windowWidth! <= 1025 ? 'block absolute w-full top-0 left-0 bg-blue-500 h-full' : 'hidden'} lg:block`}>
+        <div className={`w-[25%] bg-[#013a6fa6] overflow-hidden ${isSideBarOpen && windowWidth! <= 1025 ? 'block absolute w-full top-0 left-0 bg-blue-500 h-full' : 'hidden'} lg:block`}>
             {/* Search Bar */}
             <div className="flex items-center bg-[#013a6fae] sticky top-0 z-20 p-2 justify-between text-neutral-200 w-full">
                 {
@@ -49,7 +47,7 @@ function MemberList({ admins, moderators, members, isLoading }: Props) {
                         </div>
 
                     ) : privateChannelMembers?.length > 0 ? (
-                        <div>
+                        <div className='p-2'>
                             <h1 className='p-1 font-extrabold text-[0.9rem] mb-2 capitalize'>Channel members ({privateChannelMembers.length})</h1>
                             {
                                 privateChannelMembers?.length === 0 ? "No members" : privateChannelMembers.map((admin, index) => (

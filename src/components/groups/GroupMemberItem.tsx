@@ -34,7 +34,7 @@ function GroupMemberItem(member: Props) {
     return (
         <div className='flex items-center justify-normal gap-5 p-3 w-full cursor-pointer hover:bg-[#6bb7ff73] duration-150 rounded-lg'>
             <Popover>
-                <PopoverTrigger className='flex items-center justify-normal gap-5 relative'>
+                <PopoverTrigger className='flex items-center justify-normal gap-1 relative'>
                     <Avatar>
                         <AvatarImage src={member.profile_pic} className="bg-black" />
                         <AvatarFallback>{iconTextGenerator(member?.firstName as string, member?.lastName as string)}</AvatarFallback>
@@ -42,7 +42,7 @@ function GroupMemberItem(member: Props) {
                     <StatusDot status={checkIsActive(onlineUsers, member) ? 'online' : "offline"} />
                 </PopoverTrigger>
                 <PopoverTrigger>
-                    <h1 className='text-[.9rem]'>{member.firstName} {member.lastName}</h1>
+                    <h1 className='text-[.8rem]'>{member.firstName} {member.lastName}</h1>
                 </PopoverTrigger>
                 <PopoverContent className="bg-[#013a6f] text-white flex flex-col items-center p-5 gap-2 border-transparent shadow-lg rounded-lg">
                     <Avatar className='w-[100px] h-[100px]'>

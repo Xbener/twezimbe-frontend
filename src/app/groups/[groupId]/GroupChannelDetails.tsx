@@ -262,7 +262,7 @@ function ChannelDetails({ }: Props) {
                                         }
                                         className={`flex text-[.9rem] items-center gap-2 w-full hover:bg-neutral-50 hover:text-gray-700 duration-100 cursor-pointer p-2 rounded-md ${currentChannel?._id === channel?._id ? 'bg-white text-black hover:bg-[rgba(255,255,255,0.21)] hover:text-white' : ''} justify-normal gap-2 `}
                                     >
-                                        <span className="block"><Lock /> {channel.name}</span>
+                                        <span className="flex items-center gap-2"><Lock className="size-4" /> {channel.name}</span>
 
                                         {countUnreadMessages(channel) > 0 ? <span className='bg-blue-800 w-7 flex items-center justify-center h-7 rounded-full text-white'>{countUnreadMessages(channel)}</span> : null}
 
