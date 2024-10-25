@@ -29,10 +29,10 @@ const SignUp = () => {
     <div className="flex w-full flex-wrap items-center justify-center">
       <HelmetComponent title="Create account" description="Register yourself to start applying" />
       
-      <div className="flex mx-auto w-full md:w-1/2">
+      <div className="mx-auto w-1/2 hidden lg:flex">
         <img src="/assets/progress3.png" alt="signup" />
       </div>
-      <div className="flex flex-col mx-auto w-full md:w-1/2 border-2  border-neutral-100 p-4 rounded-md shadow-xl items-center justify-center">
+      <div className="flex flex-col mx-auto w-full lg:w-1/2 border-2  border-neutral-100 p-4 rounded-md shadow-xl items-center justify-center">
         <h1 className="text-3xl text-center md:text-start my-3 font-bold">Create your account now</h1>
         <SignUpForm  onSignUp={handleSignUp} isLoading={isLoading} />
       </div>

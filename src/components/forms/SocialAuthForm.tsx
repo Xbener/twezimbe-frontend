@@ -25,7 +25,7 @@ function SocialAuthForm({ }: Props) {
     <div className='w-full flex flex-col justify-center items-center p-5 gap-5'>
       <p>Or </p>
       <hr className='w-full' />
-      <div className='w-full flex items-start gap-5 justify-start '>
+      <div className='w-full flex items-start gap-5 justify-start flex-col md:flex-row'>
         {/* <button type='button' className='border-[2px] p-3 rounded-xl cursor-pointer hover:scale-105 duration-200' onClick={continueWithGoogle}>
           <AiFillGoogleCircle />
           Google

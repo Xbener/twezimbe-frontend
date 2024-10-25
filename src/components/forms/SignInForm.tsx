@@ -74,14 +74,14 @@ const SignInForm = ({ onSignIn, isLoading }: Props) => {
           <label htmlFor='viewpassword' className='text-sm'> View password</label>
         </div>
 
-        <div className='flex justify-between items-center'>
+        <div className='flex justify-between items-center md:flex-row gap-3 flex-col'>
           {isLoading ? <LoadingButton /> : <Button type='submit' className='bg-gray-800 hover:bg-gray-600 text-white'>Submit</Button>}
           <div>
             {`Don't have an account? `}
-            <a href={'/public_pages/SignUp'} className='text-blue-600'>Create account</a>
+            <a href={'/public_pages/signup'} className='text-blue-600'>Create account</a>
           </div>
         </div>
-        <div className='mt-5'>
+        <div className='mt-6'>
           {`Forgot your password? `}
           <a href={'/public_pages/forgotpassword'} className='text-blue-600'>Recover or reset your password</a>
         </div>

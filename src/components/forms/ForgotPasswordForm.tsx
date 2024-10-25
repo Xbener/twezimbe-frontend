@@ -17,8 +17,8 @@ type Props = {
   isLoading: boolean;
 }
 
-const ForgotPasswordForm = ({ onForgotPassword, isLoading }: Props ) => {
-  
+const ForgotPasswordForm = ({ onForgotPassword, isLoading }: Props) => {
+
   const form = useForm<ForgotPasswordFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -45,8 +45,8 @@ const ForgotPasswordForm = ({ onForgotPassword, isLoading }: Props ) => {
         {isLoading ? <LoadingButton /> : <Button type='submit'>Submit</Button>}
       </form>
       <div className='mt-5'>
-        {`Do you remember your password? `} 
-        <a href={'/public_pages/SignIn'} className='text-blue-600'>Go back to sign in</a>
+        {`Do you remember your password? `}
+        <a href={'/public_pages/signin'} className='text-blue-600'>Go back to sign in</a>
       </div>
     </Form>
   )
