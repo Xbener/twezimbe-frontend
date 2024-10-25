@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import Cookies from 'js-cookie'
 import { DMContext } from '@/context/DMContext'
 import { ChatRoomTypes, Message, Reaction, UnreadMessage, User } from '@/types' // Assuming you have these types
-import { ArrowLeft, AtSign, Bell, Bold, DeleteIcon, Edit, File, Italic, Link2, List, ListOrdered, Pin, Plus, Reply, ReplyAllIcon, SendHorizonal, SidebarClose, SidebarOpen, Smile, SmileIcon, Strikethrough, XIcon } from 'lucide-react'
+import { ArrowLeft, AtSign, Bell, Bold, DeleteIcon, Edit, File, Italic, Link2, List, ListOrdered, Pin, Plus, Reply, ReplyAllIcon, Search, SendHorizonal, SidebarClose, SidebarOpen, Smile, SmileIcon, Strikethrough, XIcon } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import moment from 'moment'
@@ -16,6 +16,9 @@ import { socket, useMyContext } from '@/context/MyContext'
 import MainLoader from '@/components/MainLoader'
 import { GroupContext } from '@/context/GroupContext'
 import { Editor, EditorState, Modifier } from 'draft-js';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { AlertDialogTrigger } from '@/components/ui/alert-dialog'
 
 type Props = {}
 
@@ -41,7 +44,8 @@ function Page({ }: Props) {
     const editingInputRef = useRef<HTMLTextAreaElement | null>(null)
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
     const messagingInputRef = useRef<HTMLTextAreaElement | null>(null)
-    const emojiContainerRef = useRef<HTMLDivElement | null>(null)
+    const emojiContainerRef = useRef<HTMLDivElement | null>(null)    
+    const [queriedMessages, setQueriedMessages] = useState<Message[]>([])
     const [showPicker, setShowPicker] = useState(false);
     const [quickEmojiSelector, setQuickEmojiSelector] = useState(false)
     const [isMentioning, setIsMentioning] = useState(false);
@@ -528,6 +532,11 @@ function Page({ }: Props) {
 
     const firstUnreadMessageId = getFirstUnreadMessageId(unreadMessages);
 
+
+    const handleMessageSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setQueriedMessages(messages.filter(message => message.content?.includes(e.target.value)))
+    }
+
     return (
         <div className='w-full h-screen flex flex-col bg-[#013a6fd3] text-white'>
             <div className="flex justify-between p-4 bg-[#013a6fae] border-b border-gray-700 w-full">
@@ -560,6 +569,53 @@ function Page({ }: Props) {
                 </div>
                 <div className='flex items-center gap-2'>
                     <Bell className="cursor-pointer" />
+                    <Dialog>
+                        <DialogTrigger>
+                            <Search className="cursor-pointer" />
+                        </DialogTrigger>
+                        <DialogContent className="bg-white p-2 flex flex-col">
+
+
+                            <div className="w-full">
+                                <Input
+                                    className="w-full"
+                                    onChange={handleMessageSearch}
+                                    placeholder="Search by keyword ..."
+                                />
+                            </div>
+
+                            <div className="mt-5 h-[500px] overflow-auto">
+                                {
+                                    !queriedMessages.length ? 'search messages ...' : (
+                                        queriedMessages.map(message => {
+
+                                            return (
+                                                <div
+                                                    className="w-full flex cursor-pointer hover:bg-gray-200 border-b rounded-md  p-2 flex-col"
+                                                    key={message._id}>
+                                                    <div className="flex items-center gap-3">
+                                                        <Avatar className='w-[40px] h-[40px] bg-neutral-200 rounded-full'>
+                                                            <AvatarImage src={message.sender?.profile_pic} />
+                                                            <AvatarFallback />
+                                                        </Avatar>
+
+                                                        <div className="flex items-center gap-2">
+                                                            <h1>{message.sender?.firstName} {message.sender?.lastName}</h1>
+                                                            <p className="text-[.7rem]">{moment(message.createdAt).format('MMMM D, YYYY')}</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <p className="ml-11 text-gray-600">
+                                                        {message.content}
+                                                    </p>
+                                                </div>
+                                            )
+                                        })
+                                    )
+                                }
+                            </div>
+                        </DialogContent>
+                    </Dialog>
                     <Popover>
                         <PopoverTrigger>
                             <Pin className="cursor-pointer" />
