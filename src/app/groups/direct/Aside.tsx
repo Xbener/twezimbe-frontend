@@ -63,7 +63,7 @@ function Aside({ }) {
     }
 
     return (
-        <div className={` bg-[#013a6fd8] h-full text-neutral-200 capitalize ${isMemberListOpen && windowWidth! <= 1025 ? 'w-full absolute top-0 left-0 h-full bg-blue-500 z-50' : 'relative hidden md:w-[27%] w-[40%]'} sm:block`}>
+        <div className={` bg-[#013a6fd8] h-full text-neutral-200 capitalize ${isMemberListOpen && windowWidth! <= 1025 ? 'w-full absolute top-0 left-0 h-full bg-blue-500 z-50' : 'relative hidden'} sm:block`}>
             <div className="flex items-center bg-[#013a6fae] sticky top-0 z-20 p-2 justify-between text-neutral-200 w-full">
                 {
                     isMemberListOpen && (
@@ -160,11 +160,11 @@ function Aside({ }) {
                                         alt={chatPartner?.firstName}
                                         className="profile-pic w-8 h-8 rounded-full mr-3"
                                     />
-                                    <div className="dm-details flex  justify-between items-center w-full">
+                                    <div className="dm-details flex  justify-normal gap-2 items-center w-full">
                                         <span className="user-name text-white font-medium md:text-[1rem] text-[0.9rem]">
                                             {`${chatPartner?.firstName} ${chatPartner?.lastName}`}
                                         </span>
-                                        {countUnreadMessages(dm) > 0 ? <span className='bg-blue-800 p-1 rounded-full text-white block'>{countUnreadMessages(dm)}</span> : null}
+                                        {countUnreadMessages(dm) > 0 ? <span className='bg-blue-800 w-7 flex items-center justify-center h-7 rounded-full text-white'>{countUnreadMessages(dm)}</span> : null}
                                     </div>
                                 </div>
                             );
