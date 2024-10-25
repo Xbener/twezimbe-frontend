@@ -425,5 +425,11 @@ export interface UnreadMessage {
     message: Message;
     chatroom?: Chatroom;
     sender?: User;
-    contact?: GroupTypes|User;
+    contact?: GroupTypes | User;
+}
+
+
+export interface ChannelSettings {
+    postPermission: 'anyone' | 'moderators' | 'admins'
+    _id?: string
 }

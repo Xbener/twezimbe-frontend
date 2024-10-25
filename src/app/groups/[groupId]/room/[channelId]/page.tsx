@@ -2,7 +2,7 @@
 
 import { useGetSingleChannel } from '@/api/channel'
 import { GroupContext } from '@/context/GroupContext'
-import { ChannelTypes, Message, Reaction, UnreadMessage, User } from '@/types'
+import { ChannelSettings, ChannelTypes, Message, Reaction, UnreadMessage, User } from '@/types'
 import { useParams } from 'next/navigation'
 import React, { MouseEventHandler, useContext, useEffect, useRef, useState } from 'react'
 import Cookies from 'js-cookie'
@@ -51,12 +51,68 @@ function Page({ }: Props) {
     const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
     const [validUserNames, setValidUserNames] = useState<string[]>([])
     const [queriedMessages, setQueriedMessages] = useState<Message[]>([])
+    const [settings, setSettings] = useState<ChannelSettings|null>(null)
+    const [updatedSettings, setUpdatedSettings] = useState<ChannelSettings>({
+        postPermission: 'anyone'
+    })
     const [channelUpdateData, setChannelUpdateData] = useState({
         name: channel?.name,
         description: channel?.description,
         state: channel?.state
 
     })
+
+    useEffect(() => {
+
+        const getSettings = async () => {
+
+            try {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/settings/channel/${params?.channelId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${Cookies.get('access-token')}`
+                    }
+                })
+
+                const data = await res.json()
+                if (!data.status) return
+                setSettings(data.channelSettings)
+            } catch (error) {
+                console.log('could not get settings', error)
+            }
+        }
+        if (params.channelId) {
+            getSettings()
+        }
+    }, [params])
+
+
+    const handleUpdatedSettingsChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setUpdatedSettings({ ...updatedSettings, [e.target.name]: e.target.value })
+    }
+    const updateSettings = async (updatedSettings: ChannelSettings) => {
+        if (settings) {
+            try {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/settings/channel/${settings._id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${Cookies.get('access-token')}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ ...updatedSettings })
+                })
+
+                const data = await res.json()
+                if (!data.status) toast.error(data.errors || data.message || "Unable to updated")
+                window.location.reload()
+            } catch (error) {
+                console.log(error)
+                toast.error('unable to update')
+            }
+        }
+    }
+
+
+
     useEffect(() => {
         setValidUserNames(group?.members.map(member => `@${member.lastName}`) || [])
     }, [group])
@@ -830,7 +886,9 @@ function Page({ }: Props) {
                                                         className="w-full bg-transparent p-2 border outline-none" placeholder="Channel description ..." />
                                                 </div>
 
-                                                <Select defaultValue={channelUpdateData?.state} onValueChange={(v) => setChannelUpdateData(prev => ({ ...prev, state: v }))}>
+                                                <Select
+                                                    defaultValue={channelUpdateData?.state}
+                                                    onValueChange={(v) => setChannelUpdateData(prev => ({ ...prev, state: v }))}>
                                                     <SelectTrigger className="bg-transparent w-full text-white">
                                                         <SelectValue placeholder="Channel state" />
                                                     </SelectTrigger>
@@ -864,10 +922,14 @@ function Page({ }: Props) {
                                                 <div className="mt-5 w-full">
 
                                                     <div className='flex w-full justify-between items-center'>
-                                                        <h1>Who can post?</h1>
+                                                        <h1>Who can message?</h1>
 
                                                         <div>
-                                                            <Select>
+                                                            <Select
+                                                                onValueChange={(v: 'admins' | 'anyone' | 'moderators') => {
+                                                                   updateSettings({postPermission: v})
+                                                                }}
+                                                                defaultValue={settings?.postPermission}>
                                                                 <SelectTrigger className="bg-transparent w-full text-white">
                                                                     <SelectValue placeholder="Choose" />
                                                                 </SelectTrigger>

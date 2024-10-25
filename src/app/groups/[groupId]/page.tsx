@@ -11,9 +11,9 @@ function GroupId({ }: Props) {
     const { group } = useContext(GroupContext)
     return (
         <div className='w-[100%] flex items-center justify-center h-full'>
-            <MainLoader />
+            {/* <MainLoader /> */}
         </div>
-    )
+)
 }
 
 export default GroupId
