@@ -6,7 +6,7 @@ import { ChannelTypes, Message, Reaction, UnreadMessage, User } from '@/types'
 import { useParams } from 'next/navigation'
 import React, { MouseEventHandler, useContext, useEffect, useRef, useState } from 'react'
 import Cookies from 'js-cookie'
-import { Lock, Bell, Pin, Smile, Image as Sticker, Plus, StickerIcon, DeleteIcon, Reply, Edit, ReplyAllIcon, XIcon, Settings, MessageCircleWarning, Delete, File, FileIcon, SmileIcon, Bold, Italic, Strikethrough, Link2, List, ListOrdered, AtSign, SidebarOpen, SendHorizonal, ArrowLeft } from 'lucide-react'
+import { Lock, Bell, Pin, Smile, Image as Sticker, Plus, StickerIcon, DeleteIcon, Reply, Edit, ReplyAllIcon, XIcon, Settings, MessageCircleWarning, Delete, File, FileIcon, SmileIcon, Bold, Italic, Strikethrough, Link2, List, ListOrdered, AtSign, SidebarOpen, SendHorizonal, ArrowLeft, Search } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import moment from 'moment'
@@ -24,6 +24,7 @@ import EmojiPicker from 'emoji-picker-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import addNotification from 'react-push-notification'
 import ChatInput from '@/components/chatInput'
+import { Input } from '@/components/ui/input'
 
 
 type Props = {}
@@ -49,6 +50,7 @@ function Page({ }: Props) {
     const [isMentioning, setIsMentioning] = useState(false);
     const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
     const [validUserNames, setValidUserNames] = useState<string[]>([])
+    const [queriedMessages, setQueriedMessages] = useState<Message[]>([])
     const [channelUpdateData, setChannelUpdateData] = useState({
         name: channel?.name,
         description: channel?.description,
@@ -58,10 +60,10 @@ function Page({ }: Props) {
     useEffect(() => {
         setValidUserNames(group?.members.map(member => `@${member.lastName}`) || [])
     }, [group])
-    
-    useEffect(()=>{
+
+    useEffect(() => {
         console.log(validUserNames)
-    },[validUserNames])
+    }, [validUserNames])
     const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         const value = e.target.value;
         setMessage(value);
@@ -696,6 +698,10 @@ function Page({ }: Props) {
 
     const firstUnreadMessageId = getFirstUnreadMessageId(unreadMessages);
 
+    const handleMessageSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setQueriedMessages(messages.filter(message => message.content?.includes(e.target.value)))
+    }
+
     return (
         <div className="w-full h-screen flex flex-col bg-[#013a6fd3] text-white">
             {/* Header */}
@@ -709,6 +715,53 @@ function Page({ }: Props) {
                 </div>
                 <div className='flex items-center gap-4'>
                     <Bell className="cursor-pointer" />
+                    <Dialog>
+                        <DialogTrigger>
+                            <Search className="cursor-pointer" />
+                        </DialogTrigger>
+                        <DialogContent className="bg-white p-2 flex flex-col">
+                            
+
+                            <div className="w-full">
+                                <Input
+                                    className="w-full"
+                                    onChange={handleMessageSearch}
+                                    placeholder="Search by keyword ..."
+                                />
+                            </div>
+
+                            <div className="mt-5 h-[500px] overflow-auto">
+                                {
+                                    !queriedMessages.length ? 'search messages ...' : (
+                                        queriedMessages.map(message => {
+
+                                            return (
+                                                <div
+                                                    className="w-full flex cursor-pointer hover:bg-gray-200 border-b rounded-md  p-2 flex-col"
+                                                    key={message._id}>
+                                                    <div className="flex items-center gap-3">
+                                                        <Avatar className='w-[40px] h-[40px] bg-neutral-200 rounded-full'>
+                                                            <AvatarImage src={message.sender?.profile_pic} />
+                                                            <AvatarFallback />
+                                                        </Avatar>
+
+                                                        <div className="flex items-center gap-2">
+                                                            <h1>{message.sender?.firstName} {message.sender?.lastName}</h1>
+                                                            <p className="text-[.7rem]">{moment(message.createdAt).format('MMMM D, YYYY')}</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <p className="ml-11 text-gray-600">
+                                                        {message.content}
+                                                    </p>
+                                                </div>
+                                            )
+                                        })
+                                    )
+                                }
+                            </div>
+                        </DialogContent>
+                    </Dialog>
                     <Popover>
                         <PopoverTrigger>
                             <Pin className="cursor-pointer" />
@@ -1090,8 +1143,8 @@ function Page({ }: Props) {
                                                                                             style={{
                                                                                                 backgroundColor: isValidMention ? 'rgba(255, 165, 0, 0.4)' : 'transparent', // Only highlight valid mentions
                                                                                                 transition: 'background-color 0.3s ease',
-                                                                                                padding:"5px",
-                                                                                                borderRadius:'10px'
+                                                                                                padding: "5px",
+                                                                                                borderRadius: '10px'
                                                                                             }}
                                                                                         >
                                                                                             {part}
