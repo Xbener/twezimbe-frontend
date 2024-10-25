@@ -218,7 +218,7 @@ function ChannelDetails({ }: Props) {
 
                 <div className="flex flex-col gap-4">
                     <div className='w-full p-2 flex flex-col gap-2'>
-                        <h1 className='text-[1.2rem] sm:text-[1rem]'>Public channels</h1>
+                        <h1 className='text-[1.2rem] sm:text-[.9rem]'>Public channels</h1>
                         <div className='w-full flex flex-col'>
                             {
                                 channelList?.map((channel, index) => channel.state?.toLowerCase() === 'public' && (
@@ -231,7 +231,7 @@ function ChannelDetails({ }: Props) {
                                             // setChId(channel?._id)
 
                                         }}
-                                        className={`flex text-[.9rem] items-center gap-2 w-full hover:bg-neutral-50 hover:text-gray-700 duration-100 cursor-pointer p-2 rounded-md ${currentChannel?._id === channel?._id ? 'bg-white text-black hover:bg-[rgba(255,255,255,0.27)] hover:text-white' : ''} justify-normal gap-2`}
+                                        className={`flex items-center gap-2 w-full hover:bg-neutral-50 hover:text-gray-700 duration-100 cursor-pointer p-2 rounded-md ${currentChannel?._id === channel?._id ? 'bg-white text-black hover:bg-[rgba(255,255,255,0.27)] hover:text-white' : ''} justify-normal gap-2`}
                                     >
                                         <span className='block'>{channel?.state === 'public' ? "#" : <Lock className='' />} {channel.name}</span>
 

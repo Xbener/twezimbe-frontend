@@ -12,7 +12,7 @@ function Aside({ }) {
 
     console.log("group", group)
     return (
-        <div className={` bg-[#013a6fd8] h-full text-neutral-200 capitalize ${isMemberListOpen && windowWidth! <= 1025 ? 'w-full absolute top-0 left-0 h-full bg-blue-500 z-50' : 'relative hidden w-[35%] md:w-[20%]'} sm:block`}>
+        <div className={` bg-[#013a6fd8] h-full text-neutral-200 capitalize ${isMemberListOpen && windowWidth! <= 1025 ? 'w-full absolute top-0 left-0 h-full bg-blue-500 z-50' : 'relative hidden sm:w-[22%]'} md:block`}>
            
             <ChannelDetails />
         </div>
