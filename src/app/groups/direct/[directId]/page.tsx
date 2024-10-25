@@ -15,6 +15,7 @@ import EmojiPicker from 'emoji-picker-react';
 import { socket, useMyContext } from '@/context/MyContext'
 import MainLoader from '@/components/MainLoader'
 import { GroupContext } from '@/context/GroupContext'
+import { Editor, EditorState, Modifier } from 'draft-js';
 
 type Props = {}
 
@@ -33,7 +34,9 @@ function Page({ }: Props) {
         replyingTo: "",
         message: {} as Message
     })
-
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [suggestions, setSuggestions] = useState<typeof currentPatners>([]);
+    const textareaRef = useRef(null);
 
     const editingInputRef = useRef<HTMLTextAreaElement | null>(null)
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -41,6 +44,8 @@ function Page({ }: Props) {
     const emojiContainerRef = useRef<HTMLDivElement | null>(null)
     const [showPicker, setShowPicker] = useState(false);
     const [quickEmojiSelector, setQuickEmojiSelector] = useState(false)
+    const [isMentioning, setIsMentioning] = useState(false);
+      const [filteredUsers, setFilteredUsers] = useState<typeof currentPatners>([]);
     const [contextMenu, setContextMenu] = useState<{
         visible: boolean;
         x: number;
@@ -58,8 +63,31 @@ function Page({ }: Props) {
         content: "",
         message: {} as Message
     })
+    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const value = e.target.value;
+        setMessage(value);
 
 
+        const mentionMatch = value.match(/@(\w+)$/);
+        if (mentionMatch) {
+            setIsMentioning(true);
+            const searchTerm = mentionMatch[1].toLowerCase();
+            setFilteredUsers(
+                currentPatners.filter((user) =>
+                    user.lastName.toLowerCase().startsWith(searchTerm)
+                )
+            );
+        } else {
+            setIsMentioning(false);
+        }
+    };
+
+    const handleUserSelect = (user: User) => {
+        const updatedMessage = message.replace(/@\w*$/, `@${user.lastName} `);
+        setMessage(updatedMessage);
+        setIsMentioning(false);
+        setFilteredUsers([]);
+    };
 
     const scrollToBottom = () => {
         if (messagesEndRef.current) {
@@ -452,12 +480,20 @@ function Page({ }: Props) {
                 setMessage('');
                 scrollToBottom();
                 setIsReplying({ state: false, message: {}, replyingTo: "" });
+                setSuggestions([]); 
             } catch (error) {
                 console.error('Error sending message', error);
             } finally {
                 setSending(false);
             }
         }
+    };
+
+    const handleMentionClick = (mention: string) => {
+        const mentionIndex = message.lastIndexOf('@');
+        const newMessage = message.slice(0, mentionIndex) + mention + ' ';
+        setMessage(newMessage);
+        setShowSuggestions(false);
     };
 
     const groupMessagesByDate = (messages: Message[]) => {
@@ -660,6 +696,7 @@ function Page({ }: Props) {
                                                                         onChange={(e) => setIsEditing(prev => ({ ...prev, content: e.target.value }))}
                                                                         onKeyDown={handleEdit}
                                                                     />
+                                                                 
                                                                 </div>
                                                                 <div className="w-full flex p-2">
                                                                     <div className="">
@@ -889,21 +926,32 @@ function Page({ }: Props) {
                             </span>
 
                         </div>
-                        <div className="">
+                        {isMentioning && (
+                            <ul className="mention-dropdown absolute bg-white text-black w-1/2 rounded-md overflow-auto z-50 max-h-44 border-2 border-black shadow-md">
+                                {filteredUsers.map((user) => (
+                                    <>
+                                        <li
+                                            className="cursor-pointer hover:bg-gray-200 p-3"
+                                            key={user.id}
+                                            onClick={() => handleUserSelect(user)}>
+                                            @{user.lastName} {user.firstName}
+                                        </li>
+                                    </>
+                                ))}
+                            </ul>
+                        )}
+                        <div className="relative">
                             <textarea
-                                ref={messagingInputRef}
+                                ref={textareaRef}
                                 disabled={sending}
-                                // onBlur={() => setIsTyping(prev => ({ message: "" }))}
-                                // onFocus={() => setIsTyping(prev => ({ ...prev, message: `${currentUser?.firstName} is typing ...` }))}
                                 className="flex-grow bg-transparent p-3 rounded-md text-white placeholder-gray-400 focus:outline-none disabled:cursor-not-allowed w-full"
-                                placeholder={`Message ${currentPatners[0]?.lastName! || 'DM'}`}
+                                placeholder={`Message...`}
                                 value={message}
-                                onChange={(e) => {
-                                    setMessage(e.target.value);
-
-                                }}
+                                onChange={handleChange}
                                 onKeyDown={handleKeyPress}
+                                style={{ minHeight: '40px', overflowY: 'auto' }} // Adjust height as needed
                             />
+                            
                         </div>
                         <div className="w-full flex p-2">
                             <div className="flex w-full items-center justify-between">
