@@ -60,13 +60,13 @@ const PrimaryMenu = () => {
                             </Link>
                             <Button variant={'secondary'} className="text-white" size={'sm'} onClick={() => {
                                 Cookies.remove('access-token');
-                                window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/public_pages/signin`
+                                window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/public_pages/SignIn`
                                 // setUser(false);
                             }}>Sign out</Button>
                         </PopoverContent>
                     </Popover>
                     :
-                    <Link href={'/public_pages/signin'} className="hidden md:block text-blue-950 px-4 py-2 rounded-xl bg-yellow-500 hover:bg-yellow-400 font-bold">Sign In</Link>
+                    <Link href={'/public_pages/SignIn'} className="hidden md:block text-blue-950 px-4 py-2 rounded-xl bg-yellow-500 hover:bg-yellow-400 font-bold">Sign In</Link>
                 }
             </div>
         </>

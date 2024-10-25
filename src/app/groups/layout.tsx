@@ -31,7 +31,7 @@ export default function GroupLayout({
 
     useEffect(() => {
         if (!access_token) {
-            window.location.href = '/public_pages/signin'
+            window.location.href = '/public_pages/SignIn'
         }
     }, [access_token])
     useEffect(() => {

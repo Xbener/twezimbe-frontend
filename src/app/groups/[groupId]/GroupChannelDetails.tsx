@@ -113,7 +113,7 @@ function ChannelDetails({ }: Props) {
             name: "Logout", link: "#", icon: <LogOut />,
             action: () => {
                 Cookies.remove('access-token');
-                window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/public_pages/signin`
+                window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/public_pages/SignIn`
             }
         },
     ]

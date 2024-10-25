@@ -13,7 +13,7 @@ const ResetPassword = () => {
     const router = useRouter()
 
     if (isSuccess) {
-        router.push('/public_pages/signin');
+        router.push('/public_pages/SignIn');
     }
 
     return (

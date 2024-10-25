@@ -127,7 +127,7 @@ const SignUpForm = ({ onSignUp, isLoading }: Props) => {
       </form>
       <div className='mt-5'>
         {`Already has an account? `}
-        <a href={'/public_pages/signin'} className='text-blue-600'>Login</a>
+        <a href={'/public_pages/SignIn'} className='text-blue-600'>Login</a>
       </div>
 
       <SocialAuthForm />

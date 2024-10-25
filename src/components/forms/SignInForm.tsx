@@ -78,7 +78,7 @@ const SignInForm = ({ onSignIn, isLoading }: Props) => {
           {isLoading ? <LoadingButton /> : <Button type='submit' className='bg-gray-800 hover:bg-gray-600 text-white'>Submit</Button>}
           <div>
             {`Don't have an account? `}
-            <a href={'/public_pages/signup'} className='text-blue-600'>Create account</a>
+            <a href={'/public_pages/SignUp'} className='text-blue-600'>Create account</a>
           </div>
         </div>
         <div className='mt-6'>
