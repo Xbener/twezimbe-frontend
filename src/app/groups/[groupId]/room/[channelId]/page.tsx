@@ -51,7 +51,7 @@ function Page({ }: Props) {
     const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
     const [validUserNames, setValidUserNames] = useState<string[]>([])
     const [queriedMessages, setQueriedMessages] = useState<Message[]>([])
-    const [settings, setSettings] = useState<ChannelSettings|null>(null)
+    const [settings, setSettings] = useState<ChannelSettings | null>(null)
     const [updatedSettings, setUpdatedSettings] = useState<ChannelSettings>({
         postPermission: 'anyone'
     })
@@ -927,7 +927,7 @@ function Page({ }: Props) {
                                                         <div>
                                                             <Select
                                                                 onValueChange={(v: 'admins' | 'anyone' | 'moderators') => {
-                                                                   updateSettings({postPermission: v})
+                                                                    updateSettings({ postPermission: v })
                                                                 }}
                                                                 defaultValue={settings?.postPermission}>
                                                                 <SelectTrigger className="bg-transparent w-full text-white">
@@ -1446,11 +1446,20 @@ function Page({ }: Props) {
                         <div className="relative">
                             <textarea
                                 ref={messagingInputRef}
-                                disabled={sending}
+                                disabled={
+                                    sending ||
+                                    (settings?.postPermission === 'admins' && channel?.role?.role_name !== 'ChannelAdmin') ||
+                                    (settings?.postPermission === 'moderators' && !['ChannelModerator', 'ChannelAdmin'].includes(channel?.role?.role_name as string))
+                                }
                                 onBlur={() => setIsTyping(prev => ({ message: "" }))}
                                 onFocus={() => setIsTyping(prev => ({ ...prev, message: `${currentUser?.firstName} is typing ...` }))}
                                 className="flex-grow bg-transparent p-3 rounded-md text-white placeholder-gray-400 focus:outline-none disabled:cursor-not-allowed w-full"
-                                placeholder={`Message ${channel?.name}`}
+                                placeholder={
+                                    (settings?.postPermission === 'admins' && channel?.role?.role_name !== 'ChannelAdmin') ||
+                                        (settings?.postPermission === 'moderators' && !['ChannelModerator', 'ChannelAdmin'].includes(channel?.role?.role_name as string))
+                                        ? "Not allowed to send messages"
+                                        : `Message ${channel?.name}`
+                                }
                                 value={message}
                                 onChange={handleChange}
                                 onKeyDown={handleKeyPress}

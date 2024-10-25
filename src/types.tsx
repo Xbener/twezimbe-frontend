@@ -361,6 +361,9 @@ export type ChannelTypes = {
     members?: string[] | string | any;
     groupId?: string;
     membersDetails?: User[]
+    role?: {
+        role_name: string;
+    }
 }
 
 export type ChatRoomTypes = {

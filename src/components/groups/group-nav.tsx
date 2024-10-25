@@ -55,7 +55,7 @@ const GroupNav = () => {
     }, {} as Record<string, { chatroom: Chatroom; contact?: GroupTypes | User | any; count: number }>);
 
     const unreadMessageGroups = Object.values(groupedUnreadMessages);
-    const unreadGroupIds = new Set(unreadMessageGroups.map(msg => msg.contact._id));
+    const unreadGroupIds = new Set(unreadMessageGroups.map(msg => msg?.contact?._id));
 
 
     return (
