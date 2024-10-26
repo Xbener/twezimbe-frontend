@@ -1008,6 +1008,53 @@ function Page({ }: Props) {
                                                             </Select>
                                                         </div>
                                                     </div>
+
+                                                    <div className='flex w-full justify-between items-center mt-5'>
+                                                        <h1>Change member roles</h1>
+
+                                                        <Dialog>
+                                                            <DialogTrigger>
+                                                                <Button className="bg-blue-500">
+                                                                    Change
+                                                                </Button>
+
+                                                            </DialogTrigger>
+                                                            <DialogContent className="bg-white w-full">
+                                                                {
+                                                                    channel?.membersDetails?.map((member: any) => {
+
+                                                                        return (
+                                                                            <div className="w-full p-2 justify-between flex items-center  text-black">
+                                                                                <div className="flex items-center gap-2">
+                                                                                    <Avatar className="w-[40px] h-[40px] bg-neutral-200 rounded-full">
+                                                                                        <AvatarImage src={member?.profile_pic} />
+                                                                                        <AvatarFallback />
+                                                                                    </Avatar>
+                                                                                    <h1>{member?.firstName} {member?.lastName}</h1>
+                                                                                </div>
+                                                                                <div> 
+                                                                                    <Select
+                                                                                    defaultValue={member?.role?.role_name}
+                                                                                // onValueChange={(v) => setChannelUpdateData(prev => ({ ...prev, state: v }))}
+                                                                                >
+                                                                                    <SelectTrigger className="bg-transparent w-full text-black">
+                                                                                        <SelectValue placeholder="Change role" />
+                                                                                    </SelectTrigger>
+                                                                                    <SelectContent className="bg-white">
+                                                                                        <SelectItem className="cursor-pointer" value="ChannelAdmin">admin</SelectItem>
+                                                                                        <SelectItem className="cursor-pointer" value="ChannelModerator">Moderator</SelectItem>
+                                                                                        <SelectItem className="cursor-pointer" value="ChannelMember">regular member</SelectItem>
+                                                                                    </SelectContent>
+                                                                                </Select>
+                                                                                </div>
+
+                                                                            </div>
+                                                                        )
+                                                                    })
+                                                                }
+                                                            </DialogContent>
+                                                        </Dialog>
+                                                    </div>
                                                 </div>
 
                                             </div>
