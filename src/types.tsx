@@ -436,3 +436,15 @@ export interface ChannelSettings {
     postPermission: 'anyone' | 'moderators' | 'admins'
     _id?: string
 }
+
+export type UserSettings = {
+    _id?: string;
+    userId: string;
+    notificationSettings: {
+        chatroomsMuted: string[];
+        notifyOnMention: boolean;
+        notifyOnDirectMessage: boolean;
+        notifyOnReaction: boolean;
+        notifyOnOtherEvents: boolean;
+    };
+};

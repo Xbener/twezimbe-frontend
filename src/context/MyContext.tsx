@@ -1,5 +1,5 @@
 import { useGetProfileData } from "@/api/auth";
-import { ChannelTypes, ChatRoomTypes, FriendTypes, JoinedGroupTypes, Message, Reaction, UnreadMessage, User } from "@/types";
+import { ChannelTypes, ChatRoomTypes, FriendTypes, JoinedGroupTypes, Message, Reaction, UnreadMessage, User, UserSettings } from "@/types";
 import Cookies from 'js-cookie';
 import React, { createContext, Ref, useContext, useEffect, useRef, useState } from 'react';
 import io, { Socket } from 'socket.io-client';
@@ -44,6 +44,8 @@ type MyContextType = {
     unreadMessages: UnreadMessage[]
     setUnreadMessages: (vl: UnreadMessage[]) => void
     roomIdRef: React.MutableRefObject<string>
+    userSettings: UserSettings
+    setUserSettings: (vl: UserSettings) => void
 };
 
 const MyContext = createContext<MyContextType | undefined>(undefined);
@@ -68,6 +70,7 @@ export const MyProvider = ({ children }: Props) => {
     const [roomId, setRoomId] = useState('')
     const roomIdRef = useRef(roomId);
     const [unreadMessages, setUnreadMessages] = useState<UnreadMessage[]>([])
+    const [userSettings, setUserSettings] = useState<UserSettings | null>(null)
 
     useEffect(() => {
         if (document && unreadMessages && unreadMessages?.filter(msg => !msg?.isRead!).length > 0) {
@@ -82,6 +85,30 @@ export const MyProvider = ({ children }: Props) => {
     useEffect(() => {
         roomIdRef.current = roomId; // Keep ref updated
     }, [roomId]);
+
+    useEffect(() => {
+
+        const getUserSettings = async () => {
+            try {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/settings/user/${currentUser?._id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${Cookies.get('access-token')}`
+                    }
+                })
+
+                const data = await res.json()
+                if (!data.status) return
+                setUserSettings(data.userSettings)
+            } catch (error) {
+                console.log('failed to get user settings')
+            }
+        }
+        if (currentUser) {
+
+            getUserSettings()
+        }
+    }, [currentUser])
 
     useEffect(() => {
         const getUnreadMessages = async () => {
@@ -162,8 +189,8 @@ export const MyProvider = ({ children }: Props) => {
                 });
             });
             const handleNewMessage = (vl: { message: Message, chatroomId: string, sentTo: string }) => {
-                console.log( roomIdRef.current, vl.sentTo);
-                if (`${roomIdRef.current}`==`${vl.sentTo}`) {
+                console.log(roomIdRef.current, vl.sentTo);
+                if (`${roomIdRef.current}` == `${vl.sentTo}`) {
                     setMessages((prev) => [...prev.filter(message => message._id !== vl.message._id), vl.message]);
                 }
                 addNotification({
@@ -270,7 +297,9 @@ export const MyProvider = ({ children }: Props) => {
                 setUserDMs,
                 unreadMessages,
                 setUnreadMessages,
-                roomIdRef
+                roomIdRef,
+                userSettings: userSettings as UserSettings,
+                setUserSettings
             }}
         >
             {children}

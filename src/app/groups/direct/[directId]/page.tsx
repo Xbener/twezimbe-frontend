@@ -4,7 +4,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import Cookies from 'js-cookie'
 import { DMContext } from '@/context/DMContext'
-import { ChatRoomTypes, Message, Reaction, UnreadMessage, User } from '@/types' // Assuming you have these types
+import { ChatRoomTypes, Message, Reaction, UnreadMessage, User, UserSettings } from '@/types' // Assuming you have these types
 import { ArrowLeft, AtSign, Bell, Bold, DeleteIcon, Edit, File, Italic, Link2, List, ListOrdered, Pin, Plus, Reply, ReplyAllIcon, Search, SendHorizonal, SidebarClose, SidebarOpen, Smile, SmileIcon, Strikethrough, XIcon } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
@@ -19,7 +19,7 @@ import { Editor, EditorState, Modifier } from 'draft-js';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { AlertDialogTrigger } from '@/components/ui/alert-dialog'
-
+import { InputSwitch } from 'primereact/inputswitch'
 type Props = {}
 
 function Page({ }: Props) {
@@ -28,7 +28,7 @@ function Page({ }: Props) {
     const { setCurrentDM, currentUser, currentDM } = useContext(DMContext)
     const [currentPatners, setCurrentPatners] = useState<User[]>([])
     const currentUserId = Cookies.get('current-user-id') // Assuming you store the current user ID in cookies
-    const { setRoomId, messages, setMessages, unreadMessages, roomId, roomIdRef } = useMyContext()
+    const { setRoomId, messages, setMessages, unreadMessages, roomId, roomIdRef, userSettings, setUserSettings } = useMyContext()
     const [sending, setSending] = useState(false)
     const { setIsSideBarOpen, setIsMemberListOpen } = useContext(GroupContext)
     const [attachments, setAttachments] = useState<File[] | any>(null)
@@ -45,7 +45,7 @@ function Page({ }: Props) {
     const editingInputRef = useRef<HTMLTextAreaElement | null>(null)
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
     const messagingInputRef = useRef<HTMLTextAreaElement | null>(null)
-    const emojiContainerRef = useRef<HTMLDivElement | null>(null)    
+    const emojiContainerRef = useRef<HTMLDivElement | null>(null)
     const [queriedMessages, setQueriedMessages] = useState<Message[]>([])
     const [showPicker, setShowPicker] = useState(false);
     const [quickEmojiSelector, setQuickEmojiSelector] = useState(false)
@@ -69,7 +69,7 @@ function Page({ }: Props) {
         message: {} as Message
     })
 
-        useEffect(() => {
+    useEffect(() => {
         setValidUserNames(currentDM?.memberDetails.map(member => `@${member.lastName}`) || [])
     }, [currentDM])
     const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -83,7 +83,7 @@ function Page({ }: Props) {
             const searchTerm = mentionMatch[1].toLowerCase();
             setFilteredUsers(
                 currentPatners.filter((user) =>
-                    user.lastName.toLowerCase().startsWith(searchTerm)||
+                    user.lastName.toLowerCase().startsWith(searchTerm) ||
                     user.firstName.toLowerCase().startsWith(searchTerm)
                 )
             );
@@ -91,6 +91,27 @@ function Page({ }: Props) {
             setIsMentioning(false);
         }
     };
+
+    const handleUpdateUserSettings = async (settings: UserSettings) => {
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/settings/user/${settings?._id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('access-token')}`
+                },
+                body: JSON.stringify({ ...settings })
+            })
+
+            const data = await res.json()
+            if (!data.status) return toast.error(data.errors || data.message || "Unable to update")
+            setUserSettings(({ ...data.userSettings }))
+        } catch (error) {
+            toast.error('unable to updated')
+            console.log(error)
+        }
+    }
+
 
     const handleUserSelect = (user: User) => {
         const updatedMessage = message.replace(/@\w*$/, `@${user.lastName} `);
@@ -573,7 +594,34 @@ function Page({ }: Props) {
                     )}
                 </div>
                 <div className='flex items-center gap-2'>
-                    <Bell className="cursor-pointer" />
+                    <Popover>
+
+                        <PopoverTrigger>
+                            <Bell className="cursor-pointer" />
+                        </PopoverTrigger>
+                        <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col pl-3 ">
+                            <div className="w-full flex items-center justify-between">
+                                <h1>Mute</h1>
+                                <input
+                                type="checkbox"
+                                    onChange={(e) =>
+                                        handleUpdateUserSettings({
+                                            ...userSettings,
+                                            notificationSettings: {
+                                                ...userSettings.notificationSettings,
+                                                chatroomsMuted: e.target.checked
+                                                    ? [...userSettings.notificationSettings.chatroomsMuted, `${currentDM?._id}`]
+                                                    : userSettings.notificationSettings.chatroomsMuted.filter((chat) => chat !== currentDM?._id)
+                                            }
+                                        })
+                                    }
+                                    checked={userSettings?.notificationSettings.chatroomsMuted.includes(currentDM?._id!)}
+                                    className="p-5 w-5 h-5 cursor-pointer rounded-full "
+                                />
+
+                            </div>
+                        </PopoverContent>
+                    </Popover>
                     <Dialog>
                         <DialogTrigger>
                             <Search className="cursor-pointer" />
@@ -805,35 +853,35 @@ function Page({ }: Props) {
                                                                 </div>
                                                             ) : null}
                                                             <div className="text-white flex items-center gap-2">
-                                                                    <p>
-                                                                        {msg?.content &&
-                                                                            msg.content.split('\n').map((line, index) => (
-                                                                                <span key={index}>
-                                                                                    {line.split(/(@\w+)/g).map((part, i) => {
-                                                                                        const isMention = part.startsWith('@');
-                                                                                        const username = part.slice(1); // Remove "@" for validation
+                                                                <p>
+                                                                    {msg?.content &&
+                                                                        msg.content.split('\n').map((line, index) => (
+                                                                            <span key={index}>
+                                                                                {line.split(/(@\w+)/g).map((part, i) => {
+                                                                                    const isMention = part.startsWith('@');
+                                                                                    const username = part.slice(1); // Remove "@" for validation
 
-                                                                                        // Check if it matches a valid username for highlighting
-                                                                                        const isValidMention = isMention && validUserNames.includes(`@${username}`);
+                                                                                    // Check if it matches a valid username for highlighting
+                                                                                    const isValidMention = isMention && validUserNames.includes(`@${username}`);
 
-                                                                                        return (
-                                                                                            <span
-                                                                                                key={i}
-                                                                                                style={{
-                                                                                                    backgroundColor: isValidMention ? 'rgba(255, 165, 0, 0.4)' : 'transparent', // Only highlight valid mentions
-                                                                                                    transition: 'background-color 0.3s ease',
-                                                                                                    padding: "5px",
-                                                                                                    borderRadius: '10px'
-                                                                                                }}
-                                                                                            >
-                                                                                                {part}
-                                                                                            </span>
-                                                                                        );
-                                                                                    })}
-                                                                                    {msg?.content && index < msg.content.split('\n').length - 1 && <br />}
-                                                                                </span>
-                                                                            ))}
-                                                                    </p>
+                                                                                    return (
+                                                                                        <span
+                                                                                            key={i}
+                                                                                            style={{
+                                                                                                backgroundColor: isValidMention ? 'rgba(255, 165, 0, 0.4)' : 'transparent', // Only highlight valid mentions
+                                                                                                transition: 'background-color 0.3s ease',
+                                                                                                padding: "5px",
+                                                                                                borderRadius: '10px'
+                                                                                            }}
+                                                                                        >
+                                                                                            {part}
+                                                                                        </span>
+                                                                                    );
+                                                                                })}
+                                                                                {msg?.content && index < msg.content.split('\n').length - 1 && <br />}
+                                                                            </span>
+                                                                        ))}
+                                                                </p>
                                                                 <span>{msg.edited && <span className='text-[.7rem] text-gray-200'>(edited)</span>}</span>
                                                             </div>
                                                             <div className="flex items-center w-full justify-start p-1 gap-1">

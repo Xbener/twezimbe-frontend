@@ -25,6 +25,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import addNotification from 'react-push-notification'
 import ChatInput from '@/components/chatInput'
 import { Input } from '@/components/ui/input'
+import { InputSwitch } from 'primereact/inputswitch'
 
 
 type Props = {}
@@ -32,7 +33,7 @@ type Props = {}
 
 function Page({ }: Props) {
     const params = useParams()
-    const { messages, setMessages, isTyping, setIsTyping, unreadMessages, setUnreadMessages, roomIdRef, setCurrentChannel, setChId, setRoomId, roomId } = useMyContext()
+    const { messages, setMessages, isTyping, setIsTyping, unreadMessages, setUnreadMessages, roomIdRef, setCurrentChannel, setChId, userSettings,  setRoomId, roomId } = useMyContext()
     const { getChannel, isError } = useGetSingleChannel()
     const [isLoading, setLoading] = useState(true)
     const [sending, setSending] = useState(false)
@@ -770,7 +771,21 @@ function Page({ }: Props) {
                     <h1 className="text-base md:text-xl">{channel?.name}</h1>
                 </div>
                 <div className='flex items-center gap-4'>
-                    <Bell className="cursor-pointer" />
+                    <Popover>
+
+                        <PopoverTrigger>
+                            <Bell className="cursor-pointer" />
+                        </PopoverTrigger>
+                        <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col pl-3 ">
+                            <div className="w-full flex items-center justify-between">
+                                <h1>Mute</h1>
+                                <InputSwitch
+                                    checked={!userSettings?.notificationSettings.chatroomsMuted.includes(channel?.chatroom?._id as string)}
+                                    className="p-2 rounded-full"
+                                />
+                            </div>
+                        </PopoverContent>
+                    </Popover>
                     <Dialog>
                         <DialogTrigger>
                             <Search className="cursor-pointer" />
