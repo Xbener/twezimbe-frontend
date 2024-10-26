@@ -84,12 +84,8 @@ const GroupCreateDialog = ({ }: Props) => {
     });
 
     useEffect(()=>{
-        if(allUsers){
-            allUsers?.map(user=>{
-                setSelectedUsersId(prev=>([...prev, `${user?._id}`]))
-            })
-        }
-    },[])
+                setSelectedUsersId([`${currentUser?._id}`])
+    },[currentUser])
 
 
     const onSubmit = async (GroupData: GroupFormData) => {
@@ -175,28 +171,11 @@ const GroupCreateDialog = ({ }: Props) => {
                             hidden
                             onChange={(e) => setSelectedImage(e.target.files![0])}
                         />
-                        {selectedUsersId.length > 1 && (
-                            <>
-                                <Input
-                                    placeholder="Group Name"
-                                    value={groupName}
-                                    onChange={(e) => setGroupName(e.target.value)}
-                                    className="border-[#0f172a] border-2 placeholder:text-gray-600"
-                                />
-                                <div
-                                    className="flex w-full gap-2 bg-[#0f172a] text-white hover:bg-gray-500 justify-center h-8 items-center rounded-lg cursor-pointer"
-                                    onClick={() => imgRef.current?.click()}
-                                >
-                                    <ImageIcon size={20} />
-                                    Group Image
-                                </div>
-                            </>
-                        )}
+
                         {step === 1 && (
                             <>
                                 <div className="flex flex-col gap-3 overflow-auto max-h-[500px] max-w-screen-2xl">
                                     {allUsers?.map((user) => (
-                            
                                         <FormField
                                             control={form.control}
                                             name='name'
@@ -224,7 +203,11 @@ const GroupCreateDialog = ({ }: Props) => {
                                     <Button
                                         variant={"outline"}
                                         className="bg-blue-500 text-white hover:bg-gray-500"
-                                        disabled={!groupName||isLoading}
+                                        disabled={
+                                            selectedUsersId.length === 0 ||
+                                            (selectedUsersId.length > 1 && !groupName) ||
+                                            isLoading
+                                        }
                                         onClick={() => setStep(2)}>Next</Button>
                                 </div>
                             </>
