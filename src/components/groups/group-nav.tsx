@@ -73,7 +73,7 @@ const GroupNav = () => {
         </NavLink>
       ))} */}
 
-
+{/* 
             {unreadMessageGroups.map((message) => {
                 const isChannel = message.chatroom.type === 'channel';
                 const profilePic = isChannel ? message.contact?.group_picture : message.contact?.profile_pic;
@@ -95,13 +95,13 @@ const GroupNav = () => {
                         </span>
                     </NavLink>
                 );
-            })}
+            })} */}
 
             {groupList?.map((group) => {
-                // Check if the group_id exists in the unread messages
-                if (unreadGroupIds.has(group.group_id || group?._id)) {
-                    return null; // Skip rendering this group
-                }
+                // // Check if the group_id exists in the unread messages
+                // if (unreadGroupIds.has(group.group_id || group?._id)) {
+                //     return null; // Skip rendering this group
+                // }
 
                 return (
                     <NavLink
