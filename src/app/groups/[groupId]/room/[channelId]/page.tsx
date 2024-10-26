@@ -63,7 +63,7 @@ function Page({ }: Props) {
 
     })
 
-    const [userRole,setUserRole] = useState<string>("ChannelMember")
+    const [userRole, setUserRole] = useState<string>("ChannelMember")
     useEffect(() => {
         if (channel) {
             const thisUser = channel.membersDetails?.find((member: User) => member._id === currentUser?._id); // Replace with actual user ID
@@ -131,28 +131,34 @@ function Page({ }: Props) {
     useEffect(() => {
         console.log(validUserNames)
     }, [validUserNames])
+
     const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         const value = e.target.value;
         setMessage(value);
 
-
-        const mentionMatch = value.match(/@(\w+)$/);
+        // Match the mention syntax and capture the username after '@'
+        const mentionMatch = value.match(/@(\w*)$/); // Allow for partial names
         if (mentionMatch) {
             setIsMentioning(true);
             const searchTerm = mentionMatch[1].toLowerCase();
+
+            // If there's a search term, filter the members, otherwise show all
             setFilteredUsers(
                 group?.members?.filter((user) =>
                     user.lastName.toLowerCase().startsWith(searchTerm) ||
                     user.firstName.toLowerCase().startsWith(searchTerm)
-                ) || []
+                ) || [] // Fallback to an empty array if no members are present
             );
         } else {
             setIsMentioning(false);
+            setFilteredUsers([]);
+            messagingInputRef?.current?.focus()
         }
     };
 
+
     const handleUserSelect = (user: User) => {
-        const updatedMessage = message.replace(/@\w*$/, `@${user.lastName}`);
+        const updatedMessage = message.replace(/@\w*$/, `@${user.lastName} `);
         setMessage(updatedMessage);
         setIsMentioning(false);
         setFilteredUsers([]);
@@ -632,6 +638,7 @@ function Page({ }: Props) {
             setMessage('');
             scrollToBottom();
             setIsReplying({ state: false, message: {}, replyingTo: "" });
+            messagingInputRef?.current?.focus()
         } catch (error) {
             console.error('Error sending message', error);
         } finally {
@@ -673,6 +680,7 @@ function Page({ }: Props) {
                 setMessage('');
                 scrollToBottom();
                 setIsReplying({ state: false, message: {}, replyingTo: "" });
+                messagingInputRef?.current?.focus()
             } catch (error) {
                 console.error('Error sending message', error);
             } finally {
@@ -1495,7 +1503,10 @@ function Page({ }: Props) {
                                         <li
                                             className="cursor-pointer hover:bg-gray-200 p-3"
                                             key={user.id}
-                                            onClick={() => handleUserSelect(user)}>
+                                            onClick={() => {
+                                                handleUserSelect(user)
+                                                messagingInputRef?.current?.focus()
+                                            }}>
                                             @{user.lastName} {user.firstName}
                                         </li>
                                     </>

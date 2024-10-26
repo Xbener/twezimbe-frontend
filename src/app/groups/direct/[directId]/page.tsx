@@ -40,7 +40,6 @@ function Page({ }: Props) {
     })
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [suggestions, setSuggestions] = useState<typeof currentPatners>([]);
-    const textareaRef = useRef(null);
 
     const editingInputRef = useRef<HTMLTextAreaElement | null>(null)
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -72,25 +71,37 @@ function Page({ }: Props) {
     useEffect(() => {
         setValidUserNames(currentDM?.memberDetails.map(member => `@${member.lastName}`) || [])
     }, [currentDM])
+
+
     const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         const value = e.target.value;
         setMessage(value);
 
-
-        const mentionMatch = value.match(/@(\w+)$/);
+        // Check if the user is mentioning someone
+        const mentionMatch = value.match(/@(\w*)$/); // Adjusted regex to capture more characters if needed
         if (mentionMatch) {
             setIsMentioning(true);
+
             const searchTerm = mentionMatch[1].toLowerCase();
-            setFilteredUsers(
-                currentPatners.filter((user) =>
-                    user.lastName.toLowerCase().startsWith(searchTerm) ||
-                    user.firstName.toLowerCase().startsWith(searchTerm)
-                )
-            );
+
+            // If there's a search term, filter users; otherwise, show all users
+            if (searchTerm) {
+                setFilteredUsers(
+                    currentPatners.filter((user) =>
+                        user.lastName.toLowerCase().startsWith(searchTerm) ||
+                        user.firstName.toLowerCase().startsWith(searchTerm)
+                    )
+                );
+            } else {
+                setFilteredUsers(currentPatners); // Show all users if searchTerm is empty
+            }
         } else {
             setIsMentioning(false);
+            setFilteredUsers([]);
+            messagingInputRef?.current?.focus()
         }
     };
+
 
     const handleUpdateUserSettings = async (settings: UserSettings) => {
         try {
@@ -466,6 +477,7 @@ function Page({ }: Props) {
                 setMessage('');
                 scrollToBottom();
                 setIsReplying({ state: false, message: {}, replyingTo: "" });
+                messagingInputRef?.current?.focus()
             } catch (error) {
                 console.error('Error sending message', error);
             } finally {
@@ -512,6 +524,7 @@ function Page({ }: Props) {
                 scrollToBottom();
                 setIsReplying({ state: false, message: {}, replyingTo: "" });
                 setSuggestions([]);
+                messagingInputRef?.current?.focus()
             } catch (error) {
                 console.error('Error sending message', error);
             } finally {
@@ -603,7 +616,7 @@ function Page({ }: Props) {
                             <div className="w-full flex items-center justify-between">
                                 <h1>Mute</h1>
                                 <input
-                                type="checkbox"
+                                    type="checkbox"
                                     onChange={(e) =>
                                         handleUpdateUserSettings({
                                             ...userSettings,
@@ -1064,7 +1077,11 @@ function Page({ }: Props) {
                                         <li
                                             className="cursor-pointer hover:bg-gray-200 p-3"
                                             key={user.id}
-                                            onClick={() => handleUserSelect(user)}>
+                                            onClick={() => {
+                                                handleUserSelect(user)
+                                                messagingInputRef?.current?.focus()
+
+                                            }}>
                                             @{user.lastName} {user.firstName}
                                         </li>
                                     </>
@@ -1073,7 +1090,7 @@ function Page({ }: Props) {
                         )}
                         <div className="relative">
                             <textarea
-                                ref={textareaRef}
+                                ref={messagingInputRef}
                                 disabled={sending}
                                 className="flex-grow bg-transparent p-3 rounded-md text-white placeholder-gray-400 focus:outline-none disabled:cursor-not-allowed w-full"
                                 placeholder={`Message...`}

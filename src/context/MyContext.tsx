@@ -71,7 +71,7 @@ export const MyProvider = ({ children }: Props) => {
     const roomIdRef = useRef(roomId);
     const [unreadMessages, setUnreadMessages] = useState<UnreadMessage[]>([])
     const [userSettings, setUserSettings] = useState<UserSettings | null>(null)
-
+    const userSettingsRef = useRef(userSettings)
     useEffect(() => {
         if (document && unreadMessages && unreadMessages?.filter(msg => !msg?.isRead!).length > 0) {
             document.title = `${unreadMessages.filter(msg => !msg?.isRead!).length} unread messages `
@@ -83,8 +83,10 @@ export const MyProvider = ({ children }: Props) => {
     }, [roomId])
 
     useEffect(() => {
-        roomIdRef.current = roomId; // Keep ref updated
+        roomIdRef.current = roomId;
     }, [roomId]);
+
+
 
     useEffect(() => {
 
@@ -189,11 +191,10 @@ export const MyProvider = ({ children }: Props) => {
                 });
             });
             const handleNewMessage = (vl: { message: Message, chatroomId: string, sentTo: string }) => {
-                console.log(roomIdRef.current, vl.sentTo);
                 if (`${roomIdRef.current}` == `${vl.sentTo}`) {
                     setMessages((prev) => [...prev.filter(message => message._id !== vl.message._id), vl.message]);
                 }
-                if (!userSettings?.notificationSettings.chatroomsMuted.includes(roomIdRef.current)) {
+                if (!userSettings?.notificationSettings.chatroomsMuted.find(room => room === roomIdRef.current)) {
                     addNotification({
                         title: 'New Message',
                         subtitle: 'You have a new message',
