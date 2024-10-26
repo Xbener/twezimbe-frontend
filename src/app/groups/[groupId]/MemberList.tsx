@@ -75,9 +75,9 @@ function MemberList({ admins, moderators, members, isLoading }: Props) {
                                     </div>
 
                                     <div className="w-full p-2 mb-3 ">
-                                        <h1 className='p-1 font-extrabold text-[0.9rem] mb-2 capitalize'>All Members ({privateChannelMembers.filter(member => member.role.role_name === 'ChannelMember').length})</h1>
+                                        <h1 className='p-1 font-extrabold text-[0.9rem] mb-2 capitalize'>All Members ({privateChannelMembers.filter(member => member).length})</h1>
                                         {
-                                            privateChannelMembers.filter(member => member.role.role_name === 'ChannelMember').length === 0 ? "No other members" : privateChannelMembers.filter(member => member.role.role_name === 'ChannelMember').map((member, index) => (
+                                            privateChannelMembers.length === 0 ? "No other members" : privateChannelMembers.filter(member => member).map((member, index) => (
                                                 <GroupMemberItem key={index} {...member} />
                                             ))
                                         }

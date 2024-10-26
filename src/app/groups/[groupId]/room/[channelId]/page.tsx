@@ -47,7 +47,7 @@ function Page({ }: Props) {
     const emojiContainerRef = useRef<HTMLDivElement | null>(null)
     const [showPicker, setShowPicker] = useState(false);
     const [quickEmojiSelector, setQuickEmojiSelector] = useState(false)
-    const [attachments, setAttachments] = useState<File[] | any>(null)
+    const [attachments, setAttachments] = useState<any>(null)
     const [isMentioning, setIsMentioning] = useState(false);
     const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
     const [validUserNames, setValidUserNames] = useState<string[]>([])
@@ -1529,13 +1529,20 @@ function Page({ }: Props) {
                         </div>
                     </div>
                 ) : attachments?.length ? (
-                    <div className='w-full h-auto p-2 flex gap-2 overflow-auto flex-wrap'>
-                        {/* <div className='w-auto p-2 flex flex-col items-center justify-center gap-2 border rounded-md'>
-                            <span className='bg-neutral-50 text-black rounded-full place-self-end justify-self-end cursor-pointer'><XIcon /></span>
-                            <FileIcon className=" size-12" />
-                            <h1>filename.pdf</h1>
-                        </div> */}
-                    </div>
+                        <div className='w-full h-auto p-2 flex gap-2 overflow-auto flex-wrap'>
+                            {/* {Array.from(attachments).map((file: File, index: number) => (
+                                <div key={index} className='w-auto p-2 flex flex-col items-center justify-center gap-2 border rounded-md'>
+                                    <span
+                                        className='bg-neutral-50 text-black rounded-full place-self-end justify-self-end cursor-pointer'
+                                        onClick={() => handleRemoveAttachment(file)}
+                                    >
+                                        <XIcon />
+                                    </span>
+                                    <FileIcon className="size-12" />
+                                    <h1>{file.name}</h1>
+                                </div>
+                            ))} */}
+                        </div>
                 ) : null}
                 <div className="space-x-3 relative w-full ">
 
