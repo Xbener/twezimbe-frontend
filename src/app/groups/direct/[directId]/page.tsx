@@ -993,101 +993,101 @@ function Page({ }: Props) {
                                                                     </div>
                                                                 </div>
                                                             ) : null}
-                                                                <div className="text-white flex items-center gap-2">
-                                                                    <div className="w-full flex flex-col gap-2">
-                                                                        <p>
-                                                                            {msg?.content &&
-                                                                                msg.content.split('\n').map((line, index) => (
-                                                                                    <span key={index}>
-                                                                                        {line.split(/(@\w+)/g).map((part, i) => {
-                                                                                            const isMention = part.startsWith('@');
-                                                                                            const username = part.slice(1); // Remove "@" for validation
+                                                            <div className="text-white flex items-center gap-2">
+                                                                <div className="w-full flex flex-col gap-2">
+                                                                    <p>
+                                                                        {msg?.content &&
+                                                                            msg.content.split('\n').map((line, index) => (
+                                                                                <span key={index}>
+                                                                                    {line.split(/(@\w+)/g).map((part, i) => {
+                                                                                        const isMention = part.startsWith('@');
+                                                                                        const username = part.slice(1); // Remove "@" for validation
 
-                                                                                            // Check if it matches a valid username for highlighting
-                                                                                            const isValidMention = isMention && validUserNames.includes(`@${username}`);
+                                                                                        // Check if it matches a valid username for highlighting
+                                                                                        const isValidMention = isMention && validUserNames.includes(`@${username}`);
 
-                                                                                            return (
-                                                                                                <span
-                                                                                                    key={i}
-                                                                                                    style={{
-                                                                                                        backgroundColor: isValidMention ? 'rgba(255, 165, 0, 0.4)' : 'transparent', // Only highlight valid mentions
-                                                                                                        transition: 'background-color 0.3s ease',
-                                                                                                        padding: "5px",
-                                                                                                        borderRadius: '10px'
-                                                                                                    }}
-                                                                                                >
-                                                                                                    {part}
-                                                                                                </span>
-                                                                                            );
-                                                                                        })}
-                                                                                        {msg?.content && index < msg.content.split('\n').length - 1 && <br />}
+                                                                                        return (
+                                                                                            <span
+                                                                                                key={i}
+                                                                                                style={{
+                                                                                                    backgroundColor: isValidMention ? 'rgba(255, 165, 0, 0.4)' : 'transparent', // Only highlight valid mentions
+                                                                                                    transition: 'background-color 0.3s ease',
+                                                                                                    padding: "5px",
+                                                                                                    borderRadius: '10px'
+                                                                                                }}
+                                                                                            >
+                                                                                                {part}
+                                                                                            </span>
+                                                                                        );
+                                                                                    })}
+                                                                                    {msg?.content && index < msg.content.split('\n').length - 1 && <br />}
 
-                                                                                    </span>
-                                                                                ))}
-                                                                        </p>
-                                                                        {
-                                                                            msg.attachmentUrls && (
-                                                                                <div className="w-full flex gap-2 flex-wrap">
-                                                                                    {msg.attachmentUrls.map((attachment, index) => {
-                                                                                        const svgIcon = mimeTypeToSvg[attachment.type as any] || mimeTypeToSvg['default'];
+                                                                                </span>
+                                                                            ))}
+                                                                    </p>
+                                                                    {
+                                                                        msg.attachmentUrls && (
+                                                                            <div className="w-full flex gap-2 flex-wrap">
+                                                                                {msg.attachmentUrls.map((attachment, index) => {
+                                                                                    const svgIcon = mimeTypeToSvg[attachment.type as any] || mimeTypeToSvg['default'];
 
-                                                                                        // Check if the attachment is an image
-                                                                                        if (attachment.type.startsWith('image/')) {
-                                                                                            return (
-                                                                                                <a
+                                                                                    // Check if the attachment is an image
+                                                                                    if (attachment.type.startsWith('image/')) {
+                                                                                        return (
+                                                                                            <a
+                                                                                                key={index}
+                                                                                                href={attachment.url}
+                                                                                                target="_blank"
+                                                                                                rel="noopener noreferrer"
+                                                                                                download
+                                                                                                className="hover:bg-[rgba(50,139,255,0.39)] p-3 rounded-md"
+                                                                                            >
+                                                                                                <div className="w-full flex items-center gap-2 justify-between group p-1 mb-5">
+                                                                                                    <span className="text-[.7rem]">{attachment?.name.substr(0, 20)}</span>
+                                                                                                    <button className="invisible group-hover:visible">
+                                                                                                        <Download />
+                                                                                                    </button>
+                                                                                                </div>
+                                                                                                <img
                                                                                                     key={index}
-                                                                                                    href={attachment.url}
-                                                                                                    target="_blank"
-                                                                                                    rel="noopener noreferrer"
-                                                                                                    download
-                                                                                                    className="hover:bg-[rgba(50,139,255,0.39)] p-3 rounded-md"
-                                                                                                >
-                                                                                                    <div className="w-full flex items-center gap-2 justify-between group p-1 mb-5">
+                                                                                                    className="object-fit rounded-md"
+                                                                                                    src={attachment.url}
+                                                                                                    alt="attachment"
+                                                                                                    width={200}
+                                                                                                    height={200}
+                                                                                                />
+                                                                                            </a>
+                                                                                        );
+                                                                                    } else {
+                                                                                        // Render non-image files with SVG icon and download link
+                                                                                        return (
+                                                                                            <a
+                                                                                                key={index}
+                                                                                                href={attachment.url}
+                                                                                                target="_blank"
+                                                                                                rel="noopener noreferrer"
+                                                                                                download
+                                                                                                className="hover:bg-[rgba(50,139,255,0.39)] p-3 rounded-md "
+                                                                                            >
+                                                                                                <div className="file-preview flex flex-col w-full justify-between group">
+                                                                                                    <div className="w-full flex items-center gap-2 p-1 mb-5">
                                                                                                         <span className="text-[.7rem]">{attachment?.name.substr(0, 20)}</span>
                                                                                                         <button className="invisible group-hover:visible">
                                                                                                             <Download />
                                                                                                         </button>
                                                                                                     </div>
-                                                                                                    <img
-                                                                                                        key={index}
-                                                                                                        className="object-fit rounded-md"
-                                                                                                        src={attachment.url}
-                                                                                                        alt="attachment"
-                                                                                                        width={200}
-                                                                                                        height={200}
-                                                                                                    />
-                                                                                                </a>
-                                                                                            );
-                                                                                        } else {
-                                                                                            // Render non-image files with SVG icon and download link
-                                                                                            return (
-                                                                                                <a
-                                                                                                    key={index}
-                                                                                                    href={attachment.url}
-                                                                                                    target="_blank"
-                                                                                                    rel="noopener noreferrer"
-                                                                                                    download
-                                                                                                    className="hover:bg-[rgba(50,139,255,0.39)] p-3 rounded-md "
-                                                                                                >
-                                                                                                    <div className="file-preview flex flex-col w-full justify-between group">
-                                                                                                        <div className="w-full flex items-center gap-2 p-1 mb-5">
-                                                                                                            <span className="text-[.7rem]">{attachment?.name.substr(0, 20)}</span>
-                                                                                                            <button className="invisible group-hover:visible">
-                                                                                                                <Download />
-                                                                                                            </button>
-                                                                                                        </div>
-                                                                                                        <img src={svgIcon} alt={attachment.type} width={100} height={100} className="mr-2" />
-                                                                                                    </div>
-                                                                                                </a>
-                                                                                            );
-                                                                                        }
-                                                                                    })}
-                                                                                </div>
-                                                                            )
-                                                                        }
-                                                                    </div>
-                                                                    <span>{msg.edited && <span className='text-[.7rem] text-gray-200'>(edited)</span>}</span>
+                                                                                                    <img src={svgIcon} alt={attachment.type} width={100} height={100} className="mr-2" />
+                                                                                                </div>
+                                                                                            </a>
+                                                                                        );
+                                                                                    }
+                                                                                })}
+                                                                            </div>
+                                                                        )
+                                                                    }
                                                                 </div>
+                                                                <span>{msg.edited && <span className='text-[.7rem] text-gray-200'>(edited)</span>}</span>
+                                                            </div>
                                                             <div className="flex items-center w-full justify-start p-1 gap-1">
                                                                 {
                                                                     msg.reactions?.length! > 0 && (
@@ -1230,21 +1230,21 @@ function Page({ }: Props) {
                         </div>
                     </div>
                 ) : attachments?.length ? (
-                        <div className='w-full h-auto p-2 flex gap-2 overflow-auto flex-wrap'>
-                            {Array.from(attachments as File[]).map((file: File, index: number) => (
-                                <div key={index} className='w-[100px] overflow-hidden p-2 flex flex-col items-center justify-center gap-2 border rounded-md'>
-                                    <button
+                    <div className='w-full h-auto p-2 flex gap-2 overflow-auto flex-wrap'>
+                        {Array.from(attachments as File[]).map((file: File, index: number) => (
+                            <div key={index} className='w-[100px] overflow-hidden p-2 flex flex-col items-center justify-center gap-2 border rounded-md'>
+                                <button
 
-                                        className='bg-neutral-50 text-black rounded-full place-self-end justify-self-end cursor-pointer'
-                                        onClick={() => handleRemoveAttachment(file)}
-                                    >
-                                        <XIcon />
-                                    </button>
-                                    <FileIcon className="size-12" />
-                                    <h1>{file.name}</h1>
-                                </div>
-                            ))}
-                        </div>
+                                    className='bg-neutral-50 text-black rounded-full place-self-end justify-self-end cursor-pointer'
+                                    onClick={() => handleRemoveAttachment(file)}
+                                >
+                                    <XIcon />
+                                </button>
+                                <FileIcon className="size-12" />
+                                <h1>{file.name}</h1>
+                            </div>
+                        ))}
+                    </div>
                 ) : null}
                 <div className="space-x-3 relative w-full">
                     <div className="W-full flex flex-col border-gray-700 border focus-within:border-white rounded-md">
@@ -1290,7 +1290,7 @@ function Page({ }: Props) {
                         <div className="relative">
                             <textarea
                                 ref={messagingInputRef}
-                                disabled={sending||fileUploading.state}
+                                disabled={sending || fileUploading.state}
                                 className="flex-grow bg-transparent p-3 rounded-md text-white placeholder-gray-400 focus:outline-none disabled:cursor-not-allowed w-full"
                                 placeholder={`Message...`}
                                 value={message}
@@ -1303,28 +1303,21 @@ function Page({ }: Props) {
                         <div className="w-full flex p-2">
                             <div className="flex w-full items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <Popover>
-                                        <PopoverTrigger  disabled={sending||fileUploading.state} className="p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75">
-                                            <Plus className="size-5" />
-                                        </PopoverTrigger>
-                                        <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col ">
-                                            <input
-                                                type="file"
-                                                hidden
-                                                name="attachment"
-                                                id="attachment"
-                                                multiple
-                                                onChange={(e) => setAttachments(e.target.files as FileList)}
-                                            />
-                                            <Button disabled={sending || fileUploading.state} className="flex items-center gap-2 hover:bg-[rgb(0,0,0,.5)]">
-                                                <label className="flex items-center gap-2" htmlFor="attachment">
-                                                    <File />
-                                                    Upload a file
-                                                </label>
-                                            </Button>
 
-                                        </PopoverContent>
-                                    </Popover>
+                                    <input
+                                        type="file"
+                                        hidden
+                                        name="attachment"
+                                        id="attachment"
+                                        multiple
+                                        onChange={(e) => setAttachments(e.target.files as FileList)}
+                                    />
+                                    <button disabled={sending || fileUploading.state} className="p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-7 cursor-pointer5">
+                                        <label className="flex items-center gap-2 cursor-pointer" htmlFor="attachment">
+                                            <Plus className="size-5" />
+                                        </label>
+                                    </button>
+
                                     <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
                                         <Smile onClick={() => setShowPicker(prev => !prev)} className="size-5" />
                                     </span>
@@ -1334,7 +1327,7 @@ function Page({ }: Props) {
                                             messagingInputRef.current?.focus()
                                             setIsMentioning(true)
                                             setFilteredUsers(currentPatners.filter((user) => user) || []);
-                                        }} 
+                                        }}
                                         />
                                     </span>
                                 </div>

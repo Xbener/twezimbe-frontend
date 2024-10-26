@@ -1447,11 +1447,11 @@ function Page({ }: Props) {
                                                                                                 className="hover:bg-[rgba(50,139,255,0.39)] p-3 rounded-md"
                                                                                             >
                                                                                                 <div className="w-full flex items-center gap-2 justify-between group p-1 mb-5">
-                                                                                                        <span className="text-[.7rem]">{attachment?.name.substr(0, 20)}</span>
-                                                                                                        <button className="invisible group-hover:visible">
-                                                                                                            <Download />
-                                                                                                        </button>
-                                                                                                    </div>
+                                                                                                    <span className="text-[.7rem]">{attachment?.name.substr(0, 20)}</span>
+                                                                                                    <button className="invisible group-hover:visible">
+                                                                                                        <Download />
+                                                                                                    </button>
+                                                                                                </div>
                                                                                                 <img
                                                                                                     key={index}
                                                                                                     className="object-fit rounded-md"
@@ -1719,29 +1719,21 @@ function Page({ }: Props) {
                         <div className="w-full flex p-2">
                             <div className="flex w-full items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <Popover>
-                                        <PopoverTrigger disabled={sending || fileUploading.state} className="p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75">
+
+                                    <input
+                                        type="file"
+                                        hidden
+                                        name="attachment"
+                                        id="attachment"
+                                        multiple
+                                        onChange={(e) => setAttachments(e.target.files as FileList)}
+                                    />
+                                        <button disabled={sending || fileUploading.state} className="p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-7 cursor-pointer5">
+                                    <label className="flex items-center gap-2 cursor-pointer" htmlFor="attachment">
                                             <Plus className="size-5" />
-                                        </PopoverTrigger>
-                                        <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col ">
-                                            <input
-                                                type="file"
-                                                hidden
-                                                name="attachment"
-                                                id="attachment"
-                                                multiple
-                                                onChange={(e) => setAttachments(e.target.files as FileList)}
-                                            />
+                                    </label>
+                                        </button>
 
-                                            <Button disabled={sending || fileUploading.state} className="flex items-center gap-2 hover:bg-[rgb(0,0,0,.5)]">
-                                                <label className="flex items-center gap-2" htmlFor="attachment">
-                                                    <File />
-                                                    Upload a file
-                                                </label>
-                                            </Button>
-
-                                        </PopoverContent>
-                                    </Popover>
                                     <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
                                         <Smile onClick={() => setShowPicker(prev => !prev)} className="size-5" />
                                     </span>
