@@ -83,69 +83,14 @@ const GroupCreateDialog = ({ }: Props) => {
         }
     });
 
-    // const createConversation = useMutation(api.conversations.createConversation)
-    // const generateUploadUrl = useMutation(api.conversations.generateUploadUrl)
-    // const me = useQuery(api.users.getMe)
-    // const users = useQuery(api.users.getUsers)
+    useEffect(()=>{
+        if(allUsers){
+            allUsers?.map(user=>{
+                setSelectedUsersId(prev=>([...prev, `${user?._id}`]))
+            })
+        }
+    },[])
 
-    // const { setSelectedConversation } = useConversationStore()
-
-    // const handlCreateConversation = async () => {
-    //   if (selectedUsers.length === 0) return
-    //   setIsLoading(true)
-    //   try {
-    //     const isGroup = selectedUsers.length > 1
-    //     let conversationId
-    //     if (!isGroup) {
-    //       conversationId = await createConversation({
-    //         participants: [...selectedUsers, me?._id!], // [1, 2]
-    //         isGroup: false,
-    //       })
-    //     } else {
-    //       const postUrl = await generateUploadUrl()
-    //       const result = await fetch(postUrl, {
-    //         method: "POST",
-    //         headers: {
-    //           "Content-Type": selectedImage?.type!,
-    //         },
-    //         body: selectedImage,
-    //       })
-
-    //       const { storageId } = await result.json()
-    //       conversationId = await createConversation({
-    //         participants: [...selectedUsers, me?._id!], // [1, 2]
-    //         isGroup: true,
-    //         admin: me?._id!,
-    //         groupName,
-    //         groupImage: storageId,
-    //       })
-    //     }
-    //     dialogCloseRef.current?.click()
-    //     setSelectedUsers([])
-    //     setGroupName("")
-    //     setSelectedImage(null)
-
-    //     const conversationName = isGroup
-    //       ? groupName
-    //       : users?.find((user) => user._id === selectedUsers[0])?.name
-
-    //     setSelectedConversation({
-    //       _id: conversationId,
-    //       participants: selectedUsers,
-    //       isGroup,
-    //       image: isGroup
-    //         ? renderedImage
-    //         : users?.find((user) => user._id === selectedUsers[0])?.image,
-    //       name: conversationName,
-    //       admin: me?._id!,
-    //     })
-    //   } catch (error) {
-    //     toast.error("Failed to create conversation")
-    //     console.error(error)
-    //   } finally {
-    //     setIsLoading(false)
-    //   }
-    // }
 
     const onSubmit = async (GroupData: GroupFormData) => {
 
@@ -251,43 +196,25 @@ const GroupCreateDialog = ({ }: Props) => {
                             <>
                                 <div className="flex flex-col gap-3 overflow-auto max-h-[500px] max-w-screen-2xl">
                                     {allUsers?.map((user) => (
-                                        <div
-                                            key={user?._id}
-                                            className={`flex gap-3 items-center p-2 rounded cursor-pointer active:scale-95 
-								transition-all ease-in-out duration-300
-							${selectedUsersId.includes(`${user?._id}`) ? "bg-[#00a884] text-white" : ""}`}
-                                            onClick={() => {
-                                                if (selectedUsersId.includes(`${user?._id}`)) {
-                                                    setSelectedUsersId(
-                                                        selectedUsersId.filter((id) => id !== user?._id)
-                                                    )
-                                                } else {
-                                                    setSelectedUsersId([...selectedUsersId, `${user?._id}`])
-                                                }
-                                            }}
-                                        >
-                                            <Avatar className="overflow-visible">
-                                                {user?.isActive && (
-                                                    <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-foreground" />
-                                                )}
+                            
+                                        <FormField
+                                            control={form.control}
+                                            name='name'
 
-                                                <AvatarImage
-                                                    src={user?.profile_pic}
-                                                    className="rounded-full object-cover"
-                                                />
-                                                <AvatarFallback>
-                                                    <div className="animate-pulse bg-gray-tertiary w-full h-full rounded-full"></div>
-                                                </AvatarFallback>
-                                            </Avatar>
-
-                                            <div className="w-full ">
-                                                <div className="flex items-center justify-between">
-                                                    <p className="text-md font-medium">
-                                                        {user?.lastName}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Group Name</FormLabel>
+                                                    <FormControl>
+                                                        <Input {...field}
+                                                            name="name"
+                                                            value={groupName}
+                                                            onChange={(e) => setGroupName(e.target.value)}
+                                                            className="bg-white border-2 placeholder:text-gray-600" placeholder="Group Name" />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
                                     ))}
                                 </div>
                                 <div className="flex justify-between text-white">
@@ -297,11 +224,7 @@ const GroupCreateDialog = ({ }: Props) => {
                                     <Button
                                         variant={"outline"}
                                         className="bg-blue-500 text-white hover:bg-gray-500"
-                                        disabled={
-                                            selectedUsersId.length === 0 ||
-                                            (selectedUsersId.length > 1 && !groupName) ||
-                                            isLoading
-                                        }
+                                        disabled={!groupName||isLoading}
                                         onClick={() => setStep(2)}>Next</Button>
                                 </div>
                             </>
@@ -321,24 +244,7 @@ const GroupCreateDialog = ({ }: Props) => {
                                     )}
                                 />
 
-                                <FormField
-                                    control={form.control}
-                                    name='name'
-
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Group Name</FormLabel>
-                                            <FormControl>
-                                                <Input {...field}
-                                                    name="name"
-                                                    value={groupName}
-                                                    onChange={(e) => setGroupName(e.target.value)}
-                                                    className="bg-white border-2 placeholder:text-gray-600" placeholder="Group Name" />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                             
                                 <FormField
                                     control={form.control}
                                     name='group_type'
