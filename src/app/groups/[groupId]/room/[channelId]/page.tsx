@@ -309,6 +309,7 @@ function Page({ }: Props) {
             message: msg, // Store the clicked message
         });
     };
+
     const handleDelete = async (message: Message) => {
         try {
             const token = Cookies.get('access-token')
@@ -1536,8 +1537,8 @@ function Page({ }: Props) {
                                             {
                                                 contextMenu.visible && contextMenu.message?._id === msg._id && ( // Show the context menu for the correct message
                                                     <div
-                                                        className="absolute bg-gray-700 text-white rounded-md shadow-sm w-[200px] z-50"
-                                                        style={{ left: contextMenu.x, top: contextMenu.y }}
+                                                        className="absolute bg-gray-700 text-white rounded-md shadow-sm w-auto p-1 z-50"
+                                                        style={{ left: contextMenu.y, top: contextMenu.y }}
                                                         onMouseLeave={closeContextMenu}
                                                     >
                                                         {instantActions.map((action, index) => {
@@ -1546,7 +1547,7 @@ function Page({ }: Props) {
                                                             }
                                                             if (action.name === "React") {
                                                                 return (
-                                                                    <div className="flex items-center w-full justify-around p-2">
+                                                                    <div className="flex items-center w-full justify-around p-2 gap-3">
                                                                         {
                                                                             action.emojis!.map((emoji, index) => (
                                                                                 <span key={index} className="border p-1 rounded-md hover:bg-[rgba(255,255,255,0.24)] cursor-pointer"
@@ -1675,11 +1676,11 @@ function Page({ }: Props) {
 
                         </div>
                         {isMentioning && (
-                            <ul className="mention-dropdown absolute bg-white text-black w-1/5 rounded-md overflow-auto z-50 max-h-44 border-2 border-black shadow-md">
+                            <ul className="mention-dropdown absolute bg-blue-500 text-white w-1/5 rounded-md overflow-auto z-50 max-h-44 shadow-md">
                                 {filteredUsers.map((user) => (
                                     <>
                                         <li
-                                            className="cursor-pointer hover:bg-gray-200 p-3"
+                                            className="cursor-pointer hover:bg-gray-200 p-3 hover:text-black"
                                             key={user.id}
                                             onClick={() => {
                                                 handleUserSelect(user)

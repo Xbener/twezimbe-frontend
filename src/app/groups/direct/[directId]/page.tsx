@@ -1133,7 +1133,7 @@ function Page({ }: Props) {
                                             {
                                                 contextMenu.visible && contextMenu.message?._id === msg._id && ( // Show the context menu for the correct message
                                                     <div
-                                                        className="absolute bg-gray-700 text-white rounded-md shadow-sm w-[200px] z-50"
+                                                        className="absolute bg-gray-700 text-white rounded-md shadow-sm w-auto p-1 z-50"
                                                         style={{ left: contextMenu.x, top: contextMenu.y }}
                                                         onMouseLeave={closeContextMenu}
                                                     >
@@ -1270,11 +1270,11 @@ function Page({ }: Props) {
 
                         </div>
                         {isMentioning && (
-                            <ul className="mention-dropdown absolute bg-white text-black w-1/5 rounded-md overflow-auto z-50 max-h-44 border-2 border-black shadow-md">
+                            <ul className="mention-dropdown absolute bg-blue-500 text-white w-1/5 rounded-md overflow-auto z-50 max-h-44  shadow-md">
                                 {filteredUsers.map((user) => (
                                     <>
                                         <li
-                                            className="cursor-pointer hover:bg-gray-200 p-3"
+                                            className="cursor-pointer hover:bg-gray-200 hover:text-black p-3"
                                             key={user.id}
                                             onClick={() => {
                                                 handleUserSelect(user)
