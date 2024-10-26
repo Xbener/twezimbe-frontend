@@ -2,7 +2,7 @@
 
 import { useGetSingleChannel } from '@/api/channel'
 import { GroupContext } from '@/context/GroupContext'
-import { ChannelSettings, ChannelTypes, Message, Reaction, UnreadMessage, User } from '@/types'
+import { ChannelSettings, ChannelTypes, Message, Reaction, UnreadMessage, User, UserSettings } from '@/types'
 import { useParams } from 'next/navigation'
 import React, { MouseEventHandler, useContext, useEffect, useRef, useState } from 'react'
 import Cookies from 'js-cookie'
@@ -33,7 +33,7 @@ type Props = {}
 
 function Page({ }: Props) {
     const params = useParams()
-    const { messages, setMessages, isTyping, setIsTyping, unreadMessages, setUnreadMessages, roomIdRef, setCurrentChannel, setChId, userSettings,  setRoomId, roomId } = useMyContext()
+    const { messages, setMessages, isTyping, setIsTyping, unreadMessages, setUnreadMessages, roomIdRef, setCurrentChannel, setChId, userSettings, setUserSettings, setRoomId, roomId } = useMyContext()
     const { getChannel, isError } = useGetSingleChannel()
     const [isLoading, setLoading] = useState(true)
     const [sending, setSending] = useState(false)
@@ -62,6 +62,16 @@ function Page({ }: Props) {
         state: channel?.state
 
     })
+
+    const [userRole,setUserRole] = useState<string>("ChannelMember")
+    useEffect(() => {
+        if (channel) {
+            const thisUser = channel.membersDetails?.find((member: User) => member._id === currentUser?._id); // Replace with actual user ID
+            if (thisUser?.role?.role_name) {
+                setUserRole(thisUser.role.role_name);
+            }
+        }
+    }, [channel]);
 
     useEffect(() => {
 
@@ -759,6 +769,27 @@ function Page({ }: Props) {
         setQueriedMessages(messages.filter(message => message.content?.includes(e.target.value)))
     }
 
+    const handleUpdateUserSettings = async (settings: UserSettings) => {
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/settings/user/${settings?._id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('access-token')}`
+                },
+                body: JSON.stringify({ ...settings })
+            })
+
+            const data = await res.json()
+            if (!data.status) return toast.error(data.errors || data.message || "Unable to update")
+            setUserSettings(({ ...data.userSettings }))
+        } catch (error) {
+            toast.error('unable to updated')
+            console.log(error)
+        }
+    }
+
+
     return (
         <div className="w-full h-screen flex flex-col bg-[#013a6fd3] text-white">
             {/* Header */}
@@ -779,10 +810,23 @@ function Page({ }: Props) {
                         <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col pl-3 ">
                             <div className="w-full flex items-center justify-between">
                                 <h1>Mute</h1>
-                                <InputSwitch
-                                    checked={!userSettings?.notificationSettings.chatroomsMuted.includes(channel?.chatroom?._id as string)}
-                                    className="p-2 rounded-full"
+                                <input
+                                    type="checkbox"
+                                    onChange={(e) =>
+                                        handleUpdateUserSettings({
+                                            ...userSettings,
+                                            notificationSettings: {
+                                                ...userSettings.notificationSettings,
+                                                chatroomsMuted: e.target.checked
+                                                    ? [...userSettings.notificationSettings.chatroomsMuted, `${channel?.chatroom?._id}`]
+                                                    : userSettings.notificationSettings.chatroomsMuted.filter((chat) => chat !== channel?.chatroom?._id)
+                                            }
+                                        })
+                                    }
+                                    checked={userSettings?.notificationSettings.chatroomsMuted.includes(channel?.chatroom?._id!)}
+                                    className="p-5 w-5 h-5 cursor-pointer rounded-full "
                                 />
+
                             </div>
                         </PopoverContent>
                     </Popover>
@@ -1463,15 +1507,17 @@ function Page({ }: Props) {
                                 ref={messagingInputRef}
                                 disabled={
                                     sending ||
-                                    (settings?.postPermission === 'admins' && channel?.role?.role_name !== 'ChannelAdmin') ||
-                                    (settings?.postPermission === 'moderators' && !['ChannelModerator', 'ChannelAdmin'].includes(channel?.role?.role_name as string))
+                                    (
+                                        (settings?.postPermission === 'admins' && userRole !== 'ChannelAdmin') ||
+                                        (settings?.postPermission === 'moderators' && !['ChannelAdmin', 'ChannelMember'].includes(userRole))
+                                    )
                                 }
                                 onBlur={() => setIsTyping(prev => ({ message: "" }))}
                                 onFocus={() => setIsTyping(prev => ({ ...prev, message: `${currentUser?.firstName} is typing ...` }))}
                                 className="flex-grow bg-transparent p-3 rounded-md text-white placeholder-gray-400 focus:outline-none disabled:cursor-not-allowed w-full"
                                 placeholder={
-                                    (settings?.postPermission === 'admins' && channel?.role?.role_name !== 'ChannelAdmin') ||
-                                        (settings?.postPermission === 'moderators' && !['ChannelModerator', 'ChannelAdmin'].includes(channel?.role?.role_name as string))
+                                    (settings?.postPermission === 'admins' && userRole !== 'ChannelAdmin') ||
+                                        (settings?.postPermission === 'moderators' && !['ChannelAdmin', 'ChannelMember'].includes(userRole))
                                         ? "Not allowed to send messages"
                                         : `Message ${channel?.name}`
                                 }
@@ -1479,6 +1525,7 @@ function Page({ }: Props) {
                                 onChange={handleChange}
                                 onKeyDown={handleKeyPress}
                             />
+
                         </div>
                         <div className="w-full flex p-2">
                             <div className="flex w-full items-center justify-between">

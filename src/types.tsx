@@ -360,10 +360,7 @@ export type ChannelTypes = {
     chatroom?: ChatRoomTypes;
     members?: string[] | string | any;
     groupId?: string;
-    membersDetails?: User[]
-    role?: {
-        role_name: string;
-    }
+    membersDetails?:any
 }
 
 export type ChatRoomTypes = {

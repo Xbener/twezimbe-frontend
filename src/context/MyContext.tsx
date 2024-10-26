@@ -193,14 +193,16 @@ export const MyProvider = ({ children }: Props) => {
                 if (`${roomIdRef.current}` == `${vl.sentTo}`) {
                     setMessages((prev) => [...prev.filter(message => message._id !== vl.message._id), vl.message]);
                 }
-                addNotification({
-                    title: 'New Message',
-                    subtitle: 'You have a new message',
-                    message: vl.message.content,
-                    theme: 'darkblue',
-                    native: true,
-                    onClick: () => window.focus()
-                });
+                if (!userSettings?.notificationSettings.chatroomsMuted.includes(roomIdRef.current)) {
+                    addNotification({
+                        title: 'New Message',
+                        subtitle: 'You have a new message',
+                        message: vl.message.content,
+                        theme: 'darkblue',
+                        native: true,
+                        onClick: () => window.focus()
+                    });
+                }
                 setUnreadMessages(prev => {
                     return [...prev,
                     { messageId: vl.message._id || vl.sentTo, isRead: false, message: vl.message, userId: currentUser?._id }]
