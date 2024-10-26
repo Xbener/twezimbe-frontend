@@ -6,7 +6,7 @@ import { ChannelSettings, ChannelTypes, Message, Reaction, UnreadMessage, User, 
 import { useParams } from 'next/navigation'
 import React, { MouseEventHandler, useContext, useEffect, useRef, useState } from 'react'
 import Cookies from 'js-cookie'
-import { Lock, Bell, Pin, Smile, Image as Sticker, Plus, StickerIcon, DeleteIcon, Reply, Edit, ReplyAllIcon, XIcon, Settings, MessageCircleWarning, Delete, File, FileIcon, SmileIcon, Bold, Italic, Strikethrough, Link2, List, ListOrdered, AtSign, SidebarOpen, SendHorizonal, ArrowLeft, Search } from 'lucide-react'
+import { Lock, Bell, Pin, Smile, Image as Sticker, Plus, StickerIcon, DeleteIcon, Reply, Edit, ReplyAllIcon, XIcon, Settings, MessageCircleWarning, Delete, File, FileIcon, SmileIcon, Bold, Italic, Strikethrough, Link2, List, ListOrdered, AtSign, SidebarOpen, SendHorizonal, ArrowLeft, Search, Download } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import moment from 'moment'
@@ -26,6 +26,7 @@ import addNotification from 'react-push-notification'
 import ChatInput from '@/components/chatInput'
 import { Input } from '@/components/ui/input'
 import { InputSwitch } from 'primereact/inputswitch'
+import { mimeTypeToSvg } from '@/constants'
 
 
 type Props = {}
@@ -1430,16 +1431,60 @@ function Page({ }: Props) {
                                                                     {
                                                                         msg.attachmentUrls && (
                                                                             <div className="w-full flex gap-2 flex-wrap">
-                                                                                {
-                                                                                    msg.attachmentUrls.map(url => (
-                                                                                        <img
-                                                                                            className="object-fit rounded-md"
-                                                                                            src={url}
-                                                                                            width={200}
-                                                                                            height={200}
-                                                                                        />
-                                                                                    ))
-                                                                                }
+                                                                                {msg.attachmentUrls.map((attachment, index) => {
+                                                                                    const svgIcon = mimeTypeToSvg[attachment.type as any] || mimeTypeToSvg['default'];
+
+                                                                                    // Check if the attachment is an image
+                                                                                    if (attachment.type.startsWith('image/')) {
+                                                                                        return (
+                                                                                            <a
+                                                                                                key={index}
+                                                                                                href={attachment.url}
+                                                                                                target="_blank"
+                                                                                                rel="noopener noreferrer"
+                                                                                                download
+                                                                                                className="hover:bg-[rgba(50,139,255,0.39)] p-3 rounded-md"
+                                                                                            >
+                                                                                                <div className="w-full flex items-center gap-2 justify-between group p-1 mb-5">
+                                                                                                        <span className="text-[.7rem]">{attachment?.name.substr(0, 20)}</span>
+                                                                                                        <button className="invisible group-hover:visible">
+                                                                                                            <Download />
+                                                                                                        </button>
+                                                                                                    </div>
+                                                                                                <img
+                                                                                                    key={index}
+                                                                                                    className="object-fit rounded-md"
+                                                                                                    src={attachment.url}
+                                                                                                    alt="attachment"
+                                                                                                    width={200}
+                                                                                                    height={200}
+                                                                                                />
+                                                                                            </a>
+                                                                                        );
+                                                                                    } else {
+                                                                                        // Render non-image files with SVG icon and download link
+                                                                                        return (
+                                                                                            <a
+                                                                                                key={index}
+                                                                                                href={attachment.url}
+                                                                                                target="_blank"
+                                                                                                rel="noopener noreferrer"
+                                                                                                download
+                                                                                                className="hover:bg-[rgba(50,139,255,0.39)] p-3 rounded-md "
+                                                                                            >
+                                                                                                <div className="file-preview flex flex-col w-full justify-between group">
+                                                                                                    <div className="w-full flex items-center gap-2 p-1 mb-5">
+                                                                                                        <span className="text-[.7rem]">{attachment?.name.substr(0, 20)}</span>
+                                                                                                        <button className="invisible group-hover:visible">
+                                                                                                            <Download />
+                                                                                                        </button>
+                                                                                                    </div>
+                                                                                                    <img src={svgIcon} alt={attachment.type} width={100} height={100} className="mr-2" />
+                                                                                                </div>
+                                                                                            </a>
+                                                                                        );
+                                                                                    }
+                                                                                })}
                                                                             </div>
                                                                         )
                                                                     }
@@ -1674,7 +1719,7 @@ function Page({ }: Props) {
                             <div className="flex w-full items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <Popover>
-                                        <PopoverTrigger disabled={sending||fileUploading.state} className="p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75">
+                                        <PopoverTrigger disabled={sending || fileUploading.state} className="p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75">
                                             <Plus className="size-5" />
                                         </PopoverTrigger>
                                         <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col ">
@@ -1686,8 +1731,8 @@ function Page({ }: Props) {
                                                 multiple
                                                 onChange={(e) => setAttachments(e.target.files as FileList)}
                                             />
-                                
-                                            <Button disabled={sending || fileUploading.state}  className="flex items-center gap-2 hover:bg-[rgb(0,0,0,.5)]">
+
+                                            <Button disabled={sending || fileUploading.state} className="flex items-center gap-2 hover:bg-[rgb(0,0,0,.5)]">
                                                 <label className="flex items-center gap-2" htmlFor="attachment">
                                                     <File />
                                                     Upload a file
@@ -1701,16 +1746,16 @@ function Page({ }: Props) {
                                     </span>
                                     <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
                                         <AtSign onClick={() => {
-                                            setMessage(prev=> prev+ " @")
+                                            setMessage(prev => prev + " @")
                                             messagingInputRef.current?.focus()
                                             setIsMentioning(true)
-                                            setFilteredUsers(group?.members?.filter((user) => user) || [] );
+                                            setFilteredUsers(group?.members?.filter((user) => user) || []);
                                         }} className="size-5" />
                                     </span>
                                 </div>
 
                                 <Button
-                                disabled={sending||fileUploading.state}
+                                    disabled={sending || fileUploading.state}
                                     onClick={() => sendBySendBtn(message)}
                                 >
                                     <SendHorizonal />

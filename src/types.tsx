@@ -387,7 +387,11 @@ export type Message = {
     chatroom?: string;
     content?: string;
     messageType?: 'text' | 'image' | 'video' | 'sticker' | 'gif';
-    attachmentUrls?: string[];
+    attachmentUrls?: {
+        type:string
+        url:string
+        name: string
+    }[];
     read?: boolean;
     status?: 'sending' | 'sent' | 'delivered' | 'seen';
     reactions?: Reaction[];

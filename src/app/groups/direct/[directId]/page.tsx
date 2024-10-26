@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import Cookies from 'js-cookie'
 import { DMContext } from '@/context/DMContext'
 import { ChatRoomTypes, Message, Reaction, UnreadMessage, User, UserSettings } from '@/types' // Assuming you have these types
-import { ArrowLeft, AtSign, Bell, Bold, DeleteIcon, Edit, File, FileIcon, Italic, Link2, List, ListOrdered, Pin, Plus, Reply, ReplyAllIcon, Search, SendHorizonal, SidebarClose, SidebarOpen, Smile, SmileIcon, Strikethrough, XIcon } from 'lucide-react'
+import { ArrowLeft, AtSign, Bell, Download, Bold, DeleteIcon, Edit, File, FileIcon, Italic, Link2, List, ListOrdered, Pin, Plus, Reply, ReplyAllIcon, Search, SendHorizonal, SidebarClose, SidebarOpen, Smile, SmileIcon, Strikethrough, XIcon } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import moment from 'moment'
@@ -20,6 +20,7 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { AlertDialogTrigger } from '@/components/ui/alert-dialog'
 import { InputSwitch } from 'primereact/inputswitch'
+import { mimeTypeToSvg } from '@/constants'
 type Props = {}
 
 function Page({ }: Props) {
@@ -1027,16 +1028,60 @@ function Page({ }: Props) {
                                                                         {
                                                                             msg.attachmentUrls && (
                                                                                 <div className="w-full flex gap-2 flex-wrap">
-                                                                                    {
-                                                                                        msg.attachmentUrls.map(url => (
-                                                                                            <img
-                                                                                                className="object-fit rounded-md"
-                                                                                                src={url}
-                                                                                                width={200}
-                                                                                                height={200}
-                                                                                            />
-                                                                                        ))
-                                                                                    }
+                                                                                    {msg.attachmentUrls.map((attachment, index) => {
+                                                                                        const svgIcon = mimeTypeToSvg[attachment.type as any] || mimeTypeToSvg['default'];
+
+                                                                                        // Check if the attachment is an image
+                                                                                        if (attachment.type.startsWith('image/')) {
+                                                                                            return (
+                                                                                                <a
+                                                                                                    key={index}
+                                                                                                    href={attachment.url}
+                                                                                                    target="_blank"
+                                                                                                    rel="noopener noreferrer"
+                                                                                                    download
+                                                                                                    className="hover:bg-[rgba(50,139,255,0.39)] p-3 rounded-md"
+                                                                                                >
+                                                                                                    <div className="w-full flex items-center gap-2 justify-between group p-1 mb-5">
+                                                                                                        <span className="text-[.7rem]">{attachment?.name.substr(0, 20)}</span>
+                                                                                                        <button className="invisible group-hover:visible">
+                                                                                                            <Download />
+                                                                                                        </button>
+                                                                                                    </div>
+                                                                                                    <img
+                                                                                                        key={index}
+                                                                                                        className="object-fit rounded-md"
+                                                                                                        src={attachment.url}
+                                                                                                        alt="attachment"
+                                                                                                        width={200}
+                                                                                                        height={200}
+                                                                                                    />
+                                                                                                </a>
+                                                                                            );
+                                                                                        } else {
+                                                                                            // Render non-image files with SVG icon and download link
+                                                                                            return (
+                                                                                                <a
+                                                                                                    key={index}
+                                                                                                    href={attachment.url}
+                                                                                                    target="_blank"
+                                                                                                    rel="noopener noreferrer"
+                                                                                                    download
+                                                                                                    className="hover:bg-[rgba(50,139,255,0.39)] p-3 rounded-md "
+                                                                                                >
+                                                                                                    <div className="file-preview flex flex-col w-full justify-between group">
+                                                                                                        <div className="w-full flex items-center gap-2 p-1 mb-5">
+                                                                                                            <span className="text-[.7rem]">{attachment?.name.substr(0, 20)}</span>
+                                                                                                            <button className="invisible group-hover:visible">
+                                                                                                                <Download />
+                                                                                                            </button>
+                                                                                                        </div>
+                                                                                                        <img src={svgIcon} alt={attachment.type} width={100} height={100} className="mr-2" />
+                                                                                                    </div>
+                                                                                                </a>
+                                                                                            );
+                                                                                        }
+                                                                                    })}
                                                                                 </div>
                                                                             )
                                                                         }
