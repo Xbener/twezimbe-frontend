@@ -18,7 +18,10 @@ export type User = {
     del_falg: number;
     verified: boolean;
     salt: string;
-    role: "GroupUser" | "GroupModerator" | "GroupManager";
+    role: {
+        role_name:string;
+        role_id: string;
+    }
     otp: number;
     otpExpiryTime: Date;
     profile_pic?: string;
@@ -360,7 +363,7 @@ export type ChannelTypes = {
     chatroom?: ChatRoomTypes;
     members?: string[] | string | any;
     groupId?: string;
-    membersDetails?:any
+    membersDetails?: any
 }
 
 export type ChatRoomTypes = {

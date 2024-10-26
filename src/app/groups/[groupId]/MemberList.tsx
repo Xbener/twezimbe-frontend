@@ -47,14 +47,42 @@ function MemberList({ admins, moderators, members, isLoading }: Props) {
                         </div>
 
                     ) : privateChannelMembers?.length > 0 ? (
-                        <div className='p-2'>
-                            <h1 className='p-1 font-extrabold text-[0.9rem] mb-2 capitalize'>Channel members ({privateChannelMembers.length})</h1>
-                            {
-                                privateChannelMembers?.length === 0 ? "No members" : privateChannelMembers.map((admin, index) => (
-                                    <GroupMemberItem key={index} {...admin} />
-                                ))
-                            }
-                        </div>
+                        // <div className='p-2'>
+                        //     <h1 className='p-1 font-extrabold text-[0.9rem] mb-2 capitalize'>Channel members ({privateChannelMembers.length})</h1>
+                        //     {
+                        //         privateChannelMembers?.length === 0 ? "No members" : privateChannelMembers.map((admin, index) => (
+                        //             <GroupMemberItem key={index} {...admin} />
+                        //         ))
+                        //     }
+                        // </div>
+                                <>
+                                    <div className="w-full p-2 mb-3 ">
+                                        <h1 className='p-1 font-extrabold text-[0.9rem] mb-2 capitalize'>Channel admins ({privateChannelMembers.filter(member=>member.role.role_name==='ChannelAdmin').length})</h1>
+                                        {
+                                            privateChannelMembers.filter(member => member.role.role_name === 'ChannelAdmin').length === 0 ? "No admins" : privateChannelMembers.filter(member => member.role.role_name === 'ChannelAdmin').map((admin, index) => (
+                                                <GroupMemberItem key={index} {...admin} />
+                                            ))
+                                        }
+                                    </div>
+
+                                    <div className="w-full p-2 mb-3 ">
+                                        <h1 className='p-1 font-extrabold text-[0.9rem] mb-2 capitalize'>Channel moderators ({privateChannelMembers.filter(member => member.role.role_name === 'ChannelModerator').length})</h1>
+                                        {
+                                            privateChannelMembers.filter(member => member.role.role_name === 'ChannelModerator').length === 0 ? "No moderators" : privateChannelMembers.filter(member => member.role.role_name === 'ChannelModerator').map((moderator, index) => (
+                                                <GroupMemberItem key={index} {...moderator} />
+                                            ))
+                                        }
+                                    </div>
+
+                                    <div className="w-full p-2 mb-3 ">
+                                        <h1 className='p-1 font-extrabold text-[0.9rem] mb-2 capitalize'>All Members ({privateChannelMembers.filter(member => member.role.role_name === 'ChannelMember').length})</h1>
+                                        {
+                                            privateChannelMembers.filter(member => member.role.role_name === 'ChannelMember').length === 0 ? "No other members" : privateChannelMembers.filter(member => member.role.role_name === 'ChannelMember').map((member, index) => (
+                                                <GroupMemberItem key={index} {...member} />
+                                            ))
+                                        }
+                                    </div>
+                                </>
                     ) : (
                         <>
                             <div className="w-full p-2 mb-3 ">

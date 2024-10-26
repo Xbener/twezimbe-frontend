@@ -18,7 +18,7 @@ type GroupContextTypes = {
     members: User[];
     isLoading: boolean
     privateChannelMembers: User[]
-    setPrivateChannelMembers: (vl: User[]) => void
+    setPrivateChannelMembers: (vl: any) => any
     isSideBarOpen?: boolean
     isMemberListOpen?: boolean
     setIsSideBarOpen: (vl: boolean) => void | boolean
