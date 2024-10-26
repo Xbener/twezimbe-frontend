@@ -1041,7 +1041,7 @@ function Page({ }: Props) {
                                                             <DialogContent className="bg-white w-full">
                                                                 {
                                                                     channel?.membersDetails?.map((member: any) => {
-
+                                                                        if(member?._id === channel?.created_by?._id) return null
                                                                         return (
                                                                             <div className="w-full p-2 justify-between flex items-center  text-black">
                                                                                 <div className="flex items-center gap-2">
