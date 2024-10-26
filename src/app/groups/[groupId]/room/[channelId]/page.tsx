@@ -1063,9 +1063,9 @@ function Page({ }: Props) {
                                                                                             <SelectValue placeholder="Change role" />
                                                                                         </SelectTrigger>
                                                                                         <SelectContent className="bg-white">
-                                                                                            <SelectItem className="cursor-pointer" value="ChannelAdmin">admin</SelectItem>
+                                                                                            <SelectItem className="cursor-pointer" value="ChannelAdmin">Admin</SelectItem>
                                                                                             <SelectItem className="cursor-pointer" value="ChannelModerator">Moderator</SelectItem>
-                                                                                            <SelectItem className="cursor-pointer" value="ChannelMember">regular member</SelectItem>
+                                                                                            <SelectItem className="cursor-pointer" value="ChannelMember">Regular member</SelectItem>
                                                                                         </SelectContent>
                                                                                     </Select>
                                                                                 </div>
