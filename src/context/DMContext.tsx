@@ -67,7 +67,7 @@ function DMContextProvider({ children }: Props) {
                     body: JSON.stringify({ userId: currentUser?._id, type: "dm" })
                 })
                 const data = await res.json()
-                if (!data.status&&!data.chatrooms.length) return setUserDMs([])
+                if (!data.status||!data.chatrooms.length) return setUserDMs([])
                 setUserDMs(data.chatrooms)
                 router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups/direct/${data.chatrooms[0]._id}`)
             } catch (error) {
