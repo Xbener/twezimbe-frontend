@@ -758,9 +758,16 @@ function Page({ }: Props) {
             setSending(false)
         }
     }
-    useEffect(() => {
-        console.log(attachments)
-    }, [attachments])
+    const handleRemoveAttachment = (attachment: File) => {
+        setAttachments(
+            Array.from(attachments).filter((attached) => {
+                // Assert that 'attached' is of type 'File'
+                const fileAttached = attached as File;
+                return fileAttached.name !== attachment.name;
+            })
+        );
+
+    }
     if (isLoading) return (
         <div className='w-full h-full grid place-content-center'>
             <PacmanLoader color='white w-2' size={'small'} />
@@ -812,9 +819,9 @@ function Page({ }: Props) {
 
             if (!data.status) return toast.error(data.errors || data.message || "Unable to update user role")
             toast.success("User role updated successfully")
-            setPrivateChannelMembers((prev: User[])=> {
-                return prev.map((member: User)=> {
-                    if (member?._id === user_id) return {...member, role: {...member.role, role_name}}
+            setPrivateChannelMembers((prev: User[]) => {
+                return prev.map((member: User) => {
+                    if (member?._id === user_id) return { ...member, role: { ...member.role, role_name } }
                     return member
                 })
             })
@@ -1530,8 +1537,8 @@ function Page({ }: Props) {
                     </div>
                 ) : attachments?.length ? (
                         <div className='w-full h-auto p-2 flex gap-2 overflow-auto flex-wrap'>
-                            {/* {Array.from(attachments).map((file: File, index: number) => (
-                                <div key={index} className='w-auto p-2 flex flex-col items-center justify-center gap-2 border rounded-md'>
+                            {Array.from(attachments as File[]).map((file: File, index: number) => (
+                                <div key={index} className='w-[100px] overflow-hidden p-2 flex flex-col items-center justify-center gap-2 border rounded-md'>
                                     <span
                                         className='bg-neutral-50 text-black rounded-full place-self-end justify-self-end cursor-pointer'
                                         onClick={() => handleRemoveAttachment(file)}
@@ -1541,21 +1548,12 @@ function Page({ }: Props) {
                                     <FileIcon className="size-12" />
                                     <h1>{file.name}</h1>
                                 </div>
-                            ))} */}
+                            ))}
                         </div>
+
                 ) : null}
                 <div className="space-x-3 relative w-full ">
 
-                    {/* <ChatInput
-                    channel={channel as ChannelTypes}
-                    currentUser={currentUser}
-                    handleKeyPress={handleKeyPress}
-                    message={message}
-                    sending={sending}
-                    setAttachments={setAttachments}
-                    setIsTyping={setIsTyping}
-                    setMessage={setMessage}
-                    /> */}
                     <div className="W-full flex flex-col border-gray-700 border focus-within:border-white rounded-md">
                         <div className='flex gap-2 group-focus-within:border-b-white border-b border-b-gray-500 p-2'>
                             <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
