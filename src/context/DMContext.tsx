@@ -44,7 +44,7 @@ function DMContextProvider({ children }: Props) {
                     headers
                 })
                 const data = await res.json()
-                if (!data.status) return
+                if (!data.status) return setUserDMs([])
                 setAllUsers(data.users)
             } catch (error) {
                 console.log(error)
@@ -67,7 +67,7 @@ function DMContextProvider({ children }: Props) {
                     body: JSON.stringify({ userId: currentUser?._id, type: "dm" })
                 })
                 const data = await res.json()
-                if (!data.status) return toast.error(data.errors || "something went wrong")
+                if (!data.status&&!data.chatrooms.length) return setUserDMs([])
                 setUserDMs(data.chatrooms)
                 router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups/direct/${data.chatrooms[0]._id}`)
             } catch (error) {
