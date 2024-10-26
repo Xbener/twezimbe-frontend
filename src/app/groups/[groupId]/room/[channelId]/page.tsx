@@ -1039,9 +1039,12 @@ function Page({ }: Props) {
 
                                                             </DialogTrigger>
                                                             <DialogContent className="bg-white w-full">
+                                                            <DialogHeader className="text-[1.1rem] ">
+                                                                Modify channel member role
+                                                            </DialogHeader>
                                                                 {
                                                                     channel?.membersDetails?.map((member: any) => {
-                                                                        if(member?._id === channel?.created_by?._id) return null
+                                                                        if(member?._id === channel?.created_by?._id||member?._id=== currentUser?._id) return null
                                                                         return (
                                                                             <div className="w-full p-2 justify-between flex items-center  text-black">
                                                                                 <div className="flex items-center gap-2">
@@ -1080,7 +1083,7 @@ function Page({ }: Props) {
                                         </div>
                                     )
                                 }
-                                {((currentUser?._id === channel?.created_by?._id) && (channel?.state !== 'public')) && (
+                                {((userRole === 'ChannelAdmin') &&(channel?.state !== 'public')) && (
                                     <div className='flex w-full justify-between items-center border rounded-md p-2'>
                                         <h1>Add member </h1>
                                         <Dialog>
