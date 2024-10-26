@@ -11,17 +11,18 @@ import React, { useContext } from 'react'
 type Props = {}
 
 function page({ }: Props) {
-  const { } = useContext(DMContext)
+  const { setCurrentDM } = useContext(DMContext)
   const { userDMs } = useMyContext()
   const router = useRouter()
 
-  if(userDMs.length>0){
+  if (userDMs.length > 0) {
+    setCurrentDM(userDMs[0])
     router.push(`/groups/direct/${userDMs[0]._id}`)
   }
   return (
     <div className='w-[100%] flex items-center justify-center h-full'>
       {
-        userDMs.length === 0 && "No DMs" 
+        userDMs.length === 0 && "No DMs"
       }
     </div>
   )

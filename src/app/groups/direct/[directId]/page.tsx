@@ -449,8 +449,8 @@ function Page({ }: Props) {
     ];
 
     const sendBySendBtn = async (content: string) => {
-        if (!currentDM) return;
-        if (message) {
+        // if (!currentDM) return;
+        // if (message) {
 
             try {
                 setSending(true);
@@ -483,7 +483,7 @@ function Page({ }: Props) {
             } finally {
                 setSending(false);
             }
-        }
+        // }
     };
 
     const handleKeyPress = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
