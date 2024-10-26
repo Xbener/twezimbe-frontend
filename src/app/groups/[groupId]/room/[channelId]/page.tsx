@@ -797,7 +797,26 @@ function Page({ }: Props) {
         }
     }
 
+    const updateChannelUserRole = async (user_id: string, role_name: string) => {
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/channels/user-role`, {
+                method: "PUT",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('access-token')}`
+                },
+                body: JSON.stringify({ channel_id: channel?._id, user_id, role_name })
+            })
 
+            const data = await res.json()
+
+            if (!data.status) return toast.error(data.errors || data.message || "Unable to update user role")
+            toast.success("User role updated successfully")
+        } catch (error) {
+            console.log(error)
+            toast.error("unable to updated user role")
+        }
+    }
     return (
         <div className="w-full h-screen flex flex-col bg-[#013a6fd3] text-white">
             {/* Header */}
@@ -931,7 +950,7 @@ function Page({ }: Props) {
 
                             <div className='flex flex-col gap-2 mt-5 w-full'>
                                 {
-                                    channel?.created_by?._id === currentUser?._id && (
+                                    (channel?.created_by?._id === currentUser?._id || userRole === 'ChannelAdmin') && (
                                         <div className='p-3 border-b flex items-start justify-around w-full flex-col'>
                                             <div className='w-full flex flex-col gap-2 items-end'>
                                                 <div className="w-full flex flex-col gap-2">
@@ -1032,20 +1051,20 @@ function Page({ }: Props) {
                                                                                     </Avatar>
                                                                                     <h1>{member?.firstName} {member?.lastName}</h1>
                                                                                 </div>
-                                                                                <div> 
+                                                                                <div>
                                                                                     <Select
-                                                                                    defaultValue={member?.role?.role_name}
-                                                                                // onValueChange={(v) => setChannelUpdateData(prev => ({ ...prev, state: v }))}
-                                                                                >
-                                                                                    <SelectTrigger className="bg-transparent w-full text-black">
-                                                                                        <SelectValue placeholder="Change role" />
-                                                                                    </SelectTrigger>
-                                                                                    <SelectContent className="bg-white">
-                                                                                        <SelectItem className="cursor-pointer" value="ChannelAdmin">admin</SelectItem>
-                                                                                        <SelectItem className="cursor-pointer" value="ChannelModerator">Moderator</SelectItem>
-                                                                                        <SelectItem className="cursor-pointer" value="ChannelMember">regular member</SelectItem>
-                                                                                    </SelectContent>
-                                                                                </Select>
+                                                                                        defaultValue={member?.role?.role_name}
+                                                                                        onValueChange={(v) => updateChannelUserRole(member?._id, v)}
+                                                                                    >
+                                                                                        <SelectTrigger className="bg-transparent w-full text-black">
+                                                                                            <SelectValue placeholder="Change role" />
+                                                                                        </SelectTrigger>
+                                                                                        <SelectContent className="bg-white">
+                                                                                            <SelectItem className="cursor-pointer" value="ChannelAdmin">admin</SelectItem>
+                                                                                            <SelectItem className="cursor-pointer" value="ChannelModerator">Moderator</SelectItem>
+                                                                                            <SelectItem className="cursor-pointer" value="ChannelMember">regular member</SelectItem>
+                                                                                        </SelectContent>
+                                                                                    </Select>
                                                                                 </div>
 
                                                                             </div>
