@@ -1587,17 +1587,15 @@ function Page({ }: Props) {
                                 ref={messagingInputRef}
                                 disabled={
                                     sending ||
-                                    (
-                                        (settings?.postPermission === 'admins' && userRole !== 'ChannelAdmin') ||
-                                        (settings?.postPermission === 'moderators' && !['ChannelAdmin', 'ChannelMember'].includes(userRole))
-                                    )
+                                    (settings?.postPermission.toLowerCase() === 'admins' && userRole !== 'ChannelAdmin') ||
+                                    (settings?.postPermission.toLowerCase() === 'moderators' && userRole === 'ChannelMember')
                                 }
                                 onBlur={() => setIsTyping(prev => ({ message: "" }))}
                                 onFocus={() => setIsTyping(prev => ({ ...prev, message: `${currentUser?.firstName} is typing ...` }))}
                                 className="flex-grow bg-transparent p-3 rounded-md text-white placeholder-gray-400 focus:outline-none disabled:cursor-not-allowed w-full"
                                 placeholder={
                                     (settings?.postPermission === 'admins' && userRole !== 'ChannelAdmin') ||
-                                        (settings?.postPermission === 'moderators' && !['ChannelAdmin', 'ChannelMember'].includes(userRole))
+                                        (settings?.postPermission === 'moderators' && userRole === 'ChannelMember')
                                         ? "Not allowed to send messages"
                                         : `Message ${channel?.name}`
                                 }
@@ -1605,6 +1603,7 @@ function Page({ }: Props) {
                                 onChange={handleChange}
                                 onKeyDown={handleKeyPress}
                             />
+
 
                         </div>
                         <div className="w-full flex p-2">
