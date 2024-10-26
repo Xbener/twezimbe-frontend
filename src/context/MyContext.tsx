@@ -191,7 +191,7 @@ export const MyProvider = ({ children }: Props) => {
                 });
             });
             const handleNewMessage = (vl: { message: Message, chatroomId: string, sentTo: string }) => {
-                if (`${roomIdRef.current}` == `${vl.sentTo}`) {
+                if (`${roomIdRef.current}` == `${vl.sentTo}` || roomIdRef.current === vl.chatroomId) {
                     setMessages((prev) => [...prev.filter(message => message._id !== vl.message._id), vl.message]);
                 }
                 if (!userSettings?.notificationSettings.chatroomsMuted.find(room => room === roomIdRef.current)) {
