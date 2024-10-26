@@ -52,6 +52,10 @@ function Page({ }: Props) {
     const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
     const [validUserNames, setValidUserNames] = useState<string[]>([])
     const [queriedMessages, setQueriedMessages] = useState<Message[]>([])
+    const [fileUploading, setFileUploading] = useState({
+        state: false,
+        message: ""
+    })
     const [settings, setSettings] = useState<ChannelSettings | null>(null)
     const [updatedSettings, setUpdatedSettings] = useState<ChannelSettings>({
         postPermission: 'anyone'
@@ -609,12 +613,39 @@ function Page({ }: Props) {
             socket.emit('is-typing', { message: isTyping.message, currentUser, receiver: channel?.members })
         }
     }, [isTyping.message])
+    const uploadFiles = async () => {
+        try {
+            setAttachments([])
+            setFileUploading(prev => ({ state: true, message: "File uploading" }));
+            const formData = new FormData();
 
-    const sendBySendBtn = async (content: string) => {
-        if (!channel) return; // Make sure there's a channel context
+            // Append each file individually
+            Array.from(attachments as File[]).forEach((file: File) => {
+                formData.append('attachments', file);
+            });
+
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/upload-message-pictures`, {
+                method: 'POST', // Specify the method
+                headers: {
+                    'Authorization': `Bearer ${Cookies.get('access-token')}`,
+                },
+                body: formData
+            });
+            const data = await res.json()
+            if (!data.status) return setFileUploading({ state: false, message: data.errors || data.message || "File upload failed" })
+            return data.attachmentUrls
+        } catch (error) {
+            console.error('Error uploading files:', error);
+            setFileUploading(prev => ({ state: false, message: "File upload failed" }));
+        } finally {
+            setFileUploading(prev => ({ state: false, message: "File upload completed" }));
+        }
+    }
+
+    const sendMessage = async (content: string, fileUpload: any = null) => {
+        if (!channel) return; // Ensure there's a channel context
 
         try {
-            setSending(true);
             const token = Cookies.get('access-token');
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/${channel.chatroom?._id}`, {
                 method: 'POST',
@@ -625,70 +656,65 @@ function Page({ }: Props) {
                 body: JSON.stringify({
                     sender_id: currentUser?._id,
                     chatroom: channel.chatroom?._id,
-                    content: content,
+                    content: content.trim(),
                     messageType: "text",
-                    attachmentUrl: "none",
-                    receiver_id: channel.members, // Ensure you're sending to the right members
+                    attachmentUrls: fileUpload || null,
+                    receiver_id: channel.members,
+                    replyingTo: isReplying.state ? isReplying.message._id : null,
                 })
             });
 
             const data = await response.json();
-            setMessages((prev) => [...prev, { ...data.message, createdAt: new Date(), sender: currentUser, status: "sending" }]);
-            socket.emit('new-message', { sender: currentUser, chatroomId: channel.chatroom?._id, sentTo: channel.chatroom?._id, receiver: channel.members, message: { ...data.message, sender: currentUser } });
+            setMessages(prev => [
+                ...prev,
+                { ...data.message, createdAt: new Date(), sender: currentUser, replyingTo: isReplying.state ? isReplying.message : null }
+            ]);
+            socket.emit('new-message', { sender: currentUser, chatroomId: channel.chatroom?._id, sentTo: channel.chatroom?._id, receiver: channel.members, message: { ...data.message, sender: currentUser, replyingTo: isReplying.state ? isReplying.message : null } });
+
+            // Reset the state
             setMessage('');
+            setAttachments([]);
             scrollToBottom();
             setIsReplying({ state: false, message: {}, replyingTo: "" });
-            messagingInputRef?.current?.focus()
+            messagingInputRef?.current?.focus();
+
         } catch (error) {
             console.error('Error sending message', error);
+            // Optionally, display an error message to the user
         } finally {
             setSending(false);
         }
     };
 
-    const handleKeyPress = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if (e.ctrlKey && e.key === "Enter") {
-            setMessage(prev => prev + '\n')
-            return
+    const sendBySendBtn = async (content: string) => {
+        let fileUpload = null;
+        if (attachments && attachments.length > 0) {
+            fileUpload = await uploadFiles();
         }
-        if (e.key === 'Enter' && message.trim()) {
-            if (!channel) return; // Make sure there's a channel context
-
-            try {
-                setSending(true);
-                const token = Cookies.get('access-token');
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/${channel.chatroom?._id}`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        sender_id: currentUser?._id,
-                        chatroom: channel.chatroom?._id,
-                        content: message,
-                        messageType: "text",
-                        attachmentUrl: "none",
-                        receiver_id: channel.members, // Ensure you're sending to the right members
-                        replyingTo: isReplying.state ? isReplying.message._id : null,
-                    })
-                });
-
-                const data = await response.json();
-                setMessages((prev) => [...prev, { ...data.message, createdAt: new Date(), sender: currentUser, replyingTo: isReplying.state ? isReplying.message : null }]);
-                socket.emit('new-message', { sender: currentUser, chatroomId: channel.chatroom?._id, sentTo: channel.chatroom?._id, receiver: channel.members, message: { ...data.message, sender: currentUser, replyingTo: isReplying.state ? isReplying.message : null } });
-                setMessage('');
-                scrollToBottom();
-                setIsReplying({ state: false, message: {}, replyingTo: "" });
-                messagingInputRef?.current?.focus()
-            } catch (error) {
-                console.error('Error sending message', error);
-            } finally {
-                setSending(false);
-            }
+        if (content.trim() || fileUpload) {
+            setSending(true);
+            await sendMessage(content, fileUpload);
         }
     };
 
+    const handleKeyPress = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.ctrlKey && e.key === "Enter") {
+            // Add a newline if Ctrl + Enter is pressed
+            setMessage(prev => prev + '\n');
+        } else if (e.key === 'Enter') {
+            // Prevent the default behavior to avoid new lines when just Enter is pressed
+            e.preventDefault();
+
+            let fileUpload = null;
+            if (attachments && attachments.length > 0) {
+                fileUpload = await uploadFiles();
+            }
+            if (message.trim() || fileUpload) {
+                setSending(true);
+                await sendMessage(message, fileUpload);
+            }
+        }
+    };
 
 
     // Group messages by date
@@ -831,7 +857,15 @@ function Page({ }: Props) {
         }
     }
     return (
-        <div className="w-full h-screen flex flex-col bg-[#013a6fd3] text-white">
+        <div className="w-full h-screen flex flex-col bg-[#013a6fd3] text-white relative">
+            {
+                fileUploading.state && (
+                    <div className="w-auto p-2 pl-5 pr-5 bg-blue-500 rounded-full shadow-lg text-white absolute left-1/2 mt-5">
+                        file (s) uploading ...
+                    </div>
+
+                )
+            }
             {/* Header */}
             <div className="flex justify-between p-4 bg-[#013a6fae] border-b border-gray-700">
                 <div className='flex items-center gap-2 capitalize text-[1.2rem] text-xl'>
@@ -1362,36 +1396,54 @@ function Page({ }: Props) {
                                                                 </div>
                                                             ) : null}
                                                             <div className="text-white flex items-center gap-2">
-                                                                <p>
-                                                                    {msg?.content &&
-                                                                        msg.content.split('\n').map((line, index) => (
-                                                                            <span key={index}>
-                                                                                {line.split(/(@\w+)/g).map((part, i) => {
-                                                                                    const isMention = part.startsWith('@');
-                                                                                    const username = part.slice(1); // Remove "@" for validation
+                                                                <div className="w-full flex flex-col gap-2">
+                                                                    <p>
+                                                                        {msg?.content &&
+                                                                            msg.content.split('\n').map((line, index) => (
+                                                                                <span key={index}>
+                                                                                    {line.split(/(@\w+)/g).map((part, i) => {
+                                                                                        const isMention = part.startsWith('@');
+                                                                                        const username = part.slice(1); // Remove "@" for validation
 
-                                                                                    // Check if it matches a valid username for highlighting
-                                                                                    const isValidMention = isMention && validUserNames.includes(`@${username}`);
+                                                                                        // Check if it matches a valid username for highlighting
+                                                                                        const isValidMention = isMention && validUserNames.includes(`@${username}`);
 
-                                                                                    return (
-                                                                                        <span
-                                                                                            key={i}
-                                                                                            style={{
-                                                                                                backgroundColor: isValidMention ? 'rgba(255, 165, 0, 0.4)' : 'transparent', // Only highlight valid mentions
-                                                                                                transition: 'background-color 0.3s ease',
-                                                                                                padding: "5px",
-                                                                                                borderRadius: '10px'
-                                                                                            }}
-                                                                                        >
-                                                                                            {part}
-                                                                                        </span>
-                                                                                    );
-                                                                                })}
-                                                                                {msg?.content && index < msg.content.split('\n').length - 1 && <br />}
-                                                                            </span>
-                                                                        ))}
-                                                                </p>
+                                                                                        return (
+                                                                                            <span
+                                                                                                key={i}
+                                                                                                style={{
+                                                                                                    backgroundColor: isValidMention ? 'rgba(255, 165, 0, 0.4)' : 'transparent', // Only highlight valid mentions
+                                                                                                    transition: 'background-color 0.3s ease',
+                                                                                                    padding: "5px",
+                                                                                                    borderRadius: '10px'
+                                                                                                }}
+                                                                                            >
+                                                                                                {part}
+                                                                                            </span>
+                                                                                        );
+                                                                                    })}
+                                                                                    {msg?.content && index < msg.content.split('\n').length - 1 && <br />}
 
+                                                                                </span>
+                                                                            ))}
+                                                                    </p>
+                                                                    {
+                                                                        msg.attachmentUrls && (
+                                                                            <div className="w-full flex gap-2 flex-wrap">
+                                                                                {
+                                                                                    msg.attachmentUrls.map(url => (
+                                                                                        <img
+                                                                                            className="object-fit rounded-md"
+                                                                                            src={url}
+                                                                                            width={200}
+                                                                                            height={200}
+                                                                                        />
+                                                                                    ))
+                                                                                }
+                                                                            </div>
+                                                                        )
+                                                                    }
+                                                                </div>
                                                                 <span>{msg.edited && <span className='text-[.7rem] text-gray-200'>(edited)</span>}</span>
                                                             </div>
                                                             <div className="flex items-center w-full justify-start p-1 gap-1">
@@ -1536,20 +1588,21 @@ function Page({ }: Props) {
                         </div>
                     </div>
                 ) : attachments?.length ? (
-                        <div className='w-full h-auto p-2 flex gap-2 overflow-auto flex-wrap'>
-                            {Array.from(attachments as File[]).map((file: File, index: number) => (
-                                <div key={index} className='w-[100px] overflow-hidden p-2 flex flex-col items-center justify-center gap-2 border rounded-md'>
-                                    <span
-                                        className='bg-neutral-50 text-black rounded-full place-self-end justify-self-end cursor-pointer'
-                                        onClick={() => handleRemoveAttachment(file)}
-                                    >
-                                        <XIcon />
-                                    </span>
-                                    <FileIcon className="size-12" />
-                                    <h1>{file.name}</h1>
-                                </div>
-                            ))}
-                        </div>
+                    <div className='w-full h-auto p-2 flex gap-2 overflow-auto flex-wrap'>
+                        {Array.from(attachments as File[]).map((file: File, index: number) => (
+                            <div key={index} className='w-[100px] overflow-hidden p-2 flex flex-col items-center justify-center gap-2 border rounded-md'>
+                                <button
+
+                                    className='bg-neutral-50 text-black rounded-full place-self-end justify-self-end cursor-pointer'
+                                    onClick={() => handleRemoveAttachment(file)}
+                                >
+                                    <XIcon />
+                                </button>
+                                <FileIcon className="size-12" />
+                                <h1>{file.name}</h1>
+                            </div>
+                        ))}
+                    </div>
 
                 ) : null}
                 <div className="space-x-3 relative w-full ">
@@ -1577,7 +1630,7 @@ function Page({ }: Props) {
 
                         </div>
                         {isMentioning && (
-                            <ul className="mention-dropdown absolute bg-white text-black w-1/2 rounded-md overflow-auto z-50 max-h-44 border-2 border-black shadow-md">
+                            <ul className="mention-dropdown absolute bg-white text-black w-1/5 rounded-md overflow-auto z-50 max-h-44 border-2 border-black shadow-md">
                                 {filteredUsers.map((user) => (
                                     <>
                                         <li
@@ -1597,7 +1650,7 @@ function Page({ }: Props) {
                             <textarea
                                 ref={messagingInputRef}
                                 disabled={
-                                    sending ||
+                                    sending || fileUploading.state ||
                                     (settings?.postPermission.toLowerCase() === 'admins' && userRole !== 'ChannelAdmin') ||
                                     (settings?.postPermission.toLowerCase() === 'moderators' && userRole === 'ChannelMember')
                                 }
@@ -1621,7 +1674,7 @@ function Page({ }: Props) {
                             <div className="flex w-full items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <Popover>
-                                        <PopoverTrigger className="p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75">
+                                        <PopoverTrigger disabled={sending||fileUploading.state} className="p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75">
                                             <Plus className="size-5" />
                                         </PopoverTrigger>
                                         <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col ">
@@ -1633,7 +1686,8 @@ function Page({ }: Props) {
                                                 multiple
                                                 onChange={(e) => setAttachments(e.target.files as FileList)}
                                             />
-                                            <Button className="flex items-center gap-2 hover:bg-[rgb(0,0,0,.5)]">
+                                
+                                            <Button disabled={sending || fileUploading.state}  className="flex items-center gap-2 hover:bg-[rgb(0,0,0,.5)]">
                                                 <label className="flex items-center gap-2" htmlFor="attachment">
                                                     <File />
                                                     Upload a file
@@ -1646,11 +1700,17 @@ function Page({ }: Props) {
                                         <Smile onClick={() => setShowPicker(prev => !prev)} className="size-5" />
                                     </span>
                                     <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                        <AtSign onClick={() => setShowPicker(prev => !prev)} className="size-5" />
+                                        <AtSign onClick={() => {
+                                            setMessage(prev=> prev+ " @")
+                                            messagingInputRef.current?.focus()
+                                            setIsMentioning(true)
+                                            setFilteredUsers(group?.members?.filter((user) => user) || [] );
+                                        }} className="size-5" />
                                     </span>
                                 </div>
 
                                 <Button
+                                disabled={sending||fileUploading.state}
                                     onClick={() => sendBySendBtn(message)}
                                 >
                                     <SendHorizonal />
