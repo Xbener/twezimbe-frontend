@@ -15,6 +15,9 @@ import MainLoader from "@/components/MainLoader";
 import 'react-loading-skeleton/dist/skeleton.css'
 // import 'emoji-mart/css/emoji-mart.css';
 import 'draft-js/dist/Draft.css';
+import 'react-quill/dist/quill.snow.css';
+import 'froala-editor/css/froala_style.min.css';
+import 'froala-editor/css/froala_editor.pkgd.min.css';
 
 const inter = Inter({ subsets: ["latin"] });
 

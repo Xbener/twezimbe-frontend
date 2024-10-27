@@ -740,8 +740,8 @@ function Page({ }: Props) {
                         <PopoverTrigger>
                             <Bell className="cursor-pointer" />
                         </PopoverTrigger>
-                        <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col pl-3 ">
-                            <div className="w-full flex items-center justify-between">
+                        <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col pl-3 w-5/6">
+                            <div className="w-full flex items-center justify-between gap-5">
                                 <h1>Mute</h1>
                                 <input
                                     type="checkbox"
@@ -1339,8 +1339,8 @@ function Page({ }: Props) {
                                     <SendHorizonal />
                                 </Button>
                             </div>
-                            <div ref={emojiContainerRef} className="absolute z-50 bottom-9 right-0">
-                                <EmojiPicker open={showPicker} onEmojiClick={(emoji) => {
+                            <div ref={emojiContainerRef} className="absolute bottom-9 right-0">
+                                <EmojiPicker  open={showPicker} lazyLoadEmojis onEmojiClick={(emoji) => {
                                     setMessage(prev => prev + emoji.emoji)
                                 }} />
                             </div>

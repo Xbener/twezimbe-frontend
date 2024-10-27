@@ -150,8 +150,8 @@ function Page({ }: Props) {
             // If there's a search term, filter the members, otherwise show all
             setFilteredUsers(
                 group?.members?.filter((user) =>
-                    user.lastName.toLowerCase().startsWith(searchTerm) ||
-                    user.firstName.toLowerCase().startsWith(searchTerm)
+                    user.lastName?.toLowerCase()?.startsWith(searchTerm) ||
+                    user.firstName?.toLowerCase()?.startsWith(searchTerm)
                 ) || [] // Fallback to an empty array if no members are present
             );
         } else {
@@ -1404,8 +1404,8 @@ function Page({ }: Props) {
                                                                             msg.content.split('\n').map((line, index) => (
                                                                                 <span key={index}>
                                                                                     {line.split(/(@\w+)/g).map((part, i) => {
-                                                                                        const isMention = part.startsWith('@');
-                                                                                        const username = part.slice(1); // Remove "@" for validation
+                                                                                        const isMention = part && part?.startsWith('@');
+                                                                                        const username = part && part.slice(1); // Remove "@" for validation
 
                                                                                         // Check if it matches a valid username for highlighting
                                                                                         const isValidMention = isMention && validUserNames.includes(`@${username}`);
@@ -1436,7 +1436,7 @@ function Page({ }: Props) {
                                                                                     const svgIcon = mimeTypeToSvg[attachment.type as any] || mimeTypeToSvg['default'];
 
                                                                                     // Check if the attachment is an image
-                                                                                    if (attachment.type.startsWith('image/')) {
+                                                                                    if (attachment.type && attachment.type?.startsWith('image/')) {
                                                                                         return (
                                                                                             <a
                                                                                                 key={index}
@@ -1728,11 +1728,11 @@ function Page({ }: Props) {
                                         multiple
                                         onChange={(e) => setAttachments(e.target.files as FileList)}
                                     />
-                                        <button disabled={sending || fileUploading.state} className="p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-7 cursor-pointer5">
-                                    <label className="flex items-center gap-2 cursor-pointer" htmlFor="attachment">
+                                    <button disabled={sending || fileUploading.state} className="p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-7 cursor-pointer5">
+                                        <label className="flex items-center gap-2 cursor-pointer" htmlFor="attachment">
                                             <Plus className="size-5" />
-                                    </label>
-                                        </button>
+                                        </label>
+                                    </button>
 
                                     <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
                                         <Smile onClick={() => setShowPicker(prev => !prev)} className="size-5" />
