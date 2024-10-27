@@ -53,12 +53,12 @@ button{
 }
 
 
-ul {
+.message-body ul {
     list-style-type: disc; /* Default bullet */
     padding-left: 20px; /* Indent the list */
 }
 
-ol {
+.message-body ol {
     list-style-type: decimal; /* Default numbering */
     padding-left: 20px; /* Indent the list */
 }

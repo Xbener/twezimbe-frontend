@@ -1,7 +1,7 @@
 'use client'
 import GroupNav from "@/components/groups/group-nav";
 import React, { useEffect, useState } from "react";
-import { Geologica } from 'next/font/google'
+import { Inter } from 'next/font/google'
 import { useGetProfileData } from "@/api/auth";
 import { useGetjoinedGroupList } from "@/api/group";
 import { useMyContext } from "@/context/MyContext";
@@ -13,7 +13,7 @@ import GroupProvider from "@/context/GroupContext";
 import Script from 'next/script';
 
 
-const geologica = Geologica({ subsets: ['latin'] })
+const inter = Inter({ subsets: ["latin"] });
 
 export default function GroupLayout({
     children,
@@ -44,7 +44,7 @@ export default function GroupLayout({
         setGroupList(joinedGroupList)
     }, [joinedGroupList])
     return (
-        <div className={`${geologica.className} flex fixed top-0 h-[100dvh] w-full`}>
+        <div className={`${inter.className} flex fixed top-0 h-[100dvh] w-full`}>
             <GroupProvider>
                 <Script
                     src="https://checkout.flutterwave.com/v3.js"

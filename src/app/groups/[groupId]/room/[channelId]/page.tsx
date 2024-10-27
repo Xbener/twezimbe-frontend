@@ -1258,7 +1258,7 @@ function Page({ }: Props) {
             </div>
 
             {/* Body */}
-            <div className="flex-grow overflow-y-auto p-4 space-y-3 overflow-x-hidden">
+            <div className="message-body flex-grow overflow-y-auto p-4 space-y-3 overflow-x-hidden">
                 {
                     messages.length <= 0 && (
                         <div className="w-full h-full flex flex-col items-center justify-center gap-3">
