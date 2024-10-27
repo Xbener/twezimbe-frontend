@@ -990,7 +990,7 @@ function Page({ }: Props) {
                                                                         ref={editingInputRef}
                                                                         disabled={sending}
                                                                         className="flex-grow bg-transparent p-2 rounded-md text-white placeholder-gray-400 focus:outline-none disabled:cursor-not-allowed w-full"
-                                                                        value={isEditing.content}
+                                                                        value={isEditing.content.replace(/<\/?[^>]+(>|$)/g, "")}
                                                                         onChange={(e) => setIsEditing(prev => ({ ...prev, content: e.target.value }))}
                                                                         onKeyDown={handleEdit}
                                                                     />
@@ -1301,7 +1301,7 @@ function Page({ }: Props) {
                                             setAttachments={setAttachments}
                                             sendMessage={sendMessage}
                                             filesAttached={(attachments && attachments.length) > 0 ? true : false}
-                                            placeholder={currentPatners ? `message ${currentPatners[0]?.lastName} ...` : "Send DM..."}
+                                            placeholder={currentPatners.length >0 ? `message ${currentPatners[1]?.lastName} ...` : "Send DM..."}
                                             disabled={sending || fileUploading.state}
                                         />
                                     </div>
