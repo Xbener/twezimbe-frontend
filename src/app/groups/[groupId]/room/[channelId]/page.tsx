@@ -650,9 +650,9 @@ function Page({ }: Props) {
         try {
             let fileUpload = null;
             if (attachments && attachments.length > 0) {
-                setFileUploading(prev=>({...prev,state:true}))
+                setFileUploading(prev => ({ ...prev, state: true }))
                 fileUpload = await uploadFiles();
-                setFileUploading(prev=>({...prev,state:false}))
+                setFileUploading(prev => ({ ...prev, state: false }))
             }
             if (message.trim() || content.trim() || fileUpload) {
                 const token = Cookies.get('access-token');
@@ -1426,10 +1426,10 @@ function Page({ }: Props) {
                                                             ) : null}
                                                             <div className="text-white flex items-center gap-2">
                                                                 <div className="w-full flex flex-col gap-2">
-                                                                        <p
-                                                                            dangerouslySetInnerHTML={{ __html: getFormattedMessageContent() }}
-                                                                            style={{ transition: 'background-color 0.3s ease' }}
-                                                                        />
+                                                                    <p
+                                                                        dangerouslySetInnerHTML={{ __html: getFormattedMessageContent() }}
+                                                                        style={{ transition: 'background-color 0.3s ease' }}
+                                                                    />
                                                                     {
                                                                         msg.attachmentUrls && (
                                                                             <div className="w-full flex gap-2 flex-wrap">
@@ -1622,7 +1622,7 @@ function Page({ }: Props) {
             </div>
 
             {/* Footer */}
-            <div className="bg-gray-800 p-4 border-t border-gray-700 w-full flex flex-col">
+            <div className="bg-gray-800 border-t border-gray-700 w-full flex flex-col">
                 {isReplying.state ? (
                     <div className='w-full p-2 rounded-md '>
                         <div className=" overflow-hidden flex items-center justify-between gap-2">
@@ -1655,27 +1655,7 @@ function Page({ }: Props) {
                 <div className="space-x-3 relative w-full ">
 
                     <div className="W-full flex flex-col border-gray-700 border focus-within:border-white rounded-md">
-                        {/* <div className='flex gap-2 group-focus-within:border-b-white border-b border-b-gray-500 p-2'>
-                            <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                <Bold className="size-5" />
-                            </span>
-                            <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                <Italic className="size-5" />
-                            </span>
-                            <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                <Strikethrough className="size-5" />
-                            </span>
-                            <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                <Link2 className="size-5" />
-                            </span>
-                            <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                <List className="size-5" />
-                            </span>
-                            <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                <ListOrdered className="size-5" />
-                            </span>
 
-                        </div> */}
                         {isMentioning && (
                             <ul className="mention-dropdown absolute bg-blue-500 text-white w-1/5 rounded-md overflow-auto z-50 max-h-44 shadow-md">
                                 {filteredUsers.map((user) => (
@@ -1693,30 +1673,9 @@ function Page({ }: Props) {
                                 ))}
                             </ul>
                         )}
-                        <div className="relative">
-                            {/* <textarea
-                                ref={messagingInputRef}
-                                disabled={
-                                    sending || fileUploading.state ||
-                                    (settings?.postPermission.toLowerCase() === 'admins' && userRole !== 'ChannelAdmin') ||
-                                    (settings?.postPermission.toLowerCase() === 'moderators' && userRole === 'ChannelMember')
-                                }
-                                onBlur={() => setIsTyping(prev => ({ message: "" }))}
-                                onFocus={() => setIsTyping(prev => ({ ...prev, message: `${currentUser?.firstName} is typing ...` }))}
-                                className="flex-grow bg-transparent p-3 rounded-md text-white placeholder-gray-400 focus:outline-none disabled:cursor-not-allowed w-full"
-                                placeholder={
-                                    (settings?.postPermission === 'admins' && userRole !== 'ChannelAdmin') ||
-                                        (settings?.postPermission === 'moderators' && userRole === 'ChannelMember')
-                                        ? "Not allowed to send messages"
-                                        : `Message ${channel?.name}`
-                                }
-                                value={message}
-                                onChange={handleChange}
-                                onKeyDown={handleKeyPress}
-                            />
- */}
+                        <div className="relative w-full">
 
-                            <div className="flex-1 w-full" />
+
                             <ChatInput
                                 setAttachments={setAttachments}
                                 sendMessage={sendMessage}
@@ -1734,30 +1693,7 @@ function Page({ }: Props) {
                                 }
                             />
                         </div>
-                        <div className="w-full flex p-2">
-                            <div className="flex w-full items-center justify-between">
-                                <div className="flex items-center gap-2">
-
-                                    {/* <input
-                                        type="file"
-                                        hidden
-                                        name="attachment"
-                                        id="attachment"
-                                        multiple
-                                        onChange={(e) => setAttachments(e.target.files as FileList)}
-                                    />
-                                    <button disabled={sending || fileUploading.state} className="p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-7 cursor-pointer5">
-                                        <label className="flex items-center gap-2 cursor-pointer" htmlFor="attachment">
-                                            <Plus className="size-5" />
-                                        </label>
-                                    </button> */}
-                                </div>
-                            </div>
-                        </div>
-
                     </div>
-
-
                 </div>
             </div>
         </div >

@@ -63,44 +63,43 @@ button{
     padding-left: 20px; /* Indent the list */
 }
 
-.ql-toolbar { 
+.ql-container, 
+.ql-container *,
+ .ql-editor, 
+ .ql-editor *,
+  .ql-toolbar,
+   .ql-toolbar * {
   border: none !important;
-
+  color:white;
 }
 
-.ql-toolbar .ql-formats:not(:nth-last-child) {
-  border :1px solid blue !important;
+
+.ql-editor.ql-blank::before {
+    color: rgb(164, 164, 164) !important;
 }
 
-.ql-container {
-  width: 100% !important;
-    background: rgb(43, 43, 43) !important;
-
-  border:none !important;
+.ql-toolbar .ql-stroke {
+    fill: none;
+    stroke: rgb(164, 164, 164) !important;
 }
 
-.ql-editor {
-  line-height: 22px !important;
-  padding: 8px 12px !important;
-  color: black !important;
-  font-weight: 400 !important;
+.ql-toolbar .ql-fill {
+    fill: rgb(164, 164, 164) !important;
+    stroke: none ;
 }
 
-.ql-editor a {
-  color: #1263a3 !important;
+.ql-toolbar .ql-picker {
+    color: rgb(164, 164, 164) !important;
 }
 
-.ql-editor a:hover{
-  text-decoration: underline !important;
-}
-.ql-renderer {
-  padding :0 !important;
+.ql-toolbar .ql-picker:hover{
+  color: blue !important;
 }
 
-.ql-editor::before{
-  left: 12px !important;
-  color: #8d8d8d !important;
-  font-size: 14px !important;
-  font-weight: 400 !important;
-  @apply truncate;
+.ql-toolbar .ql-fill:hover{
+  color:blue !important;
+}
+
+.ql-toolbar .ql-stroke:hover{
+  color:blue !important;
 }

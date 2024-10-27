@@ -51,6 +51,7 @@ function Editor({
         const container = containerRef.current
         const editorContainer = container.appendChild(container.ownerDocument.createElement('div'))
         const options: QuillOptions = {
+            readOnly: disabledRef.current || filesAttached,
             theme: "snow",
             placeholder: placeholderRef.current,
             modules: {
@@ -58,13 +59,15 @@ function Editor({
                     ['bold', 'italic', 'strike'],
                     ['link'],
                     [{ list: "ordered" }, { list: 'bullet' }]
+
                 ],
                 keyboard: {
                     bindings: {
                         enter: {
                             key: "Enter",
                             handler: () => {
-                                submitRef.current(quillRef.current?.getText() || text)
+                                console.log(quillRef.current?.getSemanticHTML())
+                                submitRef.current(quillRef.current?.getSemanticHTML() || text)
                                 if (quillRef) {
                                     quillRef.current?.setText("")
                                     quillRef.current?.focus()
@@ -125,11 +128,11 @@ function Editor({
     const isEmpty = text.replace(/<(.|\n)*?>/g, '').trim().length === 0
 
     return (
-        <div className="flex flex-col w-full ">
-            <div className="flex w-full flex-col border border-slate-200  rounded-md overflow-hidden focus-within:border-slate-300 focus-within:shadow-sm transition bg-white">
-                <div ref={containerRef} className="h-full ql-custom w-full " />
-                <div className="flex px-2 pb-2 z-[5] text-black justify-between">
-                    <div className="flex px-2 pb-2 z-[5] text-black">
+        <div className="flex bg-[#001d38] flex-col w-full ">
+            <div className="flex w-full flex-col rounded-md overflow-hidden  focus-within:shadow-sm transition bg-[#001d38]">
+                <div ref={containerRef} className="h-[100px] bg-[#001d38] border-none w-[100%] ql-custom placeholder:text-white" />
+                <div className="flex px-2 pb-2 z-[5] text-black bg-[#001d38] justify-between">
+                    <div className="flex px-2 pb-2 z-[5] text-black ">
                         {
                             variant === 'create' && (
                                 <>
@@ -143,15 +146,16 @@ function Editor({
                                             setAttachments(e.target.files as FileList)
                                         }}
                                     />
-                                    <button disabled={disabled} className="p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-7 cursor-pointer5">
+                                    <button disabled={disabled} className="p-1 font-bold rounded-full cursor-pointer">
                                         <label className="flex items-center gap-2 cursor-pointer" htmlFor="attachment">
-                                            <PlusIcon className="size-5" />
+                                            <PlusIcon className="size-5 text-white" />
                                         </label>
                                     </button>
                                 </>
                             )
                         }
                         <Button
+                            className="text-white"
                             onClick={toggleToolbar}
                         >
 
@@ -161,6 +165,7 @@ function Editor({
                             onEmojiSelector={onEmojiSelector}
                         >
                             <Button
+                                className="text-white"
 
                             >
                                 <Smile />
@@ -173,16 +178,16 @@ function Editor({
                             variant === 'update' && (
                                 <>
                                     <Button
+                                        className="text-white"
                                         disabled={disabled}
-                                        className="justify-self-end"
                                     >
 
                                         Cancel
                                     </Button>
                                     <Button
+                                        className="text-white"
 
                                         disabled={disabled || isEmpty}
-                                        className="justify-self-end bg-blue-500 text-white"
                                     >
 
                                         Save
@@ -193,6 +198,7 @@ function Editor({
                         {
                             variant === 'create' && (
                                 <Button
+                                    className="text-white"
                                     onClick={() => {
                                         submitRef.current(quillRef.current?.getText() || text)
                                         if (quillRef) {
@@ -200,8 +206,7 @@ function Editor({
                                             quillRef.current?.focus()
                                         }
                                     }}
-                                    disabled={isEmpty||disabled}
-                                    className=" justify-self-end"
+                                    disabled={isEmpty || disabled}
                                 >
 
                                     <SendHorizonal />
@@ -218,7 +223,7 @@ function Editor({
                         "p-2 text-[10px] text-muted-foreground justify-end w-full flex opacity-0",
                         !isEmpty && 'opacity-100'
                     )}>
-                        <p className="text-[.7rem]"><strong>ctrl+enter</strong> to add a new line</p>
+                        <p className="text-[.7rem]"><code className='text-[.6rem]'>ctrl+enter</code> to add a new line</p>
                     </div>
                 )
             }

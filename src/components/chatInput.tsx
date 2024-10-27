@@ -16,7 +16,7 @@ function chatInput({ placeholder, disabled, sendMessage, setAttachments, filesAt
 
     const editorRef = React.useRef<Quill | null>(null)
     return (
-        <div className="px-5 w-full">
+        <div className="px-5 w-full bg-[#001d38]">
             <Editor
                 placeholder={placeholder}
                 onSubmit={(content) => sendMessage(content)}
