@@ -34,7 +34,7 @@ type Props = {}
 
 function Page({ }: Props) {
     const params = useParams()
-    const { messages, setMessages, isTyping, setIsTyping, unreadMessages, setUnreadMessages, roomIdRef, setCurrentChannel, setChId, userSettings, setUserSettings, setRoomId, roomId } = useMyContext()
+    const { messages, setMessages, isTyping, setIsTyping, unreadMessages, unreadMessagesRef, setUnreadMessages, roomIdRef, setCurrentChannel, setChId, userSettings, setUserSettings, setRoomId, roomId } = useMyContext()
     const { getChannel, isError } = useGetSingleChannel()
     const [isLoading, setLoading] = useState(true)
     const [sending, setSending] = useState(false)
@@ -531,7 +531,7 @@ function Page({ }: Props) {
     }, [channel, params])
 
     useEffect(() => {
-        const currentDMUnreadMessages = unreadMessages.filter(msg => msg?.chatroom?._id === channel?.chatroom?._id && !msg?.isRead!)
+        const currentDMUnreadMessages = unreadMessagesRef.current?.filter(msg => msg?.chatroom?._id === channel?.chatroom?._id && !msg?.isRead!)
         const markAsRead = async () => {
             currentDMUnreadMessages.forEach(async (message) => {
                 await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/mark-as-read`, {
@@ -546,19 +546,12 @@ function Page({ }: Props) {
 
             });
         }
-        if (currentDMUnreadMessages) {
-            markAsRead()
-            // const timeout = setTimeout(() => {
-            //     setUnreadMessages((prev: UnreadMessage[]) => {
-            //         return prev.map((unreadmsg: UnreadMessage) => {
-            //             if (unreadmsg?.chatroom?._id === channel?.chatroom?._id) return null
-            //             return unreadmsg
-            //         })
-            //     })
-            // }, 5000)
+        markAsRead()
+        const timeout = setTimeout(() => {
+            unreadMessagesRef.current = unreadMessagesRef.current.filter((unreadmsg: UnreadMessage) => unreadmsg?.chatroom?._id !== channel?.chatroom?._id)
+        }, 2000)
 
-            // return () => clearTimeout(timeout)
-        }
+        return () => clearTimeout(timeout)
     }, [channel, params, roomId])
 
     const getChannelMessages = async () => {
@@ -811,7 +804,7 @@ function Page({ }: Props) {
         return firstUnreadMessage?.messageId;
     };
 
-    const firstUnreadMessageId = getFirstUnreadMessageId(unreadMessages);
+    const firstUnreadMessageId = getFirstUnreadMessageId(unreadMessagesRef.current);
 
     const handleMessageSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setQueriedMessages(messages.filter(message => message.content?.includes(e.target.value)))

@@ -27,7 +27,7 @@ const GroupNav = () => {
         onlineUsers
     } = useMyContext()
     const { group: currentGroup, setGroup } = useContext(GroupContext)
-    const { unreadMessages } = useMyContext()
+    const { unreadMessages, unreadMessagesRef } = useMyContext()
     const pathname = usePathname()
     const settingsItems = [
         { name: "Edit profile", link: "/public_pages/Profile", icon: <Edit /> },
@@ -39,7 +39,7 @@ const GroupNav = () => {
             }
         },
     ]
-    const groupedUnreadMessages = unreadMessages.reduce((acc, message) => {
+    const groupedUnreadMessages = unreadMessagesRef.current.reduce((acc, message) => {
         if (!message.isRead && message.chatroom?._id) {
             const chatroomId = message.chatroom._id;
             if (!acc[chatroomId]) {

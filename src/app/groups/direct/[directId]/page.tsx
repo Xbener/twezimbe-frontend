@@ -31,7 +31,7 @@ function Page({ }: Props) {
     const { setCurrentDM, currentUser, currentDM } = useContext(DMContext)
     const [currentPatners, setCurrentPatners] = useState<User[]>([])
     const currentUserId = Cookies.get('current-user-id') // Assuming you store the current user ID in cookies
-    const { setRoomId, messages, setMessages, unreadMessages, roomId, roomIdRef, userSettings, setUserSettings } = useMyContext()
+    const { setRoomId, messages, setMessages, unreadMessages, unreadMessagesRef, setUnreadMessages, roomId, roomIdRef, userSettings, setUserSettings } = useMyContext()
     const [sending, setSending] = useState(false)
     const { setIsSideBarOpen, setIsMemberListOpen } = useContext(GroupContext)
     const [attachments, setAttachments] = useState<File[] | any>(null)
@@ -381,7 +381,7 @@ function Page({ }: Props) {
 
 
     useEffect(() => {
-        const currentDMUnreadMessages = unreadMessages.filter(msg => msg?.chatroom?._id === currentDM?._id && !msg?.isRead!)
+        const currentDMUnreadMessages = unreadMessagesRef.current.filter(msg => msg?.chatroom?._id === currentDM?._id && !msg?.isRead!)
         const markAsRead = async () => {
             currentDMUnreadMessages.forEach(async (message) => {
                 await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/mark-as-read`, {
@@ -396,6 +396,16 @@ function Page({ }: Props) {
         }
         if (currentDMUnreadMessages) {
             markAsRead()
+            const timeout = setTimeout(() => {
+                if (unreadMessagesRef.current) {
+                    unreadMessagesRef.current = unreadMessagesRef.current.map((unreadmsg: UnreadMessage) => {
+                        if (unreadmsg?.chatroom?._id === currentDM?._id) return {} as UnreadMessage
+                        return unreadmsg
+                    })
+                }
+            }, 5000)
+
+            return () => clearTimeout(timeout)
         }
     }, [currentDM, roomId])
 
@@ -681,7 +691,7 @@ function Page({ }: Props) {
         return firstUnreadMessage?.messageId;
     };
 
-    const firstUnreadMessageId = getFirstUnreadMessageId(unreadMessages);
+    const firstUnreadMessageId = getFirstUnreadMessageId(unreadMessagesRef.current);
 
 
     const handleMessageSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -744,7 +754,7 @@ function Page({ }: Props) {
                         </PopoverTrigger>
                         <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 flex flex-col pl-3 w-auto gap-3 ">
                             <div className="w-full flex items-center justify-between gap-5">
-                                <label htmlFor="mute">{userSettings?.notificationSettings.chatroomsMuted.includes(currentDM?._id!) ? "Unmute" :'mute'}</label>
+                                <label htmlFor="mute">{userSettings?.notificationSettings.chatroomsMuted.includes(currentDM?._id!) ? "Unmute" : 'mute'}</label>
                                 <input
                                     id='mute'
                                     name="mute"
@@ -886,7 +896,7 @@ function Page({ }: Props) {
                         <div className="w-full h-full flex flex-col items-center justify-center gap-3">
                             Start Conversation
                             <Button disabled={
-                                sending||
+                                sending ||
                                 userSettings?.notificationSettings.chatroomsBlocked.includes(currentDM?._id!)
                             } className="bg-blue-500 disabled:cursor-pointer z-50 text-white disabled:bg-gray-700"
                                 onClick={() => {
@@ -1042,10 +1052,10 @@ function Page({ }: Props) {
                                                             ) : null}
                                                             <div className="text-white flex items-center gap-2">
                                                                 <div className="w-full flex flex-col gap-2">
-                                                                        <p
-                                                                            dangerouslySetInnerHTML={{ __html: getFormattedMessageContent() }}
-                                                                            style={{ transition: 'background-color 0.3s ease' }}
-                                                                        />
+                                                                    <p
+                                                                        dangerouslySetInnerHTML={{ __html: getFormattedMessageContent() }}
+                                                                        style={{ transition: 'background-color 0.3s ease' }}
+                                                                    />
                                                                     {
                                                                         msg.attachmentUrls && (
                                                                             <div className="w-full flex gap-2 flex-wrap">
@@ -1238,78 +1248,78 @@ function Page({ }: Props) {
             </div>
 
 
-           {
+            {
                 userSettings?.notificationSettings.chatroomsBlocked.includes(currentDM?._id!) ? (
-                   <div className="W-full p-2 text-center">
-                    You blocked this profile 
-                   </div>
+                    <div className="W-full p-2 text-center">
+                        You blocked this profile
+                    </div>
                 ) : (
-                        <div className="bg-gray-800 p-4 border-t border-gray-700 w-full">
-                            {isReplying.state ? (
-                                <div className='w-full p-2 rounded-md '>
-                                    <div className=" overflow-hidden flex items-center justify-between gap-2">
-                                        <div className="flex items-start justify-normal text-[.7rem] gap-2">
-                                            <ReplyAllIcon className="rotate-180" /> {isReplying.message.content?.slice(0, 150)}
-                                        </div>
-                                        <Button onClick={() => setIsReplying({ state: false, replyingTo: "", message: {} })}>
+                    <div className="bg-gray-800 p-4 border-t border-gray-700 w-full">
+                        {isReplying.state ? (
+                            <div className='w-full p-2 rounded-md '>
+                                <div className=" overflow-hidden flex items-center justify-between gap-2">
+                                    <div className="flex items-start justify-normal text-[.7rem] gap-2">
+                                        <ReplyAllIcon className="rotate-180" /> {isReplying.message.content?.slice(0, 150)}
+                                    </div>
+                                    <Button onClick={() => setIsReplying({ state: false, replyingTo: "", message: {} })}>
+                                        <XIcon />
+                                    </Button>
+                                </div>
+                            </div>
+                        ) : attachments?.length ? (
+                            <div className='w-full h-auto p-2 flex gap-2 overflow-auto flex-wrap'>
+                                {Array.from(attachments as File[]).map((file: File, index: number) => (
+                                    <div key={index} className='w-[100px] overflow-hidden p-2 flex flex-col items-center justify-center gap-2 border rounded-md'>
+                                        <button
+
+                                            className='bg-neutral-50 text-black rounded-full place-self-end justify-self-end cursor-pointer'
+                                            onClick={() => handleRemoveAttachment(file)}
+                                        >
                                             <XIcon />
-                                        </Button>
+                                        </button>
+                                        <FileIcon className="size-12" />
+                                        <h1>{file.name}</h1>
                                     </div>
-                                </div>
-                            ) : attachments?.length ? (
-                                <div className='w-full h-auto p-2 flex gap-2 overflow-auto flex-wrap'>
-                                    {Array.from(attachments as File[]).map((file: File, index: number) => (
-                                        <div key={index} className='w-[100px] overflow-hidden p-2 flex flex-col items-center justify-center gap-2 border rounded-md'>
-                                            <button
+                                ))}
+                            </div>
+                        ) : null}
+                        <div className="space-x-3 relative w-full">
+                            <div className="W-full flex flex-col border-gray-700 border focus-within:border-white rounded-md">
 
-                                                className='bg-neutral-50 text-black rounded-full place-self-end justify-self-end cursor-pointer'
-                                                onClick={() => handleRemoveAttachment(file)}
-                                            >
-                                                <XIcon />
-                                            </button>
-                                            <FileIcon className="size-12" />
-                                            <h1>{file.name}</h1>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : null}
-                            <div className="space-x-3 relative w-full">
-                                <div className="W-full flex flex-col border-gray-700 border focus-within:border-white rounded-md">
-                                   
-                                    {isMentioning && (
-                                        <ul className="mention-dropdown absolute bg-blue-500 text-white w-1/5 rounded-md overflow-auto z-50 max-h-44  shadow-md">
-                                            {filteredUsers.map((user) => (
-                                                <>
-                                                    <li
-                                                        className="cursor-pointer hover:bg-gray-200 hover:text-black p-3"
-                                                        key={user.id}
-                                                        onClick={() => {
-                                                            handleUserSelect(user)
-                                                            messagingInputRef?.current?.focus()
+                                {isMentioning && (
+                                    <ul className="mention-dropdown absolute bg-blue-500 text-white w-1/5 rounded-md overflow-auto z-50 max-h-44  shadow-md">
+                                        {filteredUsers.map((user) => (
+                                            <>
+                                                <li
+                                                    className="cursor-pointer hover:bg-gray-200 hover:text-black p-3"
+                                                    key={user.id}
+                                                    onClick={() => {
+                                                        handleUserSelect(user)
+                                                        messagingInputRef?.current?.focus()
 
-                                                        }}>
-                                                        @{user.lastName} {user.firstName}
-                                                    </li>
-                                                </>
-                                            ))}
-                                        </ul>
-                                    )}
+                                                    }}>
+                                                    @{user.lastName} {user.firstName}
+                                                </li>
+                                            </>
+                                        ))}
+                                    </ul>
+                                )}
 
-                                    <div className="relative">
+                                <div className="relative">
 
-                                        <ChatInput
-                                            setAttachments={setAttachments}
-                                            sendMessage={sendMessage}
-                                            filesAttached={(attachments && attachments.length) > 0 ? true : false}
-                                            placeholder={currentPatners.length >0 ? `message ${currentPatners[1]?.lastName} ...` : "Send DM..."}
-                                            disabled={sending || fileUploading.state}
-                                        />
-                                    </div>
+                                    <ChatInput
+                                        setAttachments={setAttachments}
+                                        sendMessage={sendMessage}
+                                        filesAttached={(attachments && attachments.length) > 0 ? true : false}
+                                        placeholder={currentPatners.length > 0 ? `message ${currentPatners[0]?.lastName} ...` : "Send DM..."}
+                                        disabled={sending || fileUploading.state}
+                                    />
                                 </div>
                             </div>
                         </div>
+                    </div>
                 )
-           }
+            }
         </div>
     )
 }

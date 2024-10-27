@@ -42,10 +42,11 @@ type MyContextType = {
     userDMs: ChatRoomTypes[]
     setUserDMs: (vl: ChatRoomTypes[]) => void
     unreadMessages: UnreadMessage[]
-    setUnreadMessages: (vl: UnreadMessage[]) => void
+    setUnreadMessages: (vl: any) => any
     roomIdRef: React.MutableRefObject<string>
     userSettings: UserSettings
     setUserSettings: (vl: UserSettings) => void
+    unreadMessagesRef: React.MutableRefObject<UnreadMessage[]>
 };
 
 const MyContext = createContext<MyContextType | undefined>(undefined);
@@ -72,21 +73,16 @@ export const MyProvider = ({ children }: Props) => {
     const [unreadMessages, setUnreadMessages] = useState<UnreadMessage[]>([])
     const [userSettings, setUserSettings] = useState<UserSettings | null>(null)
     const userSettingsRef = useRef(userSettings)
-    useEffect(() => {
-        if (document && unreadMessages && unreadMessages?.filter(msg => !msg?.isRead!).length > 0) {
-            document.title = `${unreadMessages.filter(msg => !msg?.isRead!).length} unread messages `
-        }
-    }, [unreadMessages])
-
-    useEffect(() => {
-        console.log("roomId", roomId)
-    }, [roomId])
+    const unreadMessagesRef = useRef<UnreadMessage[]>([])
 
     useEffect(() => {
         roomIdRef.current = roomId;
     }, [roomId]);
 
-
+    useEffect(() => {
+        unreadMessagesRef.current = unreadMessages
+        console.log(unreadMessages, unreadMessagesRef.current)
+    }, [unreadMessages])
 
     useEffect(() => {
 
@@ -135,6 +131,13 @@ export const MyProvider = ({ children }: Props) => {
 
         getUnreadMessages()
     }, [])
+
+    useEffect(() => {
+        if (document && unreadMessages && unreadMessagesRef.current?.filter(msg => !msg?.isRead!).length > 0) {
+            document.title = `${unreadMessagesRef.current.filter(msg => !msg?.isRead!).length} unread messages `
+        }
+    }, [unreadMessagesRef.current])
+
 
 
     useEffect(() => {
@@ -208,6 +211,7 @@ export const MyProvider = ({ children }: Props) => {
                     return [...prev,
                     { messageId: vl.message._id || vl.sentTo, isRead: false, message: vl.message, userId: currentUser?._id }]
                 })
+                unreadMessagesRef.current = [...unreadMessagesRef.current, { messageId: vl.message._id || vl.sentTo, isRead: false, message: vl.message, userId: currentUser?._id }]
             };
 
             socket.on('new-message-added', handleNewMessage);
@@ -302,7 +306,8 @@ export const MyProvider = ({ children }: Props) => {
                 setUnreadMessages,
                 roomIdRef,
                 userSettings: userSettings as UserSettings,
-                setUserSettings
+                setUserSettings,
+                unreadMessagesRef
             }}
         >
             {children}

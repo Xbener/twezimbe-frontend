@@ -9,7 +9,7 @@ import { CaretDownIcon } from '@radix-ui/react-icons'
 import { Bell, Edit, Lock, LogOut, MessageCirclePlus, PlusIcon, Settings, Upload, X } from 'lucide-react'
 import Link from 'next/link'
 import { userInfo } from 'os'
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useLayoutEffect } from 'react'
 import Cookies from 'js-cookie'
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog'
 import { useMyContext } from '@/context/MyContext'
@@ -21,7 +21,7 @@ import { useAddChannel } from '@/api/channel'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { PopoverClose } from '@radix-ui/react-popover'
-import { ChannelTypes } from '@/types'
+import { ChannelTypes, ChatRoomTypes } from '@/types'
 
 type Props = {
 
@@ -31,7 +31,7 @@ type Props = {
 
 function ChannelDetails({ }: Props) {
     const { group, isMemberListOpen, setIsMemberListOpen, windowWidth, setIsSideBarOpen } = useContext(GroupContext)
-    const { channelList, setChannelList, members, unreadMessages, setCurrentChannel, currentChannel, setChId, setRoomId } = useMyContext()
+    const { channelList, setChannelList, members, unreadMessages, unreadMessagesRef, setCurrentChannel, currentChannel, setChId, setRoomId } = useMyContext()
     const router = useRouter()
     const { currentUser } = useGetProfileData()
     const { addChannel, isError, isLoading, isSuccess } = useAddChannel()
@@ -125,10 +125,23 @@ function ChannelDetails({ }: Props) {
         return item.privilege !== 'admin' || (currentUser?._id === group?.created_by[0]?._id);
     });
 
-    const countUnreadMessages = (channel: ChannelTypes) => {
-        const unreadCount = unreadMessages.filter(msg => msg?.chatroom?._id === channel?.chatroom?._id && !msg?.isRead);
-        return unreadCount.length;
+    let countUnreadMessages = (channel: ChannelTypes) => {
+     if(unreadMessagesRef.current){
+         const unreadCount = unreadMessagesRef.current?.filter(msg => msg?.chatroom?._id === channel?.chatroom?._id && !msg?.isRead);
+         return unreadCount.length;
+     }
+     return 0
     }
+
+    useLayoutEffect(() => {
+        countUnreadMessages = (channel: ChannelTypes) => {
+            if (unreadMessagesRef.current) {
+                const unreadCount = unreadMessagesRef.current.filter(msg => msg?.chatroom?._id === channel?.chatroom?._id && !msg?.isRead);
+                return unreadCount.length;
+            }
+            return 0
+        }
+    })
 
     return (
         <>

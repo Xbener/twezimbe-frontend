@@ -5,7 +5,7 @@ import { GroupContext } from '@/context/GroupContext'
 import { ChatRoomTypes, GroupTypes } from '@/types'
 import { CaretDownIcon } from '@radix-ui/react-icons'
 import { PlusIcon, Search, X } from 'lucide-react'
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext, useState, useEffect, useLayoutEffect } from 'react'
 import { iconTextGenerator } from '@/lib/iconTextGenerator';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -26,12 +26,27 @@ function Aside({ }) {
     const { group, isMemberListOpen, windowWidth, setIsMemberListOpen } = useContext(GroupContext)
     const [q, setQ] = useState('')
     const { allUsers, currentUser, setCurrentDM, currentDM } = useContext(DMContext)
-    const { onlineUsers, setUserDMs, userDMs, setMessages, setRoomId, unreadMessages } = useMyContext()
+    const { onlineUsers, setUserDMs, userDMs, setMessages, setRoomId, unreadMessages, unreadMessagesRef } = useMyContext()
     const [loading, setLoading] = useState(false)
     const router = useRouter()
 
+    let countUnreadMessages = (currentDM: ChatRoomTypes) => {
+        if (unreadMessagesRef.current) {
+            const unreadCount = unreadMessagesRef.current.filter(msg => msg?.chatroom?._id === currentDM?._id && !msg?.isRead);
+            return unreadCount.length;
+        }
+        return 0
+    }
 
-
+    useLayoutEffect(() => {
+        countUnreadMessages = (currentDM: ChatRoomTypes) => {
+            if (unreadMessagesRef.current) {
+                const unreadCount = unreadMessagesRef.current.filter(msg => msg?.chatroom?._id === currentDM?._id && !msg?.isRead);
+                return unreadCount.length;
+            }
+            return 0
+        }
+    })
     const handleGetUserDms = async () => {
         try {
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/chatrooms/user`, {
@@ -57,10 +72,6 @@ function Aside({ }) {
         if (currentUser) handleGetUserDms()
     }, [currentUser])
 
-    const countUnreadMessages = (currentDM: ChatRoomTypes) => {
-        const unreadCount = unreadMessages.filter(msg => msg?.chatroom?._id === currentDM?._id && !msg?.isRead);
-        return unreadCount.length;
-    }
 
     return (
         <div className={` bg-[#013a6fd8] h-full text-neutral-200 capitalize ${isMemberListOpen && windowWidth! <= 1025 ? 'w-full absolute top-0 left-0 h-full bg-blue-500 z-50' : 'relative hidden'} sm:block`}>
