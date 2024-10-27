@@ -742,7 +742,7 @@ function Page({ }: Props) {
                         <PopoverTrigger>
                             <Bell className="cursor-pointer" />
                         </PopoverTrigger>
-                        <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 flex flex-col pl-3 w-[100%]  gap-3">
+                        <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 flex flex-col pl-3 w-auto gap-3 ">
                             <div className="w-full flex items-center justify-between gap-5">
                                 <label htmlFor="mute">{userSettings?.notificationSettings.chatroomsMuted.includes(currentDM?._id!) ? "Unmute" :'mute'}</label>
                                 <input

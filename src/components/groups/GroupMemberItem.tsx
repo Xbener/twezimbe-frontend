@@ -47,7 +47,7 @@ function GroupMemberItem(member: Props) {
                 <PopoverTrigger>
                     <h1 className='text-[.8rem]'>{member.firstName} {member.lastName}</h1>
                 </PopoverTrigger>
-                <PopoverContent className="bg-[#013a6f] text-white flex flex-col items-center p-5 gap-2 border-transparent shadow-lg rounded-lg">
+                <PopoverContent className="bg-[#013a6f] text-white flex flex-col items-center p-5 gap-2 border-transparent shadow-lg rounded-lg w-auto">
                     <Avatar className='w-[100px] h-[100px]'>
                         <AvatarImage src={member.profile_pic} className="bg-black" />
                         <AvatarFallback>{iconTextGenerator(member?.firstName as string, member?.lastName as string)}</AvatarFallback>
