@@ -742,7 +742,7 @@ function Page({ }: Props) {
                         </PopoverTrigger>
                         <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 flex flex-col pl-3 w-[100%]  gap-3">
                             <div className="w-full flex items-center justify-between gap-5">
-                                <label htmlFor="mute">Mute</label>
+                                <label htmlFor="mute">{userSettings?.notificationSettings.chatroomsMuted.includes(currentDM?._id!) ? "Unmute" :'mute'}</label>
                                 <input
                                     id='mute'
                                     name="mute"
@@ -765,7 +765,7 @@ function Page({ }: Props) {
                             </div>
 
                             <div className="w-full flex items-center justify-between gap-5">
-                                <label htmlFor="block">Block</label>
+                                <label htmlFor="block">{userSettings?.notificationSettings.chatroomsBlocked.includes(currentDM?._id!) ? "Unblock" : 'block'}</label>
                                 <input
                                     id="block"
                                     name="mute"
