@@ -21,6 +21,8 @@ import { Input } from '@/components/ui/input'
 import { AlertDialogTrigger } from '@/components/ui/alert-dialog'
 import { InputSwitch } from 'primereact/inputswitch'
 import { mimeTypeToSvg } from '@/constants'
+import ChatInput from '@/components/chatInput'
+
 type Props = {}
 
 function Page({ }: Props) {
@@ -908,6 +910,23 @@ function Page({ }: Props) {
                             {msgs.map((msg, index) => {
                                 const showAvatarAndName = index === 0 || msgs[index - 1]?.sender?._id !== msg?.sender?._id;
                                 const isUnreadMessage = msg._id === firstUnreadMessageId;
+
+                                const getFormattedMessageContent = () => {
+                                    return msg.content! && msg?.content
+                                        .split('\n')
+                                        .map((line) =>
+                                            line.split(/(@\w+)/g).map((part) => {
+                                                const isMention = part.startsWith('@');
+                                                const username = part.slice(1); // Remove "@" for validation
+                                                const isValidMention = isMention && validUserNames.includes(`@${username}`);
+
+                                                return isMention && isValidMention
+                                                    ? `<span style="background-color: rgba(255, 165, 0, 0.4); padding: 5px; border-radius: 10px;">${part}</span>`
+                                                    : part;
+                                            }).join('') // Join parts of each line to keep formatting
+                                        )
+                                        .join('<br />'); // Add line breaks
+                                };
                                 return (
                                     <React.Fragment key={msg._id}>
                                         {isUnreadMessage && (
@@ -1023,36 +1042,10 @@ function Page({ }: Props) {
                                                             ) : null}
                                                             <div className="text-white flex items-center gap-2">
                                                                 <div className="w-full flex flex-col gap-2">
-                                                                    <p>
-                                                                        {msg?.content &&
-                                                                            msg.content.split('\n').map((line, index) => (
-                                                                                <span key={index}>
-                                                                                    {line.split(/(@\w+)/g).map((part, i) => {
-                                                                                        const isMention = part.startsWith('@');
-                                                                                        const username = part.slice(1); // Remove "@" for validation
-
-                                                                                        // Check if it matches a valid username for highlighting
-                                                                                        const isValidMention = isMention && validUserNames.includes(`@${username}`);
-
-                                                                                        return (
-                                                                                            <span
-                                                                                                key={i}
-                                                                                                style={{
-                                                                                                    backgroundColor: isValidMention ? 'rgba(255, 165, 0, 0.4)' : 'transparent', // Only highlight valid mentions
-                                                                                                    transition: 'background-color 0.3s ease',
-                                                                                                    padding: "5px",
-                                                                                                    borderRadius: '10px'
-                                                                                                }}
-                                                                                            >
-                                                                                                {part}
-                                                                                            </span>
-                                                                                        );
-                                                                                    })}
-                                                                                    {msg?.content && index < msg.content.split('\n').length - 1 && <br />}
-
-                                                                                </span>
-                                                                            ))}
-                                                                    </p>
+                                                                        <p
+                                                                            dangerouslySetInnerHTML={{ __html: getFormattedMessageContent() }}
+                                                                            style={{ transition: 'background-color 0.3s ease' }}
+                                                                        />
                                                                     {
                                                                         msg.attachmentUrls && (
                                                                             <div className="w-full flex gap-2 flex-wrap">
@@ -1282,27 +1275,7 @@ function Page({ }: Props) {
                             ) : null}
                             <div className="space-x-3 relative w-full">
                                 <div className="W-full flex flex-col border-gray-700 border focus-within:border-white rounded-md">
-                                    <div className='flex gap-2 group-focus-within:border-b-white border-b border-b-gray-500 p-2'>
-                                        <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                            <Bold className="size-5" />
-                                        </span>
-                                        <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                            <Italic className="size-5" />
-                                        </span>
-                                        <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                            <Strikethrough className="size-5" />
-                                        </span>
-                                        <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                            <Link2 className="size-5" />
-                                        </span>
-                                        <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                            <List className="size-5" />
-                                        </span>
-                                        <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                            <ListOrdered className="size-5" />
-                                        </span>
-
-                                    </div>
+                                   
                                     {isMentioning && (
                                         <ul className="mention-dropdown absolute bg-blue-500 text-white w-1/5 rounded-md overflow-auto z-50 max-h-44  shadow-md">
                                             {filteredUsers.map((user) => (
@@ -1323,73 +1296,15 @@ function Page({ }: Props) {
                                     )}
 
                                     <div className="relative">
-                                        <textarea
-                                            ref={messagingInputRef}
+
+                                        <ChatInput
+                                            setAttachments={setAttachments}
+                                            sendMessage={sendMessage}
+                                            filesAttached={(attachments && attachments.length) > 0 ? true : false}
+                                            placeholder={currentPatners ? `message ${currentPatners[0]?.lastName} ...` : "Send DM..."}
                                             disabled={sending || fileUploading.state}
-                                            className="flex-grow bg-transparent p-3 rounded-md text-white placeholder-gray-400 focus:outline-none disabled:cursor-not-allowed w-full"
-                                            placeholder={`Message...`}
-                                            value={message}
-                                            onChange={handleChange}
-                                            onKeyDown={handleKeyPress}
-                                            style={{ minHeight: '40px', overflowY: 'auto' }} // Adjust height as needed
                                         />
-
                                     </div>
-                                    <div className="w-full flex p-2">
-                                        <div className="flex w-full items-center justify-between">
-                                            <div className="flex items-center gap-2">
-
-                                                <input
-                                                    type="file"
-                                                    hidden
-                                                    name="attachment"
-                                                    id="attachment"
-                                                    multiple
-                                                    onChange={(e) => setAttachments(e.target.files as FileList)}
-                                                />
-                                                <button disabled={sending || fileUploading.state} className="p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-7 cursor-pointer5">
-                                                    <label className="flex items-center gap-2 cursor-pointer" htmlFor="attachment">
-                                                        <Plus className="size-5" />
-                                                    </label>
-                                                </button>
-
-                                                <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                                    <Smile onClick={() => setShowPicker(prev => !prev)} className="size-5" />
-                                                </span>
-                                                <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                                    <AtSign onClick={() => {
-                                                        setMessage(prev => prev + " @")
-                                                        messagingInputRef.current?.focus()
-                                                        setIsMentioning(true)
-                                                        setFilteredUsers(currentPatners.filter((user) => user) || []);
-                                                    }}
-                                                    />
-                                                </span>
-                                            </div>
-
-                                            <Button
-                                                disabled={sending || fileUploading.state}
-                                                onClick={() => sendBySendBtn(message)}
-                                            >
-                                                <SendHorizonal />
-                                            </Button>
-                                        </div>
-                                        <div ref={emojiContainerRef} className="absolute bottom-9 right-0">
-                                            <EmojiPicker open={showPicker} lazyLoadEmojis onEmojiClick={(emoji) => {
-                                                setMessage(prev => prev + emoji.emoji)
-                                            }} />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className='w-full h-1 text-[.7rem] p-1 flex justify-between'>
-                                {/* {isTyping.message !== "" && isTyping.message} */}
-                                <div></div>
-                                <div className="text-[.6rem] flex gap-1">
-                                    <code className="rounded-md ">
-                                        ctrl+enter
-                                    </code>
-                                    for new line
                                 </div>
                             </div>
                         </div>

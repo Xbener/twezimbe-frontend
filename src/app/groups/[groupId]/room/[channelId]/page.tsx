@@ -1684,7 +1684,7 @@ function Page({ }: Props) {
                                     (settings?.postPermission === 'admins' && userRole !== 'ChannelAdmin') ||
                                         (settings?.postPermission === 'moderators' && userRole === 'ChannelMember')
                                         ? "Not allowed to send messages"
-                                        : `Message ${channel?.name}`
+                                        : `Message # ${channel?.name} ...`
                                 }
                                 disabled={
                                     sending || fileUploading.state ||
