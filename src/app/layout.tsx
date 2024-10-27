@@ -13,7 +13,6 @@ import AutoLogin from "@/context/AutoLogin";
 import { MyProvider } from "@/context/MyContext";
 import MainLoader from "@/components/MainLoader";
 import 'react-loading-skeleton/dist/skeleton.css'
-// import 'emoji-mart/css/emoji-mart.css';
 import 'draft-js/dist/Draft.css';
 import 'react-quill/dist/quill.snow.css';
 import 'froala-editor/css/froala_style.min.css';
