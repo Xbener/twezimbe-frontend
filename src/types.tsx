@@ -446,6 +446,7 @@ export type UserSettings = {
     userId: string;
     notificationSettings: {
         chatroomsMuted: string[];
+        chatroomsBlocked: string[];
         notifyOnMention: boolean;
         notifyOnDirectMessage: boolean;
         notifyOnReaction: boolean;

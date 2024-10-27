@@ -740,10 +740,12 @@ function Page({ }: Props) {
                         <PopoverTrigger>
                             <Bell className="cursor-pointer" />
                         </PopoverTrigger>
-                        <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col pl-3 w-5/6">
+                        <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 flex flex-col pl-3 w-[100%]  gap-3">
                             <div className="w-full flex items-center justify-between gap-5">
-                                <h1>Mute</h1>
+                                <label htmlFor="mute">Mute</label>
                                 <input
+                                    id='mute'
+                                    name="mute"
                                     type="checkbox"
                                     onChange={(e) =>
                                         handleUpdateUserSettings({
@@ -757,6 +759,29 @@ function Page({ }: Props) {
                                         })
                                     }
                                     checked={userSettings?.notificationSettings.chatroomsMuted.includes(currentDM?._id!)}
+                                    className="p-5 w-5 h-5 cursor-pointer rounded-full "
+                                />
+
+                            </div>
+
+                            <div className="w-full flex items-center justify-between gap-5">
+                                <label htmlFor="block">Block</label>
+                                <input
+                                    id="block"
+                                    name="mute"
+                                    type="checkbox"
+                                    onChange={(e) =>
+                                        handleUpdateUserSettings({
+                                            ...userSettings,
+                                            notificationSettings: {
+                                                ...userSettings.notificationSettings,
+                                                chatroomsBlocked: e.target.checked
+                                                    ? [...userSettings.notificationSettings.chatroomsBlocked, `${currentDM?._id}`]
+                                                    : userSettings.notificationSettings.chatroomsBlocked.filter((chat) => chat !== currentDM?._id)
+                                            }
+                                        })
+                                    }
+                                    checked={userSettings?.notificationSettings.chatroomsBlocked.includes(currentDM?._id!)}
                                     className="p-5 w-5 h-5 cursor-pointer rounded-full "
                                 />
 
@@ -858,7 +883,10 @@ function Page({ }: Props) {
                     messages.length <= 0 && (
                         <div className="w-full h-full flex flex-col items-center justify-center gap-3">
                             Start Conversation
-                            <Button disabled={sending} className="bg-blue-500 disabled:cursor-not-allowed text-white"
+                            <Button disabled={
+                                sending||
+                                userSettings?.notificationSettings.chatroomsBlocked.includes(currentDM?._id!)
+                            } className="bg-blue-500 disabled:cursor-pointer z-50 text-white disabled:bg-gray-700"
                                 onClick={() => {
                                     // setMessage("Hi!")
                                     sendBySendBtn("Hi!")
@@ -1217,147 +1245,156 @@ function Page({ }: Props) {
             </div>
 
 
-            <div className="bg-gray-800 p-4 border-t border-gray-700 w-full">
-                {isReplying.state ? (
-                    <div className='w-full p-2 rounded-md '>
-                        <div className=" overflow-hidden flex items-center justify-between gap-2">
-                            <div className="flex items-start justify-normal text-[.7rem] gap-2">
-                                <ReplyAllIcon className="rotate-180" /> {isReplying.message.content?.slice(0, 150)}
-                            </div>
-                            <Button onClick={() => setIsReplying({ state: false, replyingTo: "", message: {} })}>
-                                <XIcon />
-                            </Button>
-                        </div>
-                    </div>
-                ) : attachments?.length ? (
-                    <div className='w-full h-auto p-2 flex gap-2 overflow-auto flex-wrap'>
-                        {Array.from(attachments as File[]).map((file: File, index: number) => (
-                            <div key={index} className='w-[100px] overflow-hidden p-2 flex flex-col items-center justify-center gap-2 border rounded-md'>
-                                <button
-
-                                    className='bg-neutral-50 text-black rounded-full place-self-end justify-self-end cursor-pointer'
-                                    onClick={() => handleRemoveAttachment(file)}
-                                >
-                                    <XIcon />
-                                </button>
-                                <FileIcon className="size-12" />
-                                <h1>{file.name}</h1>
-                            </div>
-                        ))}
-                    </div>
-                ) : null}
-                <div className="space-x-3 relative w-full">
-                    <div className="W-full flex flex-col border-gray-700 border focus-within:border-white rounded-md">
-                        <div className='flex gap-2 group-focus-within:border-b-white border-b border-b-gray-500 p-2'>
-                            <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                <Bold className="size-5" />
-                            </span>
-                            <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                <Italic className="size-5" />
-                            </span>
-                            <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                <Strikethrough className="size-5" />
-                            </span>
-                            <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                <Link2 className="size-5" />
-                            </span>
-                            <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                <List className="size-5" />
-                            </span>
-                            <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                <ListOrdered className="size-5" />
-                            </span>
-
-                        </div>
-                        {isMentioning && (
-                            <ul className="mention-dropdown absolute bg-blue-500 text-white w-1/5 rounded-md overflow-auto z-50 max-h-44  shadow-md">
-                                {filteredUsers.map((user) => (
-                                    <>
-                                        <li
-                                            className="cursor-pointer hover:bg-gray-200 hover:text-black p-3"
-                                            key={user.id}
-                                            onClick={() => {
-                                                handleUserSelect(user)
-                                                messagingInputRef?.current?.focus()
-
-                                            }}>
-                                            @{user.lastName} {user.firstName}
-                                        </li>
-                                    </>
-                                ))}
-                            </ul>
-                        )}
-                        <div className="relative">
-                            <textarea
-                                ref={messagingInputRef}
-                                disabled={sending || fileUploading.state}
-                                className="flex-grow bg-transparent p-3 rounded-md text-white placeholder-gray-400 focus:outline-none disabled:cursor-not-allowed w-full"
-                                placeholder={`Message...`}
-                                value={message}
-                                onChange={handleChange}
-                                onKeyDown={handleKeyPress}
-                                style={{ minHeight: '40px', overflowY: 'auto' }} // Adjust height as needed
-                            />
-
-                        </div>
-                        <div className="w-full flex p-2">
-                            <div className="flex w-full items-center justify-between">
-                                <div className="flex items-center gap-2">
-
-                                    <input
-                                        type="file"
-                                        hidden
-                                        name="attachment"
-                                        id="attachment"
-                                        multiple
-                                        onChange={(e) => setAttachments(e.target.files as FileList)}
-                                    />
-                                    <button disabled={sending || fileUploading.state} className="p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-7 cursor-pointer5">
-                                        <label className="flex items-center gap-2 cursor-pointer" htmlFor="attachment">
-                                            <Plus className="size-5" />
-                                        </label>
-                                    </button>
-
-                                    <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                        <Smile onClick={() => setShowPicker(prev => !prev)} className="size-5" />
-                                    </span>
-                                    <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                        <AtSign onClick={() => {
-                                            setMessage(prev => prev + " @")
-                                            messagingInputRef.current?.focus()
-                                            setIsMentioning(true)
-                                            setFilteredUsers(currentPatners.filter((user) => user) || []);
-                                        }}
-                                        />
-                                    </span>
+           {
+                userSettings?.notificationSettings.chatroomsBlocked.includes(currentDM?._id!) ? (
+                   <div className="W-full p-2 text-center">
+                    You blocked this profile 
+                   </div>
+                ) : (
+                        <div className="bg-gray-800 p-4 border-t border-gray-700 w-full">
+                            {isReplying.state ? (
+                                <div className='w-full p-2 rounded-md '>
+                                    <div className=" overflow-hidden flex items-center justify-between gap-2">
+                                        <div className="flex items-start justify-normal text-[.7rem] gap-2">
+                                            <ReplyAllIcon className="rotate-180" /> {isReplying.message.content?.slice(0, 150)}
+                                        </div>
+                                        <Button onClick={() => setIsReplying({ state: false, replyingTo: "", message: {} })}>
+                                            <XIcon />
+                                        </Button>
+                                    </div>
                                 </div>
+                            ) : attachments?.length ? (
+                                <div className='w-full h-auto p-2 flex gap-2 overflow-auto flex-wrap'>
+                                    {Array.from(attachments as File[]).map((file: File, index: number) => (
+                                        <div key={index} className='w-[100px] overflow-hidden p-2 flex flex-col items-center justify-center gap-2 border rounded-md'>
+                                            <button
 
-                                <Button
-                                    disabled={sending || fileUploading.state}
-                                    onClick={() => sendBySendBtn(message)}
-                                >
-                                    <SendHorizonal />
-                                </Button>
+                                                className='bg-neutral-50 text-black rounded-full place-self-end justify-self-end cursor-pointer'
+                                                onClick={() => handleRemoveAttachment(file)}
+                                            >
+                                                <XIcon />
+                                            </button>
+                                            <FileIcon className="size-12" />
+                                            <h1>{file.name}</h1>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : null}
+                            <div className="space-x-3 relative w-full">
+                                <div className="W-full flex flex-col border-gray-700 border focus-within:border-white rounded-md">
+                                    <div className='flex gap-2 group-focus-within:border-b-white border-b border-b-gray-500 p-2'>
+                                        <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                            <Bold className="size-5" />
+                                        </span>
+                                        <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                            <Italic className="size-5" />
+                                        </span>
+                                        <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                            <Strikethrough className="size-5" />
+                                        </span>
+                                        <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                            <Link2 className="size-5" />
+                                        </span>
+                                        <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                            <List className="size-5" />
+                                        </span>
+                                        <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                            <ListOrdered className="size-5" />
+                                        </span>
+
+                                    </div>
+                                    {isMentioning && (
+                                        <ul className="mention-dropdown absolute bg-blue-500 text-white w-1/5 rounded-md overflow-auto z-50 max-h-44  shadow-md">
+                                            {filteredUsers.map((user) => (
+                                                <>
+                                                    <li
+                                                        className="cursor-pointer hover:bg-gray-200 hover:text-black p-3"
+                                                        key={user.id}
+                                                        onClick={() => {
+                                                            handleUserSelect(user)
+                                                            messagingInputRef?.current?.focus()
+
+                                                        }}>
+                                                        @{user.lastName} {user.firstName}
+                                                    </li>
+                                                </>
+                                            ))}
+                                        </ul>
+                                    )}
+
+                                    <div className="relative">
+                                        <textarea
+                                            ref={messagingInputRef}
+                                            disabled={sending || fileUploading.state}
+                                            className="flex-grow bg-transparent p-3 rounded-md text-white placeholder-gray-400 focus:outline-none disabled:cursor-not-allowed w-full"
+                                            placeholder={`Message...`}
+                                            value={message}
+                                            onChange={handleChange}
+                                            onKeyDown={handleKeyPress}
+                                            style={{ minHeight: '40px', overflowY: 'auto' }} // Adjust height as needed
+                                        />
+
+                                    </div>
+                                    <div className="w-full flex p-2">
+                                        <div className="flex w-full items-center justify-between">
+                                            <div className="flex items-center gap-2">
+
+                                                <input
+                                                    type="file"
+                                                    hidden
+                                                    name="attachment"
+                                                    id="attachment"
+                                                    multiple
+                                                    onChange={(e) => setAttachments(e.target.files as FileList)}
+                                                />
+                                                <button disabled={sending || fileUploading.state} className="p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-7 cursor-pointer5">
+                                                    <label className="flex items-center gap-2 cursor-pointer" htmlFor="attachment">
+                                                        <Plus className="size-5" />
+                                                    </label>
+                                                </button>
+
+                                                <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                                    <Smile onClick={() => setShowPicker(prev => !prev)} className="size-5" />
+                                                </span>
+                                                <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                                    <AtSign onClick={() => {
+                                                        setMessage(prev => prev + " @")
+                                                        messagingInputRef.current?.focus()
+                                                        setIsMentioning(true)
+                                                        setFilteredUsers(currentPatners.filter((user) => user) || []);
+                                                    }}
+                                                    />
+                                                </span>
+                                            </div>
+
+                                            <Button
+                                                disabled={sending || fileUploading.state}
+                                                onClick={() => sendBySendBtn(message)}
+                                            >
+                                                <SendHorizonal />
+                                            </Button>
+                                        </div>
+                                        <div ref={emojiContainerRef} className="absolute bottom-9 right-0">
+                                            <EmojiPicker open={showPicker} lazyLoadEmojis onEmojiClick={(emoji) => {
+                                                setMessage(prev => prev + emoji.emoji)
+                                            }} />
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div ref={emojiContainerRef} className="absolute bottom-9 right-0">
-                                <EmojiPicker  open={showPicker} lazyLoadEmojis onEmojiClick={(emoji) => {
-                                    setMessage(prev => prev + emoji.emoji)
-                                }} />
+                            <div className='w-full h-1 text-[.7rem] p-1 flex justify-between'>
+                                {/* {isTyping.message !== "" && isTyping.message} */}
+                                <div></div>
+                                <div className="text-[.6rem] flex gap-1">
+                                    <code className="rounded-md ">
+                                        ctrl+enter
+                                    </code>
+                                    for new line
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div className='w-full h-1 text-[.7rem] p-1 flex justify-between'>
-                    {/* {isTyping.message !== "" && isTyping.message} */}
-                    <div></div>
-                    <div className="text-[.6rem] flex gap-1">
-                        <code className="rounded-md ">
-                            ctrl+enter
-                        </code>
-                        for new line
-                    </div>
-                </div>
-            </div>
+                )
+           }
         </div>
     )
 }
