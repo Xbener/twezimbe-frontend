@@ -1447,7 +1447,7 @@ function Page({ }: Props) {
                                                                                                 className="hover:bg-[rgba(50,139,255,0.39)] p-3 rounded-md"
                                                                                             >
                                                                                                 <div className="w-full flex items-center gap-2 justify-between group p-1 mb-5">
-                                                                                                    <span className="text-[.7rem]">{attachment?.name.substr(0, 20)}</span>
+                                                                                                    <span className="text-[.7rem]">{attachment?.name?.substr(0, 20)}</span>
                                                                                                     <button className="invisible group-hover:visible">
                                                                                                         <Download />
                                                                                                     </button>
@@ -1475,7 +1475,7 @@ function Page({ }: Props) {
                                                                                             >
                                                                                                 <div className="file-preview flex flex-col w-full justify-between group">
                                                                                                     <div className="w-full flex items-center gap-2 p-1 mb-5">
-                                                                                                        <span className="text-[.7rem]">{attachment?.name.substr(0, 20)}</span>
+                                                                                                        <span className="text-[.7rem]">{attachment?.name?.substr(0, 20)}</span>
                                                                                                         <button className="invisible group-hover:visible">
                                                                                                             <Download />
                                                                                                         </button>
