@@ -1670,6 +1670,7 @@ function Page({ }: Props) {
 
 
                             <ChatInput
+                                chatMembers={group?.members as User[]}
                                 setAttachments={setAttachments}
                                 sendMessage={sendMessage}
                                 filesAttached={(attachments && attachments.length) > 0 ? true : false}

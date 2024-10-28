@@ -5,6 +5,7 @@ import { SendHorizonal, Smile, PlusIcon } from 'lucide-react'
 import { Delta, Op } from 'quill/core'
 import { cn } from '@/lib/utils'
 import { EmojiPopover } from './emoji-popover'
+import { User } from '@/types'
 
 interface Props {
     variant?: "create" | 'update'
@@ -16,6 +17,7 @@ interface Props {
     innerRef?: React.MutableRefObject<Quill | null>
     setAttachments: (vl: FileList) => void
     filesAttached?: boolean
+    chatMembers: User[]
 }
 
 function Editor({
@@ -28,6 +30,7 @@ function Editor({
     placeholder = "Send a message ...",
     setAttachments,
     filesAttached,
+    chatMembers
 }: Props) {
 
     const [text, setText] = React.useState("")
@@ -37,12 +40,18 @@ function Editor({
     const placeholderRef = React.useRef(placeholder)
     const quillRef = React.useRef<Quill | null>(null)
     const defaultValueRef = React.useRef(defaultValue)
+    const [isMentioning, setIsMentioning] = React.useState(false)
+    const [filteredUsers, setFilteredUsers] = React.useState<User[]>([]);
+    const chatMembersRef = React.useRef<User[]>([])
+    const [message, setMessage] = React.useState("")
     const disabledRef = React.useRef(disabled)
+    const [selectionIndex, setSelectionIndex] = React.useState<number | null>(null);
 
     React.useLayoutEffect(() => {
         submitRef.current = onSubmit
         placeholderRef.current = placeholder
         defaultValueRef.current = defaultValue
+        chatMembersRef.current = chatMembers
         disabledRef.current = disabled
     })
 
@@ -127,8 +136,65 @@ function Editor({
     }
     const isEmpty = text.replace(/<(.|\n)*?>/g, '').trim().length === 0
 
+
+    const handleChange = () => {
+        if (quillRef.current) {
+            const value = quillRef.current.getText().trim();
+            setMessage(value);
+            setSelectionIndex(quillRef.current.getSelection()?.index ?? null);
+            // Match the mention syntax and capture the username after '@'
+            const mentionMatch = value.match(/@(\w*)/);
+            console.log(mentionMatch);
+            if (mentionMatch) {
+                setIsMentioning(true);
+                const searchTerm = mentionMatch[1].toLowerCase();
+
+                // Filter chat members based on the search term
+                const matchedUsers = chatMembersRef.current?.filter((user: User) =>
+                    user.lastName?.toLowerCase().startsWith(searchTerm) ||
+                    user.firstName?.toLowerCase().startsWith(searchTerm)
+                ) || [];
+
+                // Update state to trigger reactivity in the UI
+                setFilteredUsers(matchedUsers);
+            } else {
+                setIsMentioning(false);
+                setFilteredUsers([]);
+            }
+        }
+    };
+    React.useEffect(() => {
+        handleChange()
+    }, [chatMembers, quillRef.current, text])
+    const handleMentionClick = (user: User) => {
+        const quill = quillRef.current;
+        const index = quill?.getSelection()?.index ?? selectionIndex ?? 0;
+
+        quill?.insertText(index, `${user.lastName}`);
+        quill?.setSelection(index + user.lastName.length); // Move the cursor after the mention
+        quill?.focus();
+        setIsMentioning(false);
+    };
     return (
-        <div className="flex bg-[#001d38] flex-col w-full ">
+        <div className="flex bg-[#001d38] flex-col w-full relative">
+            {isMentioning && (
+                <ul className="mention-dropdown absolute bg-blue-500 text-white w-1/5 rounded-md overflow-auto z-50 max-h-44 shadow-md">
+                    {filteredUsers.map((user: User) => (
+                        <>
+                            <li
+                                className="cursor-pointer hover:bg-gray-200 p-3 hover:text-black"
+                                key={user.id}
+                                onClick={() => {
+                                    handleMentionClick(user)
+                                    setIsMentioning(false);
+
+                                }}>
+                                {user.lastName} {user.firstName}
+                            </li>
+                        </>
+                    ))}
+                </ul>
+            )}
             <div className="flex w-full flex-col rounded-md overflow-hidden  focus-within:shadow-sm transition bg-[#001d38]">
                 <div ref={containerRef} className="h-[100px] bg-[#001d38] border-none w-[100%] ql-custom placeholder:text-white" />
                 <div className="flex px-2 pb-2 z-[5] text-black bg-[#001d38] justify-between">
