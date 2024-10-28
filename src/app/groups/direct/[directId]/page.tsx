@@ -713,6 +713,23 @@ function Page({ }: Props) {
         );
 
     }
+
+    const getFormattedMessageContent = (content?: string) => {
+        return content! && content
+            .split('\n')
+            .map((line) =>
+                line.split(/(@\w+)/g).map((part) => {
+                    const isMention = part.startsWith('@');
+                    const username = part.slice(1); // Remove "@" for validation
+                    const isValidMention = isMention && validUserNames.includes(`@${username}`);
+
+                    return isMention && isValidMention
+                        ? `<span style="background-color: rgba(255, 165, 0, 0.4); padding: 5px; border-radius: 10px;">${part}</span>`
+                        : part;
+                }).join('') // Join parts of each line to keep formatting
+            )
+            .join('<br />'); // Add line breaks
+    };
     return (
         <DragDrop
             setAttachments={setAttachments}
@@ -929,8 +946,8 @@ function Page({ }: Props) {
                                     const showAvatarAndName = index === 0 || msgs[index - 1]?.sender?._id !== msg?.sender?._id;
                                     const isUnreadMessage = msg._id === firstUnreadMessageId;
 
-                                    const getFormattedMessageContent = () => {
-                                        return msg.content! && msg?.content
+                                    const getFormattedMessageContent = (content?: string) => {
+                                        return content! && content
                                             .split('\n')
                                             .map((line) =>
                                                 line.split(/(@\w+)/g).map((part) => {
@@ -1054,14 +1071,18 @@ function Page({ }: Props) {
                                                                     <div className='bg-gray-800 p-2 rounded-md mb-1'>
                                                                         <div className="flex items-start justify-start gap-2 overflow-hidden italic text-gray-300 ">
                                                                             <ReplyAllIcon className="rotate-180" />
-                                                                            <span>{(msg.replyingTo && msg.replyingTo.content?.slice(0, 150))}</span>
+                                                                            {/* <span>{(msg.replyingTo && msg.replyingTo.content?.slice(0, 150))}</span> */}
+                                                                                <p
+                                                                                    dangerouslySetInnerHTML={{ __html: getFormattedMessageContent(msg.replyingTo?.content?.slice(0,150)) }}
+                                                                                    style={{ transition: 'background-color 0.3s ease' }}
+                                                                                />
                                                                         </div>
                                                                     </div>
                                                                 ) : null}
                                                                 <div className="text-white flex items-center gap-2">
                                                                     <div className="w-full flex flex-col gap-2">
                                                                         <p
-                                                                            dangerouslySetInnerHTML={{ __html: getFormattedMessageContent() }}
+                                                                            dangerouslySetInnerHTML={{ __html: getFormattedMessageContent(msg?.content) }}
                                                                             style={{ transition: 'background-color 0.3s ease' }}
                                                                         />
                                                                         {
@@ -1267,7 +1288,10 @@ function Page({ }: Props) {
                                 <div className='w-full p-2 rounded-md '>
                                     <div className=" overflow-hidden flex items-center justify-between gap-2">
                                         <div className="flex items-start justify-normal text-[.7rem] gap-2">
-                                            <ReplyAllIcon className="rotate-180" /> {isReplying.message.content?.slice(0, 150)}
+                                                <ReplyAllIcon className="rotate-180" /> <p
+                                                    dangerouslySetInnerHTML={{ __html: getFormattedMessageContent(isReplying.message?.content?.slice(0, 150)) }}
+                                                    style={{ transition: 'background-color 0.3s ease' }}
+                                                />
                                         </div>
                                         <Button onClick={() => setIsReplying({ state: false, replyingTo: "", message: {} })}>
                                             <XIcon />
