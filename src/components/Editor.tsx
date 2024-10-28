@@ -176,7 +176,7 @@ function Editor({
         setIsMentioning(false);
     };
     return (
-        <div className="flex bg-[#001d38] flex-col w-full relative">
+        <div className="flex bg-[#013a6fae] flex-col w-full relative">
             {isMentioning && (
                 <ul className="mention-dropdown absolute bg-blue-500 text-white w-1/5 rounded-md overflow-auto z-50 max-h-44 shadow-md">
                     {filteredUsers.map((user: User) => (
@@ -195,98 +195,99 @@ function Editor({
                     ))}
                 </ul>
             )}
-            <div className="flex w-full flex-col rounded-md overflow-hidden  focus-within:shadow-sm transition bg-[#001d38]">
-                <div ref={containerRef} className="h-[100px] bg-[#001d38] border-none w-[100%] ql-custom placeholder:text-white" />
-                <div className="flex px-2 pb-2 z-[5] text-black bg-[#001d38] justify-between">
-                    <div className="flex px-2 pb-2 z-[5] text-black ">
-                        {
-                            variant === 'create' && (
-                                <>
-                                    <input
-                                        type="file"
-                                        hidden
-                                        name="attachment"
-                                        id="attachment"
-                                        multiple
-                                        onChange={(e) => {
-                                            setAttachments(e.target.files as FileList)
-                                        }}
-                                    />
-                                    <button disabled={disabled} className="p-1 font-bold rounded-full cursor-pointer">
-                                        <label className="flex items-center gap-2 cursor-pointer" htmlFor="attachment">
-                                            <PlusIcon className="size-5 text-white" />
-                                        </label>
-                                    </button>
-                                </>
-                            )
-                        }
+            <div className="flex w-full flex-col rounded-md overflow-hidden bg-[#013a6fae] border-b border-b-white">
+                <div ref={containerRef} className="h-[100px] bg-[#013a6fae] border-none w-[100%] ql-custom placeholder:text-white border-b border-b-white" />
+                
+            </div>
+            <div className="border-t border-t-white flex px-2 pb-2 z-[5] text-black bg-[#013a6fae] justify-between">
+                <div className="flex px-2 pb-2 z-[5] text-black">
+                    {
+                        variant === 'create' && (
+                            <>
+                                <input
+                                    type="file"
+                                    hidden
+                                    name="attachment"
+                                    id="attachment"
+                                    multiple
+                                    onChange={(e) => {
+                                        setAttachments(e.target.files as FileList)
+                                    }}
+                                />
+                                <button disabled={disabled} className="p-1 font-bold rounded-full cursor-pointer">
+                                    <label className="flex items-center gap-2 cursor-pointer" htmlFor="attachment">
+                                        <PlusIcon className="size-5 text-white" />
+                                    </label>
+                                </button>
+                            </>
+                        )
+                    }
+                    <Button
+                        className="text-white"
+                        onClick={toggleToolbar}
+                    >
+
+                        Aa
+                    </Button>
+                    <EmojiPopover
+                        onEmojiSelector={onEmojiSelector}
+                    >
                         <Button
                             className="text-white"
-                            onClick={toggleToolbar}
-                        >
 
-                            Aa
+                        >
+                            <Smile />
                         </Button>
-                        <EmojiPopover
-                            onEmojiSelector={onEmojiSelector}
-                        >
-                            <Button
-                                className="text-white"
+                    </EmojiPopover>
 
-                            >
-                                <Smile />
-                            </Button>
-                        </EmojiPopover>
-
-                    </div>
-                    <div className="justify-self-end">
-                        {
-                            variant === 'update' && (
-                                <>
-                                    <Button
-                                        className="text-white"
-                                        disabled={disabled}
-                                    >
-
-                                        Cancel
-                                    </Button>
-                                    <Button
-                                        className="text-white"
-
-                                        disabled={disabled || isEmpty}
-                                    >
-
-                                        Save
-                                    </Button>
-                                </>
-                            )
-                        }
-                        {
-                            variant === 'create' && (
+                </div>
+                <div className="justify-self-end">
+                    {
+                        variant === 'update' && (
+                            <>
                                 <Button
                                     className="text-white"
-                                    onClick={() => {
-                                        submitRef.current(quillRef.current?.getText() || text)
-                                        if (quillRef) {
-                                            quillRef.current?.setText("")
-                                            quillRef.current?.focus()
-                                        }
-                                    }}
-                                    disabled={isEmpty || disabled}
+                                    disabled={disabled}
                                 >
 
-                                    <SendHorizonal />
+                                    Cancel
                                 </Button>
-                            )
-                        }
-                    </div>
+                                <Button
+                                    className="text-white"
+
+                                    disabled={disabled || isEmpty}
+                                >
+
+                                    Save
+                                </Button>
+                            </>
+                        )
+                    }
+                    {
+                        variant === 'create' && (
+                            <Button
+                                className="text-white"
+                                onClick={() => {
+                                    submitRef.current(quillRef.current?.getText() || text)
+                                    if (quillRef) {
+                                        quillRef.current?.setText("")
+                                        quillRef.current?.focus()
+                                    }
+                                }}
+                                disabled={isEmpty || disabled}
+                            >
+
+                                <SendHorizonal />
+                            </Button>
+                        )
+                    }
                 </div>
             </div>
 
             {
                 variant === 'create' && (
                     <div className={cn(
-                        "p-2 text-[10px] text-muted-foreground justify-end w-full flex opacity-0",
+                        "p-2 bg-[#013a6fae] text-[10px] text-muted-foreground justify-end w-full flex opacity-0",
                         !isEmpty && 'opacity-100'
                     )}>
                         <p className="text-[.7rem]"><code className='text-[.6rem]'>ctrl+enter</code> to add a new line</p>

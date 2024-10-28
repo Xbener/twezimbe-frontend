@@ -63,14 +63,21 @@ button{
     padding-left: 20px; /* Indent the list */
 }
 
-.ql-container, 
-.ql-container *,
- .ql-editor, 
- .ql-editor *,
-  .ql-toolbar,
-   .ql-toolbar * {
-  border: none !important;
-  color:white;
+
+.ql-toolbar {
+  padding: 15px !important;
+  border: 5px !important; 
+}
+
+.ql-toolbar * {
+  border-bottom: 2px !important;
+  border-top: none !important;
+}
+
+.ql-editor {
+  height: 50px !important;
+  z-index: 50000 !important;
+  margin-bottom: 10em;
 }
 
 
@@ -102,4 +109,8 @@ button{
 
 .ql-toolbar .ql-stroke:hover{
   color:blue !important;
+}
+
+.drag-drop {
+  @apply w-full absolute h-full z-[5000] bg-[rgb(0,0,0,0.5)]
 }

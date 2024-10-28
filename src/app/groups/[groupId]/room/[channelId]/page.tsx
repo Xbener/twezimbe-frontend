@@ -27,6 +27,7 @@ import ChatInput from '@/components/chatInput'
 import { Input } from '@/components/ui/input'
 import { InputSwitch } from 'primereact/inputswitch'
 import { mimeTypeToSvg } from '@/constants'
+import { DragDrop } from '@/components/drag-drop'
 
 
 type Props = {}
@@ -48,7 +49,7 @@ function Page({ }: Props) {
     const emojiContainerRef = useRef<HTMLDivElement | null>(null)
     const [showPicker, setShowPicker] = useState(false);
     const [quickEmojiSelector, setQuickEmojiSelector] = useState(false)
-    const [attachments, setAttachments] = useState<any>(null)
+    const [attachments, setAttachments] = useState<any>([])
     const [isMentioning, setIsMentioning] = useState(false);
     const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
     const [validUserNames, setValidUserNames] = useState<string[]>([])
@@ -859,183 +860,186 @@ function Page({ }: Props) {
 
 
     return (
-        <div className="w-full h-screen flex flex-col bg-[#013a6fd3] text-white relative">
-            {
-                fileUploading.state && (
-                    <div className="w-auto p-2 pl-5 pr-5 bg-blue-500 rounded-full shadow-lg text-white absolute left-1/2 mt-5">
-                        file (s) uploading ...
+       <DragDrop
+       setAttachments={setAttachments}
+       >
+            <div className="w-full h-screen flex flex-col bg-[#013a6fd3] text-white relative">
+                {
+                    fileUploading.state && (
+                        <div className="w-auto p-2 pl-5 pr-5 bg-blue-500 rounded-full shadow-lg text-white absolute left-1/2 mt-5">
+                            file (s) uploading ...
+                        </div>
+
+                    )
+                }
+                {/* Header */}
+                <div className="flex justify-between p-4 bg-[#013a6fae] border-b border-gray-700">
+                    <div className='flex items-center gap-2 capitalize text-[1.2rem] text-xl'>
+                        <span className="lg:hidden block" onClick={() => setIsMemberListOpen(true)}>
+                            <ArrowLeft className="cursor-pointer" />
+                        </span>
+                        <span>{channel?.state === 'public' ? '#' : <Lock />}</span>
+                        <h1 className="text-base md:text-xl">{channel?.name}</h1>
                     </div>
+                    <div className='flex items-center gap-4'>
+                        <Popover>
 
-                )
-            }
-            {/* Header */}
-            <div className="flex justify-between p-4 bg-[#013a6fae] border-b border-gray-700">
-                <div className='flex items-center gap-2 capitalize text-[1.2rem] text-xl'>
-                    <span className="lg:hidden block" onClick={() => setIsMemberListOpen(true)}>
-                        <ArrowLeft className="cursor-pointer" />
-                    </span>
-                    <span>{channel?.state === 'public' ? '#' : <Lock />}</span>
-                    <h1 className="text-base md:text-xl">{channel?.name}</h1>
-                </div>
-                <div className='flex items-center gap-4'>
-                    <Popover>
+                            <PopoverTrigger>
+                                <Bell className="cursor-pointer" />
+                            </PopoverTrigger>
+                            <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 flex flex-col pl-3 gap-3 w-auto">
+                                <div className="w-full flex items-center justify-between gap-5">
+                                    <label htmlFor="mute">{userSettings?.notificationSettings.chatroomsMuted.includes(channel?.chatroom?._id!) ? "Unmute" : 'mute'}</label>
+                                    <input
+                                        name="mute"
+                                        id="mute"
+                                        type="checkbox"
+                                        onChange={(e) =>
+                                            handleUpdateUserSettings({
+                                                ...userSettings,
+                                                notificationSettings: {
+                                                    ...userSettings.notificationSettings,
+                                                    chatroomsMuted: e.target.checked
+                                                        ? [...userSettings.notificationSettings.chatroomsMuted, `${channel?.chatroom?._id}`]
+                                                        : userSettings.notificationSettings.chatroomsMuted.filter((chat) => chat !== channel?.chatroom?._id)
+                                                }
+                                            })
+                                        }
+                                        checked={userSettings?.notificationSettings.chatroomsMuted.includes(channel?.chatroom?._id!)}
+                                        className="p-5 w-5 h-5 cursor-pointer rounded-full "
+                                    />
 
-                        <PopoverTrigger>
-                            <Bell className="cursor-pointer" />
-                        </PopoverTrigger>
-                        <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 flex flex-col pl-3 gap-3 w-auto">
-                            <div className="w-full flex items-center justify-between gap-5">
-                                <label htmlFor="mute">{userSettings?.notificationSettings.chatroomsMuted.includes(channel?.chatroom?._id!) ? "Unmute" : 'mute'}</label>
-                                <input
-                                    name="mute"
-                                    id="mute"
-                                    type="checkbox"
-                                    onChange={(e) =>
-                                        handleUpdateUserSettings({
-                                            ...userSettings,
-                                            notificationSettings: {
-                                                ...userSettings.notificationSettings,
-                                                chatroomsMuted: e.target.checked
-                                                    ? [...userSettings.notificationSettings.chatroomsMuted, `${channel?.chatroom?._id}`]
-                                                    : userSettings.notificationSettings.chatroomsMuted.filter((chat) => chat !== channel?.chatroom?._id)
-                                            }
-                                        })
-                                    }
-                                    checked={userSettings?.notificationSettings.chatroomsMuted.includes(channel?.chatroom?._id!)}
-                                    className="p-5 w-5 h-5 cursor-pointer rounded-full "
-                                />
-
-                            </div>
-                        </PopoverContent>
-                    </Popover>
-                    <Dialog>
-                        <DialogTrigger>
-                            <Search className="cursor-pointer" />
-                        </DialogTrigger>
-                        <DialogContent className="bg-white p-2 flex flex-col">
+                                </div>
+                            </PopoverContent>
+                        </Popover>
+                        <Dialog>
+                            <DialogTrigger>
+                                <Search className="cursor-pointer" />
+                            </DialogTrigger>
+                            <DialogContent className="bg-white p-2 flex flex-col">
 
 
-                            <div className="w-full">
-                                <Input
-                                    className="w-full"
-                                    onChange={handleMessageSearch}
-                                    placeholder="Search by keyword ..."
-                                />
-                            </div>
+                                <div className="w-full">
+                                    <Input
+                                        className="w-full"
+                                        onChange={handleMessageSearch}
+                                        placeholder="Search by keyword ..."
+                                    />
+                                </div>
 
-                            <div className="mt-5 h-[500px] overflow-auto">
-                                {
-                                    !queriedMessages.length ? 'search messages ...' : (
-                                        queriedMessages.map(message => {
+                                <div className="mt-5 h-[500px] overflow-auto">
+                                    {
+                                        !queriedMessages.length ? 'search messages ...' : (
+                                            queriedMessages.map(message => {
 
-                                            return (
-                                                <div
-                                                    className="w-full flex cursor-pointer hover:bg-gray-200 border-b rounded-md  p-2 flex-col"
-                                                    key={message._id}>
-                                                    <div className="flex items-center gap-3">
-                                                        <Avatar className='w-[40px] h-[40px] bg-neutral-200 rounded-full'>
-                                                            <AvatarImage src={message.sender?.profile_pic} />
-                                                            <AvatarFallback />
-                                                        </Avatar>
+                                                return (
+                                                    <div
+                                                        className="w-full flex cursor-pointer hover:bg-gray-200 border-b rounded-md  p-2 flex-col"
+                                                        key={message._id}>
+                                                        <div className="flex items-center gap-3">
+                                                            <Avatar className='w-[40px] h-[40px] bg-neutral-200 rounded-full'>
+                                                                <AvatarImage src={message.sender?.profile_pic} />
+                                                                <AvatarFallback />
+                                                            </Avatar>
 
-                                                        <div className="flex items-center gap-2">
-                                                            <h1>{message.sender?.firstName} {message.sender?.lastName}</h1>
-                                                            <p className="text-[.7rem]">{moment(message.createdAt).format('MMMM D, YYYY')}</p>
+                                                            <div className="flex items-center gap-2">
+                                                                <h1>{message.sender?.firstName} {message.sender?.lastName}</h1>
+                                                                <p className="text-[.7rem]">{moment(message.createdAt).format('MMMM D, YYYY')}</p>
+                                                            </div>
                                                         </div>
+
+                                                        <p className="ml-11 text-gray-600">
+                                                            {message.content}
+                                                        </p>
+                                                    </div>
+                                                )
+                                            })
+                                        )
+                                    }
+                                </div>
+                            </DialogContent>
+                        </Dialog>
+                        <Popover>
+                            <PopoverTrigger>
+                                <Pin className="cursor-pointer" />
+                            </PopoverTrigger>
+                            <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col pl-3 ">
+                                {
+                                    messages && !messages.find(msg => msg.pinned) ? <span className='text-center'>no pinned messages</span> : messages.map((msg, index) => {
+                                        if (!msg.pinned) return null
+                                        return <div
+                                            key={msg._id}
+                                            className={`flex flex-co gap-4 hover:bg-[#cbcbcb2e] cursor-pointer rounded-md items-start mb-1 justify-normal p-1 group`} // Reduced margin between consecutive messages
+                                        >
+                                            <span onClick={() => handlePin(msg)} className="border rounded-full p-2 hover:bg-neutral-50 hover:text-black duration-75">
+                                                <Pin className='size-3' />
+                                            </span>
+                                            <div className='flex flex-col w-full items-start justify-center'>
+                                                <div className="flex gap-2 items-center">
+                                                    <Avatar className='w-[40px] h-[40px] bg-neutral-200 rounded-full'>
+                                                        <AvatarImage src={msg.sender?.profile_pic} />
+                                                        <AvatarFallback />
+                                                    </Avatar>
+                                                    <div className="flex flex-col">
+                                                        <span>{msg?.sender?.lastName} {msg?.sender?.firstName}</span>
+                                                        <span className="text-[.7rem] text-neutral-400">{formatMessageDate(msg?.createdAt as Date)}</span>
+                                                    </div>
+                                                </div>
+                                                <span className="p-2 w-full mt-1 rounded-md break-words text-wrap">
+                                                    {msg?.content?.slice(0, 100)}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    })
+                                }
+                            </PopoverContent>
+                        </Popover>
+                        <Dialog>
+                            <DialogTrigger>
+                                <Settings className="cursor-pointer" />
+                            </DialogTrigger>
+                            <DialogContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col pl-3 ">
+                                <DialogHeader className="text-[1.2rem]">
+                                    {channel?.name} settings
+                                </DialogHeader>
+
+                                <div className='flex flex-col gap-2 mt-5 w-full'>
+                                    {
+                                        (channel?.created_by?._id === currentUser?._id || userRole === 'ChannelAdmin') && (
+                                            <div className='p-3 border-b flex items-start justify-around w-full flex-col'>
+                                                <div className='w-full flex flex-col gap-2 items-end'>
+                                                    <div className="w-full flex flex-col gap-2">
+                                                        <label className='font-extrabold text-[.8rem]' htmlFor="group_name">Channel name</label>
+                                                        <input
+                                                            id="name"
+                                                            name="name"
+                                                            value={channelUpdateData?.name}
+                                                            onChange={handleUpdateChange}
+                                                            className="bg-transparent p-2 border outline-none w-full" placeholder="Channel name" />
+                                                    </div>
+                                                    <div className="w-full flex flex-col gap-2">
+                                                        <label className='font-extrabold text-[.8rem]' htmlFor="description">Channel description</label>
+                                                        <textarea
+                                                            id="description"
+                                                            name="description"
+                                                            value={channelUpdateData?.description}
+                                                            onChange={handleUpdateChange}
+                                                            className="w-full bg-transparent p-2 border outline-none" placeholder="Channel description ..." />
                                                     </div>
 
-                                                    <p className="ml-11 text-gray-600">
-                                                        {message.content}
-                                                    </p>
-                                                </div>
-                                            )
-                                        })
-                                    )
-                                }
-                            </div>
-                        </DialogContent>
-                    </Dialog>
-                    <Popover>
-                        <PopoverTrigger>
-                            <Pin className="cursor-pointer" />
-                        </PopoverTrigger>
-                        <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col pl-3 ">
-                            {
-                                messages && !messages.find(msg => msg.pinned) ? <span className='text-center'>no pinned messages</span> : messages.map((msg, index) => {
-                                    if (!msg.pinned) return null
-                                    return <div
-                                        key={msg._id}
-                                        className={`flex flex-co gap-4 hover:bg-[#cbcbcb2e] cursor-pointer rounded-md items-start mb-1 justify-normal p-1 group`} // Reduced margin between consecutive messages
-                                    >
-                                        <span onClick={() => handlePin(msg)} className="border rounded-full p-2 hover:bg-neutral-50 hover:text-black duration-75">
-                                            <Pin className='size-3' />
-                                        </span>
-                                        <div className='flex flex-col w-full items-start justify-center'>
-                                            <div className="flex gap-2 items-center">
-                                                <Avatar className='w-[40px] h-[40px] bg-neutral-200 rounded-full'>
-                                                    <AvatarImage src={msg.sender?.profile_pic} />
-                                                    <AvatarFallback />
-                                                </Avatar>
-                                                <div className="flex flex-col">
-                                                    <span>{msg?.sender?.lastName} {msg?.sender?.firstName}</span>
-                                                    <span className="text-[.7rem] text-neutral-400">{formatMessageDate(msg?.createdAt as Date)}</span>
-                                                </div>
-                                            </div>
-                                            <span className="p-2 w-full mt-1 rounded-md break-words text-wrap">
-                                                {msg?.content?.slice(0, 100)}
-                                            </span>
-                                        </div>
-                                    </div>
-                                })
-                            }
-                        </PopoverContent>
-                    </Popover>
-                    <Dialog>
-                        <DialogTrigger>
-                            <Settings className="cursor-pointer" />
-                        </DialogTrigger>
-                        <DialogContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col pl-3 ">
-                            <DialogHeader className="text-[1.2rem]">
-                                {channel?.name} settings
-                            </DialogHeader>
+                                                    <Select
+                                                        defaultValue={channelUpdateData?.state}
+                                                        onValueChange={(v) => setChannelUpdateData(prev => ({ ...prev, state: v }))}>
+                                                        <SelectTrigger className="bg-transparent w-full text-white">
+                                                            <SelectValue placeholder="Channel state" />
+                                                        </SelectTrigger>
+                                                        <SelectContent className="bg-white">
+                                                            <SelectItem className="cursor-pointer" value="private">Private</SelectItem>
+                                                            <SelectItem className="cursor-pointer" value="public">Public</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
 
-                            <div className='flex flex-col gap-2 mt-5 w-full'>
-                                {
-                                    (channel?.created_by?._id === currentUser?._id || userRole === 'ChannelAdmin') && (
-                                        <div className='p-3 border-b flex items-start justify-around w-full flex-col'>
-                                            <div className='w-full flex flex-col gap-2 items-end'>
-                                                <div className="w-full flex flex-col gap-2">
-                                                    <label className='font-extrabold text-[.8rem]' htmlFor="group_name">Channel name</label>
-                                                    <input
-                                                        id="name"
-                                                        name="name"
-                                                        value={channelUpdateData?.name}
-                                                        onChange={handleUpdateChange}
-                                                        className="bg-transparent p-2 border outline-none w-full" placeholder="Channel name" />
-                                                </div>
-                                                <div className="w-full flex flex-col gap-2">
-                                                    <label className='font-extrabold text-[.8rem]' htmlFor="description">Channel description</label>
-                                                    <textarea
-                                                        id="description"
-                                                        name="description"
-                                                        value={channelUpdateData?.description}
-                                                        onChange={handleUpdateChange}
-                                                        className="w-full bg-transparent p-2 border outline-none" placeholder="Channel description ..." />
-                                                </div>
-
-                                                <Select
-                                                    defaultValue={channelUpdateData?.state}
-                                                    onValueChange={(v) => setChannelUpdateData(prev => ({ ...prev, state: v }))}>
-                                                    <SelectTrigger className="bg-transparent w-full text-white">
-                                                        <SelectValue placeholder="Channel state" />
-                                                    </SelectTrigger>
-                                                    <SelectContent className="bg-white">
-                                                        <SelectItem className="cursor-pointer" value="private">Private</SelectItem>
-                                                        <SelectItem className="cursor-pointer" value="public">Public</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-
-                                                {/* {
+                                                    {/* {
                                 groupData.group_type && (
                                     <input
                                         name="group_type"
@@ -1045,525 +1049,543 @@ function Page({ }: Props) {
                                 )
                             } */}
 
-                                                <div>
-                                                    <Button
-                                                        disabled={sending}
-                                                        onClick={handleUpdateChannel}
-                                                        className='bg-blue-500 text-white'>Update</Button>
+                                                    <div>
+                                                        <Button
+                                                            disabled={sending}
+                                                            onClick={handleUpdateChannel}
+                                                            className='bg-blue-500 text-white'>Update</Button>
+                                                    </div>
                                                 </div>
-                                            </div>
-
-                                            <div className="mt-5 w-full">
-                                                <h1 className="font-extrabold text-[.8rem]">Manage channel members</h1>
 
                                                 <div className="mt-5 w-full">
+                                                    <h1 className="font-extrabold text-[.8rem]">Manage channel members</h1>
 
-                                                    <div className='flex w-full justify-between items-center'>
-                                                        <h1>Who can message?</h1>
+                                                    <div className="mt-5 w-full">
 
-                                                        <div>
-                                                            <Select
-                                                                onValueChange={(v: 'admins' | 'anyone' | 'moderators') => {
-                                                                    updateSettings({ postPermission: v })
-                                                                }}
-                                                                defaultValue={settings?.postPermission}>
-                                                                <SelectTrigger className="bg-transparent w-full text-white">
-                                                                    <SelectValue placeholder="Choose" />
-                                                                </SelectTrigger>
-                                                                <SelectContent className="bg-white">
-                                                                    <SelectItem className="cursor-pointer" value="anyone">Anyone</SelectItem>
-                                                                    <SelectItem className="cursor-pointer" value="moderators">Moderators</SelectItem>
-                                                                    <SelectItem className="cursor-pointer" value="admins">Admins</SelectItem>
-                                                                </SelectContent>
-                                                            </Select>
+                                                        <div className='flex w-full justify-between items-center'>
+                                                            <h1>Who can message?</h1>
+
+                                                            <div>
+                                                                <Select
+                                                                    onValueChange={(v: 'admins' | 'anyone' | 'moderators') => {
+                                                                        updateSettings({ postPermission: v })
+                                                                    }}
+                                                                    defaultValue={settings?.postPermission}>
+                                                                    <SelectTrigger className="bg-transparent w-full text-white">
+                                                                        <SelectValue placeholder="Choose" />
+                                                                    </SelectTrigger>
+                                                                    <SelectContent className="bg-white">
+                                                                        <SelectItem className="cursor-pointer" value="anyone">Anyone</SelectItem>
+                                                                        <SelectItem className="cursor-pointer" value="moderators">Moderators</SelectItem>
+                                                                        <SelectItem className="cursor-pointer" value="admins">Admins</SelectItem>
+                                                                    </SelectContent>
+                                                                </Select>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className='flex w-full justify-between items-center mt-5'>
+                                                            <h1>Change member roles</h1>
+
+                                                            <Dialog>
+                                                                <DialogTrigger>
+                                                                    <Button className="bg-blue-500">
+                                                                        Change
+                                                                    </Button>
+
+                                                                </DialogTrigger>
+                                                                <DialogContent className="bg-white w-full">
+                                                                    <DialogHeader className="text-[1.1rem] ">
+                                                                        Modify channel member role
+                                                                    </DialogHeader>
+                                                                    {
+                                                                        channel?.membersDetails?.map((member: any) => {
+                                                                            if (member?._id === channel?.created_by?._id || member?._id === currentUser?._id) return null
+                                                                            return (
+                                                                                <div className="w-full p-2 justify-between flex items-center  text-black">
+                                                                                    <div className="flex items-center gap-2">
+                                                                                        <Avatar className="w-[40px] h-[40px] bg-neutral-200 rounded-full">
+                                                                                            <AvatarImage src={member?.profile_pic} />
+                                                                                            <AvatarFallback />
+                                                                                        </Avatar>
+                                                                                        <h1>{member?.firstName} {member?.lastName}</h1>
+                                                                                    </div>
+                                                                                    <div>
+                                                                                        <Select
+                                                                                            defaultValue={member?.role?.role_name}
+                                                                                            onValueChange={(v) => updateChannelUserRole(member?._id, v)}
+                                                                                        >
+                                                                                            <SelectTrigger className="bg-transparent w-full text-black">
+                                                                                                <SelectValue placeholder="Change role" />
+                                                                                            </SelectTrigger>
+                                                                                            <SelectContent className="bg-white">
+                                                                                                <SelectItem className="cursor-pointer" value="ChannelAdmin">Admin</SelectItem>
+                                                                                                <SelectItem className="cursor-pointer" value="ChannelModerator">Moderator</SelectItem>
+                                                                                                <SelectItem className="cursor-pointer" value="ChannelMember">Regular member</SelectItem>
+                                                                                            </SelectContent>
+                                                                                        </Select>
+                                                                                    </div>
+
+                                                                                </div>
+                                                                            )
+                                                                        })
+                                                                    }
+                                                                </DialogContent>
+                                                            </Dialog>
                                                         </div>
                                                     </div>
 
-                                                    <div className='flex w-full justify-between items-center mt-5'>
-                                                        <h1>Change member roles</h1>
-
-                                                        <Dialog>
-                                                            <DialogTrigger>
-                                                                <Button className="bg-blue-500">
-                                                                    Change
-                                                                </Button>
-
-                                                            </DialogTrigger>
-                                                            <DialogContent className="bg-white w-full">
-                                                                <DialogHeader className="text-[1.1rem] ">
-                                                                    Modify channel member role
-                                                                </DialogHeader>
-                                                                {
-                                                                    channel?.membersDetails?.map((member: any) => {
-                                                                        if (member?._id === channel?.created_by?._id || member?._id === currentUser?._id) return null
-                                                                        return (
-                                                                            <div className="w-full p-2 justify-between flex items-center  text-black">
-                                                                                <div className="flex items-center gap-2">
-                                                                                    <Avatar className="w-[40px] h-[40px] bg-neutral-200 rounded-full">
-                                                                                        <AvatarImage src={member?.profile_pic} />
-                                                                                        <AvatarFallback />
-                                                                                    </Avatar>
-                                                                                    <h1>{member?.firstName} {member?.lastName}</h1>
-                                                                                </div>
-                                                                                <div>
-                                                                                    <Select
-                                                                                        defaultValue={member?.role?.role_name}
-                                                                                        onValueChange={(v) => updateChannelUserRole(member?._id, v)}
-                                                                                    >
-                                                                                        <SelectTrigger className="bg-transparent w-full text-black">
-                                                                                            <SelectValue placeholder="Change role" />
-                                                                                        </SelectTrigger>
-                                                                                        <SelectContent className="bg-white">
-                                                                                            <SelectItem className="cursor-pointer" value="ChannelAdmin">Admin</SelectItem>
-                                                                                            <SelectItem className="cursor-pointer" value="ChannelModerator">Moderator</SelectItem>
-                                                                                            <SelectItem className="cursor-pointer" value="ChannelMember">Regular member</SelectItem>
-                                                                                        </SelectContent>
-                                                                                    </Select>
-                                                                                </div>
-
-                                                                            </div>
-                                                                        )
-                                                                    })
-                                                                }
-                                                            </DialogContent>
-                                                        </Dialog>
-                                                    </div>
                                                 </div>
-
                                             </div>
-                                        </div>
-                                    )
-                                }
-                                {((userRole === 'ChannelAdmin') && (channel?.state !== 'public')) && (
-                                    <div className='flex w-full justify-between items-center border rounded-md p-2'>
-                                        <h1>Add member </h1>
-                                        <Dialog>
-                                            <DialogTrigger disabled={sending}>
-                                                <Button disabled={sending} className='bg-red-500 text-white flex items-center gap-1'>
-                                                    <MessageCircleWarning />
-                                                    Add
-                                                </Button>
-                                            </DialogTrigger>
-                                            <DialogContent className="bg-white text-black">
-                                                <DialogHeader className="text-[1.3rem]">
-                                                    {/* <Warn */}
-                                                    Choose among the group members
-                                                </DialogHeader>
-                                                <div className="p-2">
-                                                    {
-                                                        group?.members.map((member, index) => {
-                                                            // Check if the group member exists in channel members
-                                                            const isMemberInChannel = channel?.members?.includes(member?._id);
-
-                                                            if (!isMemberInChannel) {
-                                                                // Render the member who is not in the channel
-                                                                return (
-                                                                    <div className="w-full flex items-center justify-between mb-2" key={member._id}>
-                                                                        <div className="flex items-center gap-2">
-                                                                            <Avatar className="w-[40px] h-[40px] bg-neutral-200 rounded-full">
-                                                                                <AvatarImage src={member?.profile_pic} />
-                                                                                <AvatarFallback />
-                                                                            </Avatar>
-                                                                            <h1>{member?.firstName} {member?.lastName}</h1>
-                                                                        </div>
-                                                                        <Button onClick={() => handleAddChannelMember(member)} className="bg-blue-500 text-white">
-                                                                            Add
-                                                                        </Button>
-                                                                    </div>
-                                                                );
-                                                            }
-
-                                                            return null; // Don't render anything if the member is already in the channel
-                                                        })
-                                                    }
-                                                </div>
-                                                <div>
-                                                    <DialogClose>
-                                                        <Button disabled={sending}>
-                                                            Cancel
-                                                        </Button>
-                                                    </DialogClose>
-                                                </div>
-                                            </DialogContent>
-                                        </Dialog>
-                                    </div>
-                                )}
-                                <div className='flex w-full justify-between items-center border rounded-md p-2'>
-                                    <h1>Leave channel </h1>
-                                    <Dialog>
-                                        <DialogTrigger disabled={sending}>
-                                            <Button disabled={sending} className='bg-red-500 text-white flex items-center gap-1'>
-                                                <MessageCircleWarning />
-                                                Leave
-                                            </Button>
-                                        </DialogTrigger>
-                                        <DialogContent className="bg-white text-black">
-                                            <DialogHeader>
-                                                {/* <Warn */}
-                                                Confirm Leaving this channel
-                                            </DialogHeader>
-                                            <div>
-                                                <DialogClose>
-                                                    <Button disabled={sending}>
-                                                        Cancel
-                                                    </Button>
-                                                </DialogClose>
-                                                <Button disabled={sending} className="bg-red-500 text-white" >
-                                                    Confirm
-                                                </Button>
-                                            </div>
-                                        </DialogContent>
-                                    </Dialog>
-                                </div>
-
-                                {
-                                    currentUser?._id === channel?.created_by?._id && (
-                                        <div className='flex w-full justify-between items-center border border-red-500 rounded-md p-2 text-red-500'>
-                                            <h1>Delete channel </h1>
+                                        )
+                                    }
+                                    {((userRole === 'ChannelAdmin') && (channel?.state !== 'public')) && (
+                                        <div className='flex w-full justify-between items-center border rounded-md p-2'>
+                                            <h1>Add member </h1>
                                             <Dialog>
                                                 <DialogTrigger disabled={sending}>
                                                     <Button disabled={sending} className='bg-red-500 text-white flex items-center gap-1'>
-                                                        <Delete />
-                                                        Delete
+                                                        <MessageCircleWarning />
+                                                        Add
                                                     </Button>
                                                 </DialogTrigger>
                                                 <DialogContent className="bg-white text-black">
-                                                    <DialogHeader>
+                                                    <DialogHeader className="text-[1.3rem]">
                                                         {/* <Warn */}
-                                                        Confirm Deleting this channel
+                                                        Choose among the group members
                                                     </DialogHeader>
+                                                    <div className="p-2">
+                                                        {
+                                                            group?.members.map((member, index) => {
+                                                                // Check if the group member exists in channel members
+                                                                const isMemberInChannel = channel?.members?.includes(member?._id);
+
+                                                                if (!isMemberInChannel) {
+                                                                    // Render the member who is not in the channel
+                                                                    return (
+                                                                        <div className="w-full flex items-center justify-between mb-2" key={member._id}>
+                                                                            <div className="flex items-center gap-2">
+                                                                                <Avatar className="w-[40px] h-[40px] bg-neutral-200 rounded-full">
+                                                                                    <AvatarImage src={member?.profile_pic} />
+                                                                                    <AvatarFallback />
+                                                                                </Avatar>
+                                                                                <h1>{member?.firstName} {member?.lastName}</h1>
+                                                                            </div>
+                                                                            <Button onClick={() => handleAddChannelMember(member)} className="bg-blue-500 text-white">
+                                                                                Add
+                                                                            </Button>
+                                                                        </div>
+                                                                    );
+                                                                }
+
+                                                                return null; // Don't render anything if the member is already in the channel
+                                                            })
+                                                        }
+                                                    </div>
                                                     <div>
                                                         <DialogClose>
                                                             <Button disabled={sending}>
                                                                 Cancel
                                                             </Button>
                                                         </DialogClose>
-                                                        <Button onClick={handleDeleteChannel} disabled={sending} className="bg-red-500 text-white" >
-                                                            Confirm
-                                                        </Button>
                                                     </div>
                                                 </DialogContent>
                                             </Dialog>
                                         </div>
-                                    )
-                                }
-                            </div>
-                        </DialogContent>
-                    </Dialog>
+                                    )}
+                                    <div className='flex w-full justify-between items-center border rounded-md p-2'>
+                                        <h1>Leave channel </h1>
+                                        <Dialog>
+                                            <DialogTrigger disabled={sending}>
+                                                <Button disabled={sending} className='bg-red-500 text-white flex items-center gap-1'>
+                                                    <MessageCircleWarning />
+                                                    Leave
+                                                </Button>
+                                            </DialogTrigger>
+                                            <DialogContent className="bg-white text-black">
+                                                <DialogHeader>
+                                                    {/* <Warn */}
+                                                    Confirm Leaving this channel
+                                                </DialogHeader>
+                                                <div>
+                                                    <DialogClose>
+                                                        <Button disabled={sending}>
+                                                            Cancel
+                                                        </Button>
+                                                    </DialogClose>
+                                                    <Button disabled={sending} className="bg-red-500 text-white" >
+                                                        Confirm
+                                                    </Button>
+                                                </div>
+                                            </DialogContent>
+                                        </Dialog>
+                                    </div>
 
-                    <span className="lg:hidden block" onClick={() => setIsSideBarOpen(true)}>
-                        <SidebarOpen className="cursor-pointer" />
-                    </span>
-                </div>
-            </div>
-
-            {/* Body */}
-            <div className="message-body flex-grow overflow-y-auto p-4 space-y-3 overflow-x-hidden">
-                {
-                    messages.length <= 0 && (
-                        <div className="w-full h-full flex flex-col items-center justify-center gap-3">
-                            Start Conversation
-                            <Button disabled={sending} className="bg-blue-500 disabled:cursor-not-allowed text-white"
-                                onClick={() => {
-                                    // setMessage("Hi!")
-                                    sendMessage("Hi!")
-                                }}
-                            >Say Hi!</Button>
-                        </div>
-                    )
-                }
-                {
-                    Object.entries(groupedMessages).map(([date, msgs]) => (
-                        <div key={date}>
-                            <div className="text-neutral-400 text-sm my-2 text-center flex items-center">
-                                <hr className="flex-grow border-t border-neutral-600" />
-                                <span className="mx-2">{date}</span> {/* Margin added for spacing */}
-                                <hr className="flex-grow border-t border-neutral-600" />
-                            </div>
-
-
-                            {msgs.map((msg, index) => {
-                                const showAvatarAndName = index === 0 || msgs[index - 1]?.sender?._id !== msg?.sender?._id;
-                                const isUnreadMessage = msg._id === firstUnreadMessageId;
-
-
-                                const getFormattedMessageContent = () => {
-                                    return msg.content! && msg?.content
-                                        .split('\n')
-                                        .map((line) =>
-                                            line.split(/(@\w+)/g).map((part) => {
-                                                const isMention = part.startsWith('@');
-                                                const username = part.slice(1); // Remove "@" for validation
-                                                const isValidMention = isMention && validUserNames.includes(`@${username}`);
-
-                                                return isMention && isValidMention
-                                                    ? `<span style="background-color: rgba(255, 165, 0, 0.4); padding: 5px; border-radius: 10px;">${part}</span>`
-                                                    : part;
-                                            }).join('') // Join parts of each line to keep formatting
-                                        )
-                                        .join('<br />'); // Add line breaks
-                                };
-                                return (
-
-                                    <React.Fragment key={msg._id}>
-                                        {isUnreadMessage && (
-                                            <div className="w-full my-2 flex items-center">
-                                                <hr className="flex-grow border-t border-red-500" />
-                                                <span className="mx-2 text-red-500 text-xs">Unread Messages</span>
-                                                <hr className="flex-grow border-t border-red-500" />
+                                    {
+                                        currentUser?._id === channel?.created_by?._id && (
+                                            <div className='flex w-full justify-between items-center border border-red-500 rounded-md p-2 text-red-500'>
+                                                <h1>Delete channel </h1>
+                                                <Dialog>
+                                                    <DialogTrigger disabled={sending}>
+                                                        <Button disabled={sending} className='bg-red-500 text-white flex items-center gap-1'>
+                                                            <Delete />
+                                                            Delete
+                                                        </Button>
+                                                    </DialogTrigger>
+                                                    <DialogContent className="bg-white text-black">
+                                                        <DialogHeader>
+                                                            {/* <Warn */}
+                                                            Confirm Deleting this channel
+                                                        </DialogHeader>
+                                                        <div>
+                                                            <DialogClose>
+                                                                <Button disabled={sending}>
+                                                                    Cancel
+                                                                </Button>
+                                                            </DialogClose>
+                                                            <Button onClick={handleDeleteChannel} disabled={sending} className="bg-red-500 text-white" >
+                                                                Confirm
+                                                            </Button>
+                                                        </div>
+                                                    </DialogContent>
+                                                </Dialog>
                                             </div>
-                                        )}
-                                        <div
+                                        )
+                                    }
+                                </div>
+                            </DialogContent>
+                        </Dialog>
 
-                                            onContextMenu={(e) => handleContextMenu(e, msg)} // Pass the message to the context menu handler
-                                            className={`flex w-full gap-4 hover:bg-[#cbcbcb2e] cursor-pointer rounded-md items-start mb-1 justify-normal ${index === msgs.length && "mb-5"} ${msg.pinned ? "bg-[rgba(255,193,59,0.42)]" : ' '} group `} // Reduced margin between consecutive messages
-                                        >
+                        <span className="lg:hidden block" onClick={() => setIsSideBarOpen(true)}>
+                            <SidebarOpen className="cursor-pointer" />
+                        </span>
+                    </div>
+                </div>
 
-                                            {msg.pinned && <Pin />}
-                                            {showAvatarAndName ? (
-                                                <Avatar className=' bg-neutral-200 rounded-full'>
-                                                    <AvatarImage src={msg.sender?.profile_pic} />
-                                                    <AvatarFallback />
-                                                </Avatar>
-                                            ) : (
-                                                <div className='w-[40px] p-0 h-0 text-[.5rem] items-center invisible group-hover:visible' >
-                                                    {new Date(msg?.createdAt as Date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
+                {/* Body */}
+                <div className="message-body flex-grow overflow-y-auto p-4 space-y-3 overflow-x-hidden">
+                    {
+                        messages.length <= 0 && (
+                            <div className="w-full h-full flex flex-col items-center justify-center gap-3">
+                                Start Conversation
+                                <Button disabled={sending} className="bg-blue-500 disabled:cursor-not-allowed text-white"
+                                    onClick={() => {
+                                        // setMessage("Hi!")
+                                        sendMessage("Hi!")
+                                    }}
+                                >Say Hi!</Button>
+                            </div>
+                        )
+                    }
+                    {
+                        Object.entries(groupedMessages).map(([date, msgs]) => (
+                            <div key={date}>
+                                <div className="text-neutral-400 text-sm my-2 text-center flex items-center">
+                                    <hr className="flex-grow border-t border-neutral-600" />
+                                    <span className="mx-2">{date}</span> {/* Margin added for spacing */}
+                                    <hr className="flex-grow border-t border-neutral-600" />
+                                </div>
+
+
+                                {msgs.map((msg, index) => {
+                                    const showAvatarAndName = index === 0 || msgs[index - 1]?.sender?._id !== msg?.sender?._id;
+                                    const isUnreadMessage = msg._id === firstUnreadMessageId;
+
+
+                                    const getFormattedMessageContent = () => {
+                                        return msg.content! && msg?.content
+                                            .split('\n')
+                                            .map((line) =>
+                                                line.split(/(@\w+)/g).map((part) => {
+                                                    const isMention = part.startsWith('@');
+                                                    const username = part.slice(1); // Remove "@" for validation
+                                                    const isValidMention = isMention && validUserNames.includes(`@${username}`);
+
+                                                    return isMention && isValidMention
+                                                        ? `<span style="background-color: rgba(255, 165, 0, 0.4); padding: 5px; border-radius: 10px;">${part}</span>`
+                                                        : part;
+                                                }).join('') // Join parts of each line to keep formatting
+                                            )
+                                            .join('<br />'); // Add line breaks
+                                    };
+                                    return (
+
+                                        <React.Fragment key={msg._id}>
+                                            {isUnreadMessage && (
+                                                <div className="w-full my-2 flex items-center">
+                                                    <hr className="flex-grow border-t border-red-500" />
+                                                    <span className="mx-2 text-red-500 text-xs">Unread Messages</span>
+                                                    <hr className="flex-grow border-t border-red-500" />
                                                 </div>
                                             )}
+                                            <div
 
-                                            <div className='flex flex-col w-full items-start justify-center '>
-                                                {showAvatarAndName && (
-                                                    <div className="flex gap-2 items-center">
-                                                        <span>{msg?.sender?.lastName} {msg?.sender?.firstName}</span>
-                                                        <span className="text-[.7rem] text-neutral-400">{formatMessageDate(msg?.createdAt as Date)}</span>
+                                                onContextMenu={(e) => handleContextMenu(e, msg)} // Pass the message to the context menu handler
+                                                className={`flex w-full gap-4 hover:bg-[#cbcbcb2e] cursor-pointer rounded-md items-start mb-1 justify-normal ${index === msgs.length && "mb-5"} ${msg.pinned ? "bg-[rgba(255,193,59,0.42)]" : ' '} group `} // Reduced margin between consecutive messages
+                                            >
+
+                                                {msg.pinned && <Pin />}
+                                                {showAvatarAndName ? (
+                                                    <Avatar className=' bg-neutral-200 rounded-full'>
+                                                        <AvatarImage src={msg.sender?.profile_pic} />
+                                                        <AvatarFallback />
+                                                    </Avatar>
+                                                ) : (
+                                                    <div className='w-[40px] p-0 h-0 text-[.5rem] items-center invisible group-hover:visible' >
+                                                        {new Date(msg?.createdAt as Date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
                                                     </div>
                                                 )}
-                                                {
-                                                    isEditing.state && isEditing.message._id === msg._id ? (
-                                                        <div className="w-full flex flex-col items-start">
-                                                            <div className="W-full flex flex-col border-gray-700 border focus-within:border-white rounded-md">
-                                                                <div className='flex gap-2 group-focus-within:border-b-white border-b border-b-gray-500 p-2'>
-                                                                    <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                                                        <Bold className="size-5" />
-                                                                    </span>
-                                                                    <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                                                        <Italic className="size-5" />
-                                                                    </span>
-                                                                    <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                                                        <Strikethrough className="size-5" />
-                                                                    </span>
-                                                                    <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                                                        <Link2 className="size-5" />
-                                                                    </span>
-                                                                    <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                                                        <List className="size-5" />
-                                                                    </span>
-                                                                    <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                                                        <ListOrdered className="size-5" />
-                                                                    </span>
 
-                                                                </div>
-                                                                <div className="">
-                                                                    <textarea
-                                                                        ref={editingInputRef}
-                                                                        disabled={sending}
-                                                                        className="flex-grow bg-transparent p-2 rounded-md text-white placeholder-gray-400 focus:outline-none disabled:cursor-not-allowed w-full"
-                                                                        value={isEditing.content}
-                                                                        onChange={(e) => setIsEditing(prev => ({ ...prev, content: e.target.value }))}
-                                                                        onKeyDown={handleEdit}
-                                                                    />
-                                                                </div>
-                                                                <div className="w-full flex p-2">
-                                                                    <div className="">
-                                                                        <Popover>
-                                                                            <PopoverTrigger className="p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75">
-                                                                                <Plus className="size-5" />
-                                                                            </PopoverTrigger>
-                                                                            <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col ">
-                                                                                <input
-                                                                                    type="file"
-                                                                                    hidden
-                                                                                    name="attachment"
-                                                                                    id="attachment"
-                                                                                    multiple
-                                                                                    onChange={(e) => setAttachments(e.target.files as FileList)}
-                                                                                />
-                                                                            </PopoverContent>
-                                                                        </Popover>
-
-                                                                    </div>
-                                                                    <div ref={emojiContainerRef} className="absolute z-50 bottom-9 right-0">
-                                                                        <EmojiPicker open={showPicker} onEmojiClick={(emoji) => {
-                                                                            setIsEditing(prev => ({ ...prev, content: prev.content + emoji.emoji }))
-                                                                        }} />
-                                                                    </div>
-                                                                    <div className="flex items-center gap-2">
-                                                                        <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                                                            <Smile onClick={() => setShowPicker(prev => !prev)} className="size-5" />
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                            <Button onClick={() => setIsEditing({ state: false, content: "", message: {} })} className="underline text-[.7rem]">cancel</Button>
+                                                <div className='flex flex-col w-full items-start justify-center '>
+                                                    {showAvatarAndName && (
+                                                        <div className="flex gap-2 items-center">
+                                                            <span>{msg?.sender?.lastName} {msg?.sender?.firstName}</span>
+                                                            <span className="text-[.7rem] text-neutral-400">{formatMessageDate(msg?.createdAt as Date)}</span>
                                                         </div>
-                                                    ) : (
-                                                        <div className='text-[#c4c4c4] text-[.9rem] w-[90%] break-words p-0 m-0'>
-                                                            {msg.replyingTo ? (
-                                                                <div className='bg-gray-800 p-2 rounded-md mb-1'>
-                                                                    <div className="flex items-start justify-start gap-2 overflow-hidden italic text-gray-300 ">
-                                                                        <ReplyAllIcon className="rotate-180" />
-                                                                        <span>{(msg.replyingTo && msg.replyingTo.content?.slice(0, 150))}</span>
+                                                    )}
+                                                    {
+                                                        isEditing.state && isEditing.message._id === msg._id ? (
+                                                            <div className="w-full flex flex-col items-start">
+                                                                <div className="W-full flex flex-col border-gray-700 border focus-within:border-white rounded-md">
+                                                                    <div className='flex gap-2 group-focus-within:border-b-white border-b border-b-gray-500 p-2'>
+                                                                        <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                                                            <Bold className="size-5" />
+                                                                        </span>
+                                                                        <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                                                            <Italic className="size-5" />
+                                                                        </span>
+                                                                        <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                                                            <Strikethrough className="size-5" />
+                                                                        </span>
+                                                                        <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                                                            <Link2 className="size-5" />
+                                                                        </span>
+                                                                        <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                                                            <List className="size-5" />
+                                                                        </span>
+                                                                        <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                                                            <ListOrdered className="size-5" />
+                                                                        </span>
+
+                                                                    </div>
+                                                                    <div className="">
+                                                                        <textarea
+                                                                            ref={editingInputRef}
+                                                                            disabled={sending}
+                                                                            className="flex-grow bg-transparent p-2 rounded-md text-white placeholder-gray-400 focus:outline-none disabled:cursor-not-allowed w-full"
+                                                                            value={isEditing.content}
+                                                                            onChange={(e) => setIsEditing(prev => ({ ...prev, content: e.target.value }))}
+                                                                            onKeyDown={handleEdit}
+                                                                        />
+                                                                    </div>
+                                                                    <div className="w-full flex p-2">
+                                                                        <div className="">
+                                                                            <Popover>
+                                                                                <PopoverTrigger className="p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75">
+                                                                                    <Plus className="size-5" />
+                                                                                </PopoverTrigger>
+                                                                                <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col ">
+                                                                                    <input
+                                                                                        type="file"
+                                                                                        hidden
+                                                                                        name="attachment"
+                                                                                        id="attachment"
+                                                                                        multiple
+                                                                                        onChange={(e) => setAttachments(e.target.files as FileList)}
+                                                                                    />
+                                                                                </PopoverContent>
+                                                                            </Popover>
+
+                                                                        </div>
+                                                                        <div ref={emojiContainerRef} className="absolute z-50 bottom-9 right-0">
+                                                                            <EmojiPicker open={showPicker} onEmojiClick={(emoji) => {
+                                                                                setIsEditing(prev => ({ ...prev, content: prev.content + emoji.emoji }))
+                                                                            }} />
+                                                                        </div>
+                                                                        <div className="flex items-center gap-2">
+                                                                            <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                                                                <Smile onClick={() => setShowPicker(prev => !prev)} className="size-5" />
+                                                                            </span>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-                                                            ) : null}
-                                                            <div className="text-white flex items-center gap-2">
-                                                                <div className="w-full flex flex-col gap-2">
-                                                                    <p
-                                                                        dangerouslySetInnerHTML={{ __html: getFormattedMessageContent() }}
-                                                                        style={{ transition: 'background-color 0.3s ease' }}
-                                                                    />
-                                                                    {
-                                                                        msg.attachmentUrls && (
-                                                                            <div className="w-full flex gap-2 flex-wrap">
-                                                                                {msg.attachmentUrls.map((attachment, index) => {
-                                                                                    const svgIcon = mimeTypeToSvg[attachment.type as any] || mimeTypeToSvg['default'];
 
-                                                                                    // Check if the attachment is an image
-                                                                                    if (attachment.type && attachment.type?.startsWith('image/')) {
-                                                                                        return (
-                                                                                            <a
-                                                                                                key={index}
-                                                                                                href={attachment.url}
-                                                                                                target="_blank"
-                                                                                                rel="noopener noreferrer"
-                                                                                                download
-                                                                                                className="hover:bg-[rgba(50,139,255,0.39)] p-3 rounded-md"
-                                                                                            >
-                                                                                                <div className="w-full flex items-center gap-2 justify-between group p-1 mb-5">
-                                                                                                    <span className="text-[.7rem]">{attachment?.name?.substr(0, 20)}</span>
-                                                                                                    <button className="invisible group-hover:visible">
-                                                                                                        <Download />
-                                                                                                    </button>
-                                                                                                </div>
-                                                                                                <img
+                                                                <Button onClick={() => setIsEditing({ state: false, content: "", message: {} })} className="underline text-[.7rem]">cancel</Button>
+                                                            </div>
+                                                        ) : (
+                                                            <div className='text-[#c4c4c4] text-[.9rem] w-[90%] break-words p-0 m-0'>
+                                                                {msg.replyingTo ? (
+                                                                    <div className='bg-gray-800 p-2 rounded-md mb-1'>
+                                                                        <div className="flex items-start justify-start gap-2 overflow-hidden italic text-gray-300 ">
+                                                                            <ReplyAllIcon className="rotate-180" />
+                                                                            <span>{(msg.replyingTo && msg.replyingTo.content?.slice(0, 150))}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                ) : null}
+                                                                <div className="text-white flex items-center gap-2">
+                                                                    <div className="w-full flex flex-col gap-2">
+                                                                        <p
+                                                                            dangerouslySetInnerHTML={{ __html: getFormattedMessageContent() }}
+                                                                            style={{ transition: 'background-color 0.3s ease' }}
+                                                                        />
+                                                                        {
+                                                                            msg.attachmentUrls && (
+                                                                                <div className="w-full flex gap-2 flex-wrap">
+                                                                                    {msg.attachmentUrls.map((attachment, index) => {
+                                                                                        const svgIcon = mimeTypeToSvg[attachment.type as any] || mimeTypeToSvg['default'];
+
+                                                                                        // Check if the attachment is an image
+                                                                                        if (attachment.type && attachment.type?.startsWith('image/')) {
+                                                                                            return (
+                                                                                                <a
                                                                                                     key={index}
-                                                                                                    className="object-fit rounded-md"
-                                                                                                    src={attachment.url}
-                                                                                                    alt="attachment"
-                                                                                                    width={200}
-                                                                                                    height={200}
-                                                                                                />
-                                                                                            </a>
-                                                                                        );
-                                                                                    } else {
-                                                                                        // Render non-image files with SVG icon and download link
-                                                                                        return (
-                                                                                            <a
-                                                                                                key={index}
-                                                                                                href={attachment.url}
-                                                                                                target="_blank"
-                                                                                                rel="noopener noreferrer"
-                                                                                                download
-                                                                                                className="hover:bg-[rgba(50,139,255,0.39)] p-3 rounded-md "
-                                                                                            >
-                                                                                                <div className="file-preview flex flex-col w-full justify-between group">
-                                                                                                    <div className="w-full flex items-center gap-2 p-1 mb-5">
+                                                                                                    href={attachment.url}
+                                                                                                    target="_blank"
+                                                                                                    rel="noopener noreferrer"
+                                                                                                    download
+                                                                                                    className="hover:bg-[rgba(50,139,255,0.39)] p-3 rounded-md"
+                                                                                                >
+                                                                                                    <div className="w-full flex items-center gap-2 justify-between group p-1 mb-5">
                                                                                                         <span className="text-[.7rem]">{attachment?.name?.substr(0, 20)}</span>
                                                                                                         <button className="invisible group-hover:visible">
                                                                                                             <Download />
                                                                                                         </button>
                                                                                                     </div>
-                                                                                                    <img src={svgIcon} alt={attachment.type} width={100} height={100} className="mr-2" />
-                                                                                                </div>
-                                                                                            </a>
-                                                                                        );
+                                                                                                    <img
+                                                                                                        key={index}
+                                                                                                        className="object-fit rounded-md"
+                                                                                                        src={attachment.url}
+                                                                                                        alt="attachment"
+                                                                                                        width={200}
+                                                                                                        height={200}
+                                                                                                    />
+                                                                                                </a>
+                                                                                            );
+                                                                                        } else {
+                                                                                            // Render non-image files with SVG icon and download link
+                                                                                            return (
+                                                                                                <a
+                                                                                                    key={index}
+                                                                                                    href={attachment.url}
+                                                                                                    target="_blank"
+                                                                                                    rel="noopener noreferrer"
+                                                                                                    download
+                                                                                                    className="hover:bg-[rgba(50,139,255,0.39)] p-3 rounded-md "
+                                                                                                >
+                                                                                                    <div className="file-preview flex flex-col w-full justify-between group">
+                                                                                                        <div className="w-full flex items-center gap-2 p-1 mb-5">
+                                                                                                            <span className="text-[.7rem]">{attachment?.name?.substr(0, 20)}</span>
+                                                                                                            <button className="invisible group-hover:visible">
+                                                                                                                <Download />
+                                                                                                            </button>
+                                                                                                        </div>
+                                                                                                        <img src={svgIcon} alt={attachment.type} width={100} height={100} className="mr-2" />
+                                                                                                    </div>
+                                                                                                </a>
+                                                                                            );
+                                                                                        }
+                                                                                    })}
+                                                                                </div>
+                                                                            )
+                                                                        }
+                                                                    </div>
+                                                                    <span>{msg.edited && <span className='text-[.7rem] text-gray-200'>(edited)</span>}</span>
+                                                                </div>
+                                                                <div className="flex items-center w-full justify-start p-1 gap-1">
+                                                                    {
+                                                                        msg.reactions?.length! > 0 && (
+                                                                            (() => {
+                                                                                const emojiCounts = msg.reactions!.reduce((acc, reaction: Reaction) => {
+                                                                                    const emoji = reaction.emoji!;
+                                                                                    if (emoji !== '0') {
+                                                                                        acc[emoji] = (acc[emoji] || 0) + 1;
                                                                                     }
-                                                                                })}
-                                                                            </div>
+                                                                                    return acc;
+                                                                                }, {} as Record<string, number>);
+
+                                                                                return Object.entries(emojiCounts).map(([emoji, count], index) => {
+                                                                                    // Check if the current user has reacted with this emoji
+                                                                                    const hasUserReacted = msg.reactions?.some(
+                                                                                        (reaction) => reaction.emoji === emoji && reaction.user_id === currentUser?._id
+                                                                                    );
+
+                                                                                    return (
+                                                                                        <span
+                                                                                            key={index}
+                                                                                            // If the user has reacted, add a background color
+                                                                                            className={`${hasUserReacted ? "bg-[rgba(255,255,255,0.19)] " : ""
+                                                                                                } border p-1 rounded-md hover:bg-[rgba(255,255,255,0.24)] cursor-pointer`}
+                                                                                            onClick={() => handleReactWithEmoji(msg, emoji)} // Add react/remove logic here
+                                                                                        >
+                                                                                            {emoji} {count > 1 && <span className="ml-1">x{count}</span>}
+                                                                                        </span>
+                                                                                    );
+                                                                                });
+                                                                            })()
                                                                         )
                                                                     }
+
                                                                 </div>
-                                                                <span>{msg.edited && <span className='text-[.7rem] text-gray-200'>(edited)</span>}</span>
+
                                                             </div>
-                                                            <div className="flex items-center w-full justify-start p-1 gap-1">
-                                                                {
-                                                                    msg.reactions?.length! > 0 && (
-                                                                        (() => {
-                                                                            const emojiCounts = msg.reactions!.reduce((acc, reaction: Reaction) => {
-                                                                                const emoji = reaction.emoji!;
-                                                                                if (emoji !== '0') {
-                                                                                    acc[emoji] = (acc[emoji] || 0) + 1;
-                                                                                }
-                                                                                return acc;
-                                                                            }, {} as Record<string, number>);
+                                                        )
+                                                    }
+                                                </div>
 
-                                                                            return Object.entries(emojiCounts).map(([emoji, count], index) => {
-                                                                                // Check if the current user has reacted with this emoji
-                                                                                const hasUserReacted = msg.reactions?.some(
-                                                                                    (reaction) => reaction.emoji === emoji && reaction.user_id === currentUser?._id
-                                                                                );
-
-                                                                                return (
-                                                                                    <span
-                                                                                        key={index}
-                                                                                        // If the user has reacted, add a background color
-                                                                                        className={`${hasUserReacted ? "bg-[rgba(255,255,255,0.19)] " : ""
-                                                                                            } border p-1 rounded-md hover:bg-[rgba(255,255,255,0.24)] cursor-pointer`}
-                                                                                        onClick={() => handleReactWithEmoji(msg, emoji)} // Add react/remove logic here
-                                                                                    >
-                                                                                        {emoji} {count > 1 && <span className="ml-1">x{count}</span>}
+                                                {/* Context Menu */}
+                                                {
+                                                    contextMenu.visible && contextMenu.message?._id === msg._id && ( // Show the context menu for the correct message
+                                                        <div
+                                                            className="absolute bg-gray-700 text-white rounded-md shadow-sm w-auto p-1 z-50"
+                                                            style={{ left: contextMenu.y, top: contextMenu.y }}
+                                                            onMouseLeave={closeContextMenu}
+                                                        >
+                                                            {instantActions.map((action, index) => {
+                                                                if ((action.name === "Edit" && `${msg.sender_id}` !== `${currentUser?._id}`) || (action.name === "Delete" && `${msg.sender_id}` !== `${currentUser?._id}`)) {
+                                                                    return null;
+                                                                }
+                                                                if (action.name === "React") {
+                                                                    return (
+                                                                        <div className="flex items-center w-full justify-around p-2 gap-3">
+                                                                            {
+                                                                                action.emojis!.map((emoji, index) => (
+                                                                                    <span key={index} className="border p-1 rounded-md hover:bg-[rgba(255,255,255,0.24)] cursor-pointer"
+                                                                                        onClick={() => handleReactWithEmoji(msg, emoji)}>
+                                                                                        {emoji}
                                                                                     </span>
-                                                                                );
-                                                                            });
-                                                                        })()
+                                                                                ))
+                                                                            }
+
+                                                                            <span className="border p-1 rounded-md hover:bg-[rgba(255,255,255,0.24)] cursor-pointer"
+                                                                                onClick={() => setQuickEmojiSelector(prev => !prev)}
+                                                                            >
+                                                                                <SmileIcon />
+                                                                            </span>
+                                                                        </div>
+                                                                    );
+                                                                }
+                                                                if (action.name === "Pin" && msg.pinned) {
+                                                                    return (
+                                                                        <button
+                                                                            key={index}
+                                                                            className={`w-full text-left p-2 hover:bg-blue-600 ${action.name === "Pin" ? "text-orange-500" : ""} flex items-center gap-2`}
+                                                                            onClick={() => {
+                                                                                if (action.name === "Edit") {
+                                                                                    action.action(msg, msg.content);
+                                                                                } else {
+                                                                                    action.action(msg);
+                                                                                }
+                                                                            }}
+                                                                        >
+                                                                            {action.icon}
+                                                                            Unpin
+                                                                        </button>
                                                                     )
                                                                 }
 
-                                                            </div>
-
-                                                        </div>
-                                                    )
-                                                }
-                                            </div>
-
-                                            {/* Context Menu */}
-                                            {
-                                                contextMenu.visible && contextMenu.message?._id === msg._id && ( // Show the context menu for the correct message
-                                                    <div
-                                                        className="absolute bg-gray-700 text-white rounded-md shadow-sm w-auto p-1 z-50"
-                                                        style={{ left: contextMenu.y, top: contextMenu.y }}
-                                                        onMouseLeave={closeContextMenu}
-                                                    >
-                                                        {instantActions.map((action, index) => {
-                                                            if ((action.name === "Edit" && `${msg.sender_id}` !== `${currentUser?._id}`) || (action.name === "Delete" && `${msg.sender_id}` !== `${currentUser?._id}`)) {
-                                                                return null;
-                                                            }
-                                                            if (action.name === "React") {
-                                                                return (
-                                                                    <div className="flex items-center w-full justify-around p-2 gap-3">
-                                                                        {
-                                                                            action.emojis!.map((emoji, index) => (
-                                                                                <span key={index} className="border p-1 rounded-md hover:bg-[rgba(255,255,255,0.24)] cursor-pointer"
-                                                                                    onClick={() => handleReactWithEmoji(msg, emoji)}>
-                                                                                    {emoji}
-                                                                                </span>
-                                                                            ))
-                                                                        }
-
-                                                                        <span className="border p-1 rounded-md hover:bg-[rgba(255,255,255,0.24)] cursor-pointer"
-                                                                            onClick={() => setQuickEmojiSelector(prev => !prev)}
-                                                                        >
-                                                                            <SmileIcon />
-                                                                        </span>
-                                                                    </div>
-                                                                );
-                                                            }
-                                                            if (action.name === "Pin" && msg.pinned) {
                                                                 return (
                                                                     <button
                                                                         key={index}
-                                                                        className={`w-full text-left p-2 hover:bg-blue-600 ${action.name === "Pin" ? "text-orange-500" : ""} flex items-center gap-2`}
+                                                                        className={`w-full text-left p-2 hover:bg-blue-600 ${action.name === "Delete" ? "text-red-500 hover:text-white hover:bg-red-500" : ""} flex items-center gap-2`}
                                                                         onClick={() => {
                                                                             if (action.name === "Edit") {
                                                                                 action.action(msg, msg.content);
@@ -1573,124 +1595,106 @@ function Page({ }: Props) {
                                                                         }}
                                                                     >
                                                                         {action.icon}
-                                                                        Unpin
+                                                                        {action.name}
                                                                     </button>
-                                                                )
-                                                            }
-
-                                                            return (
-                                                                <button
-                                                                    key={index}
-                                                                    className={`w-full text-left p-2 hover:bg-blue-600 ${action.name === "Delete" ? "text-red-500 hover:text-white hover:bg-red-500" : ""} flex items-center gap-2`}
-                                                                    onClick={() => {
-                                                                        if (action.name === "Edit") {
-                                                                            action.action(msg, msg.content);
-                                                                        } else {
-                                                                            action.action(msg);
-                                                                        }
-                                                                    }}
-                                                                >
-                                                                    {action.icon}
-                                                                    {action.name}
-                                                                </button>
-                                                            );
-                                                        })}
-                                                    </div>
-                                                )
-                                            }
-                                            <div ref={emojiContainerRef} className="absolute z-50 bottom-9 right-5">
-                                                <EmojiPicker open={quickEmojiSelector} onEmojiClick={(emoji) => {
-                                                    handleReactWithEmoji(msg, emoji.emoji)
-                                                    setQuickEmojiSelector(false)
-                                                }} />
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    )
+                                                }
+                                                <div ref={emojiContainerRef} className="absolute z-50 bottom-9 right-5">
+                                                    <EmojiPicker open={quickEmojiSelector} onEmojiClick={(emoji) => {
+                                                        handleReactWithEmoji(msg, emoji.emoji)
+                                                        setQuickEmojiSelector(false)
+                                                    }} />
+                                                </div>
                                             </div>
-                                        </div>
-                                    </React.Fragment>
-                                );
-                            })}
-                        </div>
-                    ))
-                }
-                <div ref={messagesEndRef} />
-            </div>
-
-            {/* Footer */}
-            <div className="bg-gray-800 border-t border-gray-700 w-full flex flex-col">
-                {isReplying.state ? (
-                    <div className='w-full p-2 rounded-md '>
-                        <div className=" overflow-hidden flex items-center justify-between gap-2">
-                            <div className="flex items-start justify-normal text-[.7rem] gap-2">
-                                <ReplyAllIcon className="rotate-180" /> {isReplying.message.content?.slice(0, 150)}
+                                        </React.Fragment>
+                                    );
+                                })}
                             </div>
-                            <Button onClick={() => setIsReplying({ state: false, replyingTo: "", message: {} })}>
-                                <XIcon />
-                            </Button>
-                        </div>
-                    </div>
-                ) : attachments?.length ? (
-                    <div className='w-full h-auto p-2 flex gap-2 overflow-auto flex-wrap'>
-                        {Array.from(attachments as File[]).map((file: File, index: number) => (
-                            <div key={index} className='w-[100px] overflow-hidden p-2 flex flex-col items-center justify-center gap-2 border rounded-md'>
-                                <button
+                        ))
+                    }
+                    <div ref={messagesEndRef} />
+                </div>
 
-                                    className='bg-neutral-50 text-black rounded-full place-self-end justify-self-end cursor-pointer'
-                                    onClick={() => handleRemoveAttachment(file)}
-                                >
+                {/* Footer */}
+                <div className="bg-[#013a6fae] border-t border-gray-700 w-full flex flex-col">
+                    {isReplying.state ? (
+                        <div className='w-full p-2 rounded-md '>
+                            <div className=" overflow-hidden flex items-center justify-between gap-2">
+                                <div className="flex items-start justify-normal text-[.7rem] gap-2">
+                                    <ReplyAllIcon className="rotate-180" /> {isReplying.message.content?.slice(0, 150)}
+                                </div>
+                                <Button onClick={() => setIsReplying({ state: false, replyingTo: "", message: {} })}>
                                     <XIcon />
-                                </button>
-                                <FileIcon className="size-12" />
-                                <h1>{file.name}</h1>
+                                </Button>
                             </div>
-                        ))}
-                    </div>
+                        </div>
+                    ) : attachments?.length ? (
+                        <div className='w-full h-auto p-2 flex gap-2 overflow-auto flex-wrap'>
+                            {Array.from(attachments as File[]).map((file: File, index: number) => (
+                                <div key={index} className='w-[100px] overflow-hidden p-2 flex flex-col items-center justify-center gap-2 border rounded-md'>
+                                    <button
 
-                ) : null}
-                <div className="space-x-3 relative w-full ">
+                                        className='bg-neutral-50 text-black rounded-full place-self-end justify-self-end cursor-pointer'
+                                        onClick={() => handleRemoveAttachment(file)}
+                                    >
+                                        <XIcon />
+                                    </button>
+                                    <FileIcon className="size-12" />
+                                    <h1>{file.name}</h1>
+                                </div>
+                            ))}
+                        </div>
 
-                    <div className="W-full flex flex-col border-gray-700 border focus-within:border-white rounded-md">
+                    ) : null}
+                    <div className="space-x-3 relative w-full ">
 
-                        {isMentioning && (
-                            <ul className="mention-dropdown absolute bg-blue-500 text-white w-1/5 rounded-md overflow-auto z-50 max-h-44 shadow-md">
-                                {filteredUsers.map((user) => (
-                                    <>
-                                        <li
-                                            className="cursor-pointer hover:bg-gray-200 p-3 hover:text-black"
-                                            key={user.id}
-                                            onClick={() => {
-                                                handleUserSelect(user)
-                                                messagingInputRef?.current?.focus()
-                                            }}>
-                                            @{user.lastName} {user.firstName}
-                                        </li>
-                                    </>
-                                ))}
-                            </ul>
-                        )}
-                        <div className="relative w-full">
+                        <div className="W-full flex flex-col border-gray-700 border focus-within:border-white rounded-md">
 
+                            {isMentioning && (
+                                <ul className="mention-dropdown absolute bg-blue-500 text-white w-1/5 rounded-md overflow-auto z-50 max-h-44 shadow-md">
+                                    {filteredUsers.map((user) => (
+                                        <>
+                                            <li
+                                                className="cursor-pointer hover:bg-gray-200 p-3 hover:text-black"
+                                                key={user.id}
+                                                onClick={() => {
+                                                    handleUserSelect(user)
+                                                    messagingInputRef?.current?.focus()
+                                                }}>
+                                                @{user.lastName} {user.firstName}
+                                            </li>
+                                        </>
+                                    ))}
+                                </ul>
+                            )}
+                            <div className="relative w-full">
 
-                            <ChatInput
-                                chatMembers={group?.members as User[]}
-                                setAttachments={setAttachments}
-                                sendMessage={sendMessage}
-                                filesAttached={(attachments && attachments.length) > 0 ? true : false}
-                                placeholder={
-                                    (settings?.postPermission === 'admins' && userRole !== 'ChannelAdmin') ||
-                                        (settings?.postPermission === 'moderators' && userRole === 'ChannelMember')
-                                        ? "Not allowed to send messages"
-                                        : `Message # ${channel?.name} ...`
-                                }
-                                disabled={
-                                    sending || fileUploading.state ||
-                                    (settings?.postPermission.toLowerCase() === 'admins' && userRole !== 'ChannelAdmin') ||
-                                    (settings?.postPermission.toLowerCase() === 'moderators' && userRole === 'ChannelMember')
-                                }
-                            />
+                                <ChatInput
+                                    chatMembers={group?.members as User[]}
+                                    setAttachments={setAttachments}
+                                    sendMessage={sendMessage}
+                                    filesAttached={(attachments && attachments.length) > 0 ? true : false}
+                                    placeholder={
+                                        (settings?.postPermission === 'admins' && userRole !== 'ChannelAdmin') ||
+                                            (settings?.postPermission === 'moderators' && userRole === 'ChannelMember')
+                                            ? "Not allowed to send messages"
+                                            : `Message # ${channel?.name} ...`
+                                    }
+                                    disabled={
+                                        sending || fileUploading.state ||
+                                        (settings?.postPermission.toLowerCase() === 'admins' && userRole !== 'ChannelAdmin') ||
+                                        (settings?.postPermission.toLowerCase() === 'moderators' && userRole === 'ChannelMember')
+                                    }
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div >
+       </DragDrop> 
     )
 }
 

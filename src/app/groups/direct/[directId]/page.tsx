@@ -22,6 +22,7 @@ import { AlertDialogTrigger } from '@/components/ui/alert-dialog'
 import { InputSwitch } from 'primereact/inputswitch'
 import { mimeTypeToSvg } from '@/constants'
 import ChatInput from '@/components/chatInput'
+import { DragDrop } from '@/components/drag-drop'
 
 type Props = {}
 
@@ -34,7 +35,7 @@ function Page({ }: Props) {
     const { setRoomId, messages, setMessages, unreadMessages, unreadMessagesRef, setUnreadMessages, roomId, roomIdRef, userSettings, setUserSettings } = useMyContext()
     const [sending, setSending] = useState(false)
     const { setIsSideBarOpen, setIsMemberListOpen } = useContext(GroupContext)
-    const [attachments, setAttachments] = useState<File[] | any>(null)
+    const [attachments, setAttachments] = useState<File[] | any>([])
     const [validUserNames, setValidUserNames] = useState<string[]>([])
     const [isReplying, setIsReplying] = useState({
         state: false,
@@ -495,10 +496,14 @@ function Page({ }: Props) {
     }
 
 
-    const sendMessage = async (content: string, fileUpload: any = null) => {
+    const sendMessage = async (content: string) => {
         if (!currentDM) return; // Ensure there's a channel context
 
         try {
+            let fileUpload = null;
+            if (attachments && attachments.length > 0) {
+                fileUpload = await uploadFiles();
+            }
             const token = Cookies.get('access-token');
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/messages/${currentDM?._id}`, {
                 method: 'POST',
@@ -509,7 +514,7 @@ function Page({ }: Props) {
                 body: JSON.stringify({
                     sender_id: currentUser?._id,
                     chatroom: currentDM?._id,
-                    content: content.trim(),
+                    content: content.trim() || message,
                     messageType: "text",
                     attachmentUrls: fileUpload || null,
                     receiver_id: currentDM?.members,
@@ -539,16 +544,16 @@ function Page({ }: Props) {
         }
     };
 
-    const sendBySendBtn = async (content: string) => {
-        let fileUpload = null;
-        if (attachments && attachments.length > 0) {
-            fileUpload = await uploadFiles();
-        }
-        if (content.trim() || fileUpload) {
-            setSending(true);
-            await sendMessage(content, fileUpload);
-        }
-    };
+    // const sendBySendBtn = async (content: string) => {
+    //     let fileUpload = null;
+    //     if (attachments && attachments.length > 0) {
+    //         fileUpload = await uploadFiles();
+    //     }
+    //     if (content.trim() || fileUpload) {
+    //         setSending(true);
+    //         await sendMessage(content, fileUpload);
+    //     }
+    // };
 
     // const sendBySendBtn = async (content: string) => {
     //     // if (!currentDM) return;
@@ -588,24 +593,24 @@ function Page({ }: Props) {
     //     // }
     // };
 
-    const handleKeyPress = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if (e.ctrlKey && e.key === "Enter") {
-            // Add a newline if Ctrl + Enter is pressed
-            setMessage(prev => prev + '\n');
-        } else if (e.key === 'Enter') {
-            // Prevent the default behavior to avoid new lines when just Enter is pressed
-            e.preventDefault();
+    // const handleKeyPress = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    //     if (e.ctrlKey && e.key === "Enter") {
+    //         // Add a newline if Ctrl + Enter is pressed
+    //         setMessage(prev => prev + '\n');
+    //     } else if (e.key === 'Enter') {
+    //         // Prevent the default behavior to avoid new lines when just Enter is pressed
+    //         e.preventDefault();
 
-            let fileUpload = null;
-            if (attachments && attachments.length > 0) {
-                fileUpload = await uploadFiles();
-            }
-            if (message.trim() || fileUpload) {
-                setSending(true);
-                await sendMessage(message, fileUpload);
-            }
-        }
-    };
+    //         let fileUpload = null;
+    //         if (attachments && attachments.length > 0) {
+    //             fileUpload = await uploadFiles();
+    //         }
+    //         if (message.trim() || fileUpload) {
+    //             setSending(true);
+    //             await sendMessage(message, fileUpload);
+    //         }
+    //     }
+    // };
 
 
     // const handleKeyPress = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -709,494 +714,515 @@ function Page({ }: Props) {
 
     }
     return (
-        <div className='w-full h-screen flex flex-col bg-[#013a6fd3] text-white'>
-            {
-                fileUploading.state && (
-                    <div className="w-auto p-2 pl-5 pr-5 bg-blue-500 rounded-full shadow-lg text-white absolute left-1/2 mt-5">
-                        file (s) uploading ...
-                    </div>
-
-                )
-            }
-            <div className="flex justify-between p-4 bg-[#013a6fae] border-b border-gray-700 w-full">
-                <div className='flex items-center gap-2 capitalize text-[1.2rem] text-xl'>
-                    <span className="lg:hidden block" onClick={() => setIsMemberListOpen(true)}>
-                        <ArrowLeft className="cursor-pointer" />
-                    </span>
-                    {/* If there's only one partner, display their avatar and name */}
-                    {currentPatners.length === 1 ? (
-                        <div className="flex items-center gap-2">
-                            <img
-                                src={currentPatners[0].profile_pic}
-                                alt={`${currentPatners[0].firstName} ${currentPatners[0].lastName}`}
-                                className="w-10 h-10 rounded-full"
-                            />
-                            <span>{currentPatners[0].firstName} {currentPatners[0].lastName}</span>
-                        </div>
-                    ) : (
-                        // If there are multiple partners, display their names
-                        <h1 className="text-base md:text-xl">
-                            {currentPatners.length > 0
-                                ? currentPatners.map((partner, index) => (
-                                    <span key={partner._id}>
-                                        {partner.firstName} {partner.lastName}{index < currentPatners.length - 1 ? ', ' : ''}
-                                    </span>
-                                ))
-                                : ''}
-                        </h1>
-                    )}
-                </div>
-                <div className='flex items-center gap-2'>
-                    <Popover>
-
-                        <PopoverTrigger>
-                            <Bell className="cursor-pointer" />
-                        </PopoverTrigger>
-                        <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 flex flex-col pl-3 w-auto gap-3 ">
-                            <div className="w-full flex items-center justify-between gap-5">
-                                <label htmlFor="mute">{userSettings?.notificationSettings.chatroomsMuted.includes(currentDM?._id!) ? "Unmute" : 'mute'}</label>
-                                <input
-                                    id='mute'
-                                    name="mute"
-                                    type="checkbox"
-                                    onChange={(e) =>
-                                        handleUpdateUserSettings({
-                                            ...userSettings,
-                                            notificationSettings: {
-                                                ...userSettings.notificationSettings,
-                                                chatroomsMuted: e.target.checked
-                                                    ? [...userSettings.notificationSettings.chatroomsMuted, `${currentDM?._id}`]
-                                                    : userSettings.notificationSettings.chatroomsMuted.filter((chat) => chat !== currentDM?._id)
-                                            }
-                                        })
-                                    }
-                                    checked={userSettings?.notificationSettings.chatroomsMuted.includes(currentDM?._id!)}
-                                    className="p-5 w-5 h-5 cursor-pointer rounded-full "
-                                />
-
-                            </div>
-
-                            <div className="w-full flex items-center justify-between gap-5">
-                                <label htmlFor="block">{userSettings?.notificationSettings.chatroomsBlocked.includes(currentDM?._id!) ? "Unblock" : 'block'}</label>
-                                <input
-                                    id="block"
-                                    name="mute"
-                                    type="checkbox"
-                                    onChange={(e) =>
-                                        handleUpdateUserSettings({
-                                            ...userSettings,
-                                            notificationSettings: {
-                                                ...userSettings.notificationSettings,
-                                                chatroomsBlocked: e.target.checked
-                                                    ? [...userSettings.notificationSettings.chatroomsBlocked, `${currentDM?._id}`]
-                                                    : userSettings.notificationSettings.chatroomsBlocked.filter((chat) => chat !== currentDM?._id)
-                                            }
-                                        })
-                                    }
-                                    checked={userSettings?.notificationSettings.chatroomsBlocked.includes(currentDM?._id!)}
-                                    className="p-5 w-5 h-5 cursor-pointer rounded-full "
-                                />
-
-                            </div>
-                        </PopoverContent>
-                    </Popover>
-                    <Dialog>
-                        <DialogTrigger>
-                            <Search className="cursor-pointer" />
-                        </DialogTrigger>
-                        <DialogContent className="bg-white p-2 flex flex-col">
-
-
-                            <div className="w-full">
-                                <Input
-                                    className="w-full"
-                                    onChange={handleMessageSearch}
-                                    placeholder="Search by keyword ..."
-                                />
-                            </div>
-
-                            <div className="mt-5 h-[500px] overflow-auto">
-                                {
-                                    !queriedMessages.length ? 'search messages ...' : (
-                                        queriedMessages.map(message => {
-
-                                            return (
-                                                <div
-                                                    className="w-full flex cursor-pointer hover:bg-gray-200 border-b rounded-md  p-2 flex-col"
-                                                    key={message._id}>
-                                                    <div className="flex items-center gap-3">
-                                                        <Avatar className='w-[40px] h-[40px] bg-neutral-200 rounded-full'>
-                                                            <AvatarImage src={message.sender?.profile_pic} />
-                                                            <AvatarFallback />
-                                                        </Avatar>
-
-                                                        <div className="flex items-center gap-2">
-                                                            <h1>{message.sender?.firstName} {message.sender?.lastName}</h1>
-                                                            <p className="text-[.7rem]">{moment(message.createdAt).format('MMMM D, YYYY')}</p>
-                                                        </div>
-                                                    </div>
-
-                                                    <p className="ml-11 text-gray-600">
-                                                        {message.content}
-                                                    </p>
-                                                </div>
-                                            )
-                                        })
-                                    )
-                                }
-                            </div>
-                        </DialogContent>
-                    </Dialog>
-                    <Popover>
-                        <PopoverTrigger>
-                            <Pin className="cursor-pointer" />
-                        </PopoverTrigger>
-
-                        <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col pl-3 ">
-                            {
-                                !messages.find(msg => msg.pinned) ? <span className='text-center'>no pinned messages</span> : messages.map((msg, index) => {
-                                    if (!msg.pinned) return null
-                                    return <div
-                                        key={msg._id}
-                                        className={`flex flex-co gap-4 hover:bg-[#cbcbcb2e] cursor-pointer rounded-md items-start mb-1 justify-normal p-1 group`} // Reduced margin between consecutive messages
-                                    >
-                                        <span onClick={() => handlePin(msg)} className="border rounded-full p-2 hover:bg-neutral-50 hover:text-black duration-75">
-                                            <Pin className='size-3' />
-                                        </span>
-                                        <div className='flex flex-col w-full items-start justify-center'>
-                                            <div className="flex gap-2 items-center">
-                                                <Avatar className='w-[40px] h-[40px] bg-neutral-200 rounded-full'>
-                                                    <AvatarImage src={msg.sender?.profile_pic} />
-                                                    <AvatarFallback />
-                                                </Avatar>
-                                                <div className="flex flex-col">
-                                                    <span>{msg?.sender?.lastName} {msg?.sender?.firstName}</span>
-                                                    <span className="text-[.7rem] text-neutral-400">{formatMessageDate(msg?.createdAt as Date)}</span>
-                                                </div>
-                                            </div>
-                                            <span className="p-2 w-full mt-1 rounded-md break-words text-wrap">
-                                                {msg?.content?.slice(0, 100)}
-                                            </span>
-                                        </div>
-                                    </div>
-                                })
-                            }
-                        </PopoverContent>
-                    </Popover>
-                    <span className="lg:hidden block" onClick={() => setIsSideBarOpen(true)}>
-                        <SidebarOpen className="cursor-pointer" />
-                    </span>
-                </div>
-            </div>
-
-
-            <div className="message-body flex-grow overflow-y-auto p-4 space-y-3 overflow-x-hidden ">
+        <DragDrop
+            setAttachments={setAttachments}
+        >
+            <div className='w-full h-screen flex flex-col bg-[#013a6fd3] text-white'>
                 {
-                    messages.length <= 0 && (
-                        <div className="w-full h-full flex flex-col items-center justify-center gap-3">
-                            Start Conversation
-                            <Button disabled={
-                                sending ||
-                                userSettings?.notificationSettings.chatroomsBlocked.includes(currentDM?._id!)
-                            } className="bg-blue-500 disabled:cursor-pointer z-50 text-white disabled:bg-gray-700"
-                                onClick={() => {
-                                    // setMessage("Hi!")
-                                    sendBySendBtn("Hi!")
-                                }}
-                            >Say Hi!</Button>
+                    fileUploading.state && (
+                        <div className="w-auto p-2 pl-5 pr-5 bg-blue-500 rounded-full shadow-lg text-white absolute left-1/2 mt-5">
+                            file (s) uploading ...
                         </div>
+
                     )
                 }
-                {
-                    Object.entries(groupedMessages).map(([date, msgs]) => (
-                        <div key={date}>
-                            <div className="text-neutral-400 text-sm my-2 text-center flex items-center">
-                                <hr className="flex-grow border-t border-neutral-600" />
-                                <span className="mx-2">{date}</span> {/* Margin added for spacing */}
-                                <hr className="flex-grow border-t border-neutral-600" />
+                <div className="flex justify-between p-4 bg-[#013a6fae] border-b border-gray-700 w-full">
+                    <div className='flex items-center gap-2 capitalize text-[1.2rem] text-xl'>
+                        <span className="lg:hidden block" onClick={() => setIsMemberListOpen(true)}>
+                            <ArrowLeft className="cursor-pointer" />
+                        </span>
+                        {/* If there's only one partner, display their avatar and name */}
+                        {currentPatners.length === 1 ? (
+                            <div className="flex items-center gap-2">
+                                <img
+                                    src={currentPatners[0].profile_pic}
+                                    alt={`${currentPatners[0].firstName} ${currentPatners[0].lastName}`}
+                                    className="w-10 h-10 rounded-full"
+                                />
+                                <span>{currentPatners[0].firstName} {currentPatners[0].lastName}</span>
                             </div>
+                        ) : (
+                            // If there are multiple partners, display their names
+                            <h1 className="text-base md:text-xl">
+                                {currentPatners.length > 0
+                                    ? currentPatners.map((partner, index) => (
+                                        <span key={partner._id}>
+                                            {partner.firstName} {partner.lastName}{index < currentPatners.length - 1 ? ', ' : ''}
+                                        </span>
+                                    ))
+                                    : ''}
+                            </h1>
+                        )}
+                    </div>
+                    <div className='flex items-center gap-2'>
+                        <Popover>
+
+                            <PopoverTrigger>
+                                <Bell className="cursor-pointer" />
+                            </PopoverTrigger>
+                            <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 flex flex-col pl-3 w-auto gap-3 ">
+                                <div className="w-full flex items-center justify-between gap-5">
+                                    <label htmlFor="mute">{userSettings?.notificationSettings.chatroomsMuted.includes(currentDM?._id!) ? "Unmute" : 'mute'}</label>
+                                    <input
+                                        id='mute'
+                                        name="mute"
+                                        type="checkbox"
+                                        onChange={(e) =>
+                                            handleUpdateUserSettings({
+                                                ...userSettings,
+                                                notificationSettings: {
+                                                    ...userSettings.notificationSettings,
+                                                    chatroomsMuted: e.target.checked
+                                                        ? [...userSettings.notificationSettings.chatroomsMuted, `${currentDM?._id}`]
+                                                        : userSettings.notificationSettings.chatroomsMuted.filter((chat) => chat !== currentDM?._id)
+                                                }
+                                            })
+                                        }
+                                        checked={userSettings?.notificationSettings.chatroomsMuted.includes(currentDM?._id!)}
+                                        className="p-5 w-5 h-5 cursor-pointer rounded-full "
+                                    />
+
+                                </div>
+
+                                <div className="w-full flex items-center justify-between gap-5">
+                                    <label htmlFor="block">{userSettings?.notificationSettings.chatroomsBlocked.includes(currentDM?._id!) ? "Unblock" : 'block'}</label>
+                                    <input
+                                        id="block"
+                                        name="mute"
+                                        type="checkbox"
+                                        onChange={(e) =>
+                                            handleUpdateUserSettings({
+                                                ...userSettings,
+                                                notificationSettings: {
+                                                    ...userSettings.notificationSettings,
+                                                    chatroomsBlocked: e.target.checked
+                                                        ? [...userSettings.notificationSettings.chatroomsBlocked, `${currentDM?._id}`]
+                                                        : userSettings.notificationSettings.chatroomsBlocked.filter((chat) => chat !== currentDM?._id)
+                                                }
+                                            })
+                                        }
+                                        checked={userSettings?.notificationSettings.chatroomsBlocked.includes(currentDM?._id!)}
+                                        className="p-5 w-5 h-5 cursor-pointer rounded-full "
+                                    />
+
+                                </div>
+                            </PopoverContent>
+                        </Popover>
+                        <Dialog>
+                            <DialogTrigger>
+                                <Search className="cursor-pointer" />
+                            </DialogTrigger>
+                            <DialogContent className="bg-white p-2 flex flex-col">
 
 
-                            {msgs.map((msg, index) => {
-                                const showAvatarAndName = index === 0 || msgs[index - 1]?.sender?._id !== msg?.sender?._id;
-                                const isUnreadMessage = msg._id === firstUnreadMessageId;
+                                <div className="w-full">
+                                    <Input
+                                        className="w-full"
+                                        onChange={handleMessageSearch}
+                                        placeholder="Search by keyword ..."
+                                    />
+                                </div>
 
-                                const getFormattedMessageContent = () => {
-                                    return msg.content! && msg?.content
-                                        .split('\n')
-                                        .map((line) =>
-                                            line.split(/(@\w+)/g).map((part) => {
-                                                const isMention = part.startsWith('@');
-                                                const username = part.slice(1); // Remove "@" for validation
-                                                const isValidMention = isMention && validUserNames.includes(`@${username}`);
+                                <div className="mt-5 h-[500px] overflow-auto">
+                                    {
+                                        !queriedMessages.length ? 'search messages ...' : (
+                                            queriedMessages.map(message => {
 
-                                                return isMention && isValidMention
-                                                    ? `<span style="background-color: rgba(255, 165, 0, 0.4); padding: 5px; border-radius: 10px;">${part}</span>`
-                                                    : part;
-                                            }).join('') // Join parts of each line to keep formatting
+                                                return (
+                                                    <div
+                                                        className="w-full flex cursor-pointer hover:bg-gray-200 border-b rounded-md  p-2 flex-col"
+                                                        key={message._id}>
+                                                        <div className="flex items-center gap-3">
+                                                            <Avatar className='w-[40px] h-[40px] bg-neutral-200 rounded-full'>
+                                                                <AvatarImage src={message.sender?.profile_pic} />
+                                                                <AvatarFallback />
+                                                            </Avatar>
+
+                                                            <div className="flex items-center gap-2">
+                                                                <h1>{message.sender?.firstName} {message.sender?.lastName}</h1>
+                                                                <p className="text-[.7rem]">{moment(message.createdAt).format('MMMM D, YYYY')}</p>
+                                                            </div>
+                                                        </div>
+
+                                                        <p className="ml-11 text-gray-600">
+                                                            {message.content}
+                                                        </p>
+                                                    </div>
+                                                )
+                                            })
                                         )
-                                        .join('<br />'); // Add line breaks
-                                };
-                                return (
-                                    <React.Fragment key={msg._id}>
-                                        {isUnreadMessage && (
-                                            <div className="w-full my-2 flex items-center">
-                                                <hr className="flex-grow border-t border-red-500" />
-                                                <span className="mx-2 text-red-500 text-xs">Unread Messages</span>
-                                                <hr className="flex-grow border-t border-red-500" />
-                                            </div>
-                                        )}
-                                        <div
+                                    }
+                                </div>
+                            </DialogContent>
+                        </Dialog>
+                        <Popover>
+                            <PopoverTrigger>
+                                <Pin className="cursor-pointer" />
+                            </PopoverTrigger>
 
-                                            onContextMenu={(e) => handleContextMenu(e, msg)} // Pass the message to the context menu handler
-                                            className={`flex gap-4 hover:bg-[#cbcbcb2e] cursor-pointer rounded-md items-start mb-1 justify-normal ${index === msgs.length && "mb-5"} ${msg.pinned ? "bg-[rgba(255,193,59,0.42)]" : ' '} group`} // Reduced margin between consecutive messages
+                            <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col pl-3 ">
+                                {
+                                    !messages.find(msg => msg.pinned) ? <span className='text-center'>no pinned messages</span> : messages.map((msg, index) => {
+                                        if (!msg.pinned) return null
+                                        return <div
+                                            key={msg._id}
+                                            className={`flex flex-co gap-4 hover:bg-[#cbcbcb2e] cursor-pointer rounded-md items-start mb-1 justify-normal p-1 group`} // Reduced margin between consecutive messages
                                         >
-                                            {msg.pinned && <Pin />}
-                                            {showAvatarAndName ? (
-                                                <Avatar className=' bg-neutral-200 rounded-full'>
-                                                    <AvatarImage src={msg.sender?.profile_pic} />
-                                                    <AvatarFallback />
-                                                </Avatar>
-                                            ) : (
-                                                <div className='w-[40px] p-0 h-0 text-[.5rem] items-center invisible group-hover:visible' >
-                                                    {new Date(msg?.createdAt as Date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
-                                                </div>
-                                            )}
-
+                                            <span onClick={() => handlePin(msg)} className="border rounded-full p-2 hover:bg-neutral-50 hover:text-black duration-75">
+                                                <Pin className='size-3' />
+                                            </span>
                                             <div className='flex flex-col w-full items-start justify-center'>
-                                                {showAvatarAndName && (
-                                                    <div className="flex gap-2 items-center">
+                                                <div className="flex gap-2 items-center">
+                                                    <Avatar className='w-[40px] h-[40px] bg-neutral-200 rounded-full'>
+                                                        <AvatarImage src={msg.sender?.profile_pic} />
+                                                        <AvatarFallback />
+                                                    </Avatar>
+                                                    <div className="flex flex-col">
                                                         <span>{msg?.sender?.lastName} {msg?.sender?.firstName}</span>
                                                         <span className="text-[.7rem] text-neutral-400">{formatMessageDate(msg?.createdAt as Date)}</span>
                                                     </div>
+                                                </div>
+                                                <span className="p-2 w-full mt-1 rounded-md break-words text-wrap">
+                                                    {msg?.content?.slice(0, 100)}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    })
+                                }
+                            </PopoverContent>
+                        </Popover>
+                        <span className="lg:hidden block" onClick={() => setIsSideBarOpen(true)}>
+                            <SidebarOpen className="cursor-pointer" />
+                        </span>
+                    </div>
+                </div>
+
+
+                <div className="message-body flex-grow overflow-y-auto p-4 space-y-3 overflow-x-hidden ">
+                    {
+                        messages.length <= 0 && (
+                            <div className="w-full h-full flex flex-col items-center justify-center gap-3">
+                                Start Conversation
+                                <Button disabled={
+                                    sending ||
+                                    userSettings?.notificationSettings.chatroomsBlocked.includes(currentDM?._id!)
+                                } className="bg-blue-500 disabled:cursor-pointer z-50 text-white disabled:bg-gray-700"
+                                    onClick={() => {
+                                        // setMessage("Hi!")
+                                        sendMessage("Hi!")
+                                    }}
+                                >Say Hi!</Button>
+                            </div>
+                        )
+                    }
+                    {
+                        Object.entries(groupedMessages).map(([date, msgs]) => (
+                            <div key={date}>
+                                <div className="text-neutral-400 text-sm my-2 text-center flex items-center">
+                                    <hr className="flex-grow border-t border-neutral-600" />
+                                    <span className="mx-2">{date}</span> {/* Margin added for spacing */}
+                                    <hr className="flex-grow border-t border-neutral-600" />
+                                </div>
+
+
+                                {msgs.map((msg, index) => {
+                                    const showAvatarAndName = index === 0 || msgs[index - 1]?.sender?._id !== msg?.sender?._id;
+                                    const isUnreadMessage = msg._id === firstUnreadMessageId;
+
+                                    const getFormattedMessageContent = () => {
+                                        return msg.content! && msg?.content
+                                            .split('\n')
+                                            .map((line) =>
+                                                line.split(/(@\w+)/g).map((part) => {
+                                                    const isMention = part.startsWith('@');
+                                                    const username = part.slice(1); // Remove "@" for validation
+                                                    const isValidMention = isMention && validUserNames.includes(`@${username}`);
+
+                                                    return isMention && isValidMention
+                                                        ? `<span style="background-color: rgba(255, 165, 0, 0.4); padding: 5px; border-radius: 10px;">${part}</span>`
+                                                        : part;
+                                                }).join('') // Join parts of each line to keep formatting
+                                            )
+                                            .join('<br />'); // Add line breaks
+                                    };
+                                    return (
+                                        <React.Fragment key={msg._id}>
+                                            {isUnreadMessage && (
+                                                <div className="w-full my-2 flex items-center">
+                                                    <hr className="flex-grow border-t border-red-500" />
+                                                    <span className="mx-2 text-red-500 text-xs">Unread Messages</span>
+                                                    <hr className="flex-grow border-t border-red-500" />
+                                                </div>
+                                            )}
+                                            <div
+
+                                                onContextMenu={(e) => handleContextMenu(e, msg)} // Pass the message to the context menu handler
+                                                className={`flex gap-4 hover:bg-[#cbcbcb2e] cursor-pointer rounded-md items-start mb-1 justify-normal ${index === msgs.length && "mb-5"} ${msg.pinned ? "bg-[rgba(255,193,59,0.42)]" : ' '} group`} // Reduced margin between consecutive messages
+                                            >
+                                                {msg.pinned && <Pin />}
+                                                {showAvatarAndName ? (
+                                                    <Avatar className=' bg-neutral-200 rounded-full'>
+                                                        <AvatarImage src={msg.sender?.profile_pic} />
+                                                        <AvatarFallback />
+                                                    </Avatar>
+                                                ) : (
+                                                    <div className='w-[40px] p-0 h-0 text-[.5rem] items-center invisible group-hover:visible' >
+                                                        {new Date(msg?.createdAt as Date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
+                                                    </div>
                                                 )}
-                                                {
-                                                    isEditing.state && isEditing.message._id === msg._id ? (
-                                                        <div className="w-full flex flex-col items-start">
-                                                            <div className="W-full flex flex-col border-gray-700 border focus-within:border-white rounded-md">
-                                                                <div className='flex gap-2 group-focus-within:border-b-white border-b border-b-gray-500 p-2'>
-                                                                    <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                                                        <Bold className="size-5" />
-                                                                    </span>
-                                                                    <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                                                        <Italic className="size-5" />
-                                                                    </span>
-                                                                    <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                                                        <Strikethrough className="size-5" />
-                                                                    </span>
-                                                                    <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                                                        <Link2 className="size-5" />
-                                                                    </span>
-                                                                    <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                                                        <List className="size-5" />
-                                                                    </span>
-                                                                    <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                                                        <ListOrdered className="size-5" />
-                                                                    </span>
 
-                                                                </div>
-                                                                <div className="">
-                                                                    <textarea
-                                                                        ref={editingInputRef}
-                                                                        disabled={sending}
-                                                                        className="flex-grow bg-transparent p-2 rounded-md text-white placeholder-gray-400 focus:outline-none disabled:cursor-not-allowed w-full"
-                                                                        value={isEditing.content.replace(/<\/?[^>]+(>|$)/g, "")}
-                                                                        onChange={(e) => setIsEditing(prev => ({ ...prev, content: e.target.value }))}
-                                                                        onKeyDown={handleEdit}
-                                                                    />
-
-                                                                </div>
-                                                                <div className="w-full flex p-2">
-                                                                    <div className="">
-                                                                        <Popover>
-                                                                            <PopoverTrigger className="p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75">
-                                                                                <Plus className="size-5" />
-                                                                            </PopoverTrigger>
-                                                                            <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col ">
-                                                                                <input
-                                                                                    type="file"
-                                                                                    hidden
-                                                                                    name="attachment"
-                                                                                    id="attachment"
-                                                                                    multiple
-                                                                                    onChange={(e) => setAttachments(e.target.files as FileList)}
-                                                                                />
-                                                                            </PopoverContent>
-                                                                        </Popover>
-
-                                                                    </div>
-                                                                    <div ref={emojiContainerRef} className="absolute z-50 bottom-9 right-0">
-                                                                        <EmojiPicker open={showPicker} onEmojiClick={(emoji) => {
-                                                                            setIsEditing(prev => ({ ...prev, content: prev.content + emoji.emoji }))
-                                                                        }} />
-                                                                    </div>
-                                                                    <div className="flex items-center gap-2">
-                                                                        <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
-                                                                            <Smile onClick={() => setShowPicker(prev => !prev)} className="size-5" />
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                            <Button onClick={() => setIsEditing({ state: false, content: "", message: {} })} className="underline text-[.7rem]">cancel</Button>
+                                                <div className='flex flex-col w-full items-start justify-center'>
+                                                    {showAvatarAndName && (
+                                                        <div className="flex gap-2 items-center">
+                                                            <span>{msg?.sender?.lastName} {msg?.sender?.firstName}</span>
+                                                            <span className="text-[.7rem] text-neutral-400">{formatMessageDate(msg?.createdAt as Date)}</span>
                                                         </div>
-                                                    ) : (
-                                                        <div className='text-[#c4c4c4] text-[.9rem] w-[90%] break-words p-0 m-0'>
-                                                            {msg.replyingTo ? (
-                                                                <div className='bg-gray-800 p-2 rounded-md mb-1'>
-                                                                    <div className="flex items-start justify-start gap-2 overflow-hidden italic text-gray-300 ">
-                                                                        <ReplyAllIcon className="rotate-180" />
-                                                                        <span>{(msg.replyingTo && msg.replyingTo.content?.slice(0, 150))}</span>
+                                                    )}
+                                                    {
+                                                        isEditing.state && isEditing.message._id === msg._id ? (
+                                                            <div className="w-full flex flex-col items-start">
+                                                                <div className="W-full flex flex-col border-gray-700 border focus-within:border-white rounded-md">
+                                                                    <div className='flex gap-2 group-focus-within:border-b-white border-b border-b-gray-500 p-2'>
+                                                                        <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                                                            <Bold className="size-5" />
+                                                                        </span>
+                                                                        <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                                                            <Italic className="size-5" />
+                                                                        </span>
+                                                                        <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                                                            <Strikethrough className="size-5" />
+                                                                        </span>
+                                                                        <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                                                            <Link2 className="size-5" />
+                                                                        </span>
+                                                                        <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                                                            <List className="size-5" />
+                                                                        </span>
+                                                                        <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                                                            <ListOrdered className="size-5" />
+                                                                        </span>
+
+                                                                    </div>
+                                                                    <div className="">
+                                                                        <textarea
+                                                                            ref={editingInputRef}
+                                                                            disabled={sending}
+                                                                            className="flex-grow bg-transparent p-2 rounded-md text-white placeholder-gray-400 focus:outline-none disabled:cursor-not-allowed w-full"
+                                                                            value={isEditing.content.replace(/<\/?[^>]+(>|$)/g, "")}
+                                                                            onChange={(e) => setIsEditing(prev => ({ ...prev, content: e.target.value }))}
+                                                                            onKeyDown={handleEdit}
+                                                                        />
+
+                                                                    </div>
+                                                                    <div className="w-full flex p-2">
+                                                                        <div className="">
+                                                                            <Popover>
+                                                                                <PopoverTrigger className="p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75">
+                                                                                    <Plus className="size-5" />
+                                                                                </PopoverTrigger>
+                                                                                <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-50 gap-1 flex flex-col ">
+                                                                                    <input
+                                                                                        type="file"
+                                                                                        hidden
+                                                                                        name="attachment"
+                                                                                        id="attachment"
+                                                                                        multiple
+                                                                                        onChange={(e) => setAttachments(e.target.files as FileList)}
+                                                                                    />
+                                                                                </PopoverContent>
+                                                                            </Popover>
+
+                                                                        </div>
+                                                                        <div ref={emojiContainerRef} className="absolute z-50 bottom-9 right-0">
+                                                                            <EmojiPicker open={showPicker} onEmojiClick={(emoji) => {
+                                                                                setIsEditing(prev => ({ ...prev, content: prev.content + emoji.emoji }))
+                                                                            }} />
+                                                                        </div>
+                                                                        <div className="flex items-center gap-2">
+                                                                            <span className='p-1 font-bold hover:bg-gray-50 rounded-full cursor-pointer hover:text-neutral-700 duration-75'>
+                                                                                <Smile onClick={() => setShowPicker(prev => !prev)} className="size-5" />
+                                                                            </span>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-                                                            ) : null}
-                                                            <div className="text-white flex items-center gap-2">
-                                                                <div className="w-full flex flex-col gap-2">
-                                                                    <p
-                                                                        dangerouslySetInnerHTML={{ __html: getFormattedMessageContent() }}
-                                                                        style={{ transition: 'background-color 0.3s ease' }}
-                                                                    />
-                                                                    {
-                                                                        msg.attachmentUrls && (
-                                                                            <div className="w-full flex gap-2 flex-wrap">
-                                                                                {msg.attachmentUrls.map((attachment, index) => {
-                                                                                    const svgIcon = mimeTypeToSvg[attachment.type as any] || mimeTypeToSvg['default'];
 
-                                                                                    // Check if the attachment is an image
-                                                                                    if (attachment.type.startsWith('image/')) {
-                                                                                        return (
-                                                                                            <a
-                                                                                                key={index}
-                                                                                                href={attachment.url}
-                                                                                                target="_blank"
-                                                                                                rel="noopener noreferrer"
-                                                                                                download
-                                                                                                className="hover:bg-[rgba(50,139,255,0.39)] p-3 rounded-md"
-                                                                                            >
-                                                                                                <div className="w-full flex items-center gap-2 justify-between group p-1 mb-5">
-                                                                                                    <span className="text-[.7rem]">{attachment?.name.substr(0, 20)}</span>
-                                                                                                    <button className="invisible group-hover:visible">
-                                                                                                        <Download />
-                                                                                                    </button>
-                                                                                                </div>
-                                                                                                <img
+                                                                <Button onClick={() => setIsEditing({ state: false, content: "", message: {} })} className="underline text-[.7rem]">cancel</Button>
+                                                            </div>
+                                                        ) : (
+                                                            <div className='text-[#c4c4c4] text-[.9rem] w-[90%] break-words p-0 m-0'>
+                                                                {msg.replyingTo ? (
+                                                                    <div className='bg-gray-800 p-2 rounded-md mb-1'>
+                                                                        <div className="flex items-start justify-start gap-2 overflow-hidden italic text-gray-300 ">
+                                                                            <ReplyAllIcon className="rotate-180" />
+                                                                            <span>{(msg.replyingTo && msg.replyingTo.content?.slice(0, 150))}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                ) : null}
+                                                                <div className="text-white flex items-center gap-2">
+                                                                    <div className="w-full flex flex-col gap-2">
+                                                                        <p
+                                                                            dangerouslySetInnerHTML={{ __html: getFormattedMessageContent() }}
+                                                                            style={{ transition: 'background-color 0.3s ease' }}
+                                                                        />
+                                                                        {
+                                                                            msg.attachmentUrls && (
+                                                                                <div className="w-full flex gap-2 flex-wrap">
+                                                                                    {msg.attachmentUrls.map((attachment, index) => {
+                                                                                        const svgIcon = mimeTypeToSvg[attachment.type as any] || mimeTypeToSvg['default'];
+
+                                                                                        // Check if the attachment is an image
+                                                                                        if (attachment.type.startsWith('image/')) {
+                                                                                            return (
+                                                                                                <a
                                                                                                     key={index}
-                                                                                                    className="object-fit rounded-md"
-                                                                                                    src={attachment.url}
-                                                                                                    alt="attachment"
-                                                                                                    width={200}
-                                                                                                    height={200}
-                                                                                                />
-                                                                                            </a>
-                                                                                        );
-                                                                                    } else {
-                                                                                        // Render non-image files with SVG icon and download link
-                                                                                        return (
-                                                                                            <a
-                                                                                                key={index}
-                                                                                                href={attachment.url}
-                                                                                                target="_blank"
-                                                                                                rel="noopener noreferrer"
-                                                                                                download
-                                                                                                className="hover:bg-[rgba(50,139,255,0.39)] p-3 rounded-md "
-                                                                                            >
-                                                                                                <div className="file-preview flex flex-col w-full justify-between group">
-                                                                                                    <div className="w-full flex items-center gap-2 p-1 mb-5">
+                                                                                                    href={attachment.url}
+                                                                                                    target="_blank"
+                                                                                                    rel="noopener noreferrer"
+                                                                                                    download
+                                                                                                    className="hover:bg-[rgba(50,139,255,0.39)] p-3 rounded-md"
+                                                                                                >
+                                                                                                    <div className="w-full flex items-center gap-2 justify-between group p-1 mb-5">
                                                                                                         <span className="text-[.7rem]">{attachment?.name.substr(0, 20)}</span>
                                                                                                         <button className="invisible group-hover:visible">
                                                                                                             <Download />
                                                                                                         </button>
                                                                                                     </div>
-                                                                                                    <img src={svgIcon} alt={attachment.type} width={100} height={100} className="mr-2" />
-                                                                                                </div>
-                                                                                            </a>
-                                                                                        );
+                                                                                                    <img
+                                                                                                        key={index}
+                                                                                                        className="object-fit rounded-md"
+                                                                                                        src={attachment.url}
+                                                                                                        alt="attachment"
+                                                                                                        width={200}
+                                                                                                        height={200}
+                                                                                                    />
+                                                                                                </a>
+                                                                                            );
+                                                                                        } else {
+                                                                                            // Render non-image files with SVG icon and download link
+                                                                                            return (
+                                                                                                <a
+                                                                                                    key={index}
+                                                                                                    href={attachment.url}
+                                                                                                    target="_blank"
+                                                                                                    rel="noopener noreferrer"
+                                                                                                    download
+                                                                                                    className="hover:bg-[rgba(50,139,255,0.39)] p-3 rounded-md "
+                                                                                                >
+                                                                                                    <div className="file-preview flex flex-col w-full justify-between group">
+                                                                                                        <div className="w-full flex items-center gap-2 p-1 mb-5">
+                                                                                                            <span className="text-[.7rem]">{attachment?.name.substr(0, 20)}</span>
+                                                                                                            <button className="invisible group-hover:visible">
+                                                                                                                <Download />
+                                                                                                            </button>
+                                                                                                        </div>
+                                                                                                        <img src={svgIcon} alt={attachment.type} width={100} height={100} className="mr-2" />
+                                                                                                    </div>
+                                                                                                </a>
+                                                                                            );
+                                                                                        }
+                                                                                    })}
+                                                                                </div>
+                                                                            )
+                                                                        }
+                                                                    </div>
+                                                                    <span>{msg.edited && <span className='text-[.7rem] text-gray-200'>(edited)</span>}</span>
+                                                                </div>
+                                                                <div className="flex items-center w-full justify-start p-1 gap-1">
+                                                                    {
+                                                                        msg.reactions?.length! > 0 && (
+                                                                            (() => {
+                                                                                const emojiCounts = msg.reactions!.reduce((acc, reaction: Reaction) => {
+                                                                                    const emoji = reaction.emoji!;
+                                                                                    if (emoji !== '0') {
+                                                                                        acc[emoji] = (acc[emoji] || 0) + 1;
                                                                                     }
-                                                                                })}
-                                                                            </div>
+                                                                                    return acc;
+                                                                                }, {} as Record<string, number>);
+
+                                                                                return Object.entries(emojiCounts).map(([emoji, count], index) => {
+                                                                                    // Check if the current user has reacted with this emoji
+                                                                                    const hasUserReacted = msg.reactions?.some(
+                                                                                        (reaction) => reaction.emoji === emoji && reaction.user_id === currentUser?._id
+                                                                                    );
+
+                                                                                    return (
+                                                                                        <span
+                                                                                            key={index}
+                                                                                            // If the user has reacted, add a background color
+                                                                                            className={`${hasUserReacted ? "bg-[rgba(255,255,255,0.19)] " : ""
+                                                                                                } border p-1 rounded-md hover:bg-[rgba(255,255,255,0.24)] cursor-pointer`}
+                                                                                            onClick={() => handleReactWithEmoji(msg, emoji)} // Add react/remove logic here
+                                                                                        >
+                                                                                            {emoji} {count > 1 && <span className="ml-1">x{count}</span>}
+                                                                                        </span>
+                                                                                    );
+                                                                                });
+                                                                            })()
                                                                         )
                                                                     }
+
                                                                 </div>
-                                                                <span>{msg.edited && <span className='text-[.7rem] text-gray-200'>(edited)</span>}</span>
+
                                                             </div>
-                                                            <div className="flex items-center w-full justify-start p-1 gap-1">
-                                                                {
-                                                                    msg.reactions?.length! > 0 && (
-                                                                        (() => {
-                                                                            const emojiCounts = msg.reactions!.reduce((acc, reaction: Reaction) => {
-                                                                                const emoji = reaction.emoji!;
-                                                                                if (emoji !== '0') {
-                                                                                    acc[emoji] = (acc[emoji] || 0) + 1;
-                                                                                }
-                                                                                return acc;
-                                                                            }, {} as Record<string, number>);
+                                                        )
+                                                    }
+                                                </div>
 
-                                                                            return Object.entries(emojiCounts).map(([emoji, count], index) => {
-                                                                                // Check if the current user has reacted with this emoji
-                                                                                const hasUserReacted = msg.reactions?.some(
-                                                                                    (reaction) => reaction.emoji === emoji && reaction.user_id === currentUser?._id
-                                                                                );
-
-                                                                                return (
-                                                                                    <span
-                                                                                        key={index}
-                                                                                        // If the user has reacted, add a background color
-                                                                                        className={`${hasUserReacted ? "bg-[rgba(255,255,255,0.19)] " : ""
-                                                                                            } border p-1 rounded-md hover:bg-[rgba(255,255,255,0.24)] cursor-pointer`}
-                                                                                        onClick={() => handleReactWithEmoji(msg, emoji)} // Add react/remove logic here
-                                                                                    >
-                                                                                        {emoji} {count > 1 && <span className="ml-1">x{count}</span>}
+                                                {/* Context Menu */}
+                                                {
+                                                    contextMenu.visible && contextMenu.message?._id === msg._id && ( // Show the context menu for the correct message
+                                                        <div
+                                                            className="absolute bg-gray-700 text-white rounded-md shadow-sm w-auto p-1 z-50"
+                                                            style={{ left: contextMenu.x, top: contextMenu.y }}
+                                                            onMouseLeave={closeContextMenu}
+                                                        >
+                                                            {instantActions.map((action, index) => {
+                                                                if ((action.name === "Edit" && `${msg.sender_id}` !== `${currentUser?._id}`) || (action.name === "Delete" && `${msg.sender_id}` !== `${currentUser?._id}`)) {
+                                                                    return null;
+                                                                }
+                                                                if (action.name === "React") {
+                                                                    return (
+                                                                        <div className="flex items-center w-full justify-around p-2 gap-1">
+                                                                            {
+                                                                                action.emojis!.map((emoji, index) => (
+                                                                                    <span key={index} className="border p-1 rounded-md hover:bg-[rgba(255,255,255,0.24)] cursor-pointer"
+                                                                                        onClick={() => handleReactWithEmoji(msg, emoji)}>
+                                                                                        {emoji}
                                                                                     </span>
-                                                                                );
-                                                                            });
-                                                                        })()
+                                                                                ))
+                                                                            }
+
+                                                                            <span className="border p-1 rounded-md hover:bg-[rgba(255,255,255,0.24)] cursor-pointer"
+                                                                                onClick={() => setQuickEmojiSelector(prev => !prev)}
+                                                                            >
+                                                                                <SmileIcon />
+                                                                            </span>
+                                                                        </div>
+                                                                    );
+                                                                }
+                                                                if (action.name === "Pin" && msg.pinned) {
+                                                                    return (
+                                                                        <button
+                                                                            key={index}
+                                                                            className={`w-full text-left p-2 hover:bg-blue-600 ${action.name === "Pin" ? "text-orange-500" : ""} flex items-center gap-2`}
+                                                                            onClick={() => {
+                                                                                if (action.name === "Edit") {
+                                                                                    action.action(msg, msg.content);
+                                                                                } else {
+                                                                                    action.action(msg);
+                                                                                }
+                                                                            }}
+                                                                        >
+                                                                            {action.icon}
+                                                                            Unpin
+                                                                        </button>
                                                                     )
                                                                 }
 
-                                                            </div>
-
-                                                        </div>
-                                                    )
-                                                }
-                                            </div>
-
-                                            {/* Context Menu */}
-                                            {
-                                                contextMenu.visible && contextMenu.message?._id === msg._id && ( // Show the context menu for the correct message
-                                                    <div
-                                                        className="absolute bg-gray-700 text-white rounded-md shadow-sm w-auto p-1 z-50"
-                                                        style={{ left: contextMenu.x, top: contextMenu.y }}
-                                                        onMouseLeave={closeContextMenu}
-                                                    >
-                                                        {instantActions.map((action, index) => {
-                                                            if ((action.name === "Edit" && `${msg.sender_id}` !== `${currentUser?._id}`) || (action.name === "Delete" && `${msg.sender_id}` !== `${currentUser?._id}`)) {
-                                                                return null;
-                                                            }
-                                                            if (action.name === "React") {
-                                                                return (
-                                                                    <div className="flex items-center w-full justify-around p-2 gap-1">
-                                                                        {
-                                                                            action.emojis!.map((emoji, index) => (
-                                                                                <span key={index} className="border p-1 rounded-md hover:bg-[rgba(255,255,255,0.24)] cursor-pointer"
-                                                                                    onClick={() => handleReactWithEmoji(msg, emoji)}>
-                                                                                    {emoji}
-                                                                                </span>
-                                                                            ))
-                                                                        }
-
-                                                                        <span className="border p-1 rounded-md hover:bg-[rgba(255,255,255,0.24)] cursor-pointer"
-                                                                            onClick={() => setQuickEmojiSelector(prev => !prev)}
-                                                                        >
-                                                                            <SmileIcon />
-                                                                        </span>
-                                                                    </div>
-                                                                );
-                                                            }
-                                                            if (action.name === "Pin" && msg.pinned) {
                                                                 return (
                                                                     <button
                                                                         key={index}
-                                                                        className={`w-full text-left p-2 hover:bg-blue-600 ${action.name === "Pin" ? "text-orange-500" : ""} flex items-center gap-2`}
+                                                                        className={`w-full text-left p-2 hover:bg-blue-600 ${action.name === "Delete" ? "text-red-500 hover:text-white hover:bg-red-500" : ""} flex items-center gap-2`}
                                                                         onClick={() => {
                                                                             if (action.name === "Edit") {
                                                                                 action.action(msg, msg.content);
@@ -1206,122 +1232,105 @@ function Page({ }: Props) {
                                                                         }}
                                                                     >
                                                                         {action.icon}
-                                                                        Unpin
+                                                                        {action.name}
                                                                     </button>
-                                                                )
-                                                            }
-
-                                                            return (
-                                                                <button
-                                                                    key={index}
-                                                                    className={`w-full text-left p-2 hover:bg-blue-600 ${action.name === "Delete" ? "text-red-500 hover:text-white hover:bg-red-500" : ""} flex items-center gap-2`}
-                                                                    onClick={() => {
-                                                                        if (action.name === "Edit") {
-                                                                            action.action(msg, msg.content);
-                                                                        } else {
-                                                                            action.action(msg);
-                                                                        }
-                                                                    }}
-                                                                >
-                                                                    {action.icon}
-                                                                    {action.name}
-                                                                </button>
-                                                            );
-                                                        })}
-                                                    </div>
-                                                )
-                                            }
-                                            <div ref={emojiContainerRef} className="absolute z-50 bottom-9 right-5">
-                                                <EmojiPicker open={quickEmojiSelector} onEmojiClick={(emoji) => {
-                                                    handleReactWithEmoji(msg, emoji.emoji)
-                                                    setQuickEmojiSelector(false)
-                                                }} />
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    )
+                                                }
+                                                <div ref={emojiContainerRef} className="absolute z-50 bottom-9 right-5">
+                                                    <EmojiPicker open={quickEmojiSelector} onEmojiClick={(emoji) => {
+                                                        handleReactWithEmoji(msg, emoji.emoji)
+                                                        setQuickEmojiSelector(false)
+                                                    }} />
+                                                </div>
                                             </div>
+                                        </React.Fragment>
+                                    );
+                                })}
+                            </div>
+                        ))
+                    }
+                    <div ref={messagesEndRef} />
+                </div>
+
+
+                {
+                    userSettings?.notificationSettings.chatroomsBlocked.includes(currentDM?._id!) ? (
+                        <div className="W-full p-2 text-center">
+                            You blocked this profile
+                        </div>
+                    ) : (
+                        <div className="border-t border-gray-700 w-full">
+                            {isReplying.state ? (
+                                <div className='w-full p-2 rounded-md '>
+                                    <div className=" overflow-hidden flex items-center justify-between gap-2">
+                                        <div className="flex items-start justify-normal text-[.7rem] gap-2">
+                                            <ReplyAllIcon className="rotate-180" /> {isReplying.message.content?.slice(0, 150)}
                                         </div>
-                                    </React.Fragment>
-                                );
-                            })}
-                        </div>
-                    ))
-                }
-                <div ref={messagesEndRef} />
-            </div>
-
-
-            {
-                userSettings?.notificationSettings.chatroomsBlocked.includes(currentDM?._id!) ? (
-                    <div className="W-full p-2 text-center">
-                        You blocked this profile
-                    </div>
-                ) : (
-                    <div className="bg-gray-800 p-4 border-t border-gray-700 w-full">
-                        {isReplying.state ? (
-                            <div className='w-full p-2 rounded-md '>
-                                <div className=" overflow-hidden flex items-center justify-between gap-2">
-                                    <div className="flex items-start justify-normal text-[.7rem] gap-2">
-                                        <ReplyAllIcon className="rotate-180" /> {isReplying.message.content?.slice(0, 150)}
-                                    </div>
-                                    <Button onClick={() => setIsReplying({ state: false, replyingTo: "", message: {} })}>
-                                        <XIcon />
-                                    </Button>
-                                </div>
-                            </div>
-                        ) : attachments?.length ? (
-                            <div className='w-full h-auto p-2 flex gap-2 overflow-auto flex-wrap'>
-                                {Array.from(attachments as File[]).map((file: File, index: number) => (
-                                    <div key={index} className='w-[100px] overflow-hidden p-2 flex flex-col items-center justify-center gap-2 border rounded-md'>
-                                        <button
-
-                                            className='bg-neutral-50 text-black rounded-full place-self-end justify-self-end cursor-pointer'
-                                            onClick={() => handleRemoveAttachment(file)}
-                                        >
+                                        <Button onClick={() => setIsReplying({ state: false, replyingTo: "", message: {} })}>
                                             <XIcon />
-                                        </button>
-                                        <FileIcon className="size-12" />
-                                        <h1>{file.name}</h1>
+                                        </Button>
                                     </div>
-                                ))}
-                            </div>
-                        ) : null}
-                        <div className="space-x-3 relative w-full">
-                            <div className="W-full flex flex-col border-gray-700 border focus-within:border-white rounded-md">
+                                </div>
+                            ) : attachments?.length ? (
+                                <div className='w-full h-auto p-2 flex gap-2 overflow-auto flex-wrap'>
+                                    {Array.from(attachments as File[]).map((file: File, index: number) => (
+                                        <div key={index} className='w-[100px] overflow-hidden p-2 flex flex-col items-center justify-center gap-2 border rounded-md'>
+                                            <button
 
-                                {isMentioning && (
-                                    <ul className="mention-dropdown absolute bg-blue-500 text-white w-1/5 rounded-md overflow-auto z-50 max-h-44  shadow-md">
-                                        {filteredUsers.map((user) => (
-                                            <>
-                                                <li
-                                                    className="cursor-pointer hover:bg-gray-200 hover:text-black p-3"
-                                                    key={user.id}
-                                                    onClick={() => {
-                                                        handleUserSelect(user)
-                                                        messagingInputRef?.current?.focus()
+                                                className='bg-neutral-50 text-black rounded-full place-self-end justify-self-end cursor-pointer'
+                                                onClick={() => handleRemoveAttachment(file)}
+                                            >
+                                                <XIcon />
+                                            </button>
+                                            <FileIcon className="size-12" />
+                                            <h1>{file.name}</h1>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : null}
+                            <div className="space-x-3 relative w-full">
+                                <div className="W-full flex flex-col border-gray-700 border focus-within:border-white rounded-md">
 
-                                                    }}>
-                                                    @{user.lastName} {user.firstName}
-                                                </li>
-                                            </>
-                                        ))}
-                                    </ul>
-                                )}
+                                    {isMentioning && (
+                                        <ul className="mention-dropdown absolute bg-blue-500 text-white w-1/5 rounded-md overflow-auto z-50 max-h-44  shadow-md">
+                                            {filteredUsers.map((user) => (
+                                                <>
+                                                    <li
+                                                        className="cursor-pointer hover:bg-gray-200 hover:text-black p-3"
+                                                        key={user.id}
+                                                        onClick={() => {
+                                                            handleUserSelect(user)
+                                                            messagingInputRef?.current?.focus()
 
-                                <div className="relative">
+                                                        }}>
+                                                        @{user.lastName} {user.firstName}
+                                                    </li>
+                                                </>
+                                            ))}
+                                        </ul>
+                                    )}
 
-                                    <ChatInput
+                                    <div className="relative">
+
+                                        <ChatInput
                                             chatMembers={currentPatners}
-                                        setAttachments={setAttachments}
-                                        sendMessage={sendMessage}
-                                        filesAttached={(attachments && attachments.length) > 0 ? true : false}
-                                        placeholder={currentPatners.length > 0 ? `message ${currentPatners[0]?.lastName} ...` : "Send DM..."}
-                                        disabled={sending || fileUploading.state}
-                                    />
+                                            setAttachments={setAttachments}
+                                            sendMessage={sendMessage}
+                                            filesAttached={(attachments && attachments.length) > 0 ? true : false}
+                                            placeholder={currentPatners.length > 0 ? `message ${currentPatners[0]?.lastName} ...` : "Send DM..."}
+                                            disabled={sending || fileUploading.state}
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                )
-            }
-        </div>
+                    )
+                }
+            </div>
+        </DragDrop>
     )
 }
 
