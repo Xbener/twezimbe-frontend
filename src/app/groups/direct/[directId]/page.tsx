@@ -1308,6 +1308,7 @@ function Page({ }: Props) {
                                 <div className="relative">
 
                                     <ChatInput
+                                            chatMembers={currentPatners}
                                         setAttachments={setAttachments}
                                         sendMessage={sendMessage}
                                         filesAttached={(attachments && attachments.length) > 0 ? true : false}
