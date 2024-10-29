@@ -94,20 +94,6 @@ function BereavementFundPage({ }: Props) {
                     {errors.fundDetails && <p className="text-red-500 text-sm mt-1">{errors.fundDetails.message}</p>}
                 </div>
 
-                {/* Created by and Roles */}
-                <div className="space-y-1">
-                    <p className="text-sm font-semibold text-gray-600">
-                        Created by: {group?.created_by?.lastName || 'Admin'}
-                    </p>
-                    <p className="text-sm font-semibold text-gray-600">Roles:</p>
-                    <ul className="list-disc pl-6 text-gray-600 text-sm">
-                        <li>Admins</li>
-                        <li>Supervisors</li>
-                        <li>Approvers</li>
-                        <li>Principals</li>
-                        <li>Beneficiaries</li>
-                    </ul>
-                </div>
 
                 {/* Account Type Selection */}
                 <div>
