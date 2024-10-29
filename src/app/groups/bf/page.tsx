@@ -23,7 +23,7 @@ function BereavementFundHero({ }: Props) {
   const router = useRouter()
   useEffect(() => {
     if (selectedGroup) {
-      return
+      return router.push(`/groups/${selectedGroup._id}/bs/add-new`)
     }
   }, [selectedGroup])
 
