@@ -126,11 +126,11 @@ function ChannelDetails({ }: Props) {
     });
 
     let countUnreadMessages = (channel: ChannelTypes) => {
-     if(unreadMessagesRef.current){
-         const unreadCount = unreadMessagesRef.current?.filter(msg => msg?.chatroom?._id === channel?.chatroom?._id && !msg?.isRead);
-         return unreadCount.length;
-     }
-     return 0
+        if (unreadMessagesRef.current) {
+            const unreadCount = unreadMessagesRef.current?.filter(msg => msg?.chatroom?._id === channel?.chatroom?._id && !msg?.isRead);
+            return unreadCount.length;
+        }
+        return 0
     }
 
     useLayoutEffect(() => {
@@ -203,9 +203,16 @@ function ChannelDetails({ }: Props) {
                                 Create a new channel
                             </DialogHeader>
                             <div className='w-full flex flex-col gap-2'>
-                                <Input value={channelFields.name} onChange={handleChannelFieldChange} name="name" placeholder='Enter channel name' />
+                                <div className="w-full flex items-start justify-start">
+                                    <span className="p-2 grid place-content-center">
+                                        {
+                                            channelFields.state === 'public' ? '#' : <Lock className='size-4' />
+                                        }
+                                    </span>
+                                    <Input value={channelFields.name} onChange={handleChannelFieldChange} name="name" placeholder='Enter channel name' />
+                                </div>
                                 <Textarea value={channelFields.description} onChange={handleChannelFieldChange} name="description" placeholder='Enter channel description ...' />
-                                <Select value={channelFields.state} name='state' onValueChange={(v) => setChannelFields(prev => ({ ...prev, state: v }))}>
+                                <Select defaultValue='public' value={channelFields.state} name='state' onValueChange={(v) => setChannelFields(prev => ({ ...prev, state: v }))}>
                                     <SelectTrigger className="bg-white w-full">
                                         <SelectValue placeholder="Select Privacy" />
                                     </SelectTrigger>
