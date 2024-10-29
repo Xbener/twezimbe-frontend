@@ -170,7 +170,7 @@ function ChannelDetails({ }: Props) {
                         {group?.group_name}
                         <CaretDownIcon className='w-[20px] ' />
                     </div>
-                    <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-40 gap-1 flex flex-col border-transparent border-l-8 border-l-neutral-400 pl-3  w-auto">
+                    <PopoverContent className="text-white bg-[#013a6f] shadow-2xl p-0 z-40 gap-1 flex flex-col border-transparent border-l-8 border-l-neutral-400 pl-3 w-auto">
                         {filteredMenuItems.map((item, index) => (
                             <PopoverClose>
                                 <Link
@@ -178,6 +178,7 @@ function ChannelDetails({ }: Props) {
                                         if (item.onClick) {
                                             e.preventDefault()
                                             item.onClick()
+                                        
                                         }
                                         if (windowWidth! <= 1025) {
                                             setIsMemberListOpen(false)
@@ -186,7 +187,7 @@ function ChannelDetails({ }: Props) {
                                     }}
                                     href={item.link}
                                     key={index}
-                                    className="text-white flex p-2 w-full text-[1.1rem] hover:bg-[#6bb7ff73] cursor-pointer rounded-md items-center gap-2 duration-100"
+                                    className="text-white flex p-2 w-full text-[0.9rem] hover:bg-[#6bb7ff73] cursor-pointer rounded-md items-center gap-2 duration-100"
                                 >
                                     {item.icon}
                                     {item.name}

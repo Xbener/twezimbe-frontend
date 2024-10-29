@@ -20,14 +20,7 @@ function BereavementFundHero({ }: Props) {
   const { joinedGroupList } = useGetjoinedGroupList()
   const { currentUser } = useGetProfileData()
   const { selectedGroup, setSelectedGroup } = useContext(GroupContext)
-  const access_token = useRef(Cookies.get('access-token'))
   const router = useRouter()
-
-  useEffect(() => {
-    if (!access_token.current) {
-       window.location.href = `/public_pages/SignIn`
-    }
-  }, [])
   useEffect(() => {
     if (selectedGroup) {
       return

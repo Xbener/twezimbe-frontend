@@ -20,7 +20,7 @@ const MobileMenu = ({ handleClose }: Props) => {
                         <>
                             <a href={'/account'} onClick={handleClose} className="text-white p-2 hover:bg-blue-50 hover:text-blue-500 border w-1/2 place-self-center mb-1">Profile</a>
                             <a href={'/groups'} onClick={handleClose} className="text-white p-2 hover:bg-blue-50 hover:text-blue-500 border w-1/2 place-self-center mb-1">Groups </a>
-                            <a href={'/groups/bf'} onClick={handleClose} className="text-white p-2 hover:bg-blue-50 hover:text-blue-500 border w-1/2 place-self-center mb-1">BF</a>
+                            <a href={'/groups/bf'} onClick={handleClose} className="text-white p-2 hover:bg-blue-50 hover:text-blue-500 border w-1/2 place-self-center mb-1">Bearevement Fund</a>
                             <a href={'/account/applications'} onClick={handleClose} className="text-white p-2 hover:bg-blue-50 hover:text-blue-500 border w-1/2 place-self-center mb-1">Applications</a>
                         </>
                         :
