@@ -1,4 +1,6 @@
 'use client'
+import GroupMemberItem from '@/components/groups/GroupMemberItem';
+import { Button } from '@/components/ui/button';
 import { GroupContext } from '@/context/GroupContext'
 import React, { useContext, useEffect, useState, ChangeEvent } from 'react'
 
@@ -103,6 +105,24 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                     </div>
                 </div>
             </section>
+
+            <section className="mt-5">
+                <h2 className="text-lg font-semibold text-white">3. Invite principals</h2>
+                <div className='mt-5 w-full flex flex-col gap-2 h-[400px] overflow-auto'>
+                    {
+                        group?.members?.map((member) => {
+
+                            return (
+                                <div className="w-full flex items-center gap-2">
+                                    <GroupMemberItem {...member} />
+                                    <Button className="bg-blue-500 text-white">Invite</Button>
+                                </div>
+                            )
+                        })
+                    }
+                </div>
+            </section>
+
 
             {/* Add Beneficiaries Section
             <section className="mb-6">
