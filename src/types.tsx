@@ -464,4 +464,5 @@ export interface BF {
     walletAddress?: string;
     groupId: string;
     createdBy: User[];
+    _id?: string
 }

@@ -3,7 +3,9 @@ import GroupMemberItem from '@/components/groups/GroupMemberItem';
 import { Button } from '@/components/ui/button';
 import { GroupContext } from '@/context/GroupContext'
 import React, { useContext, useEffect, useState, ChangeEvent } from 'react'
-
+import { toast } from 'sonner';
+import Cookies from 'js-cookie'
+import LoadingButton from '@/components/LoadingButton';
 type Beneficiary = {
     name: string;
     id: number;
@@ -19,6 +21,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
     const [contributionAmount, setContributionAmount] = useState<number>(0);
     const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
     const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'annual'>('monthly');
+    const [isLoading, setIsLoading] = useState(false)
 
     useEffect(() => {
         setPrivateChannelMembers([]);
@@ -44,6 +47,29 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
         updatedBeneficiaries[index].name = name;
         setBeneficiaries(updatedBeneficiaries);
     };
+
+    const handleSubmit = async () => {
+        setIsLoading(true)
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/settings/bf/${groupBF?._id}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${Cookies.get('access-token')}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ min_beneficiaries: minBeneficiaries, max_beneficiaries: maxBeneficiaries })
+            })
+
+            const data = await res.json()
+            if (!data.status) return toast.error(data.message || data.error || data.errors)
+            toast.success('Bearevement fund settings updated successfully.')
+        } catch (error: any) {
+            console.log('error updating Bearevement fund', error)
+            toast.error(error.message)
+        } finally {
+            setIsLoading(false)
+        }
+    }
 
     return (
         <div className="max-w-2xl mx-auto p-6 text-white rounded-lg shadow-md mt-10">
@@ -76,7 +102,9 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                         />
                     </div>
                 </div>
-                <Button className='bg-blue-500'>Save</Button>
+                {
+                    isLoading ? <LoadingButton /> : <Button onClick={handleSubmit} className='bg-blue-500'>Save</Button>
+                }
             </section>
 
             {/* Subscription Section */}
