@@ -16,8 +16,6 @@ function BFLayout({
             window.location.href = `/public_pages/SignIn`
         }
     }, [])
-
-
     return (
         <div className="w-full h-full overflow-auto">
             {children}

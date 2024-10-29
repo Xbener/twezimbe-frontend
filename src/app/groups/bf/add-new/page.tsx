@@ -37,7 +37,6 @@ function BereavementFundPage({ }: Props) {
     // Watch the accountType field to dynamically change validation
     const accountType = watch('accountType');
 
-    if (!group) return window.location.href = '/groups';
     if (group?.has_bf) return window.location.href = `/groups/${group._id}`;
 
     const onSubmit = async (data: FormData) => {
