@@ -214,6 +214,13 @@ function ChannelDetails({ }: Props) {
                                 >
                                     {groupBF?.fundName}
                                 </span>
+                                  <span className="p-2 w-full bg-transparent hover:bg-[rgba(255,255,255,0.29)] cursor-pointer rounded-md duration-100 mb-3"
+                                    onClick={() => {
+                                        router.push(`/groups/${group?._id}/principal-dashboard`)
+                                    }}
+                                >
+                                    Principal dashboard
+                                </span>
                             </div>
                         </div>
                     )
