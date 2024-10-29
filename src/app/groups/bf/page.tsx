@@ -9,7 +9,8 @@ import { useMyContext } from '@/context/MyContext';
 import { GroupTypes } from '@/types';
 import { ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
+import Cookies from 'js-cookie'
 
 type Props = {};
 
@@ -19,13 +20,20 @@ function BereavementFundHero({ }: Props) {
   const { joinedGroupList } = useGetjoinedGroupList()
   const { currentUser } = useGetProfileData()
   const { selectedGroup, setSelectedGroup } = useContext(GroupContext)
+  const access_token = useRef(Cookies.get('access-token'))
   const router = useRouter()
 
+  useEffect(() => {
+    if (!access_token.current) {
+       window.location.href = `/public_pages/SignIn`
+    }
+  }, [])
   useEffect(() => {
     if (selectedGroup) {
       return
     }
   }, [selectedGroup])
+
   return (
     <section className="bg-white text-black px-6 py-12 md:px-16 lg:px-24 w-full h-full">
       <div className="container mx-auto h-[100dvh] flex flex-col-reverse md:flex-row items-center justify-between space-y-8 md:space-y-0 gap-5">
