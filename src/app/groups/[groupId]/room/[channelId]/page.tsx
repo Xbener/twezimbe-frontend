@@ -963,9 +963,10 @@ function Page({ }: Props) {
                                                             </div>
                                                         </div>
 
-                                                        <p className="ml-11 text-gray-600">
-                                                            {message.content}
-                                                        </p>
+                                                        <p
+                                                            dangerouslySetInnerHTML={{ __html: getFormattedMessageContent(message.content?.slice(0, 200)) }}
+                                                            style={{ transition: 'background-color 0.3s ease' }}
+                                                        />
                                                     </div>
                                                 )
                                             })
