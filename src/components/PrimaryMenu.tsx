@@ -26,7 +26,7 @@ const PrimaryMenu = () => {
     return (
         <>
             {/* Desktop menu  */}
-            <div className="hidden lg:block">
+            <div className="hidden lg:block text-[1rem] md:text-[0.8rem]">
                 <span className="flex gap-5">
                     <a href={'/'} className="text-[#2f578b]">Home</a>
                     <a href={'/'} className="text-[#2f578b]">About Us</a>
@@ -34,6 +34,7 @@ const PrimaryMenu = () => {
                     <a href={'/'} className="text-[#2f578b]">Book Demo</a>
                     <a href={'/#process'} className="text-[#2f578b]">Process</a>
                     <a href={'/groups'} className="text-[#2f578b]">Group</a>
+                    <a href={'/bf'} className="text-[#2f578b]">Bearevement Funds</a>
                     <a href={'/apply'} className=" text-[#2f578b]">Get Started</a>
                 </span>
             </div>

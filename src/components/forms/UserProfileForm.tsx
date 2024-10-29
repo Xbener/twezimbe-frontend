@@ -227,7 +227,7 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
     return (
         <>
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSave)} className="space-y-2 bg-gray-50 rounded-lg md:p-10 w-full grid grid-cols-3 gap-5">
+                <form onSubmit={form.handleSubmit(onSave)} className="space-y-2 bg-gray-50 rounded-lg md:p-10 w-full grid md:grid-cols-3 grid-cols-1 gap-5">
                     <FormDescription className="flex flex-col">
                         View and change your profile information here
                         <span className="flex w-full items-center justify-between p-2 border rounded-md mt-3">
