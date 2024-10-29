@@ -30,7 +30,7 @@ type Props = {
 
 
 function ChannelDetails({ }: Props) {
-    const { group, isMemberListOpen, setIsMemberListOpen, windowWidth, setIsSideBarOpen, setSelectedGroup } = useContext(GroupContext)
+    const { group, isMemberListOpen, setIsMemberListOpen, windowWidth, setIsSideBarOpen, groupBF, setSelectedGroup } = useContext(GroupContext)
     const { channelList, setChannelList, members, unreadMessages, unreadMessagesRef, setCurrentChannel, currentChannel, setChId, setRoomId } = useMyContext()
     const router = useRouter()
     const { currentUser } = useGetProfileData()
@@ -178,7 +178,7 @@ function ChannelDetails({ }: Props) {
                                         if (item.onClick) {
                                             e.preventDefault()
                                             item.onClick()
-                                        
+
                                         }
                                         if (windowWidth! <= 1025) {
                                             setIsMemberListOpen(false)
@@ -201,6 +201,19 @@ function ChannelDetails({ }: Props) {
             {/* channels */}
 
             <div className='w-full p-2 flex flex-col mt-5 h-full overflow-y-auto absolute'>
+                {
+                    (group?.has_bf && groupBF) && (
+                        <div className="flex flex-col items-start justify-start font-extrabold text-[0.9rem]">
+                            <h1>Group Bearevement Fund</h1>
+
+                            <div className='mt-5 flex flex-col w-full'>
+                                <span className="p-2 w-full bg-transparent hover:bg-[rgba(255,255,255,0.29)] cursor-pointer rounded-md duration-100 mb-3">
+                                    {groupBF?.fundName}
+                                </span>
+                            </div>
+                        </div>
+                    )
+                }
                 <span className='flex items-center justify-between font-extrabold text-[0.9rem]'>
                     Channels
                     <Dialog>

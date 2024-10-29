@@ -19,7 +19,7 @@ export type User = {
     verified: boolean;
     salt: string;
     role: {
-        role_name:string;
+        role_name: string;
         role_id: string;
     }
     otp: number;
@@ -389,8 +389,8 @@ export type Message = {
     content?: string;
     messageType?: 'text' | 'image' | 'video' | 'sticker' | 'gif';
     attachmentUrls?: {
-        type:string
-        url:string
+        type: string
+        url: string
         name: string
     }[];
     read?: boolean;
@@ -454,3 +454,14 @@ export type UserSettings = {
         notifyOnOtherEvents: boolean;
     };
 };
+
+
+export interface BF {
+    fundName: string;
+    fundDetails: string;
+    accountType: 'bank' | 'mobile' | 'wallet';
+    accountInfo: string;
+    walletAddress?: string;
+    groupId: string;
+    createdBy: User[];
+}

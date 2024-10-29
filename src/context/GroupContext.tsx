@@ -1,6 +1,6 @@
 'use client'
 
-import { GroupTypes, User } from '@/types'
+import { BF, GroupTypes, User } from '@/types'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import Cookies from 'js-cookie'
@@ -26,6 +26,8 @@ type GroupContextTypes = {
     windowWidth?: number
     selectedGroup?: GroupTypes | null
     setSelectedGroup: (vl: any) => void
+    groupBF?: BF | null
+    setGroupBF: (vl: any) => void
 }
 
 export const GroupContext = React.createContext<GroupContextTypes>({
@@ -38,8 +40,9 @@ export const GroupContext = React.createContext<GroupContextTypes>({
     privateChannelMembers: [],
     setPrivateChannelMembers: () => { },
     setIsSideBarOpen(vl) { },
-    setIsMemberListOpen(vl) {},
-    setSelectedGroup(vl) {},
+    setIsMemberListOpen(vl) { },
+    setSelectedGroup(vl) { },
+    setGroupBF(vl) { },
 })
 
 function GroupProvider({ children }: Props) {
@@ -52,7 +55,30 @@ function GroupProvider({ children }: Props) {
     const [isSideBarOpen, setIsSideBarOpen] = useState(false)
     const [isMemberListOpen, setIsMemberListOpen] = useState(false)
     const [selectedGroup, setSelectedGroup] = useState<GroupTypes | null>(null)
+    const [groupBF, setGroupBF] = useState<BF | null>(null)
 
+    useEffect(() => {
+        const getGroupBF = async () => {
+            try {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bf/${group?._id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${Cookies.get('access-token')}`
+                    }
+                })
+
+                const data = await res.json()
+                if (!data.status) throw new Error(data.error || data.message || data.errors)
+                setGroupBF(data.bf)
+            } catch (error) {
+                console.log('error getting group bearevement fund', error)
+            }
+        }
+
+        if (group && group?._id && group?.has_bf) {
+            getGroupBF()
+        }
+    }, [group])
     useEffect(() => {
 
         const handleWindowChange = () => {
@@ -115,7 +141,9 @@ function GroupProvider({ children }: Props) {
             isMemberListOpen,
             setIsMemberListOpen,
             selectedGroup,
-            setSelectedGroup
+            setSelectedGroup,
+            groupBF,
+            setGroupBF
 
         }}>
 
