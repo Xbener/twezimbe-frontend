@@ -278,6 +278,7 @@ export type GroupTypes = {
     memberCount: number;
     members: User[];
     isSacco?: boolean;
+    has_bf?: boolean;
     invite_link: string;
     group_state: string;
     upgraded: boolean;

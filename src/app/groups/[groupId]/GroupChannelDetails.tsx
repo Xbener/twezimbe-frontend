@@ -30,7 +30,7 @@ type Props = {
 
 
 function ChannelDetails({ }: Props) {
-    const { group, isMemberListOpen, setIsMemberListOpen, windowWidth, setIsSideBarOpen } = useContext(GroupContext)
+    const { group, isMemberListOpen, setIsMemberListOpen, windowWidth, setIsSideBarOpen, setSelectedGroup } = useContext(GroupContext)
     const { channelList, setChannelList, members, unreadMessages, unreadMessagesRef, setCurrentChannel, currentChannel, setChId, setRoomId } = useMyContext()
     const router = useRouter()
     const { currentUser } = useGetProfileData()
@@ -103,7 +103,14 @@ function ChannelDetails({ }: Props) {
 
     const menuItems = [
         { name: "Group settings", link: `/groups/${group?._id}/settings`, icon: <Settings />, privilege: 'user' },
-        { name: "Create a bearevement fund", link: `/groups/bf`, onClick: () => { }, icon: <PlusSquare />, privilege: 'admin' },
+        {
+            name: "Create a bearevement fund", link: `/groups/bf/add-new`, onClick: () => {
+                if (group) {
+                    setSelectedGroup(group)
+                    router.push('/groups/bf/add-new')
+                }
+            }, icon: <PlusSquare />, privilege: 'admin'
+        },
         { name: "Group join requests", link: `/groups/${group?._id}/requests`, icon: <MessageCirclePlus />, privilege: 'admin' },
         { name: "Upgrade plan", link: `#`, onClick: () => handleUpgrade(), icon: <Upload />, privilege: 'admin' },
     ]
@@ -122,6 +129,9 @@ function ChannelDetails({ }: Props) {
     const filteredMenuItems = menuItems.filter(item => {
         if (item.name === "Upgrade Plan" && group?.upgraded) {
             return false;
+        }
+        if (item.name === "Create a bearevement fund" && group?.has_bf) {
+            return false
         }
         return item.privilege !== 'admin' || (currentUser?._id === group?.created_by[0]?._id);
     });

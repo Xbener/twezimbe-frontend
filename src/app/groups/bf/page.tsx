@@ -4,10 +4,12 @@ import { useGetProfileData } from '@/api/auth';
 import { useGetjoinedGroupList } from '@/api/group';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { GroupContext } from '@/context/GroupContext';
 import { useMyContext } from '@/context/MyContext';
 import { GroupTypes } from '@/types';
 import { ArrowRight } from 'lucide-react';
-import React from 'react';
+import { useRouter } from 'next/navigation';
+import React, { useContext, useEffect } from 'react';
 
 type Props = {};
 
@@ -16,7 +18,14 @@ function BereavementFundHero({ }: Props) {
   // const { groupList } = useMyContext()
   const { joinedGroupList } = useGetjoinedGroupList()
   const { currentUser } = useGetProfileData()
+  const { selectedGroup, setSelectedGroup } = useContext(GroupContext)
+  const router = useRouter()
 
+  useEffect(() => {
+    if (selectedGroup) {
+      return
+    }
+  }, [selectedGroup])
   return (
     <section className="bg-white text-black px-6 py-12 md:px-16 lg:px-24 w-full h-full">
       <div className="container mx-auto h-[100dvh] flex flex-col-reverse md:flex-row items-center justify-between space-y-8 md:space-y-0 gap-5">
@@ -42,9 +51,14 @@ function BereavementFundHero({ }: Props) {
                 joinedGroupList?.map((group: GroupTypes, index: number) => {
                   console.log(group, currentUser?._id)
 
-                  if (group?.created_by === currentUser?._id) {
+                  if (group?.created_by === currentUser?._id && !group?.has_bf) {
                     return (
-                      <div className="p-2 mt-3 border-2 border-gray-800 rounded-md cursor-pointer flex items-center justify-between hover:bg-neutral-100 transition duration-75">
+                      <div className={`p-2 mt-3 border-2 border-gray-800 rounded-md cursor-pointer flex items-center justify-between hover:bg-neutral-100 transition duration-75 ${selectedGroup?._id === group?._id && 'bg-orange-100 hover:bg-neutral-100'}`}
+                        onClick={() => {
+                          setSelectedGroup(group)
+                          router.push('/groups/bf/add-new')
+                        }}
+                      >
                         <div className="flex items-center gap-4 ">
                           <Avatar>
                             <AvatarImage src={group?.group_picture} className="bg-black w-[50px] h-[50px] rounded-full" />

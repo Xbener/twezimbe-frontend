@@ -24,6 +24,8 @@ type GroupContextTypes = {
     setIsSideBarOpen: (vl: boolean) => void | boolean
     setIsMemberListOpen: (vl: boolean) => void | boolean
     windowWidth?: number
+    selectedGroup?: GroupTypes | null
+    setSelectedGroup: (vl: any) => void
 }
 
 export const GroupContext = React.createContext<GroupContextTypes>({
@@ -36,9 +38,8 @@ export const GroupContext = React.createContext<GroupContextTypes>({
     privateChannelMembers: [],
     setPrivateChannelMembers: () => { },
     setIsSideBarOpen(vl) { },
-    setIsMemberListOpen(vl) {
-
-    },
+    setIsMemberListOpen(vl) {},
+    setSelectedGroup(vl) {},
 })
 
 function GroupProvider({ children }: Props) {
@@ -50,6 +51,7 @@ function GroupProvider({ children }: Props) {
     const [windowWidth, setWindowWidth] = useState<Window['innerWidth']>(0)
     const [isSideBarOpen, setIsSideBarOpen] = useState(false)
     const [isMemberListOpen, setIsMemberListOpen] = useState(false)
+    const [selectedGroup, setSelectedGroup] = useState<GroupTypes | null>(null)
 
     useEffect(() => {
 
@@ -111,7 +113,9 @@ function GroupProvider({ children }: Props) {
             setIsSideBarOpen,
             windowWidth,
             isMemberListOpen,
-            setIsMemberListOpen
+            setIsMemberListOpen,
+            selectedGroup,
+            setSelectedGroup
 
         }}>
 
