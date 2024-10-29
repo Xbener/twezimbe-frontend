@@ -52,7 +52,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
             </h1>
 
             {/* Beneficiaries Section */}
-            <section className="mb-6">
+            <section className="mb-6 flex flex-col gap-2">
                 <h2 className="text-lg font-semibold text-white">1. Number of Beneficiaries Per Principal</h2>
                 <div className="w-full flex items-center gap-2 justify-normal mt-5">
                     <div className="w-full">
@@ -76,10 +76,11 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                         />
                     </div>
                 </div>
+                <Button className='bg-blue-500'>Save</Button>
             </section>
 
             {/* Subscription Section */}
-            <section className="mb-6">
+            {/* <section className="mb-6">
                 <h2 className="text-lg font-semibold text-white">2. Monthly or Annual Subscription</h2>
                 <div className='w-full flex items-center gap-2 justify-normal mt-5'>
                     <div className="w-full">
@@ -104,10 +105,10 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                         </select>
                     </div>
                 </div>
-            </section>
+            </section> */}
 
             <section className="mt-5">
-                <h2 className="text-lg font-semibold text-white">3. Invite principals</h2>
+                <h2 className="text-lg font-semibold text-white">2. Invite principals</h2>
                 <div className='mt-5 w-full flex flex-col gap-2 h-[400px] overflow-auto'>
                     {
                         group?.members?.map((member) => {
