@@ -31,7 +31,7 @@ type Props = {
 
 
 function ChannelDetails({ }: Props) {
-    const { group, isMemberListOpen, setIsMemberListOpen, windowWidth, setIsSideBarOpen, groupBF, setSelectedGroup } = useContext(GroupContext)
+    const { group, isMemberListOpen, setIsMemberListOpen, windowWidth, setIsSideBarOpen, groupBF, bfMembers, setSelectedGroup } = useContext(GroupContext)
     const { channelList, setChannelList, members, unreadMessages, unreadMessagesRef, setCurrentChannel, currentChannel, setChId, setRoomId } = useMyContext()
     const router = useRouter()
     const { currentUser } = useGetProfileData()
@@ -222,13 +222,17 @@ function ChannelDetails({ }: Props) {
                                 >
                                     Principal dashboard
                                 </span>
-                                <span className="p-2 w-full bg-transparent hover:bg-[rgba(255,255,255,0.29)] cursor-pointer rounded-md duration-100 mb-3"
-                                    onClick={async () => {
-                                        const request = await applyToJoinBF({ userId: currentUser?._id!, bf_id: groupBF?._id! })
-                                    }}
-                                >
-                                    Apply
-                                </span>
+                                {
+                                    bfMembers && !bfMembers?.find(member=>member?.user?._id===currentUser?._id) && (
+                                        <span className="p-2 w-full bg-transparent hover:bg-[rgba(255,255,255,0.29)] cursor-pointer rounded-md duration-100 mb-3"
+                                            onClick={async () => {
+                                                const request = await applyToJoinBF({ userId: currentUser?._id!, bf_id: groupBF?._id! })
+                                            }}
+                                        >
+                                            Apply
+                                        </span>
+                                    )
+                                }
                             </div>
                         </div>
                     )
