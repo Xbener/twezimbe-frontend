@@ -2,10 +2,16 @@
 import GroupMemberItem from '@/components/groups/GroupMemberItem';
 import { Button } from '@/components/ui/button';
 import { GroupContext } from '@/context/GroupContext'
-import React, { useContext, useEffect, useState, ChangeEvent } from 'react'
+import React, { useContext, useEffect, useState, ChangeEvent, useRef } from 'react'
 import { toast } from 'sonner';
 import Cookies from 'js-cookie'
 import LoadingButton from '@/components/LoadingButton';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { iconTextGenerator } from '@/lib/iconTextGenerator';
+import { addBfMember, updateUserRole } from '@/lib/bf';
+import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 type Beneficiary = {
     name: string;
     id: number;
@@ -14,7 +20,7 @@ type Beneficiary = {
 type FundSettingsPageProps = {}
 
 const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
-    const { group, groupBF, setPrivateChannelMembers } = useContext(GroupContext);
+    const { group, groupBF, setPrivateChannelMembers, bfMembers, setBfMembers } = useContext(GroupContext);
 
     const [minBeneficiaries, setMinBeneficiaries] = useState<number>(1);
     const [maxBeneficiaries, setMaxBeneficiaries] = useState<number>(5);
@@ -22,6 +28,16 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
     const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
     const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'annual'>('monthly');
     const [isLoading, setIsLoading] = useState(false)
+    const roles = useRef([
+        'admin',
+        'supervisor',
+        'hr',
+        'manager',
+        'coordinator',
+        'counselor',
+        'principal',
+        'beneficiary'
+    ])
 
     useEffect(() => {
         setPrivateChannelMembers([]);
@@ -107,51 +123,99 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                 }
             </section>
 
-            {/* Subscription Section */}
-            {/* <section className="mb-6">
-                <h2 className="text-lg font-semibold text-white">2. Monthly or Annual Subscription</h2>
-                <div className='w-full flex items-center gap-2 justify-normal mt-5'>
-                    <div className="w-full">
-                        <label className="block text-sm font-medium text-gray-700">Contribution Amount:</label>
-                        <input
-                            type="number"
-                            value={contributionAmount}
-                            onChange={(e) => setContributionAmount(Number(e.target.value))}
-                            min={0}
-                            className="w-full p-2 mt-1 border border-gray-300 rounded-md text-black"
-                        />
-                    </div>
-                    <div className="w-full">
-                        <label className="block text-sm font-medium text-gray-700">Subscription Plan:</label>
-                        <select
-                            value={selectedPlan}
-                            onChange={handleSubscriptionChange}
-                            className="w-full p-2 mt-1 border border-gray-300 rounded-md text-black"
-                        >
-                            <option value="monthly">Monthly</option>
-                            <option value="annual">Annual (Discounted)</option>
-                        </select>
-                    </div>
-                </div>
-            </section> */}
-
             <section className="mt-5">
-                <h2 className="text-lg font-semibold text-white">2. Invite principals</h2>
-                <div className='mt-5 w-full flex flex-col gap-2 h-[400px] overflow-auto'>
+                <div className="p-2 flex items-center justify-between w-fulls">
+                    <h2 className="text-lg font-semibold text-white">2. Change role</h2>
+                    <Dialog>
+                        <DialogTrigger>
+                            <Button className="bg-orange-500">
+                                Add new member
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="bg-white">
+                            <DialogHeader>
+                                Add new members to your Bearevement fund
+                            </DialogHeader>
+                            <div className="mt-5">
+                                <div className='mt-5 w-full flex flex-col gap-2 h-[400px] overflow-auto'>
+                                    {
+                                        group?.members?.map((member) => {
+
+                                            return (
+                                                <div className="w-full flex items-center gap-2">
+                                                    <GroupMemberItem {...member} />
+                                                    <Popover>
+                                                        <PopoverTrigger>
+                                                            <Button className="bg-blue-500 text-white">Add as ...</Button>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent className="bg-blue-400 flex flex-col gap-1">
+                                                            {roles.current.map((role, index) => (
+
+                                                                <span
+                                                                    className="cursor-pointer p-2 rounded-md w-full text-white hover:bg-white hover:text-blue-500"
+                                                                    key={index}
+                                                                    onClick={async () => {
+                                                                        const newMember = await addBfMember({ bf_id: groupBF?._id!, role, userId: member?._id! })
+                                                                        setBfMembers((prev: any) => ([...prev, { user: member, role, _id: newMember?._id, createdAt: new Date() }]))
+                                                                    }}
+                                                                >
+                                                                    {role}
+                                                                </span>
+                                                            ))}
+                                                        </PopoverContent>
+                                                    </Popover>
+
+                                                </div>
+                                            )
+                                        })
+                                    }
+                                </div>
+                            </div>
+
+                        </DialogContent>
+                    </Dialog>
+                </div>
+
+                <div
+                    className="mt-5 flex flex-col gap-2"
+                >
                     {
-                        group?.members?.map((member) => {
+                        bfMembers?.length ? bfMembers?.map((member) => {
 
                             return (
-                                <div className="w-full flex items-center gap-2">
-                                    <GroupMemberItem {...member} />
-                                    <Button className="bg-blue-500 text-white">Invite</Button>
+                                <div className="w-full flex items-center gap-2 justify-between">
+                                    <div className="flex items-center justify-normal gap-1 relative w-full">
+                                        <Avatar>
+                                            <AvatarImage src={member.user.profile_pic} className="bg-black" />
+                                            <AvatarFallback>{iconTextGenerator(member?.user.firstName as string, member?.user.lastName as string)}</AvatarFallback>
+                                        </Avatar>
+                                        <h1 className='text-[.8rem]'>{member.user.firstName} {member.user.lastName}</h1>
+
+                                    </div>
+
+                                    <Select
+                                        defaultValue={member?.role}
+                                        onValueChange={(v) => updateUserRole(member.user?._id!, v, groupBF?._id!)}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder={"Change role"} />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-white">
+                                            {roles.current.map((role, index) => (
+
+                                                <SelectItem
+                                                    className="cursor-pointer hover:bg-neutral-50"
+                                                    key={index}
+                                                    value={role}>{role}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                             )
-                        })
+                        }) : ('no members')
                     }
                 </div>
             </section>
-
 
             {/* Add Beneficiaries Section
             <section className="mb-6">

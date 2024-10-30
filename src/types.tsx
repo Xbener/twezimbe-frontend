@@ -466,3 +466,11 @@ export interface BF {
     createdBy: User[];
     _id?: string
 }
+
+export interface IBFMember {
+    user: User
+    role: string;
+    createdAt: Date
+    bf: BF
+    _id: string
+}

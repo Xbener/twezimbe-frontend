@@ -1,10 +1,11 @@
 'use client'
 
-import { BF, GroupTypes, User } from '@/types'
+import { BF, GroupTypes, IBFMember, User } from '@/types'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import Cookies from 'js-cookie'
 import { useMyContext } from './MyContext'
+import { getBfMembers } from '@/lib/bf'
 
 type Props = {
     children: React.ReactNode
@@ -27,7 +28,9 @@ type GroupContextTypes = {
     selectedGroup?: GroupTypes | null
     setSelectedGroup: (vl: any) => void
     groupBF?: BF | null
+    bfMembers?: IBFMember[] | null
     setGroupBF: (vl: any) => void
+    setBfMembers: (vl: any) => void
 }
 
 export const GroupContext = React.createContext<GroupContextTypes>({
@@ -43,6 +46,7 @@ export const GroupContext = React.createContext<GroupContextTypes>({
     setIsMemberListOpen(vl) { },
     setSelectedGroup(vl) { },
     setGroupBF(vl) { },
+    setBfMembers(vl) { },
 })
 
 function GroupProvider({ children }: Props) {
@@ -56,6 +60,7 @@ function GroupProvider({ children }: Props) {
     const [isMemberListOpen, setIsMemberListOpen] = useState(false)
     const [selectedGroup, setSelectedGroup] = useState<GroupTypes | null>(null)
     const [groupBF, setGroupBF] = useState<BF | null>(null)
+    const [bfMembers, setBfMembers] = useState<IBFMember[]>([])
 
     useEffect(() => {
         const getGroupBF = async () => {
@@ -79,6 +84,16 @@ function GroupProvider({ children }: Props) {
             getGroupBF()
         }
     }, [group])
+
+    useEffect(() => {
+        async function getData() {
+            const members = await getBfMembers(groupBF?._id!)
+            setBfMembers(members)
+        }
+        if (groupBF) {
+            getData()
+        }
+    }, [groupBF])
     useEffect(() => {
 
         const handleWindowChange = () => {
@@ -143,7 +158,9 @@ function GroupProvider({ children }: Props) {
             selectedGroup,
             setSelectedGroup,
             groupBF,
-            setGroupBF
+            setGroupBF,
+            setBfMembers(vl) { },
+            bfMembers
 
         }}>
 
