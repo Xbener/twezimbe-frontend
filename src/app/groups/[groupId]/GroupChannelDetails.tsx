@@ -210,6 +210,8 @@ function ChannelDetails({ }: Props) {
                             <div className='mt-5 flex flex-col w-full'>
                                 <span className="p-2 w-full bg-transparent hover:bg-[rgba(255,255,255,0.29)] cursor-pointer rounded-md duration-100 mb-3"
                                     onClick={() => {
+                                        setIsMemberListOpen(false)
+                                        setIsSideBarOpen(false)
                                         router.push(`/groups/${group?._id}/bearevement-fund`)
                                     }}
                                 >
@@ -217,6 +219,8 @@ function ChannelDetails({ }: Props) {
                                 </span>
                                 <span className="p-2 w-full bg-transparent hover:bg-[rgba(255,255,255,0.29)] cursor-pointer rounded-md duration-100 mb-3"
                                     onClick={() => {
+                                        setIsSideBarOpen(false)
+                                        setIsMemberListOpen(false)
                                         router.push(`/groups/${group?._id}/principal-dashboard`)
                                     }}
                                 >
@@ -295,6 +299,8 @@ function ChannelDetails({ }: Props) {
                                         onClick={() => {
                                             setCurrentChannel(channel)
                                             setRoomId(channel?.chatroom?._id as string)
+                                            setIsSideBarOpen(false)
+                                            setIsMemberListOpen(false)
                                             router.push(`/groups/${group?._id}/room/${channel._id}`)
                                             // setChId(channel?._id)
 
@@ -324,6 +330,8 @@ function ChannelDetails({ }: Props) {
                                         onClick={() => {
                                             setCurrentChannel(channel)
                                             setRoomId(channel?.chatroom?._id as string)
+                                            setIsSideBarOpen(false)
+                                            setIsMemberListOpen(false)
                                             router.push(`/groups/${group?._id}/room/${channel._id}`)
                                             // setChId(channel?._id)
                                         }

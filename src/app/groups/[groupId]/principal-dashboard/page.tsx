@@ -1,6 +1,9 @@
 'use client'
 import { Select, SelectTrigger, SelectValue } from '@/components/ui/select';
-import React, { useState, ChangeEvent } from 'react'
+import { GroupContext } from '@/context/GroupContext';
+import { XIcon } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import React, { useState, ChangeEvent, useContext } from 'react'
 import { toast } from 'sonner';
 
 type Props = {}
@@ -11,9 +14,8 @@ type Beneficiary = {
 
 function page({ }: Props) {
 
+    const {bfSettings} = useContext(GroupContext)
     const [formValues, setFormValues] = useState({
-        minBeneficiaries: 1,
-        maxBeneficiaries: 5,
         contributionAmount: 0,
         membershipFee: 0,
         annualSubscription: 0,
@@ -25,6 +27,7 @@ function page({ }: Props) {
     });
     const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const router = useRouter()
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
@@ -35,13 +38,13 @@ function page({ }: Props) {
     };
 
     const handleAddBeneficiary = () => {
-        if (beneficiaries.length < formValues.maxBeneficiaries) {
+        if (beneficiaries.length < bfSettings?.maxBeneficiaries!) {
             setBeneficiaries([
                 ...beneficiaries,
                 { name: '', id: beneficiaries.length + 1 }
             ]);
         } else {
-            toast.error(`You can only add up to ${formValues.maxBeneficiaries} beneficiaries.`);
+            toast.error(`You can only add up to ${bfSettings?.maxBeneficiaries!} beneficiaries.`);
         }
     };
 
@@ -53,7 +56,10 @@ function page({ }: Props) {
 
     return (
         <div className='max-w-2xl mx-auto p-6 text-white rounded-lg shadow-md mt-10'>
-
+            <XIcon
+            className="cursor-pointer border rounded-md mb-5"
+            onClick={()=>router.back()}
+            />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <section>
                     <h2 className="text-lg font-semibold text-white">1. One-off Membership Fee</h2>
@@ -155,8 +161,8 @@ function page({ }: Props) {
             </div>
 
             <section className="mb-6">
-              <div className="f">
-                  <h2 className="text-lg font-semibold text-white">8. Beneficiaries</h2>
+              <div className="flex items-center sm:flex-col flex-col justify-between w-full">
+                  <h2 className="text-lg font-semibold text-white">8. Beneficiaries (add up to {bfSettings?.maxBeneficiaries})</h2>
                 <button
                     onClick={handleAddBeneficiary}
                     className="px-4 py-2 mt-2 text-white bg-blue-600 rounded-md hover:bg-blue-500 transition duration-150"

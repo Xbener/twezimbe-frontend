@@ -126,3 +126,35 @@ export const getFundSettings = async (bf_id: string) => {
         console.log('error getting Fund Settings', error)
     }
 }
+
+export const addBeneficiary = async (body: {principalId: string, userId: string, bfId: string}) => {
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bf/requests/beneficiary`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Cookies.get('access-token')}`
+            },
+            body: JSON.stringify(body)
+        })
+
+        const data = await res.json()
+        if (!data.status) return toast.error(data.message || data.errors || "failed to add beneficiary. please try again")
+        toast.success(data.message)
+        return data
+    } catch (error) {
+        console.log('error adding beneficiary', error)
+    }
+}
+
+
+export const getBeneficiaries = async (bfId: string, principalId: string) => {
+        try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bf/beneficiary/${principalId}/${bfId}`, {})
+        const data = await res.json()
+        if (!data.status) return toast.error(data.errors || data.message)
+        return data.settings
+    } catch (error) {
+        console.log('error getting Beneficiaries', error)
+    }
+}

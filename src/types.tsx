@@ -502,3 +502,16 @@ export type FundSettings = {
     incident_contribution_fee: number;
     in_kind_support: string;
 };
+
+
+export type PrincipalType = {
+    contributionAmount: number;
+    membershipFee: number;
+    annualSubscription: number;
+    selectedPlan: 'monthly' | 'annual' | 'other';
+    paymentMethod: 'Mobile Money' | 'Bank Transfer' | 'Credit Card';
+    paymentDetails: string;
+    autoPayment: boolean;
+    dueReminder: 'day' | 'week' | 'month';
+};
+

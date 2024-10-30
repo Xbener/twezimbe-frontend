@@ -14,6 +14,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '@/components
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useGetProfileData } from '@/api/auth';
 import { FundSettings } from '@/types';
+import { useRouter } from 'next/navigation';
+import { XIcon } from 'lucide-react';
 type Beneficiary = {
     name: string;
     id: number;
@@ -29,6 +31,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
     const { currentUser } = useGetProfileData()
     const [newBfMembers, setNewBfMembers] = useState(bfMembers)
     const [allMembers, setAllMembers] = useState(group?.members)
+    const router = useRouter()
 
     useEffect(()=>{
         setFundSettings(bfSettings as FundSettings)
@@ -73,7 +76,6 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
         'coordinator',
         'counselor',
         'principal',
-        'beneficiary'
     ])
 
     useEffect(() => {
@@ -108,10 +110,16 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
   if(fundSettings){
      return (
         <div className="max-w-2xl mx-auto p-6 text-white rounded-lg shadow-md mt-10 bg-[rgba(26,65,116,0.36)] ">
+           <div className="flex items-center gap-4">
+                 <XIcon
+                     className="cursor-pointer border rounded-md mb-5"
+                     onClick={() => router.back()}
+                 />
             <h1 className="text-2xl font-bold text-center mb-6">
                 {groupBF?.fundName} - Fund Settings
             </h1>
 
+           </div>
             {/* Beneficiaries Section */}
             <section className="mb-6 flex flex-col gap-2">
                 <h2 className="text-lg font-semibold text-white">1. Number of Beneficiaries Per Principal</h2>
