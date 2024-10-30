@@ -13,6 +13,7 @@ import { acceptRequest, addBfMember, declineRequest, updateUserRole } from '@/li
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useGetProfileData } from '@/api/auth';
+import { FundSettings } from '@/types';
 type Beneficiary = {
     name: string;
     id: number;
@@ -23,15 +24,51 @@ type FundSettingsPageProps = {}
 const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
     const { group, groupBF, setPrivateChannelMembers, bfMembers, setBfMembers, bfMembersRef, bfJoinRequests } = useContext(GroupContext);
 
-    const [minBeneficiaries, setMinBeneficiaries] = useState<number>(1);
-    const [maxBeneficiaries, setMaxBeneficiaries] = useState<number>(5);
-    const [contributionAmount, setContributionAmount] = useState<number>(0);
-    const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
-    const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'annual'>('monthly');
+    const [fundSettings, setFundSettings] = useState<FundSettings>({
+        minBeneficiaries: 1,
+        maxBeneficiaries: 1,
+        membershipFee: 0,
+        subscriptionCosts: {
+            youth: 0,
+            children: 0,
+            elders: 0,
+        },
+        fundBenefits: {
+            principal: 0,
+            spouse: 0,
+            children: 0,
+            parents: 0,
+            other: 0,
+        },
+        incidentContributionFee: 0,
+        inKindSupport: "",
+    } as FundSettings)
     const [isLoading, setIsLoading] = useState(false)
     const { currentUser } = useGetProfileData()
     const [newBfMembers, setNewBfMembers] = useState(bfMembers)
     const [allMembers, setAllMembers] = useState(group?.members)
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+
+        // Split the name into parts to access nested properties
+        const nameParts = name.split('.');
+
+        setFundSettings(prevSettings => {
+            // Create a shallow copy of the previous settings
+            const newSettings = { ...prevSettings };
+
+            // Navigate to the nested property using the name parts
+            let current: any = newSettings; // Use 'any' to bypass the index signature issue
+            for (let i = 0; i < nameParts.length - 1; i++) {
+                current = current[nameParts[i]]; // This will be type-checked by TypeScript
+            }
+
+            // Set the new value for the last part of the name
+            current[nameParts[nameParts.length - 1] as keyof typeof current] = Number(value); // Cast to ensure correct indexing
+
+            return newSettings;
+        });
+    };
 
     useEffect(() => {
         setAllMembers(group?.members)
@@ -55,27 +92,6 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
         setPrivateChannelMembers([]);
     }, []);
 
-    const handleAddBeneficiary = () => {
-        if (beneficiaries.length < maxBeneficiaries) {
-            setBeneficiaries([
-                ...beneficiaries,
-                { name: '', id: beneficiaries.length + 1 }
-            ]);
-        } else {
-            alert(`You can only add up to ${maxBeneficiaries} beneficiaries.`);
-        }
-    };
-
-    const handleSubscriptionChange = (e: ChangeEvent<HTMLSelectElement>) => {
-        setSelectedPlan(e.target.value as 'monthly' | 'annual');
-    };
-
-    const handleBeneficiaryNameChange = (index: number, name: string) => {
-        const updatedBeneficiaries = [...beneficiaries];
-        updatedBeneficiaries[index].name = name;
-        setBeneficiaries(updatedBeneficiaries);
-    };
-
     const handleSubmit = async () => {
         setIsLoading(true)
         try {
@@ -85,7 +101,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                     'Authorization': `Bearer ${Cookies.get('access-token')}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ min_beneficiaries: minBeneficiaries, max_beneficiaries: maxBeneficiaries })
+                body: JSON.stringify(fundSettings)
             })
 
             const data = await res.json()
@@ -100,7 +116,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
     }
 
     return (
-        <div className="max-w-2xl mx-auto p-6 text-white rounded-lg shadow-md mt-10">
+        <div className="max-w-2xl mx-auto p-6 text-white rounded-lg shadow-md mt-10 bg-[rgba(26,65,116,0.36)] ">
             <h1 className="text-2xl font-bold text-center mb-6">
                 {groupBF?.fundName} - Fund Settings
             </h1>
@@ -113,8 +129,9 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                         <label className="block text-sm font-medium text-gray-700">Minimum Beneficiaries:</label>
                         <input
                             type="number"
-                            value={minBeneficiaries}
-                            onChange={(e) => setMinBeneficiaries(Number(e.target.value))}
+                            name="minBeneficiaries"
+                            value={fundSettings.minBeneficiaries}
+                            onChange={handleChange}
                             min={1}
                             className="w-full p-2 mt-1 border border-gray-300 rounded-md text-black"
                         />
@@ -123,21 +140,136 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                         <label className="block text-sm font-medium text-gray-700">Maximum Beneficiaries:</label>
                         <input
                             type="number"
-                            value={maxBeneficiaries}
-                            onChange={(e) => setMaxBeneficiaries(Number(e.target.value))}
+                            value={fundSettings.maxBeneficiaries}
+                            name="maxBeneficiaries"
+                            onChange={handleChange}
                             min={1}
                             className="w-full p-2 mt-1 border border-gray-300 rounded-md text-black"
                         />
                     </div>
                 </div>
+
+            </section>
+
+            <section className="mt-5">
+                <h2 className="text-lg font-semibold text-white">2. Membership Fee (One-off)</h2>
+                <label className="block text-sm font-medium text-gray-700">Set Membership Fee:</label>
+                <input
+                    type="number"
+                    placeholder="Enter membership fee (UGX)"
+                    className="w-full p-2 mt-1 border border-gray-300 rounded-md text-black"
+                    name="membershipFee"
+                    onChange={handleChange}
+                    value={fundSettings.membershipFee}
+                />
+            </section>
+
+            <section className="mt-5">
+                <h2 className="text-lg font-semibold text-white">3. Fund Subscription Costs</h2>
+                <div className="gap-5 grid grid-cols-2">
+                    <div>
+                        <label>Youth (18-60):</label>
+                        <input type="number"
+                            onChange={handleChange}
+                            name="subscriptionCosts.youth"
+                            value={fundSettings.subscriptionCosts.youth}
+                            placeholder="Set Youth fee" className="w-full p-2 border border-gray-300 rounded-md text-black" />
+                    </div>
+                    <div>
+                        <label>Children (17 or less):</label>
+                        <input type="number"
+                            name="subscriptionCosts.children"
+                            onChange={handleChange}
+                            value={fundSettings.subscriptionCosts.children}
+                            placeholder="Set Children fee" className="w-full p-2 border border-gray-300 rounded-md text-black" />
+                    </div>
+                    <div>
+                        <label>Elders (61+):</label>
+                        <input type="number"
+                            name="subscriptionCosts.elders"
+                            onChange={handleChange}
+                            value={fundSettings.subscriptionCosts.elders}
+                            placeholder="Set Elders fee" className="w-full p-2 border border-gray-300 rounded-md text-black" />
+                    </div>
+                </div>
+            </section>
+            <section className="mt-5">
+                <h2 className="text-lg font-semibold text-white">4. Fund Benefits</h2>
+                <div className="gap-5 grid grid-cols-2">
+                    <div>
+                        <label>Principal:</label>
+                        <input type="number"
+                            onChange={handleChange}
+                            name="fundBenefits.principal"
+                            value={fundSettings.fundBenefits.principal}
+                            placeholder="Benefit amount for Principal" className="w-full p-2 border border-gray-300 rounded-md text-black" />
+                    </div>
+                    <div>
+                        <label>Spouse:</label>
+                        <input type="number"
+                            onChange={handleChange}
+                            name="fundBenefits.spouse"
+                            value={fundSettings.fundBenefits.spouse}
+                            placeholder="Benefit amount for Spouse" className="w-full p-2 border border-gray-300 rounded-md text-black" />
+                    </div>
+                    <div>
+                        <label>Children:</label>
+                        <input type="number"
+                            onChange={handleChange}
+                            name="fundBenefits.children"
+                            value={fundSettings.fundBenefits.children}
+                            placeholder="Benefit amount for Children" className="w-full p-2 border border-gray-300 rounded-md text-black" />
+                    </div>
+                    <div>
+                        <label>Parents:</label>
+                        <input type="number"
+                            onChange={handleChange}
+                            name="fundBenefits.parents"
+                            value={fundSettings.fundBenefits.parents}
+                            placeholder="Benefit amount for Parents" className="w-full p-2 border border-gray-300 rounded-md text-black" />
+                    </div>
+                    <div>
+                        <label>Other (Guardians or close friends):</label>
+                        <input type="number"
+                            onChange={handleChange}
+                            name="fundBenefits.other"
+                            value={fundSettings.fundBenefits.other}
+                            placeholder="Benefit amount for Other" className="w-full p-2 border border-gray-300 rounded-md text-black" />
+                    </div>
+                </div>
+            </section>
+
+            <section className="mt-5">
+                <h2 className="text-lg font-semibold text-white">5. Incident Contribution Fee</h2>
+                <label className="block text-sm font-medium text-gray-700">Set Contribution Fee per Incident:</label>
+                <input
+                    type="number"
+                    onChange={handleChange}
+                    name="incidentContributionFee"
+                    value={fundSettings.incidentContributionFee}
+                    placeholder="Enter incident contribution fee"
+                    className="w-full p-2 mt-1 border border-gray-300 rounded-md text-black"
+                />
+            </section>
+
+            <section className="mt-5 w-full">
+                <h2 className="text-lg font-semibold text-white">6. In-kind Support</h2>
+                <label className="block text-sm font-medium text-gray-700">In-kind Support Description:</label>
+                <textarea
+                    onChange={handleChange}
+                    name="incidentContributionFee"
+                    value={fundSettings.inKindSupport}
+                    placeholder="Describe in-kind support options..."
+                    className="w-full p-2 mt-1 border border-gray-300 rounded-md text-black"
+                ></textarea>
                 {
-                    isLoading ? <LoadingButton /> : <Button onClick={handleSubmit} className='bg-blue-500'>Save</Button>
+                    isLoading ? <LoadingButton /> : <Button onClick={handleSubmit} className='bg-blue-500 w-full mt-5 justify-self-start'>Save</Button>
                 }
             </section>
 
             <section className="mt-5">
                 <div className="p-2 flex items-center justify-between w-full">
-                    <h2 className="text-lg font-semibold text-white">2. Change role</h2>
+                    <h2 className="text-lg font-semibold text-white">7. Change role</h2>
                     <Dialog>
                         <DialogTrigger>
                             <Button className="bg-orange-500">
@@ -219,7 +351,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                         onValueChange={(v) => updateUserRole(member.user?._id!, v, groupBF?._id!)}
                                     >
                                         <SelectTrigger className="w-auto">
-                                            <SelectValue  placeholder={"Change role"} />
+                                            <SelectValue placeholder={"Change role"} />
                                         </SelectTrigger>
                                         <SelectContent className="bg-white w-auto">
                                             {roles.current.map((role, index) => (
@@ -298,7 +430,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                 </div>
             </section>
 
-          
+
         </div>
     );
 }
