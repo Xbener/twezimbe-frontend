@@ -1,7 +1,7 @@
 'use client'
 
 import { BF, GroupTypes, IBFMember, User } from '@/types'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import Cookies from 'js-cookie'
 import { useMyContext } from './MyContext'
@@ -29,6 +29,7 @@ type GroupContextTypes = {
     setSelectedGroup: (vl: any) => void
     groupBF?: BF | null
     bfMembers?: IBFMember[] | null
+    bfMembersRef?: React.MutableRefObject<IBFMember[]> | null
     setGroupBF: (vl: any) => void
     setBfMembers: (vl: any) => void
 }
@@ -61,6 +62,11 @@ function GroupProvider({ children }: Props) {
     const [selectedGroup, setSelectedGroup] = useState<GroupTypes | null>(null)
     const [groupBF, setGroupBF] = useState<BF | null>(null)
     const [bfMembers, setBfMembers] = useState<IBFMember[]>([])
+
+    const bfMembersRef = useRef(bfMembers)
+    useEffect(() => {
+        console.log("Updated bfMembers:", bfMembers);
+    }, [bfMembers]);
 
     useEffect(() => {
         const getGroupBF = async () => {
@@ -160,7 +166,8 @@ function GroupProvider({ children }: Props) {
             groupBF,
             setGroupBF,
             setBfMembers(vl) { },
-            bfMembers
+            bfMembers,
+            bfMembersRef
 
         }}>
 

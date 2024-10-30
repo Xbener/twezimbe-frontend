@@ -2,7 +2,7 @@
 import GroupMemberItem from '@/components/groups/GroupMemberItem';
 import { Button } from '@/components/ui/button';
 import { GroupContext } from '@/context/GroupContext'
-import React, { useContext, useEffect, useState, ChangeEvent, useRef } from 'react'
+import React, { useContext, useEffect, useState, ChangeEvent, useRef, useLayoutEffect } from 'react'
 import { toast } from 'sonner';
 import Cookies from 'js-cookie'
 import LoadingButton from '@/components/LoadingButton';
@@ -20,7 +20,7 @@ type Beneficiary = {
 type FundSettingsPageProps = {}
 
 const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
-    const { group, groupBF, setPrivateChannelMembers, bfMembers, setBfMembers } = useContext(GroupContext);
+    const { group, groupBF, setPrivateChannelMembers, bfMembers, setBfMembers, bfMembersRef } = useContext(GroupContext);
 
     const [minBeneficiaries, setMinBeneficiaries] = useState<number>(1);
     const [maxBeneficiaries, setMaxBeneficiaries] = useState<number>(5);
@@ -28,6 +28,12 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
     const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
     const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'annual'>('monthly');
     const [isLoading, setIsLoading] = useState(false)
+    const [newBfMembers, setNewBfMembers] = useState(bfMembers)
+
+    useEffect(() => {
+        setNewBfMembers(bfMembers)
+    }, [bfMembers])
+
     const roles = useRef([
         'admin',
         'supervisor',
@@ -155,17 +161,19 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                                                     className="cursor-pointer p-2 rounded-md w-full text-white hover:bg-white hover:text-blue-500"
                                                                     key={index}
                                                                     onClick={async () => {
-                                                                        const newMember = await addBfMember({ bf_id: groupBF?._id!, role, userId: member?._id! })
-                                                                        setBfMembers((prev: any) => {
-                                                                            return prev.map((prevMember:any)=> {
-                                                                                if (prevMember?._id !== newMember?._id) return { user: member, role, _id: newMember?._id, createdAt: new Date() }
-                                                                                return prevMember
-                                                                            })
-                                                                        })
+                                                                        const newMember = await addBfMember({
+                                                                            bf_id: groupBF?._id!,
+                                                                            role,
+                                                                            user: member,
+                                                                            setBfMembers: setNewBfMembers
+                                                                        });
+
+                                                                        setNewBfMembers((prev: any) => ([...prev.filter((prevMember: any) => prevMember?._id === newMember?._id), { ...newMember, user: member, role, createdAt: new Date() }]))
                                                                     }}
                                                                 >
                                                                     {role}
                                                                 </span>
+
                                                             ))}
                                                         </PopoverContent>
                                                     </Popover>
@@ -182,10 +190,11 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                 </div>
 
                 <div
+                    key={newBfMembers?.length!}
                     className="mt-5 flex flex-col gap-2"
                 >
                     {
-                        bfMembers?.length ? bfMembers?.map((member) => {
+                        newBfMembers?.length ? newBfMembers?.map((member) => {
 
                             return (
                                 <div className="w-full flex items-center gap-2 justify-between">
