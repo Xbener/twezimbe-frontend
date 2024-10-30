@@ -160,7 +160,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                                         <PopoverTrigger>
                                                             <Button className="bg-blue-500 text-white">Add as ...</Button>
                                                         </PopoverTrigger>
-                                                        <PopoverContent className="bg-blue-400 flex flex-col gap-1">
+                                                        <PopoverContent className="bg-blue-400 flex flex-col gap-1 w-auto">
                                                             {roles.current.map((role, index) => (
 
                                                                 <span
@@ -218,10 +218,10 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                         defaultValue={member?.role}
                                         onValueChange={(v) => updateUserRole(member.user?._id!, v, groupBF?._id!)}
                                     >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder={"Change role"} />
+                                        <SelectTrigger className="w-auto">
+                                            <SelectValue  placeholder={"Change role"} />
                                         </SelectTrigger>
-                                        <SelectContent className="bg-white">
+                                        <SelectContent className="bg-white w-auto">
                                             {roles.current.map((role, index) => (
 
                                                 <SelectItem
@@ -298,49 +298,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                 </div>
             </section>
 
-            {/* Add Beneficiaries Section
-            <section className="mb-6">
-                <h2 className="text-lg font-semibold text-white">3. Add Beneficiaries</h2>
-                <button
-                    onClick={handleAddBeneficiary}
-                    className="px-4 py-2 mt-2 text-white bg-blue-600 rounded-md hover:bg-blue-500 transition duration-150"
-                >
-                    Add Beneficiary
-                </button>
-                <div className="mt-4 space-y-4">
-                    {beneficiaries.map((beneficiary, index) => (
-                        <div key={index} className="p-2 border-b border-gray-200">
-                            <span className="text-gray-700 font-medium">Beneficiary {index + 1}:</span>
-                            <input
-                                className="w-full p-2 mt-1 border border-gray-300 rounded-md text-black"
-                                placeholder="Enter name"
-                                value={beneficiary.name}
-                                onChange={(e) => handleBeneficiaryNameChange(index, e.target.value)}
-                            />
-                        </div>
-                    ))}
-                </div>
-            </section> */}
-
-            {/* Payment Options Section */}
-            {/* <section className="mb-6">
-                <h2 className="text-lg font-semibold text-white">4. Subscription Payment</h2>
-                <p className="text-sm text-gray-600">Choose your payment method and plan.</p>
-                <div className="mt-4 flex flex-wrap gap-4">
-                    <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 transition duration-150">
-                        Pay by Cash
-                    </button>
-                    <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 transition duration-150">
-                        Mobile Money
-                    </button>
-                    <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 transition duration-150">
-                        PayPal
-                    </button>
-                    <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 transition duration-150">
-                        Credit Card
-                    </button>
-                </div>
-            </section> */}
+          
         </div>
     );
 }
