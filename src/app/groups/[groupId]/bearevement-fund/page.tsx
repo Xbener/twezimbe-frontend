@@ -21,7 +21,7 @@ type Beneficiary = {
 type FundSettingsPageProps = {}
 
 const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
-    const { group, groupBF, setPrivateChannelMembers, bfMembers, setBfMembers, bfMembersRef } = useContext(GroupContext);
+    const { group, groupBF, setPrivateChannelMembers, bfMembers, setBfMembers, bfMembersRef, bfJoinRequests } = useContext(GroupContext);
 
     const [minBeneficiaries, setMinBeneficiaries] = useState<number>(1);
     const [maxBeneficiaries, setMaxBeneficiaries] = useState<number>(5);
@@ -136,7 +136,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
             </section>
 
             <section className="mt-5">
-                <div className="p-2 flex items-center justify-between w-fulls">
+                <div className="p-2 flex items-center justify-between w-full">
                     <h2 className="text-lg font-semibold text-white">2. Change role</h2>
                     <Dialog>
                         <DialogTrigger>
@@ -149,7 +149,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                 Add new members to your Bearevement fund
                             </DialogHeader>
                             <div className="mt-5">
-                                <div className='mt-5 w-full flex flex-col gap-2 h-[400px] overflow-auto'>
+                                <div className='mt-5 w-full flex flex-col gap-2 '>
                                     {
                                         group?.members?.map((member) => {
                                             if (member?._id === currentUser?._id) return null
@@ -197,7 +197,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
 
                 <div
                     key={newBfMembers?.length!}
-                    className="mt-5 flex flex-col gap-2"
+                    className="mt-5 flex flex-col gap-2 max-h-[300px] overflow-auto"
                 >
                     {
                         newBfMembers?.length ? newBfMembers?.map((member) => {
@@ -239,7 +239,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
             </section>
 
             <section className="mt-5">
-                <div className="p-2 flex items-start w-fulls flex-col">
+                <div className="p-2 flex items-start w-fulls flex-col max-h-[300px] overflow-auto">
                     <h2 className="text-lg font-semibold text-white text-left">3. Enroll principal</h2>
 
                     {
@@ -266,6 +266,27 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                         }) : ('no other members')
                     }
 
+                </div>
+            </section>
+
+            <section className="mt-5">
+                <div className="p-2 flex items-start w-fulls flex-col max-h-[300px] overflow-auto">
+                    <h2 className="text-lg font-semibold text-white text-left">4. Available Join requests</h2>
+
+                    {
+                        bfJoinRequests?.length ? bfJoinRequests?.map((request) => {
+                            return (
+                                <div className="w-full flex items-center gap-2">
+                                    <GroupMemberItem {...request.user} />
+                                    <Button
+                                        className="bg-blue-500 text-white">Accept</Button>
+                                        <Button
+                                        className="bg-orange-500"
+                                        >Decline</Button>
+                                </div>
+                            )
+                        }) : ('no other requests')
+                    }
                 </div>
             </section>
 

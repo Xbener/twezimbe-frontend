@@ -1,6 +1,6 @@
 'use client'
 
-import { BF, GroupTypes, IBFMember, User } from '@/types'
+import { BF, BfJoinRequest, GroupTypes, IBFMember, User } from '@/types'
 import React, { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import Cookies from 'js-cookie'
@@ -32,6 +32,8 @@ type GroupContextTypes = {
     bfMembersRef?: React.MutableRefObject<IBFMember[]> | null
     setGroupBF: (vl: any) => void
     setBfMembers: (vl: any) => void
+    bfJoinRequests?: BfJoinRequest[]
+    setBfJoinRequests: (vl: any) => void
 }
 
 export const GroupContext = React.createContext<GroupContextTypes>({
@@ -48,6 +50,7 @@ export const GroupContext = React.createContext<GroupContextTypes>({
     setSelectedGroup(vl) { },
     setGroupBF(vl) { },
     setBfMembers(vl) { },
+    setBfJoinRequests(vl) { },
 })
 
 function GroupProvider({ children }: Props) {
@@ -62,11 +65,34 @@ function GroupProvider({ children }: Props) {
     const [selectedGroup, setSelectedGroup] = useState<GroupTypes | null>(null)
     const [groupBF, setGroupBF] = useState<BF | null>(null)
     const [bfMembers, setBfMembers] = useState<IBFMember[]>([])
+    const [bfJoinRequests, setBfJoinRequests] = useState<BfJoinRequest[]>([])
 
     const bfMembersRef = useRef(bfMembers)
     useEffect(() => {
         console.log("Updated bfMembers:", bfMembers);
     }, [bfMembers]);
+
+    useEffect(() => {
+        const getBFJoinRequests = async () => {
+            try {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bf/requests/${groupBF?._id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${Cookies.get('access-token')}`,
+                    },
+                })
+
+                const data = await res.json()
+                if (!data.status) throw new Error(data.error || data.message || data.errors)
+                setBfJoinRequests(data.requests)
+            } catch (error) {
+                console.log('error getting group bearevement fund', error)
+            }
+        }
+        if (groupBF) {
+            getBFJoinRequests()
+        }
+    }, [group, groupBF])
 
     useEffect(() => {
         const getGroupBF = async () => {
@@ -167,7 +193,9 @@ function GroupProvider({ children }: Props) {
             setGroupBF,
             setBfMembers(vl) { },
             bfMembers,
-            bfMembersRef
+            bfMembersRef,
+            bfJoinRequests,
+            setBfJoinRequests
 
         }}>
 
