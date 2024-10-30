@@ -203,8 +203,8 @@ function ChannelDetails({ }: Props) {
             <div className='w-full p-2 flex flex-col mt-5 h-full overflow-y-auto absolute'>
                 {
                     (group?.has_bf && groupBF) && (
-                        <div className="flex flex-col items-start justify-start font-extrabold text-[0.9rem]">
-                            <h1>Group Bearevement Fund</h1>
+                        <div className="flex flex-col items-start justify-start text-[0.9rem]">
+                            <h1 className="font-bold">Group Bearevement Fund</h1>
 
                             <div className='mt-5 flex flex-col w-full'>
                                 <span className="p-2 w-full bg-transparent hover:bg-[rgba(255,255,255,0.29)] cursor-pointer rounded-md duration-100 mb-3"
@@ -214,12 +214,19 @@ function ChannelDetails({ }: Props) {
                                 >
                                     {groupBF?.fundName}
                                 </span>
-                                  <span className="p-2 w-full bg-transparent hover:bg-[rgba(255,255,255,0.29)] cursor-pointer rounded-md duration-100 mb-3"
+                                <span className="p-2 w-full bg-transparent hover:bg-[rgba(255,255,255,0.29)] cursor-pointer rounded-md duration-100 mb-3"
                                     onClick={() => {
                                         router.push(`/groups/${group?._id}/principal-dashboard`)
                                     }}
                                 >
                                     Principal dashboard
+                                </span>
+                                <span className="p-2 w-full bg-transparent hover:bg-[rgba(255,255,255,0.29)] cursor-pointer rounded-md duration-100 mb-3"
+                                    onClick={() => {
+                                        
+                                    }}
+                                >
+                                    Apply
                                 </span>
                             </div>
                         </div>

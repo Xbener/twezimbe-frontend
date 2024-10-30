@@ -31,7 +31,11 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
     const [isLoading, setIsLoading] = useState(false)
     const { currentUser } = useGetProfileData()
     const [newBfMembers, setNewBfMembers] = useState(bfMembers)
+    const [allMembers, setAllMembers] = useState(group?.members)
 
+    useEffect(() => {
+        setAllMembers(group?.members)
+    }, [group])
     useEffect(() => {
         setNewBfMembers(bfMembers)
     }, [bfMembers])
@@ -231,6 +235,37 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                             )
                         }) : ('no members')
                     }
+                </div>
+            </section>
+
+            <section className="mt-5">
+                <div className="p-2 flex items-start w-fulls flex-col">
+                    <h2 className="text-lg font-semibold text-white text-left">3. Enroll principal</h2>
+
+                    {
+                        allMembers?.length ? allMembers?.map((member) => {
+                            if (member?._id === currentUser?._id) return null
+                            if (newBfMembers && newBfMembers?.find(bfMember => bfMember?.user?._id === member._id)) return null
+                            return (
+                                <div className="w-full flex items-center gap-2">
+                                    <GroupMemberItem {...member} />
+                                    <Button
+                                        onClick={async () => {
+                                            const { newMember, status } = await addBfMember({
+                                                bf_id: groupBF?._id!,
+                                                role: 'principal',
+                                                user: member,
+                                                setBfMembers: setNewBfMembers
+                                            });
+
+                                            status && setNewBfMembers((prev: any) => ([...prev.filter((prevMember: any) => prevMember?._id === newMember?._id), { ...newMember, user: member, role: 'principal', createdAt: new Date() }]))
+                                        }}
+                                        className="bg-blue-500 text-white">Invite</Button>
+                                </div>
+                            )
+                        }) : ('no other members')
+                    }
+
                 </div>
             </section>
 
