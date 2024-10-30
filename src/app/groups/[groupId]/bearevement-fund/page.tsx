@@ -22,31 +22,19 @@ type Beneficiary = {
 type FundSettingsPageProps = {}
 
 const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
-    const { group, groupBF, setPrivateChannelMembers, bfMembers, setBfMembers, bfMembersRef, bfJoinRequests } = useContext(GroupContext);
+    const { group, groupBF, bfSettings, setBfSettings, setPrivateChannelMembers, bfMembers, setBfMembers, bfMembersRef, bfJoinRequests } = useContext(GroupContext);
 
-    const [fundSettings, setFundSettings] = useState<FundSettings>({
-        minBeneficiaries: 1,
-        maxBeneficiaries: 1,
-        membershipFee: 0,
-        subscriptionCosts: {
-            youth: 0,
-            children: 0,
-            elders: 0,
-        },
-        fundBenefits: {
-            principal: 0,
-            spouse: 0,
-            children: 0,
-            parents: 0,
-            other: 0,
-        },
-        incidentContributionFee: 0,
-        inKindSupport: "",
-    } as FundSettings)
+    const [fundSettings, setFundSettings] = useState<FundSettings>(bfSettings as FundSettings)
     const [isLoading, setIsLoading] = useState(false)
     const { currentUser } = useGetProfileData()
     const [newBfMembers, setNewBfMembers] = useState(bfMembers)
     const [allMembers, setAllMembers] = useState(group?.members)
+
+    useEffect(()=>{
+        setFundSettings(bfSettings as FundSettings)
+    },[bfSettings])
+
+
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
 
@@ -107,6 +95,8 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
             const data = await res.json()
             if (!data.status) return toast.error(data.message || data.error || data.errors)
             toast.success('Bearevement fund settings updated successfully.')
+        setBfSettings(data.settings)
+        setFundSettings(data.settings)
         } catch (error: any) {
             console.log('error updating Bearevement fund', error)
             toast.error(error.message)
@@ -115,7 +105,8 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
         }
     }
 
-    return (
+  if(fundSettings){
+     return (
         <div className="max-w-2xl mx-auto p-6 text-white rounded-lg shadow-md mt-10 bg-[rgba(26,65,116,0.36)] ">
             <h1 className="text-2xl font-bold text-center mb-6">
                 {groupBF?.fundName} - Fund Settings
@@ -158,9 +149,9 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                     type="number"
                     placeholder="Enter membership fee (UGX)"
                     className="w-full p-2 mt-1 border border-gray-300 rounded-md text-black"
-                    name="membershipFee"
+                     name="membership_fee"
                     onChange={handleChange}
-                    value={fundSettings.membershipFee}
+                    value={fundSettings.membership_fee}
                 />
             </section>
 
@@ -171,24 +162,24 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                         <label>Youth (18-60):</label>
                         <input type="number"
                             onChange={handleChange}
-                            name="subscriptionCosts.youth"
-                            value={fundSettings.subscriptionCosts.youth}
+                            name="subscription_costs.youth"
+                            value={fundSettings.subscription_costs.youth}
                             placeholder="Set Youth fee" className="w-full p-2 border border-gray-300 rounded-md text-black" />
                     </div>
                     <div>
                         <label>Children (17 or less):</label>
                         <input type="number"
-                            name="subscriptionCosts.children"
+                            name="subscription_costs.children"
                             onChange={handleChange}
-                            value={fundSettings.subscriptionCosts.children}
+                            value={fundSettings.subscription_costs.children}
                             placeholder="Set Children fee" className="w-full p-2 border border-gray-300 rounded-md text-black" />
                     </div>
                     <div>
                         <label>Elders (61+):</label>
                         <input type="number"
-                            name="subscriptionCosts.elders"
+                            name="subscription_costs.elders"
                             onChange={handleChange}
-                            value={fundSettings.subscriptionCosts.elders}
+                            value={fundSettings.subscription_costs.elders}
                             placeholder="Set Elders fee" className="w-full p-2 border border-gray-300 rounded-md text-black" />
                     </div>
                 </div>
@@ -200,40 +191,40 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                         <label>Principal:</label>
                         <input type="number"
                             onChange={handleChange}
-                            name="fundBenefits.principal"
-                            value={fundSettings.fundBenefits.principal}
+                            name="fund_benefits.principal"
+                            value={fundSettings.fund_benefits.principal}
                             placeholder="Benefit amount for Principal" className="w-full p-2 border border-gray-300 rounded-md text-black" />
                     </div>
                     <div>
                         <label>Spouse:</label>
                         <input type="number"
                             onChange={handleChange}
-                            name="fundBenefits.spouse"
-                            value={fundSettings.fundBenefits.spouse}
+                            name="fund_benefits.spouse"
+                            value={fundSettings.fund_benefits.spouse}
                             placeholder="Benefit amount for Spouse" className="w-full p-2 border border-gray-300 rounded-md text-black" />
                     </div>
                     <div>
                         <label>Children:</label>
                         <input type="number"
                             onChange={handleChange}
-                            name="fundBenefits.children"
-                            value={fundSettings.fundBenefits.children}
+                            name="fund_benefits.children"
+                            value={fundSettings.fund_benefits.children}
                             placeholder="Benefit amount for Children" className="w-full p-2 border border-gray-300 rounded-md text-black" />
                     </div>
                     <div>
                         <label>Parents:</label>
                         <input type="number"
                             onChange={handleChange}
-                            name="fundBenefits.parents"
-                            value={fundSettings.fundBenefits.parents}
+                            name="fund_benefits.parents"
+                            value={fundSettings.fund_benefits.parents}
                             placeholder="Benefit amount for Parents" className="w-full p-2 border border-gray-300 rounded-md text-black" />
                     </div>
                     <div>
                         <label>Other (Guardians or close friends):</label>
                         <input type="number"
                             onChange={handleChange}
-                            name="fundBenefits.other"
-                            value={fundSettings.fundBenefits.other}
+                            name="fund_benefits.other"
+                            value={fundSettings.fund_benefits.other}
                             placeholder="Benefit amount for Other" className="w-full p-2 border border-gray-300 rounded-md text-black" />
                     </div>
                 </div>
@@ -245,8 +236,8 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                 <input
                     type="number"
                     onChange={handleChange}
-                    name="incidentContributionFee"
-                    value={fundSettings.incidentContributionFee}
+                    name="incident_contribution_fee"
+                    value={fundSettings.incident_contribution_fee}
                     placeholder="Enter incident contribution fee"
                     className="w-full p-2 mt-1 border border-gray-300 rounded-md text-black"
                 />
@@ -257,8 +248,8 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                 <label className="block text-sm font-medium text-gray-700">In-kind Support Description:</label>
                 <textarea
                     onChange={handleChange}
-                    name="incidentContributionFee"
-                    value={fundSettings.inKindSupport}
+                     name="in_kind_support"
+                    value={fundSettings.in_kind_support}
                     placeholder="Describe in-kind support options..."
                     className="w-full p-2 mt-1 border border-gray-300 rounded-md text-black"
                 ></textarea>
@@ -433,6 +424,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
 
         </div>
     );
+  } 
 }
 
 export default FundSettingsPage;

@@ -1,11 +1,11 @@
 'use client'
 
-import { BF, BfJoinRequest, GroupTypes, IBFMember, User } from '@/types'
+import { BF, BfJoinRequest, FundSettings, GroupTypes, IBFMember, User } from '@/types'
 import React, { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import Cookies from 'js-cookie'
 import { useMyContext } from './MyContext'
-import { getBfMembers } from '@/lib/bf'
+import { getBfMembers, getFundSettings } from '@/lib/bf'
 
 type Props = {
     children: React.ReactNode
@@ -34,6 +34,8 @@ type GroupContextTypes = {
     setBfMembers: (vl: any) => void
     bfJoinRequests?: BfJoinRequest[]
     setBfJoinRequests: (vl: any) => void
+    bfSettings?: FundSettings | null
+    setBfSettings: (vl:any) => void
 }
 
 export const GroupContext = React.createContext<GroupContextTypes>({
@@ -49,6 +51,7 @@ export const GroupContext = React.createContext<GroupContextTypes>({
     setIsMemberListOpen(vl) { },
     setSelectedGroup(vl) { },
     setGroupBF(vl) { },
+    setBfSettings(vl) {},
     setBfMembers(vl) { },
     setBfJoinRequests(vl) { },
 })
@@ -66,6 +69,7 @@ function GroupProvider({ children }: Props) {
     const [groupBF, setGroupBF] = useState<BF | null>(null)
     const [bfMembers, setBfMembers] = useState<IBFMember[]>([])
     const [bfJoinRequests, setBfJoinRequests] = useState<BfJoinRequest[]>([])
+    const [bfSettings,setBfSettings] = useState<FundSettings|null>(null)
 
     const bfMembersRef = useRef(bfMembers)
     useEffect(() => {
@@ -119,8 +123,11 @@ function GroupProvider({ children }: Props) {
 
     useEffect(() => {
         async function getData() {
+            const settings = await getFundSettings(groupBF?._id!)
             const members = await getBfMembers(groupBF?._id!)
+            setBfSettings(settings)
             setBfMembers(members)
+
         }
         if (groupBF) {
             getData()
@@ -195,7 +202,8 @@ function GroupProvider({ children }: Props) {
             bfMembers,
             bfMembersRef,
             bfJoinRequests,
-            setBfJoinRequests
+            setBfJoinRequests,
+            bfSettings,setBfSettings
 
         }}>
 

@@ -115,3 +115,14 @@ export const declineRequest = async (requestId: string) => {
         console.log('error deleting request', error)
     }
 }
+
+export const getFundSettings = async (bf_id: string) => {
+        try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/settings/bf/${bf_id}`, {})
+        const data = await res.json()
+        if (!data.status) return toast.error(data.errors || data.message)
+        return data.settings
+    } catch (error) {
+        console.log('error getting Fund Settings', error)
+    }
+}

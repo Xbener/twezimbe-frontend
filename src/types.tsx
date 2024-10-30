@@ -486,19 +486,19 @@ export interface BfJoinRequest {
 export type FundSettings = {
     minBeneficiaries: number;
     maxBeneficiaries: number;
-    membershipFee: number;
-    subscriptionCosts: {
+    membership_fee: number;
+    subscription_costs: {
         youth: number;
         children: number;
         elders: number;
     };
-    fundBenefits: {
+    fund_benefits: {
         principal: number;
         spouse: number;
         children: number;
         parents: number;
         other: number;
     };
-    incidentContributionFee: number;
-    inKindSupport: string;
+    incident_contribution_fee: number;
+    in_kind_support: string;
 };
