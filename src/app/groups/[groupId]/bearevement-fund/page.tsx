@@ -156,7 +156,12 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                                                     key={index}
                                                                     onClick={async () => {
                                                                         const newMember = await addBfMember({ bf_id: groupBF?._id!, role, userId: member?._id! })
-                                                                        setBfMembers((prev: any) => ([...prev, { user: member, role, _id: newMember?._id, createdAt: new Date() }]))
+                                                                        setBfMembers((prev: any) => {
+                                                                            return prev.map((prevMember:any)=> {
+                                                                                if (prevMember?._id !== newMember?._id) return { user: member, role, _id: newMember?._id, createdAt: new Date() }
+                                                                                return prevMember
+                                                                            })
+                                                                        })
                                                                     }}
                                                                 >
                                                                     {role}
