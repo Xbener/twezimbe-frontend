@@ -56,3 +56,23 @@ export const addBfMember = async ({ role, bf_id, user, setBfMembers }: { role?: 
         console.log('error adding bf member', error)
     }
 }
+
+export const applyToJoinBF = async (body: { userId: string, bf_id: string }) => {
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bf/requests`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Cookies.get('access-token')}`
+            },
+            body: JSON.stringify(body)
+        })
+
+        const data = await res.json()
+        if (!data.status) return toast.error(data.message || data.errors || "failed to send request. please try again")
+        toast.success(data.message)
+        return data
+    } catch (error) {
+        console.log('error sending request', error)
+    }
+}

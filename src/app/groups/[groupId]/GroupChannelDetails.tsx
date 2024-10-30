@@ -22,6 +22,7 @@ import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { PopoverClose } from '@radix-ui/react-popover'
 import { ChannelTypes, ChatRoomTypes } from '@/types'
+import { applyToJoinBF } from '@/lib/bf'
 
 type Props = {
 
@@ -222,8 +223,8 @@ function ChannelDetails({ }: Props) {
                                     Principal dashboard
                                 </span>
                                 <span className="p-2 w-full bg-transparent hover:bg-[rgba(255,255,255,0.29)] cursor-pointer rounded-md duration-100 mb-3"
-                                    onClick={() => {
-                                        
+                                    onClick={async () => {
+                                        const request = await applyToJoinBF({ userId: currentUser?._id!, bf_id: groupBF?._id! })
                                     }}
                                 >
                                     Apply
