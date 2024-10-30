@@ -51,8 +51,7 @@ export const addBfMember = async ({ role, bf_id, user, setBfMembers }: { role?: 
         const data = await res.json()
         if (!data.status) return toast.error(data.message || data.errors || "failed to add new member")
         toast.success(data.message || 'successfully added new member')
-        setBfMembers((prev: any) => ([...prev.filter((prevMember: any) => prevMember?._id !== data?.newBfMember?._id), { ...data.newMember, user, role, createdAt: new Date() }]))
-        return data.newBfMember
+        return data
     } catch (error) {
         console.log('error adding bf member', error)
     }

@@ -12,6 +12,7 @@ import { iconTextGenerator } from '@/lib/iconTextGenerator';
 import { addBfMember, updateUserRole } from '@/lib/bf';
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useGetProfileData } from '@/api/auth';
 type Beneficiary = {
     name: string;
     id: number;
@@ -28,6 +29,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
     const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
     const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'annual'>('monthly');
     const [isLoading, setIsLoading] = useState(false)
+    const { currentUser } = useGetProfileData()
     const [newBfMembers, setNewBfMembers] = useState(bfMembers)
 
     useEffect(() => {
@@ -146,7 +148,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                 <div className='mt-5 w-full flex flex-col gap-2 h-[400px] overflow-auto'>
                                     {
                                         group?.members?.map((member) => {
-
+                                            if (member?._id === currentUser?._id) return null
                                             return (
                                                 <div className="w-full flex items-center gap-2">
                                                     <GroupMemberItem {...member} />
@@ -161,14 +163,14 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                                                     className="cursor-pointer p-2 rounded-md w-full text-white hover:bg-white hover:text-blue-500"
                                                                     key={index}
                                                                     onClick={async () => {
-                                                                        const newMember = await addBfMember({
+                                                                        const { newMember, status } = await addBfMember({
                                                                             bf_id: groupBF?._id!,
                                                                             role,
                                                                             user: member,
                                                                             setBfMembers: setNewBfMembers
                                                                         });
 
-                                                                        setNewBfMembers((prev: any) => ([...prev.filter((prevMember: any) => prevMember?._id === newMember?._id), { ...newMember, user: member, role, createdAt: new Date() }]))
+                                                                        status && setNewBfMembers((prev: any) => ([...prev.filter((prevMember: any) => prevMember?._id === newMember?._id), { ...newMember, user: member, role, createdAt: new Date() }]))
                                                                     }}
                                                                 >
                                                                     {role}
@@ -208,6 +210,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                     </div>
 
                                     <Select
+                                        disabled={member?._id === currentUser?._id}
                                         defaultValue={member?.role}
                                         onValueChange={(v) => updateUserRole(member.user?._id!, v, groupBF?._id!)}
                                     >
