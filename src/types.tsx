@@ -476,6 +476,8 @@ export interface IBFMember {
 }
 
 export interface BfJoinRequest {
-    user: User
-    bf: BF
+    user?: User
+    bf?: BF
+    bf_id?: string
+    _id?: string
 }

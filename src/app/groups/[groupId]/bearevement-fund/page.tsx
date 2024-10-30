@@ -9,7 +9,7 @@ import LoadingButton from '@/components/LoadingButton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { iconTextGenerator } from '@/lib/iconTextGenerator';
-import { addBfMember, updateUserRole } from '@/lib/bf';
+import { acceptRequest, addBfMember, declineRequest, updateUserRole } from '@/lib/bf';
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useGetProfileData } from '@/api/auth';
@@ -279,10 +279,18 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                 <div className="w-full flex items-center gap-2">
                                     <GroupMemberItem {...request.user} />
                                     <Button
+                                        onClick={async () => {
+                                            const { status } = await acceptRequest({ userId: request?.user?._id!, bf_id: request.bf_id!, requestId: request._id! })
+                                            // status && setNewBfMembers((prev: any) => ([...prev.filter((prevMember: any) => prevMember?._id === newMember?._id), { ...newMember, user: member, role, createdAt: new Date() }]))
+                                        }}
                                         className="bg-blue-500 text-white">Accept</Button>
-                                        <Button
+                                    <Button
+                                        onClick={async () => {
+                                            const { status } = await declineRequest(request?._id!)
+                                            // status && setNewBfMembers((prev: any) => ([...prev.filter((prevMember: any) => prevMember?._id === newMember?._id), { ...newMember, user: member, role, createdAt: new Date() }]))
+                                        }}
                                         className="bg-orange-500"
-                                        >Decline</Button>
+                                    >Decline</Button>
                                 </div>
                             )
                         }) : ('no other requests')

@@ -76,3 +76,42 @@ export const applyToJoinBF = async (body: { userId: string, bf_id: string }) => 
         console.log('error sending request', error)
     }
 }
+
+
+export const acceptRequest = async (body: { userId: string, bf_id: string, requestId: string }) => {
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bf/requests/accept`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Cookies.get('access-token')}`
+            },
+            body: JSON.stringify(body)
+        })
+
+        const data = await res.json()
+        if (!data.status) return toast.error(data.message || data.errors || "failed to accept request. please try again")
+        toast.success(data.message)
+        return data
+    } catch (error) {
+        console.log('error accepting request', error)
+    }
+}
+
+export const declineRequest = async (requestId: string) => {
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bf/requests/${requestId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${Cookies.get('access-token')}`
+            },
+        })
+
+        const data = await res.json()
+        if (!data.status) return toast.error(data.message || data.errors || "failed to delete request. please try again")
+        toast.success(data.message)
+        return data
+    } catch (error) {
+        console.log('error deleting request', error)
+    }
+}
