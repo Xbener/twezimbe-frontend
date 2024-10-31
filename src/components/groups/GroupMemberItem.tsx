@@ -56,10 +56,9 @@ function GroupMemberItem(member: Props) {
                     <h1 className='text-[.9rem]'>{member.role?.role_name === "GroupManager" || member?.role?.role_name === 'ChannelAdmin'
                         ? "Admin" : member.role?.role_name === "GroupModerator" || member?.role?.role_name === "ChannelModerator"
                             ? "Moderator" : "Member"}</h1>
-                    <div>{checkIsActive(onlineUsers, member) ?
-                        <div className="flex items-center gap-2"><span className='w-3 h-3 border rounded-full bg-green-500'></span> online</div> :
-                        <div className="flex items-center gap-2"><span className='w-3 h-3 border rounded-full bg-gray-500'></span> offline</div>}
-                    </div>
+                    {/* <div>
+                    <StatusDot status={checkIsActive(onlineUsers, member) === 'online' ? 'online' : checkIsActive(onlineUsers, member) === 'offline' ? "offline" : checkIsActive(onlineUsers, member) === 'idle' ? 'idle' : checkIsActive(onlineUsers, member) === 'do not disturb' ? "do not disturb" : 'online'} />
+                    </div> */}
                     {/* <h1>{member.email}</h1> */}
                     {
                         currentUser?._id === member.userId || currentUser?._id === member._id ?
