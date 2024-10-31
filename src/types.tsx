@@ -64,6 +64,7 @@ export type User = {
     isActive?: boolean;
     createdAt?: Date;
     id: string;
+    active_status?: 'online' | 'offline' | 'do not disturb' | 'idle'
 };
 
 

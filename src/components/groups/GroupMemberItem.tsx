@@ -25,7 +25,7 @@ type Props = {
 }
 
 export const checkIsActive = (onlineUsers: User[] | null, member: Props) => {
-    return onlineUsers?.find(user => user._id === member.userId || user._id === member._id)
+    return onlineUsers?.find(user => user._id === member.userId || user._id === member._id)?.active_status!
 }
 
 function GroupMemberItem(member: Props) {
@@ -42,7 +42,7 @@ function GroupMemberItem(member: Props) {
                         <AvatarImage src={member.profile_pic} className="bg-black" />
                         <AvatarFallback>{iconTextGenerator(member?.firstName as string, member?.lastName as string)}</AvatarFallback>
                     </Avatar>
-                    <StatusDot status={checkIsActive(onlineUsers, member) ? 'online' : "offline"} />
+                    <StatusDot status={checkIsActive(onlineUsers, member) === 'online' ? 'online' : checkIsActive(onlineUsers, member) === 'offline' ? "offline" : checkIsActive(onlineUsers, member) === 'idle' ? 'idle' : checkIsActive(onlineUsers, member) === 'do not disturb' ? "do not disturb" : 'online'} />
                 </PopoverTrigger>
                 <PopoverTrigger>
                     <h1 className='text-[.8rem]'>{member.firstName} {member.lastName}</h1>

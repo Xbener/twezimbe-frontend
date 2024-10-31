@@ -1,12 +1,12 @@
 'use client';
 
-import { useGetProfileData } from '@/api/auth';
+import { changeActiveStatus, useGetProfileData } from '@/api/auth';
 import { Eye, Verified } from '@/components/groups/icons';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ReactNode, useContext } from 'react';
+import { ReactNode, useContext, useEffect, useState, useRef } from 'react';
 import GroupCreateDialog from './GroupCreateDialog';
-import { useMyContext } from '@/context/MyContext';
+import { socket, useMyContext } from '@/context/MyContext';
 import { GroupContext } from '@/context/GroupContext';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { PopoverTrigger, Popover, PopoverContent } from '../ui/popover';
@@ -28,6 +28,11 @@ const GroupNav = () => {
     } = useMyContext()
     const { group: currentGroup, setGroup } = useContext(GroupContext)
     const { unreadMessages, unreadMessagesRef } = useMyContext()
+    const [activeStatus, setActiveStatus] = useState<User['active_status']>(currentUser?.active_status)
+    const statuses = useRef<User['active_status'][]>(['online', 'offline', 'idle', 'do not disturb'])
+    useEffect(() => {
+        setActiveStatus(currentUser?.active_status)
+    }, [currentUser])
     const pathname = usePathname()
     const settingsItems = [
         { name: "Edit profile", link: "/public_pages/Profile", icon: <Edit /> },
@@ -73,7 +78,7 @@ const GroupNav = () => {
         </NavLink>
       ))} */}
 
-{/* 
+            {/* 
             {unreadMessageGroups.map((message) => {
                 const isChannel = message.chatroom.type === 'channel';
                 const profilePic = isChannel ? message.contact?.group_picture : message.contact?.profile_pic;
@@ -144,13 +149,67 @@ const GroupNav = () => {
                             <AvatarImage src={currentUser?.profile_pic} className="bg-black w-[50px] h-[50px] rounded-full" />
                             <AvatarFallback>{iconTextGenerator(currentUser?.firstName as string, currentUser?.lastName as string)}</AvatarFallback>
                         </Avatar>
-                        <StatusDot status={"online"} />
+                        <StatusDot status={activeStatus!} />
                     </PopoverTrigger>
 
                     <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-40 gap-1 flex flex-col border-transparent border-l-8 border-l-neutral-400 pl-3 w-auto">
+                        <Popover>
+                            <PopoverTrigger>
+                                <div className="text-white flex p-2 w-full text-[1.1rem] hover:bg-[#6bb7ff73] cursor-pointer rounded-md items-center gap-2 duration-100">
+                                    {activeStatus === 'online' ? (
+                                        <div className="flex items-center gap-2 text-white cursor-pointer relative justify-between">
+                                            <StatusDot display="block" status={'online'} />
+                                            <span>online</span>
+                                        </div>
+                                    ) :
+                                        activeStatus === 'offline' ? (
+                                            <div className="flex items-center gap-2 text-white cursor-pointer relative justify-between">
+                                                <StatusDot display="block" status={'offline'} />
+                                                <span>offline</span>
+                                            </div>
+                                        ) :
+                                            activeStatus === 'idle' ? (
+                                                <div className="flex items-center gap-2 text-white cursor-pointer relative justify-between">
+                                                    <StatusDot display="block" status={'idle'} />
+                                                    <span>Idle</span>
+                                                </div>
+                                            ) :
+                                                activeStatus === 'do not disturb' ? (
+                                                    <div className="flex items-center gap-2 text-white cursor-pointer relative justify-between">
+                                                        <StatusDot display="block" status={'do not disturb'} />
+                                                        <span>Do not disturb</span>
+                                                    </div>
+                                                ) :
+                                                    (
+                                                        <div className="flex items-center gap-2 text-white cursor-pointer relative justify-between">
+                                                            <StatusDot display="block" status={'online'} />
+                                                            <span>online</span>
+                                                        </div>
+                                                    )
+                                    }
+                                </div>
+                            </PopoverTrigger>
+                            <PopoverContent className="bg-[#013a6f] flex flex-col gap-1 w-auto">
+                                {
+                                    statuses.current?.map((active_status, index) => (
+                                        <span
+                                            onClick={async () => {
+                                                const { status, activeStatus } = await changeActiveStatus(currentUser?._id!, active_status!, socket)
+                                                status && setActiveStatus(activeStatus)
+                                            }}
+                                            className='p-1 cursor-pointer text-white rounded-md hover:bg-[rgba(255,255,255,0.29)] flex items-center gap-2'>
+                                            <StatusDot display="block" status={active_status!} />
+                                            {active_status}
+                                        </span>
+
+                                    ))
+                                }
+                            </PopoverContent>
+
+                        </Popover>
                         {
                             settingsItems.map((item, index) => (
-                                <Link href={item.link} key={index} className="text-white flex p-2 w-full text-[1.1rem] hover:bg-[#6bb7ff73] cursor-pointer rounded-md items-center gap-2 duration-100" onClick={item?.action}>
+                                <Link href={item.link} key={index} className="text-white flex p-2 w-full text-[1rem] hover:bg-[#6bb7ff73] cursor-pointer rounded-md items-center gap-2 duration-100" onClick={item?.action}>
                                     {item.icon}
                                     {item.name}
                                 </Link>

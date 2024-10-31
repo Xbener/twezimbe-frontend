@@ -1,6 +1,7 @@
 import { CreateUserTypes, OPTTypes, SignInTypes, UpdateUserTypes, User } from "@/types";
 import Cookies from "js-cookie";
 import { useMutation, useQuery } from 'react-query';
+import { Socket } from "socket.io-client";
 import { toast } from 'sonner';
 
 // const API_BASE_URL = process.env.VITE_API_BASE_URL;
@@ -251,7 +252,7 @@ export const useUpdateUserAccount = () => {
         });
 
         const responseData = await response.json();
-        
+
         if (!response.ok) {
             throw new Error(responseData.errors);
         }
@@ -299,3 +300,27 @@ export const useGetAllUsers = () => {
     return { allUsers, isLoading }
 };
 
+
+
+export const changeActiveStatus = async (userId: string, status: string, socket: Socket) => {
+    try {
+        const accessToken = Cookies.get('access-token');
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/auth/status`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ userId, status })
+        })
+
+        const data = await res.json()
+        if (!data.status) return toast.error("Try again")
+        if (socket.connected) {
+            socket.emit('user-active-status-change', { userId, status })
+        }
+        return data
+    } catch (error) {
+        console.log('error changing active status')
+    }
+}

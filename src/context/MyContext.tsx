@@ -176,6 +176,10 @@ export const MyProvider = ({ children }: Props) => {
                 setOnlineUsers(prev => ([...onlineUsers, { ...user, isActive: true }]));
             });
 
+            socket.on('new-online-users', onlineUsers => {
+                setOnlineUsers(onlineUsers)
+            }) 
+
             socket.on('user-logged-out', ({ user, onlineUsers }) => {
                 setOnlineUsers(onlineUsers);
             });

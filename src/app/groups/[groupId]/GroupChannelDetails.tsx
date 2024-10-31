@@ -357,24 +357,6 @@ function ChannelDetails({ }: Props) {
                 </Avatar> */}
                 <div className="flex items-center gap-2 justify-between w-full">
                     <h1>{currentUser?.firstName} {currentUser?.lastName}</h1>
-                    <Popover>
-                        <PopoverTrigger>
-                            <Button disabled={isLoading}>
-                                <Settings />
-                            </Button>
-                        </PopoverTrigger>
-
-                        <PopoverContent className="text-white bg-[#013a6f] shadow-2xl z-40 gap-1 flex flex-col border-transparent border-l-8 border-l-neutral-400 pl-3 w-auto">
-                            {
-                                settingsItems.map((item: any, index: number) => (
-                                    <Link href={item.link} key={index} className="text-white flex p-2 w-full text-[1.1rem] hover:bg-[#6bb7ff73] cursor-pointer rounded-md items-center gap-2 duration-100" onClick={item?.action}>
-                                        {item.icon}
-                                        {item.name}
-                                    </Link>
-                                ))
-                            }
-                        </PopoverContent>
-                    </Popover>
                 </div>
             </div>
         </>
