@@ -75,9 +75,8 @@ button{
 }
 
 .ql-editor {
-  height: 50px !important;
   z-index: 50000 !important;
-  margin-bottom: 10em;
+  max-height: 500px !important;
 }
 
 

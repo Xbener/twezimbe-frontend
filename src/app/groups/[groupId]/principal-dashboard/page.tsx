@@ -84,7 +84,7 @@ function page({ }: Props) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <section>
                     <h2 className="text-lg font-semibold text-white">1. One-off Membership Fee</h2>
-                    <label className="block text-sm font-medium text-gray-700">Set Membership Fee (UGX):</label>
+                    <label className="block text-sm font-medium text-neutral-300">Set Membership Fee (UGX):</label>
                     <input
                         type="number"
                         name="membershipFee"
@@ -97,7 +97,7 @@ function page({ }: Props) {
 
                 <section>
                     <h2 className="text-lg font-semibold text-white">2. Annual Subscription</h2>
-                    <label className="block text-sm font-medium text-gray-700">Annual Subscription Fee (UGX):</label>
+                    <label className="block text-sm font-medium text-neutral-300">Annual Subscription Fee (UGX):</label>
                     <input
                         type="number"
                         name="annualSubscription"
@@ -109,7 +109,7 @@ function page({ }: Props) {
                 </section>
 
                 <section>
-                    <h2 className="text-sm font-semibold text-white">3. Preferred Subscription Payment Plan</h2>
+                    <h2 className="text-md font-semibold text-white">3. Preferred Subscription Payment Plan</h2>
                     <select
                         name="selectedPlan"
                         value={formValues.selectedPlan}

@@ -154,7 +154,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                     <h2 className="text-lg font-semibold text-white">1. Number of Beneficiaries Per Principal</h2>
                     <div className="w-full flex items-center gap-2 justify-normal mt-5">
                         <div className="w-full">
-                            <label className="block text-sm font-medium text-gray-700">Minimum Beneficiaries:</label>
+                            <label className="block text-sm font-medium text-neutral-300">Minimum Beneficiaries:</label>
                             <input
                                 type="number"
                                 name="minBeneficiaries"
@@ -165,7 +165,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                             />
                         </div>
                         <div className="w-full">
-                            <label className="block text-sm font-medium text-gray-700">Maximum Beneficiaries:</label>
+                            <label className="block text-sm font-medium text-neutral-300">Maximum Beneficiaries:</label>
                             <input
                                 type="number"
                                 value={fundSettings.maxBeneficiaries}
@@ -181,7 +181,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
 
                 <section className="mt-5">
                     <h2 className="text-lg font-semibold text-white">2. Membership Fee (One-off)</h2>
-                    <label className="block text-sm font-medium text-gray-700">Set Membership Fee:</label>
+                    <label className="block text-sm font-medium text-neutral-300">Set Membership Fee:</label>
                     <input
                         type="number"
                         placeholder="Enter membership fee (UGX)"
@@ -269,7 +269,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
 
                 <section className="mt-5">
                     <h2 className="text-lg font-semibold text-white">5. Incident Contribution Fee</h2>
-                    <label className="block text-sm font-medium text-gray-700">Set Contribution Fee per Incident:</label>
+                    <label className="block text-sm font-medium text-neutral-300">Set Contribution Fee per Incident:</label>
                     <input
                         type="number"
                         onChange={handleChange}
@@ -282,7 +282,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
 
                 <section className="mt-5 w-full">
                     <h2 className="text-lg font-semibold text-white">6. In-kind Support</h2>
-                    <label className="block text-sm font-medium text-gray-700">In-kind Support Description:</label>
+                    <label className="block text-sm font-medium text-neutral-300">In-kind Support Description:</label>
                     <textarea
                         onChange={handleChange}
                         name="in_kind_support"

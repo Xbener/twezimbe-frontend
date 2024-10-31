@@ -196,7 +196,7 @@ function Editor({
                 </ul>
             )}
             <div className="flex w-full flex-col rounded-md overflow-hidden bg-[#013a6fae] border-b border-b-white">
-                <div ref={containerRef} className="h-[100px] bg-[#013a6fae] border-none w-[100%] ql-custom placeholder:text-white border-b border-b-white" />
+                <div ref={containerRef} className="max-h-auto min-h-[100px] bg-[#013a6fae] border-none w-[100%] ql-custom placeholder:text-white border-b border-b-white" />
                 
             </div>
             <div className="border-t border-t-white flex px-2 pb-2 z-[5] text-black bg-[#013a6fae] justify-between">
