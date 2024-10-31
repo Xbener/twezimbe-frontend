@@ -1,6 +1,6 @@
 import { toast } from "sonner"
 import Cookies from 'js-cookie'
-import { User } from "@/types"
+import { PrincipalType, User } from "@/types"
 
 
 export const updateUserRole = async (userId: string, new_role: string, bf_id: string) => {
@@ -117,7 +117,7 @@ export const declineRequest = async (requestId: string) => {
 }
 
 export const getFundSettings = async (bf_id: string) => {
-        try {
+    try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/settings/bf/${bf_id}`, {})
         const data = await res.json()
         if (!data.status) return toast.error(data.errors || data.message)
@@ -127,7 +127,7 @@ export const getFundSettings = async (bf_id: string) => {
     }
 }
 
-export const addBeneficiary = async (body: {principalId: string, userId: string, bfId: string}) => {
+export const addBeneficiary = async (body: { principalId: string, userId: string, bfId: string }) => {
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bf/beneficiary`, {
             method: 'POST',
@@ -149,7 +149,7 @@ export const addBeneficiary = async (body: {principalId: string, userId: string,
 
 
 export const getBeneficiaries = async (bfId: string, principalId: string) => {
-        try {
+    try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bf/beneficiary/${principalId}/${bfId}`, {})
         const data = await res.json()
         if (!data.status) return toast.error(data.errors || data.message)
@@ -177,5 +177,46 @@ export const removeBeneficiary = async (body: { principalId: string, userId: str
         return data
     } catch (error) {
         console.log('error removing beneficiary', error)
+    }
+}
+
+
+export const updatePrincipal = async (principalId: string, body: PrincipalType) => {
+    const token = Cookies.get("access-token")
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bf/principal/${principalId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(body)
+        })
+
+        const data = await res.json()
+        if (!data.status) return toast.error(data.errors || data.message)
+        toast.success("principal settings updated successfully")
+        return data.bf_user
+    } catch (error) {
+        console.log('error updating principal settings', error)
+        toast.error("failed to update principal settings")
+    }
+}
+
+export const getPrincipalSettings = async (principalId: string) => {
+    const token = Cookies.get("access-token")
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bf/principal/${principalId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+        })
+
+        const data = await res.json()
+        if (!data.status) return toast.error(data.errors || data.message)
+        return data
+    } catch (error) {
+        console.log('error getting principal settings', error)
     }
 }
