@@ -1656,18 +1656,35 @@ function Page({ }: Props) {
                     ) : attachments?.length ? (
                         <div className='w-full h-auto p-2 flex gap-2 overflow-auto flex-wrap'>
                             {Array.from(attachments as File[]).map((file: File, index: number) => (
-                                <div key={index} className='w-[100px] overflow-hidden p-2 flex flex-col items-center justify-center gap-2 border rounded-md'>
+                                <div key={index} className="w-auto h-[120px] overflow-hidden p-2 flex flex-col items-center justify-center gap-2 border relative rounded-md text-white">
                                     <button
-
-                                        className='bg-neutral-50 text-black rounded-full place-self-end justify-self-end cursor-pointer'
+                                        className="bg-neutral-50 text-black rounded-full place-self-end justify-self-end cursor-pointer z-50 absolute top-0 right-0"
                                         onClick={() => handleRemoveAttachment(file)}
                                     >
                                         <XIcon />
                                     </button>
-                                    <FileIcon className="size-12" />
-                                    <h1>{file.name}</h1>
+
+                                    {file.type.startsWith("image/") ? (
+                                        <img
+                                            src={URL.createObjectURL(file)}
+                                            alt="Preview"
+                                            className="object-cover rounded-md w-full h-[100px]"
+                                        />
+                                    ) : (
+                                        <div className="flex w-auto items-center">
+                                            <img
+                                                src={mimeTypeToSvg[file.type] || mimeTypeToSvg['default']}
+                                            className="rounded-md h-[100px]"
+                                                alt="File Icon"
+                                            />
+                                            <span className="text-sm mt-2 text-center">
+                                                {file.name.length > 15 ? `${file.name.substring(0, 15)}...` : file.name}
+                                            </span>
+                                        </div>
+                                    )}
                                 </div>
                             ))}
+
                         </div>
 
                     ) : null}
