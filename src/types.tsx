@@ -515,3 +515,7 @@ export type PrincipalType = {
     dueReminder: 'day' | 'week' | 'month';
 };
 
+export type Beneficiary = {
+    principal: User
+    beneficiary: User
+}

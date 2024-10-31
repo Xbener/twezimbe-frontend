@@ -129,7 +129,7 @@ export const getFundSettings = async (bf_id: string) => {
 
 export const addBeneficiary = async (body: {principalId: string, userId: string, bfId: string}) => {
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bf/requests/beneficiary`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bf/beneficiary`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -153,7 +153,7 @@ export const getBeneficiaries = async (bfId: string, principalId: string) => {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bf/beneficiary/${principalId}/${bfId}`, {})
         const data = await res.json()
         if (!data.status) return toast.error(data.errors || data.message)
-        return data.settings
+        return data.beneficiaries
     } catch (error) {
         console.log('error getting Beneficiaries', error)
     }

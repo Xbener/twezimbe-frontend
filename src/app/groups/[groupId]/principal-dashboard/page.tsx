@@ -1,20 +1,22 @@
 'use client'
+import { useGetProfileData } from '@/api/auth';
+import GroupMemberItem from '@/components/groups/GroupMemberItem';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { Select, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { GroupContext } from '@/context/GroupContext';
+import { addBeneficiary, getBeneficiaries } from '@/lib/bf';
+import { Beneficiary } from '@/types';
 import { XIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import React, { useState, ChangeEvent, useContext } from 'react'
+import React, { useState, ChangeEvent, useContext, useEffect } from 'react'
 import { toast } from 'sonner';
 
 type Props = {}
-type Beneficiary = {
-    name: string;
-    id: number;
-}
-
 function page({ }: Props) {
 
-    const {bfSettings} = useContext(GroupContext)
+    const { bfSettings, group, groupBF } = useContext(GroupContext)
     const [formValues, setFormValues] = useState({
         contributionAmount: 0,
         membershipFee: 0,
@@ -26,9 +28,23 @@ function page({ }: Props) {
         dueReminder: 'week'
     });
     const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
+    const [beneficiaryQuery, setBeneficiaryQuery] = useState('')
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter()
+    const { currentUser } = useGetProfileData()
+    const [groupQuery, setGroupQuery] = useState('')
+    const [bfQuery, setBfQuery] = useState('')
 
+    useEffect(() => {
+        async function getData() {
+            const beneficiaries = await getBeneficiaries(groupBF?._id!, currentUser?._id!)
+            setBeneficiaries(beneficiaries || [])
+        }
+
+        if (groupBF && currentUser) {
+            getData()
+        }
+    }, [groupBF, currentUser])
     const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
         setFormValues(prevValues => ({
@@ -39,26 +55,31 @@ function page({ }: Props) {
 
     const handleAddBeneficiary = () => {
         if (beneficiaries.length < bfSettings?.maxBeneficiaries!) {
-            setBeneficiaries([
-                ...beneficiaries,
-                { name: '', id: beneficiaries.length + 1 }
-            ]);
+
         } else {
             toast.error(`You can only add up to ${bfSettings?.maxBeneficiaries!} beneficiaries.`);
         }
     };
 
-    const handleBeneficiaryNameChange = (index: number, name: string) => {
-        const updatedBeneficiaries = [...beneficiaries];
-        updatedBeneficiaries[index].name = name;
-        setBeneficiaries(updatedBeneficiaries);
-    };
+    const filterGroupMembers = (q: string) => {
+        const filteredMembers = group?.members.filter(member => {
+            const fullName = `${member.lastName} ${member.firstName}`
+            return fullName.toLowerCase().includes(q.toLowerCase()) ||
+                member.lastName.toLowerCase().includes(q.toLowerCase()) ||
+                member.firstName?.toLowerCase().includes(q.toLowerCase());
+        });
+        return filteredMembers;
+    }
+    let filteredGroupMembers = filterGroupMembers(groupQuery)
+    useEffect(() => {
+        filteredGroupMembers = filterGroupMembers(groupQuery)
+    }, [groupQuery])
 
     return (
         <div className='max-w-2xl mx-auto p-6 text-white rounded-lg shadow-md mt-10'>
             <XIcon
-            className="cursor-pointer border rounded-md mb-5"
-            onClick={()=>router.back()}
+                className="cursor-pointer border rounded-md mb-5"
+                onClick={() => router.back()}
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <section>
@@ -94,7 +115,7 @@ function page({ }: Props) {
                         value={formValues.selectedPlan}
                         onChange={handleInputChange}
                         className="w-full p-2 mt-1 border border-gray-300 rounded-md text-black"
-                        >
+                    >
                         <option value="monthly">Monthly</option>
                         <option value="annual">Annual (Discounted)</option>
                         <option value="other">Other (Define Instalments)</option>
@@ -161,25 +182,70 @@ function page({ }: Props) {
             </div>
 
             <section className="mb-6">
-              <div className="flex items-center sm:flex-col flex-col justify-between w-full">
-                  <h2 className="text-lg font-semibold text-white">8. Beneficiaries (add up to {bfSettings?.maxBeneficiaries})</h2>
-                <button
-                    onClick={handleAddBeneficiary}
-                    className="px-4 py-2 mt-2 text-white bg-blue-600 rounded-md hover:bg-blue-500 transition duration-150"
-                >
-                    Add Beneficiary
-                </button>
-              </div>
-                <div className="mt-4 space-y-4">
-                    {beneficiaries.map((beneficiary, index) => (
-                        <div key={index} className="p-2 border-b border-gray-200">
-                            <span className="text-gray-700 font-medium">Beneficiary {index + 1}:</span>
-                            <input
-                                className="w-full p-2 mt-1 border border-gray-300 rounded-md text-black"
-                                placeholder="Enter name"
-                                value={beneficiary.name}
-                                onChange={(e) => handleBeneficiaryNameChange(index, e.target.value)}
+                <div className="flex items-center justify-between w-full">
+                    <h2 className="text-lg font-semibold text-white">8. Beneficiaries (add up to {bfSettings?.maxBeneficiaries})</h2>
+                    <Dialog>
+                        <DialogTrigger>
+                            <Input
+                                className="w-full"
+                                value={beneficiaryQuery}
+                                onChange={(e) => setBeneficiaryQuery(e.target.value)}
+                                placeholder={`Search to add beneficiary ...`}
+                                type="text"
                             />
+                        </DialogTrigger>
+                        <DialogContent className="w-full bg-white">
+                            <Input
+                                className="w-full"
+                                value={groupQuery}
+                                onChange={(e) => setGroupQuery(e.target.value)}
+                                placeholder={`Search among the group members to add beneficiary ...`}
+                                type="text"
+                            />
+
+                            <div className="mt-5">
+                                <div className='mt-5 w-full flex flex-col gap-2 '>
+                                    {
+                                        filteredGroupMembers?.map((member) => {
+                                            if (member?._id === currentUser?._id) return null
+                                            if (beneficiaries.find(bn => bn.beneficiary?._id === member?._id)) return null
+                                            return (
+                                                <div className="w-full flex items-center gap-2">
+                                                    <GroupMemberItem {...member} />
+                                                    <Button
+                                                        className="bg-blue-500 text-white"
+                                                        onClick={async () => {
+                                                            const { beneficiary, status } = await addBeneficiary({ principalId: currentUser?._id!, userId: member?._id!, bfId: groupBF?._id! })
+                                                            status && setBeneficiaries(prev => {
+                                                                return [...prev, { principal: currentUser!, beneficiary: member }]
+                                                            })
+                                                        }}
+                                                    >
+                                                        Add
+                                                    </Button>
+                                                </div>
+                                            )
+                                        })
+                                    }
+                                </div>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
+                </div>
+                <div className="mt-4 space-y-4">
+                    {beneficiaries && beneficiaries.map((beneficiary, index) => (
+                        <div className="w-full flex items-center gap-2">
+                            <GroupMemberItem {...beneficiary.beneficiary} />
+                            <Button
+                                className="bg-orange-500 text-white"
+                                onClick={async () => {
+                                    setBeneficiaries(prev => {
+                                        return prev.filter(prev => prev.beneficiary._id !== beneficiary.beneficiary?._id)
+                                    })
+                                }}
+                            >
+                                Remove
+                            </Button>
                         </div>
                     ))}
                 </div>
