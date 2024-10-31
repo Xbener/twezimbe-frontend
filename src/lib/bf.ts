@@ -196,7 +196,7 @@ export const updatePrincipal = async (principalId: string, body: PrincipalType) 
         const data = await res.json()
         if (!data.status) return toast.error(data.errors || data.message)
         toast.success("principal settings updated successfully")
-        return data.bf_user
+        return data
     } catch (error) {
         console.log('error updating principal settings', error)
         toast.error("failed to update principal settings")
