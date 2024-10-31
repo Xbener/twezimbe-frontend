@@ -83,8 +83,8 @@ function page({ }: Props) {
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <section>
-                    <h2 className="text-lg font-semibold text-white">1. One-off Membership Fee</h2>
-                    <label className="block text-sm font-medium text-neutral-300">Set Membership Fee (UGX):</label>
+                    <h2 className="text-lg font-semibold text-white">1. One-off membership fee</h2>
+                    <label className="block text-sm font-medium text-neutral-300">Set membership fee (UGX):</label>
                     <input
                         type="number"
                         name="membershipFee"
@@ -96,8 +96,8 @@ function page({ }: Props) {
                 </section>
 
                 <section>
-                    <h2 className="text-lg font-semibold text-white">2. Annual Subscription</h2>
-                    <label className="block text-sm font-medium text-neutral-300">Annual Subscription Fee (UGX):</label>
+                    <h2 className="text-lg font-semibold text-white">2. Annual subscription</h2>
+                    <label className="block text-sm font-medium text-neutral-300">Annual subscription fee (UGX):</label>
                     <input
                         type="number"
                         name="annualSubscription"
@@ -109,7 +109,7 @@ function page({ }: Props) {
                 </section>
 
                 <section>
-                    <h2 className="text-md font-semibold text-white">3. Preferred Subscription Payment Plan</h2>
+                    <h2 className="text-md font-semibold text-white">3. Preferred subscription payment plan</h2>
                     <select
                         name="selectedPlan"
                         value={formValues.selectedPlan}
@@ -123,7 +123,7 @@ function page({ }: Props) {
                 </section>
 
                 <section>
-                    <h2 className="text-lg font-semibold text-white">4. Select Payment Method</h2>
+                    <h2 className="text-lg font-semibold text-white">4. Select payment method</h2>
                     <select
                         name="paymentMethod"
                         value={formValues.paymentMethod}
@@ -139,7 +139,7 @@ function page({ }: Props) {
                 </section>
 
                 <section className="md:col-span-2">
-                    <h2 className="text-lg font-semibold text-white">5. Add Payment Details</h2>
+                    <h2 className="text-lg font-semibold text-white">5. Add payment details</h2>
                     <input
                         type="text"
                         name="paymentDetails"
@@ -151,7 +151,7 @@ function page({ }: Props) {
                 </section>
 
                 <section>
-                    <h2 className="text-lg font-semibold text-white">6. Set Payment to Auto</h2>
+                    <h2 className="text-lg font-semibold text-white">6. Set payment to auto</h2>
                     <select
                         name="autoPayment"
                         value={formValues.autoPayment ? 'Yes' : 'No'}
@@ -167,7 +167,7 @@ function page({ }: Props) {
                 </section>
 
                 <section>
-                    <h2 className="text-lg font-semibold text-white">7. Set Payment Due Reminders</h2>
+                    <h2 className="text-lg font-semibold text-white">7. Set payment due reminders</h2>
                     <select
                         name="dueReminder"
                         value={formValues.dueReminder}

@@ -17,6 +17,7 @@ import { FundSettings } from '@/types';
 import { useRouter } from 'next/navigation';
 import { XIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { formatNumberWithCommas } from '@/utils/formatNumber';
 type Beneficiary = {
     name: string;
     id: number;
@@ -40,8 +41,9 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
     }, [bfSettings])
 
 
+
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const { name, value } = e.target;
+        const { name, value, type } = e.target;
 
         // Split the name into parts to access nested properties
         const nameParts = name.split('.');
@@ -56,8 +58,18 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                 current = current[nameParts[i]]; // This will be type-checked by TypeScript
             }
 
-            // Set the new value for the last part of the name
-            current[nameParts[nameParts.length - 1] as keyof typeof current] = Number(value); // Cast to ensure correct indexing
+            // If the input is a number, remove commas for the underlying value but display formatted with commas
+            if (type === 'number' || name.includes("subscription_costs")) {
+                // Remove commas from value for state update
+                const rawValue = value.replace(/,/g, '');
+                current[nameParts[nameParts.length - 1] as keyof typeof current] = rawValue; // Set unformatted value in state
+
+                // Display formatted value with commas
+                e.target.value = formatNumberWithCommas(rawValue);
+            } else {
+                // Set the new value for the last part of the name for non-number inputs
+                current[nameParts[nameParts.length - 1] as keyof typeof current] = value;
+            }
 
             return newSettings;
         });
@@ -99,7 +111,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
 
             const data = await res.json()
             if (!data.status) return toast.error(data.message || data.error || data.errors)
-            toast.success('Bearevement fund settings updated successfully.')
+            toast.success('You have saved successfully.')
             setBfSettings(data.settings)
             setFundSettings(data.settings)
         } catch (error: any) {
@@ -145,34 +157,34 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                         onClick={() => router.back()}
                     />
                     <h1 className="text-2xl font-bold text-center mb-6">
-                        {groupBF?.fundName} - Fund Settings
+                        {groupBF?.fundName} - Fund settings
                     </h1>
 
                 </div>
                 {/* Beneficiaries Section */}
                 <section className="mb-6 flex flex-col gap-2">
-                    <h2 className="text-lg font-semibold text-white">1. Number of Beneficiaries Per Principal</h2>
+                    <h2 className="text-lg font-semibold text-white">1. Number of beneficiaries per principal</h2>
                     <div className="w-full flex items-center gap-2 justify-normal mt-5">
                         <div className="w-full">
-                            <label className="block text-sm font-medium text-neutral-300">Minimum Beneficiaries:</label>
+                            <label className="block text-sm font-medium text-neutral-300">Minimum beneficiaries:</label>
                             <input
                                 type="number"
                                 name="minBeneficiaries"
-                                value={fundSettings.minBeneficiaries}
+                                value={(fundSettings.minBeneficiaries)}
                                 onChange={handleChange}
                                 min={1}
-                                className="w-full p-2 mt-1 border border-gray-300 rounded-md text-black"
+                                className="w-full text-right p-2 mt-1 border border-gray-300 rounded-md text-black"
                             />
                         </div>
                         <div className="w-full">
-                            <label className="block text-sm font-medium text-neutral-300">Maximum Beneficiaries:</label>
+                            <label className="block text-sm font-medium text-neutral-300">Maximum beneficiaries:</label>
                             <input
                                 type="number"
                                 value={fundSettings.maxBeneficiaries}
                                 name="maxBeneficiaries"
                                 onChange={handleChange}
                                 min={1}
-                                className="w-full p-2 mt-1 border border-gray-300 rounded-md text-black"
+                                className="w-full p-2 text-right mt-1 border border-gray-300 rounded-md text-black"
                             />
                         </div>
                     </div>
@@ -180,12 +192,12 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                 </section>
 
                 <section className="mt-5">
-                    <h2 className="text-lg font-semibold text-white">2. Membership Fee (One-off)</h2>
-                    <label className="block text-sm font-medium text-neutral-300">Set Membership Fee:</label>
+                    <h2 className="text-lg font-semibold text-white">2. Membership fee (One-off)</h2>
+                    <label className="block text-sm font-medium text-neutral-300">Set membership fee:</label>
                     <input
                         type="number"
                         placeholder="Enter membership fee (UGX)"
-                        className="w-full p-2 mt-1 border border-gray-300 rounded-md text-black"
+                        className="w-full p-2 mt-1 border border-gray-300 rounded-md text-black text-right"
                         name="membership_fee"
                         onChange={handleChange}
                         value={fundSettings.membership_fee}
@@ -193,7 +205,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                 </section>
 
                 <section className="mt-5">
-                    <h2 className="text-lg font-semibold text-white">3. Fund Subscription Costs</h2>
+                    <h2 className="text-lg font-semibold text-white">3. Fund subscription costs</h2>
                     <div className="gap-5 grid grid-cols-2">
                         <div>
                             <label>Youth (18-60):</label>
@@ -201,7 +213,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                 onChange={handleChange}
                                 name="subscription_costs.youth"
                                 value={fundSettings.subscription_costs.youth}
-                                placeholder="Set Youth fee" className="w-full p-2 border border-gray-300 rounded-md text-black" />
+                                placeholder="Set Youth fee" className="w-full p-2 border border-gray-300 rounded-md text-black text-right" />
                         </div>
                         <div>
                             <label>Children (17 or less):</label>
@@ -209,7 +221,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                 name="subscription_costs.children"
                                 onChange={handleChange}
                                 value={fundSettings.subscription_costs.children}
-                                placeholder="Set Children fee" className="w-full p-2 border border-gray-300 rounded-md text-black" />
+                                placeholder="Set Children fee" className="w-full p-2 border border-gray-300 rounded-md text-black text-right" />
                         </div>
                         <div>
                             <label>Elders (61+):</label>
@@ -217,12 +229,12 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                 name="subscription_costs.elders"
                                 onChange={handleChange}
                                 value={fundSettings.subscription_costs.elders}
-                                placeholder="Set Elders fee" className="w-full p-2 border border-gray-300 rounded-md text-black" />
+                                placeholder="Set Elders fee" className="w-full p-2 border border-gray-300 rounded-md text-black text-right" />
                         </div>
                     </div>
                 </section>
                 <section className="mt-5">
-                    <h2 className="text-lg font-semibold text-white">4. Fund Benefits</h2>
+                    <h2 className="text-lg font-semibold text-white">4. Fund benefits</h2>
                     <div className="gap-5 grid grid-cols-2">
                         <div>
                             <label>Principal:</label>
@@ -230,7 +242,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                 onChange={handleChange}
                                 name="fund_benefits.principal"
                                 value={fundSettings.fund_benefits.principal}
-                                placeholder="Benefit amount for Principal" className="w-full p-2 border border-gray-300 rounded-md text-black" />
+                                placeholder="Benefit amount for Principal" className="w-full p-2 border border-gray-300 rounded-md text-black text-right" />
                         </div>
                         <div>
                             <label>Spouse:</label>
@@ -238,7 +250,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                 onChange={handleChange}
                                 name="fund_benefits.spouse"
                                 value={fundSettings.fund_benefits.spouse}
-                                placeholder="Benefit amount for Spouse" className="w-full p-2 border border-gray-300 rounded-md text-black" />
+                                placeholder="Benefit amount for Spouse" className="w-full p-2 border border-gray-300 rounded-md text-black text-right" />
                         </div>
                         <div>
                             <label>Children:</label>
@@ -246,7 +258,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                 onChange={handleChange}
                                 name="fund_benefits.children"
                                 value={fundSettings.fund_benefits.children}
-                                placeholder="Benefit amount for Children" className="w-full p-2 border border-gray-300 rounded-md text-black" />
+                                placeholder="Benefit amount for Children" className="w-full p-2 border border-gray-300 rounded-md text-black text-right" />
                         </div>
                         <div>
                             <label>Parents:</label>
@@ -254,7 +266,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                 onChange={handleChange}
                                 name="fund_benefits.parents"
                                 value={fundSettings.fund_benefits.parents}
-                                placeholder="Benefit amount for Parents" className="w-full p-2 border border-gray-300 rounded-md text-black" />
+                                placeholder="Benefit amount for Parents" className="w-full p-2 border border-gray-300 rounded-md text-black text-right" />
                         </div>
                         <div>
                             <label>Other (Guardians or close friends):</label>
@@ -262,27 +274,27 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                 onChange={handleChange}
                                 name="fund_benefits.other"
                                 value={fundSettings.fund_benefits.other}
-                                placeholder="Benefit amount for Other" className="w-full p-2 border border-gray-300 rounded-md text-black" />
+                                placeholder="Benefit amount for Other" className="w-full p-2 border border-gray-300 rounded-md text-black text-right" />
                         </div>
                     </div>
                 </section>
 
                 <section className="mt-5">
-                    <h2 className="text-lg font-semibold text-white">5. Incident Contribution Fee</h2>
-                    <label className="block text-sm font-medium text-neutral-300">Set Contribution Fee per Incident:</label>
+                    <h2 className="text-lg font-semibold text-white">5. Incident contribution fee</h2>
+                    <label className="block text-sm font-medium text-neutral-300">Set contribution fee per incident:</label>
                     <input
                         type="number"
                         onChange={handleChange}
                         name="incident_contribution_fee"
                         value={fundSettings.incident_contribution_fee}
                         placeholder="Enter incident contribution fee"
-                        className="w-full p-2 mt-1 border border-gray-300 rounded-md text-black"
+                        className="w-full p-2 mt-1 border border-gray-300 rounded-md text-black text-right"
                     />
                 </section>
 
                 <section className="mt-5 w-full">
-                    <h2 className="text-lg font-semibold text-white">6. In-kind Support</h2>
-                    <label className="block text-sm font-medium text-neutral-300">In-kind Support Description:</label>
+                    <h2 className="text-lg font-semibold text-white">6. In-kind support</h2>
+                    <label className="block text-sm font-medium text-neutral-300">In-kind support description:</label>
                     <textarea
                         onChange={handleChange}
                         name="in_kind_support"
@@ -307,7 +319,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                             <DialogContent className="bg-white max-h-[400px] overflow-auto">
                                 <DialogHeader className='flex flex-col'>
                                     <h1>
-                                        Add new members to your Bearevement fund
+                                        Add new members to your bearevement fund
                                     </h1>
                                     <Input
                                         value={groupQuery}
@@ -343,7 +355,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                                                                 setBfMembers: setNewBfMembers
                                                                             });
 
-                                                                            status && setNewBfMembers((prev: any) => ([...prev.filter((prevMember: any) => prevMember?._id === newMember?._id), { ...newMember, user: member, role, createdAt: new Date() }]))
+                                                                            status && setNewBfMembers((prev: any) => ([...prev,{ ...newMember, user: member, role, createdAt: new Date() }]))
                                                                         }}
                                                                     >
                                                                         {role}
@@ -448,7 +460,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
 
                 <section className="mt-5">
                     <div className="p-2 flex items-start w-fulls flex-col max-h-[300px] overflow-auto">
-                        <h2 className="text-lg font-semibold text-white text-left">4. Available Join requests</h2>
+                        <h2 className="text-lg font-semibold text-white text-left">4. Available join requests</h2>
 
                         {
                             bfJoinRequests?.length ? bfJoinRequests?.map((request) => {
