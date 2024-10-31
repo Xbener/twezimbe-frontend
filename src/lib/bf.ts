@@ -158,3 +158,24 @@ export const getBeneficiaries = async (bfId: string, principalId: string) => {
         console.log('error getting Beneficiaries', error)
     }
 }
+
+
+export const removeBeneficiary = async (body: { principalId: string, userId: string, bfId: string }) => {
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bf/beneficiary/remove`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Cookies.get('access-token')}`
+            },
+            body: JSON.stringify(body)
+        })
+
+        const data = await res.json()
+        if (!data.status) return toast.error(data.message || data.errors || "failed to remove beneficiary. please try again")
+        toast.success(data.message)
+        return data
+    } catch (error) {
+        console.log('error removing beneficiary', error)
+    }
+}

@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Select, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { GroupContext } from '@/context/GroupContext';
-import { addBeneficiary, getBeneficiaries } from '@/lib/bf';
+import { addBeneficiary, getBeneficiaries, removeBeneficiary } from '@/lib/bf';
 import { Beneficiary } from '@/types';
 import { XIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -239,6 +239,7 @@ function page({ }: Props) {
                             <Button
                                 className="bg-orange-500 text-white"
                                 onClick={async () => {
+                                    const { status } = await removeBeneficiary({ principalId: currentUser?._id!, userId: beneficiary.beneficiary._id!, bfId: groupBF?._id! })
                                     setBeneficiaries(prev => {
                                         return prev.filter(prev => prev.beneficiary._id !== beneficiary.beneficiary?._id)
                                     })

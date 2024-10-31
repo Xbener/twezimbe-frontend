@@ -109,33 +109,33 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
             setIsLoading(false)
         }
     }
-const filterGroupMembers = (q: string) => {
-    const filteredMembers = group?.members.filter(member => {
-        const fullName = `${member.lastName} ${member.firstName}`
-        return fullName.toLowerCase().includes(q.toLowerCase()) ||
-               member.lastName.toLowerCase().includes(q.toLowerCase()) ||
-               member.firstName?.toLowerCase().includes(q.toLowerCase());
-    });
-    return filteredMembers;
-}
-const filterBfMembers = (q: string) => {
-    const filteredMembers = newBfMembers && newBfMembers?.filter(member => {
-        const fullName = `${member.user.lastName} ${member.user.firstName}`
-        return fullName.toLowerCase().includes(q.toLowerCase()) ||
-               member.user.lastName.toLowerCase().includes(q.toLowerCase()) ||
-               member.user.firstName?.toLowerCase().includes(q.toLowerCase());
-    });
-    return filteredMembers;
-}
+    const filterGroupMembers = (q: string) => {
+        const filteredMembers = group?.members.filter(member => {
+            const fullName = `${member.lastName} ${member.firstName}`
+            return fullName.toLowerCase().includes(q.toLowerCase()) ||
+                member.lastName.toLowerCase().includes(q.toLowerCase()) ||
+                member.firstName?.toLowerCase().includes(q.toLowerCase());
+        });
+        return filteredMembers;
+    }
+    const filterBfMembers = (q: string) => {
+        const filteredMembers = newBfMembers && newBfMembers?.filter(member => {
+            const fullName = `${member.user.lastName} ${member.user.firstName}`
+            return fullName.toLowerCase().includes(q.toLowerCase()) ||
+                member.user.lastName.toLowerCase().includes(q.toLowerCase()) ||
+                member.user.firstName?.toLowerCase().includes(q.toLowerCase());
+        });
+        return filteredMembers;
+    }
     const filteredGroupMembers = filterGroupMembers(groupQuery)
-    const filteredBfMembers = filterBfMembers(bfQuery)
+    let filteredBfMembers = filterBfMembers(bfQuery)
     useEffect(() => {
         filterGroupMembers(groupQuery)
     }, [groupQuery])
 
-    useEffect(()=>{
-        filterBfMembers(bfQuery)
-    },[bfQuery])
+    useEffect(() => {
+        filteredBfMembers = filterBfMembers(bfQuery)
+    }, [bfQuery, bfMembers])
     if (fundSettings) {
         return (
             <div className="max-w-2xl mx-auto p-6 text-white rounded-lg shadow-md mt-10 bg-[rgba(26,65,116,0.36)] ">
@@ -321,6 +321,7 @@ const filterBfMembers = (q: string) => {
                                         {
                                             filteredGroupMembers?.map((member) => {
                                                 if (member?._id === currentUser?._id) return null
+                                                if (newBfMembers && newBfMembers?.find(bfMember => bfMember.user._id === member?._id)!) return null
                                                 return (
                                                     <div className="w-full flex items-center gap-2">
                                                         <GroupMemberItem {...member} />
@@ -369,8 +370,8 @@ const filterBfMembers = (q: string) => {
                         className="mt-5 flex flex-col gap-2 max-h-[300px] overflow-auto"
                     >
                         <Input
-                        onChange={(e)=>setBfQuery(e.target.value)}
-                        value={bfQuery}
+                            onChange={(e) => setBfQuery(e.target.value)}
+                            value={bfQuery}
                             type='text'
                             className="text-neutral-700 mb-5"
                             placeholder={`Search Bearevement fund officers ...`}
@@ -451,19 +452,20 @@ const filterBfMembers = (q: string) => {
 
                         {
                             bfJoinRequests?.length ? bfJoinRequests?.map((request) => {
+                                if (newBfMembers && newBfMembers.find(bfMember => bfMember?.user?._id === request.user?._id!)) return null
                                 return (
                                     <div className="w-full flex items-center gap-2">
                                         <GroupMemberItem {...request.user} />
                                         <Button
                                             onClick={async () => {
-                                                const { status } = await acceptRequest({ userId: request?.user?._id!, bf_id: request.bf_id!, requestId: request._id! })
-                                                // status && setNewBfMembers((prev: any) => ([...prev.filter((prevMember: any) => prevMember?._id === newMember?._id), { ...newMember, user: member, role, createdAt: new Date() }]))
+                                                const { status, newMember } = await acceptRequest({ userId: request?.user?._id!, bf_id: request.bf_id!, requestId: request._id! })
+                                                status && setNewBfMembers((prev: any) => ([...prev.filter((prevMember: any) => prevMember?._id === newMember?._id), { ...newMember, user: request?.user, createdAt: new Date() }]))
                                             }}
                                             className="bg-blue-500 text-white">Accept</Button>
                                         <Button
                                             onClick={async () => {
                                                 const { status } = await declineRequest(request?._id!)
-                                                // status && setNewBfMembers((prev: any) => ([...prev.filter((prevMember: any) => prevMember?._id === newMember?._id), { ...newMember, user: member, role, createdAt: new Date() }]))
+                                                status && setNewBfMembers((prev: any) => ([...prev.filter((prevMember: any) => prevMember?.user._id === request.user?._id)]))
                                             }}
                                             className="bg-orange-500"
                                         >Decline</Button>
