@@ -258,7 +258,7 @@ function page({ }: Props) {
                             <Button onClick={() => {
                                 setIsEditing(false)
                                 principalSettings && setFormValues(principalSettings!)
-                            }} className="bg-orange-500">Cancel </Button>
+                            }} className="bg-gray-600">Cancel </Button>
                         </div>
                     ) : null
                 }
