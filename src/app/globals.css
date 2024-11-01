@@ -109,7 +109,3 @@ button{
 .ql-toolbar .ql-stroke:hover{
   color:blue !important;
 }
-
-.drag-drop {
-  @apply w-full absolute h-full z-[5000] bg-[rgb(0,0,0,0.5)]
-}

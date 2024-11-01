@@ -1,11 +1,12 @@
 'use client'
 import { GroupContext } from '@/context/GroupContext';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import Cookies from 'js-cookie';
 import { useForm } from 'react-hook-form';
 import LoadingButton from '@/components/LoadingButton';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { generateProfileID } from '@/utils/generateID';
 
 type Props = {};
 
@@ -14,11 +15,17 @@ interface FormData {
     fundDetails: string;
     accountType: 'bank' | 'mobile' | 'wallet';
     accountInfo: string;
+    walletAddress: string;
 }
 
 function BereavementFundPage({ }: Props) {
     const { selectedGroup: group } = useContext(GroupContext);
     const router = useRouter()
+    const wallet = useRef("")
+
+    useEffect(() => {
+        wallet.current = generateProfileID("")
+    }, [])
 
     const {
         register,
@@ -31,6 +38,7 @@ function BereavementFundPage({ }: Props) {
             fundDetails: '',
             accountType: 'bank',
             accountInfo: '',
+            walletAddress: wallet.current
         },
     });
 
@@ -121,6 +129,7 @@ function BereavementFundPage({ }: Props) {
                             required: accountType === 'wallet' ? "Wallet address is required" : "Account info is required",
                         })}
                         className={`w-full px-4 py-2 border ${errors.accountInfo ? 'border-red-500' : 'border-gray-300'} rounded-md focus:border-blue-800 focus:ring focus:ring-blue-200`}
+                        // value={}
                         placeholder={
                             accountType === 'wallet'
                                 ? 'Enter virtual wallet address'

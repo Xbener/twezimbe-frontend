@@ -734,7 +734,7 @@ function Page({ }: Props) {
         <DragDrop
             setAttachments={setAttachments}
         >
-            <div className='w-full h-screen flex flex-col bg-[#013a6fd3] text-white'>
+            <div className='h-screen flex flex-col bg-[#013a6fd3] text-white'>
                 {
                     fileUploading.state && (
                         <div className="w-auto p-2 pl-5 pr-5 bg-blue-500 rounded-full shadow-lg text-white absolute left-1/2 mt-5">
@@ -1301,19 +1301,35 @@ function Page({ }: Props) {
                                 </div>
                             ) : attachments?.length ? (
                                 <div className='w-full h-auto p-2 flex gap-2 overflow-auto flex-wrap'>
-                                    {Array.from(attachments as File[]).map((file: File, index: number) => (
-                                        <div key={index} className='w-[100px] overflow-hidden p-2 flex flex-col items-center justify-center gap-2 border rounded-md'>
-                                            <button
+                                            {Array.from(attachments as File[]).map((file: File, index: number) => (
+                                                <div key={index} className="w-auto h-[120px] overflow-hidden p-2 flex flex-col items-center justify-center gap-2 border relative rounded-md text-white">
+                                                    <button
+                                                        className="bg-neutral-50 text-black rounded-full place-self-end justify-self-end cursor-pointer z-50 absolute top-0 right-0"
+                                                        onClick={() => handleRemoveAttachment(file)}
+                                                    >
+                                                        <XIcon />
+                                                    </button>
 
-                                                className='bg-neutral-50 text-black rounded-full place-self-end justify-self-end cursor-pointer'
-                                                onClick={() => handleRemoveAttachment(file)}
-                                            >
-                                                <XIcon />
-                                            </button>
-                                            <FileIcon className="size-12" />
-                                            <h1>{file.name}</h1>
-                                        </div>
-                                    ))}
+                                                    {file.type.startsWith("image/") ? (
+                                                        <img
+                                                            src={URL.createObjectURL(file)}
+                                                            alt="Preview"
+                                                            className="object-cover rounded-md w-full h-[100px]"
+                                                        />
+                                                    ) : (
+                                                        <div className="flex w-auto items-center">
+                                                            <img
+                                                                src={mimeTypeToSvg[file.type] || mimeTypeToSvg['default']}
+                                                                className="rounded-md h-[100px]"
+                                                                alt="File Icon"
+                                                            />
+                                                            <span className="text-sm mt-2 text-center">
+                                                                {file.name.length > 15 ? `${file.name.substring(0, 15)}...` : file.name}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
                                 </div>
                             ) : null}
                             <div className="space-x-3 relative w-full">
