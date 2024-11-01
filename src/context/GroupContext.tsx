@@ -35,7 +35,7 @@ type GroupContextTypes = {
     bfJoinRequests?: BfJoinRequest[]
     setBfJoinRequests: (vl: any) => void
     bfSettings?: FundSettings | null
-    setBfSettings: (vl:any) => void
+    setBfSettings: (vl: any) => void
 }
 
 export const GroupContext = React.createContext<GroupContextTypes>({
@@ -51,7 +51,7 @@ export const GroupContext = React.createContext<GroupContextTypes>({
     setIsMemberListOpen(vl) { },
     setSelectedGroup(vl) { },
     setGroupBF(vl) { },
-    setBfSettings(vl) {},
+    setBfSettings(vl) { },
     setBfMembers(vl) { },
     setBfJoinRequests(vl) { },
 })
@@ -69,7 +69,7 @@ function GroupProvider({ children }: Props) {
     const [groupBF, setGroupBF] = useState<BF | null>(null)
     const [bfMembers, setBfMembers] = useState<IBFMember[]>([])
     const [bfJoinRequests, setBfJoinRequests] = useState<BfJoinRequest[]>([])
-    const [bfSettings,setBfSettings] = useState<FundSettings|null>(null)
+    const [bfSettings, setBfSettings] = useState<FundSettings | null>(null)
 
     const bfMembersRef = useRef(bfMembers)
     useEffect(() => {
@@ -109,8 +109,9 @@ function GroupProvider({ children }: Props) {
                 })
 
                 const data = await res.json()
+                console.log('group fund', data)
                 if (!data.status) throw new Error(data.error || data.message || data.errors)
-                setGroupBF(data.bf)
+                setGroupBF({ ...data.bf.fund, role: data.bf.role })
             } catch (error) {
                 console.log('error getting group bearevement fund', error)
             }
@@ -203,7 +204,7 @@ function GroupProvider({ children }: Props) {
             bfMembersRef,
             bfJoinRequests,
             setBfJoinRequests,
-            bfSettings,setBfSettings
+            bfSettings, setBfSettings
 
         }}>
 

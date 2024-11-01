@@ -465,7 +465,8 @@ export interface BF {
     walletAddress?: string;
     groupId: string;
     createdBy: User[];
-    _id?: string
+    _id?: string;
+    role?:string;
 }
 
 export interface IBFMember {

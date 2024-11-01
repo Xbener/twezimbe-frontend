@@ -168,7 +168,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                     isEditing ? (
                         <>
                             <section className="mb-6 flex flex-col gap-2">
-                              
+
                                 <h2 className="text-lg font-semibold text-white">1. Number of beneficiaries per principal</h2>
                                 <div className="w-full flex items-center gap-2 justify-normal mt-5">
                                     <div className="w-full">
@@ -321,9 +321,9 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                     ) : (
                         <div className="bg-gray-900 p-6 rounded-lg shadow-md">
                             <h2 className="text-2xl font-semibold text-white mb-4">Fund Settings Overview</h2>
-                                <p>
-                                    wallet: {groupBF?.walletAddress}
-                                </p>
+                            <p>
+                                wallet: {groupBF?.walletAddress}
+                            </p>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-white mt-5">
                                 <div>
                                     <h3 className="font-semibold text-lg">Number of Beneficiaries per Principal</h3>
@@ -357,79 +357,88 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                     <p>{fundSettings.in_kind_support || "N/A"}</p>
                                 </div>
                             </div>
-                            <Button onClick={() => setIsEditing(true)} className="bg-blue-500 mt-6">Edit Settings</Button>
+                            {
+                                ['admin', 'manager', 'hr', 'supervisor'].find(role => groupBF?.role?.includes(role)) &&
+                                <Button onClick={() => setIsEditing(true)} className="bg-blue-500 mt-6">Edit Settings</Button>
+                            }
                         </div>
                     )
                 }
 
                 <section className="mt-5">
-                    <div className="p-2 flex items-center justify-between w-full">
-                        <h2 className="text-lg font-semibold text-white">7. Add officers</h2>
-                        <Dialog>
-                            <DialogTrigger>
-                                <Button className="bg-orange-500">
-                                    Add new member
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent className="bg-white max-h-[400px] overflow-auto">
-                                <DialogHeader className='flex flex-col'>
-                                    <h1>
-                                        Add new members to your bearevement fund
-                                    </h1>
-                                    <Input
-                                        value={groupQuery}
-                                        onChange={(e) => setGroupQuery(e.target.value)}
-                                        type='text'
-                                        placeholder={`Search among the group members to enroll new officers ...`}
-                                    />
-                                </DialogHeader>
-                                <div className="mt-5">
-                                    <div className='mt-5 w-full flex flex-col gap-2 '>
-                                        {
-                                            filteredGroupMembers?.map((member) => {
-                                                if (member?._id === currentUser?._id) return null
-                                                if (newBfMembers && newBfMembers?.find(bfMember => bfMember.user._id === member?._id)!) return null
-                                                return (
-                                                    <div className="w-full flex items-center gap-2">
-                                                        <GroupMemberItem {...member} />
-                                                        <Popover>
-                                                            <PopoverTrigger>
-                                                                <Button className="bg-blue-500 text-white">Add as ...</Button>
-                                                            </PopoverTrigger>
-                                                            <PopoverContent className="bg-blue-400 flex flex-col gap-1 w-auto">
-                                                                {roles.current.map((role, index) => (
+                    {
+                        ['admin', 'manager', 'hr', 'supervisor'].find(role => groupBF?.role?.includes(role)) && (
+                            <div className="p-2 flex items-center justify-between w-full">
+                                <h2 className="text-lg font-semibold text-white">7. Add officers</h2>
+                                <Dialog>
+                                    <DialogTrigger>
+                                        <Button className="bg-orange-500">
+                                            Add new member
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="bg-white max-h-[400px] overflow-auto">
+                                        <DialogHeader className='flex flex-col'>
+                                            <h1>
+                                                Add new members to your bearevement fund
+                                            </h1>
+                                            <Input
+                                                value={groupQuery}
+                                                onChange={(e) => setGroupQuery(e.target.value)}
+                                                type='text'
+                                                placeholder={`Search among the group members to enroll new officers ...`}
+                                            />
+                                        </DialogHeader>
+                                        <div className="mt-5">
+                                            <div className='mt-5 w-full flex flex-col gap-2 '>
+                                                {
+                                                    filteredGroupMembers?.map((member) => {
+                                                        if (member?._id === currentUser?._id) return null
+                                                        if (newBfMembers && newBfMembers?.find(bfMember => bfMember.user._id === member?._id)!) return null
+                                                        return (
+                                                            <div className="w-full flex items-center gap-2">
+                                                                <GroupMemberItem {...member} />
+                                                                <Popover>
+                                                                    <PopoverTrigger>
+                                                                        <Button className="bg-blue-500 text-white">Add as ...</Button>
+                                                                    </PopoverTrigger>
+                                                                    <PopoverContent className="bg-blue-400 flex flex-col gap-1 w-auto">
+                                                                        {roles.current.map((role, index) => (
 
-                                                                    <span
-                                                                        className="cursor-pointer p-2 rounded-md w-full text-white hover:bg-white hover:text-blue-500"
-                                                                        key={index}
-                                                                        onClick={async () => {
-                                                                            const { newMember, status } = await addBfMember({
-                                                                                bf_id: groupBF?._id!,
-                                                                                role,
-                                                                                user: member,
-                                                                                setBfMembers: setNewBfMembers
-                                                                            });
+                                                                            <span
+                                                                            disabled={true}
+                                                                                className="cursor-pointer p-2 rounded-md w-full text-white hover:bg-white hover:text-blue-500"
+                                                                                key={index}
+                                                                                onClick={async () => {
+                                                                                    const { bfMember, status } = await addBfMember({
+                                                                                        bf_id: groupBF?._id!,
+                                                                                        role,
+                                                                                        user: member,
+                                                                                        setBfMembers: setNewBfMembers
+                                                                                    });
 
-                                                                            status && setNewBfMembers((prev: any) => ([...prev, { ...newMember, user: member, role, createdAt: new Date() }]))
-                                                                        }}
-                                                                    >
-                                                                        {role}
-                                                                    </span>
+                                                                                    status && setNewBfMembers((prev: any) => ([...prev, { ...bfMember, user: member, createdAt: new Date() }]))
+                                                                                }}
+                                                                            >
+                                                                                {role}
+                                                                            </span>
 
-                                                                ))}
-                                                            </PopoverContent>
-                                                        </Popover>
+                                                                        ))}
+                                                                    </PopoverContent>
+                                                                </Popover>
 
-                                                    </div>
-                                                )
-                                            })
-                                        }
-                                    </div>
-                                </div>
+                                                            </div>
+                                                        )
+                                                    })
+                                                }
+                                            </div>
+                                        </div>
 
-                            </DialogContent>
-                        </Dialog>
-                    </div>
+                                    </DialogContent>
+                                </Dialog>
+                            </div>
+                        )
+
+                    }
 
                     <div
                         key={newBfMembers?.length!}
@@ -458,8 +467,8 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                         </div>
 
                                         <Select
-                                            disabled={member?._id === currentUser?._id}
-                                            defaultValue={member?.role}
+                                            disabled={member.user?._id === currentUser?._id || !['admin', 'manager'].find(role => groupBF?.role?.includes(role))}
+                                            defaultValue={member?.role[0]}
                                             onValueChange={(v) => updateUserRole(member.user?._id!, v, groupBF?._id!)}
                                         >
                                             <SelectTrigger className="w-auto">
@@ -482,67 +491,39 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                     </div>
                 </section>
 
-                {/* <section className="mt-5">
-                <div className="p-2 flex items-start w-fulls flex-col max-h-[300px] overflow-auto">
-                    <h2 className="text-lg font-semibold text-white text-left">3. Enroll principal</h2>
+                {
+                    ['admin', 'manager', 'hr', 'supervisor'].find(role => groupBF?.role?.includes(role)) && (
+                        <section className="mt-5">
+                            <div className="p-2 flex items-start w-fulls flex-col max-h-[300px] overflow-auto">
+                                <h2 className="text-lg font-semibold text-white text-left">4. Available join requests</h2>
 
-                    {
-                        allMembers?.length ? allMembers?.map((member) => {
-                            if (member?._id === currentUser?._id) return null
-                            if (newBfMembers && newBfMembers?.find(bfMember => bfMember?.user?._id === member._id)) return null
-                            return (
-                                <div className="w-full flex items-center gap-2">
-                                    <GroupMemberItem {...member} />
-                                    <Button
-                                        onClick={async () => {
-                                            const { newMember, status } = await addBfMember({
-                                                bf_id: groupBF?._id!,
-                                                role: 'principal',
-                                                user: member,
-                                                setBfMembers: setNewBfMembers
-                                            });
-
-                                            status && setNewBfMembers((prev: any) => ([...prev.filter((prevMember: any) => prevMember?._id === newMember?._id), { ...newMember, user: member, role: 'principal', createdAt: new Date() }]))
-                                        }}
-                                        className="bg-blue-500 text-white">Invite</Button>
-                                </div>
-                            )
-                        }) : ('no other members')
-                    }
-
-                </div>
-            </section> */}
-
-                <section className="mt-5">
-                    <div className="p-2 flex items-start w-fulls flex-col max-h-[300px] overflow-auto">
-                        <h2 className="text-lg font-semibold text-white text-left">4. Available join requests</h2>
-
-                        {
-                            bfJoinRequests?.length ? bfJoinRequests?.map((request) => {
-                                if (newBfMembers && newBfMembers.find(bfMember => bfMember?.user?._id === request.user?._id!)) return null
-                                return (
-                                    <div className="w-full flex items-center gap-2">
-                                        <GroupMemberItem {...request.user} />
-                                        <Button
-                                            onClick={async () => {
-                                                const { status, newMember } = await acceptRequest({ userId: request?.user?._id!, bf_id: request.bf_id!, requestId: request._id! })
-                                                status && setNewBfMembers((prev: any) => ([...prev.filter((prevMember: any) => prevMember?._id === newMember?._id), { ...newMember, user: request?.user, createdAt: new Date() }]))
-                                            }}
-                                            className="bg-blue-500 text-white">Accept</Button>
-                                        <Button
-                                            onClick={async () => {
-                                                const { status } = await declineRequest(request?._id!)
-                                                status && setNewBfMembers((prev: any) => ([...prev.filter((prevMember: any) => prevMember?.user._id === request.user?._id)]))
-                                            }}
-                                            className="bg-orange-500"
-                                        >Decline</Button>
-                                    </div>
-                                )
-                            }) : ('no other requests')
-                        }
-                    </div>
-                </section>
-
+                                {
+                                    bfJoinRequests?.length ? bfJoinRequests?.map((request) => {
+                                        if (newBfMembers && newBfMembers.find(bfMember => bfMember?.user?._id === request.user?._id!)) return null
+                                        return (
+                                            <div className="w-full flex items-center gap-2">
+                                                <GroupMemberItem {...request.user} />
+                                                <Button
+                                                    onClick={async () => {
+                                                        const { status, newMember } = await acceptRequest({ userId: request?.user?._id!, bf_id: request.bf_id!, requestId: request._id! })
+                                                        status && setNewBfMembers((prev: any) => ([...prev.filter((prevMember: any) => prevMember?._id === newMember?._id), { ...newMember, user: request?.user, createdAt: new Date() }]))
+                                                    }}
+                                                    className="bg-blue-500 text-white">Accept</Button>
+                                                <Button
+                                                    onClick={async () => {
+                                                        const { status } = await declineRequest(request?._id!)
+                                                        status && setNewBfMembers((prev: any) => ([...prev.filter((prevMember: any) => prevMember?.user._id === request.user?._id)]))
+                                                    }}
+                                                    className="bg-orange-500"
+                                                >Decline</Button>
+                                            </div>
+                                        )
+                                    }) : ('no other requests')
+                                }
+                            </div>
+                        </section>
+                    )
+                }
 
             </div>
         );
