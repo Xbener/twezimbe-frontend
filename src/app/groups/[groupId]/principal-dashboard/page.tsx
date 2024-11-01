@@ -62,14 +62,6 @@ function page({ }: Props) {
         }));
     };
 
-    const handleAddBeneficiary = () => {
-        if (beneficiaries.length < bfSettings?.maxBeneficiaries!) {
-
-        } else {
-            toast.error(`You can only add up to ${bfSettings?.maxBeneficiaries!} beneficiaries.`);
-        }
-    };
-
 
 
     const filterGroupMembers = (q: string) => {

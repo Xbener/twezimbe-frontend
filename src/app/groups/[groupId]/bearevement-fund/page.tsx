@@ -35,6 +35,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
     const [newBfMembers, setNewBfMembers] = useState(bfMembers)
     const [allMembers, setAllMembers] = useState(group?.members)
     const router = useRouter()
+    const [isEditing, setIsEditing] = useState(false)
 
     useEffect(() => {
         setFundSettings(bfSettings as FundSettings)
@@ -114,6 +115,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
             toast.success('You have saved successfully.')
             setBfSettings(data.settings)
             setFundSettings(data.settings)
+            setIsEditing(false)
         } catch (error: any) {
             console.log('error updating Bearevement fund', error)
             toast.error(error.message)
@@ -161,151 +163,204 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                     </h1>
 
                 </div>
-                {/* Beneficiaries Section */}
-                <section className="mb-6 flex flex-col gap-2">
-                    <h2 className="text-lg font-semibold text-white">1. Number of beneficiaries per principal</h2>
-                    <div className="w-full flex items-center gap-2 justify-normal mt-5">
-                        <div className="w-full">
-                            <label className="block text-sm font-medium text-neutral-300">Minimum beneficiaries:</label>
-                            <input
-                                type="number"
-                                name="minBeneficiaries"
-                                value={(fundSettings.minBeneficiaries)}
-                                onChange={handleChange}
-                                min={1}
-                                className="w-full text-right p-2 mt-1 border border-gray-300 rounded-md text-black"
-                            />
-                        </div>
-                        <div className="w-full">
-                            <label className="block text-sm font-medium text-neutral-300">Maximum beneficiaries:</label>
-                            <input
-                                type="number"
-                                value={fundSettings.maxBeneficiaries}
-                                name="maxBeneficiaries"
-                                onChange={handleChange}
-                                min={1}
-                                className="w-full p-2 text-right mt-1 border border-gray-300 rounded-md text-black"
-                            />
-                        </div>
-                    </div>
 
-                </section>
+                {
+                    isEditing ? (
+                        <>
+                            <section className="mb-6 flex flex-col gap-2">
+                              
+                                <h2 className="text-lg font-semibold text-white">1. Number of beneficiaries per principal</h2>
+                                <div className="w-full flex items-center gap-2 justify-normal mt-5">
+                                    <div className="w-full">
+                                        <label className="block text-sm font-medium text-neutral-300">Minimum beneficiaries:</label>
+                                        <input
+                                            type="number"
+                                            name="minBeneficiaries"
+                                            value={(fundSettings.minBeneficiaries)}
+                                            onChange={handleChange}
+                                            min={1}
+                                            className="w-full text-right p-2 mt-1 border border-gray-300 rounded-md text-black"
+                                        />
+                                    </div>
+                                    <div className="w-full">
+                                        <label className="block text-sm font-medium text-neutral-300">Maximum beneficiaries:</label>
+                                        <input
+                                            type="number"
+                                            value={fundSettings.maxBeneficiaries}
+                                            name="maxBeneficiaries"
+                                            onChange={handleChange}
+                                            min={1}
+                                            className="w-full p-2 text-right mt-1 border border-gray-300 rounded-md text-black"
+                                        />
+                                    </div>
+                                </div>
 
-                <section className="mt-5">
-                    <h2 className="text-lg font-semibold text-white">2. Membership fee (One-off)</h2>
-                    <label className="block text-sm font-medium text-neutral-300">Set membership fee:</label>
-                    <input
-                        type="number"
-                        placeholder="Enter membership fee (UGX)"
-                        className="w-full p-2 mt-1 border border-gray-300 rounded-md text-black text-right"
-                        name="membership_fee"
-                        onChange={handleChange}
-                        value={fundSettings.membership_fee}
-                    />
-                </section>
+                            </section>
 
-                <section className="mt-5">
-                    <h2 className="text-lg font-semibold text-white">3. Fund subscription costs</h2>
-                    <div className="gap-5 grid grid-cols-2">
-                        <div>
-                            <label>Youth (18-60):</label>
-                            <input type="number"
-                                onChange={handleChange}
-                                name="subscription_costs.youth"
-                                value={fundSettings.subscription_costs.youth}
-                                placeholder="Set Youth fee" className="w-full p-2 border border-gray-300 rounded-md text-black text-right" />
-                        </div>
-                        <div>
-                            <label>Children (17 or less):</label>
-                            <input type="number"
-                                name="subscription_costs.children"
-                                onChange={handleChange}
-                                value={fundSettings.subscription_costs.children}
-                                placeholder="Set Children fee" className="w-full p-2 border border-gray-300 rounded-md text-black text-right" />
-                        </div>
-                        <div>
-                            <label>Elders (61+):</label>
-                            <input type="number"
-                                name="subscription_costs.elders"
-                                onChange={handleChange}
-                                value={fundSettings.subscription_costs.elders}
-                                placeholder="Set Elders fee" className="w-full p-2 border border-gray-300 rounded-md text-black text-right" />
-                        </div>
-                    </div>
-                </section>
-                <section className="mt-5">
-                    <h2 className="text-lg font-semibold text-white">4. Fund benefits</h2>
-                    <div className="gap-5 grid grid-cols-2">
-                        <div>
-                            <label>Principal:</label>
-                            <input type="number"
-                                onChange={handleChange}
-                                name="fund_benefits.principal"
-                                value={fundSettings.fund_benefits.principal}
-                                placeholder="Benefit amount for Principal" className="w-full p-2 border border-gray-300 rounded-md text-black text-right" />
-                        </div>
-                        <div>
-                            <label>Spouse:</label>
-                            <input type="number"
-                                onChange={handleChange}
-                                name="fund_benefits.spouse"
-                                value={fundSettings.fund_benefits.spouse}
-                                placeholder="Benefit amount for Spouse" className="w-full p-2 border border-gray-300 rounded-md text-black text-right" />
-                        </div>
-                        <div>
-                            <label>Children:</label>
-                            <input type="number"
-                                onChange={handleChange}
-                                name="fund_benefits.children"
-                                value={fundSettings.fund_benefits.children}
-                                placeholder="Benefit amount for Children" className="w-full p-2 border border-gray-300 rounded-md text-black text-right" />
-                        </div>
-                        <div>
-                            <label>Parents:</label>
-                            <input type="number"
-                                onChange={handleChange}
-                                name="fund_benefits.parents"
-                                value={fundSettings.fund_benefits.parents}
-                                placeholder="Benefit amount for Parents" className="w-full p-2 border border-gray-300 rounded-md text-black text-right" />
-                        </div>
-                        <div>
-                            <label>Other (Guardians or close friends):</label>
-                            <input type="number"
-                                onChange={handleChange}
-                                name="fund_benefits.other"
-                                value={fundSettings.fund_benefits.other}
-                                placeholder="Benefit amount for Other" className="w-full p-2 border border-gray-300 rounded-md text-black text-right" />
-                        </div>
-                    </div>
-                </section>
+                            <section className="mt-5">
+                                <h2 className="text-lg font-semibold text-white">2. Membership fee (One-off)</h2>
+                                <label className="block text-sm font-medium text-neutral-300">Set membership fee:</label>
+                                <input
+                                    type="number"
+                                    placeholder="Enter membership fee (UGX)"
+                                    className="w-full p-2 mt-1 border border-gray-300 rounded-md text-black text-right"
+                                    name="membership_fee"
+                                    onChange={handleChange}
+                                    value={fundSettings.membership_fee}
+                                />
+                            </section>
 
-                <section className="mt-5">
-                    <h2 className="text-lg font-semibold text-white">5. Incident contribution fee</h2>
-                    <label className="block text-sm font-medium text-neutral-300">Set contribution fee per incident:</label>
-                    <input
-                        type="number"
-                        onChange={handleChange}
-                        name="incident_contribution_fee"
-                        value={fundSettings.incident_contribution_fee}
-                        placeholder="Enter incident contribution fee"
-                        className="w-full p-2 mt-1 border border-gray-300 rounded-md text-black text-right"
-                    />
-                </section>
+                            <section className="mt-5">
+                                <h2 className="text-lg font-semibold text-white">3. Fund subscription costs</h2>
+                                <div className="gap-5 grid grid-cols-2">
+                                    <div>
+                                        <label>Youth (18-60):</label>
+                                        <input type="number"
+                                            onChange={handleChange}
+                                            name="subscription_costs.youth"
+                                            value={fundSettings.subscription_costs.youth}
+                                            placeholder="Set Youth fee" className="w-full p-2 border border-gray-300 rounded-md text-black text-right" />
+                                    </div>
+                                    <div>
+                                        <label>Children (17 or less):</label>
+                                        <input type="number"
+                                            name="subscription_costs.children"
+                                            onChange={handleChange}
+                                            value={fundSettings.subscription_costs.children}
+                                            placeholder="Set Children fee" className="w-full p-2 border border-gray-300 rounded-md text-black text-right" />
+                                    </div>
+                                    <div>
+                                        <label>Elders (61+):</label>
+                                        <input type="number"
+                                            name="subscription_costs.elders"
+                                            onChange={handleChange}
+                                            value={fundSettings.subscription_costs.elders}
+                                            placeholder="Set Elders fee" className="w-full p-2 border border-gray-300 rounded-md text-black text-right" />
+                                    </div>
+                                </div>
+                            </section>
+                            <section className="mt-5">
+                                <h2 className="text-lg font-semibold text-white">4. Fund benefits</h2>
+                                <div className="gap-5 grid grid-cols-2">
+                                    <div>
+                                        <label>Principal:</label>
+                                        <input type="number"
+                                            onChange={handleChange}
+                                            name="fund_benefits.principal"
+                                            value={fundSettings.fund_benefits.principal}
+                                            placeholder="Benefit amount for Principal" className="w-full p-2 border border-gray-300 rounded-md text-black text-right" />
+                                    </div>
+                                    <div>
+                                        <label>Spouse:</label>
+                                        <input type="number"
+                                            onChange={handleChange}
+                                            name="fund_benefits.spouse"
+                                            value={fundSettings.fund_benefits.spouse}
+                                            placeholder="Benefit amount for Spouse" className="w-full p-2 border border-gray-300 rounded-md text-black text-right" />
+                                    </div>
+                                    <div>
+                                        <label>Children:</label>
+                                        <input type="number"
+                                            onChange={handleChange}
+                                            name="fund_benefits.children"
+                                            value={fundSettings.fund_benefits.children}
+                                            placeholder="Benefit amount for Children" className="w-full p-2 border border-gray-300 rounded-md text-black text-right" />
+                                    </div>
+                                    <div>
+                                        <label>Parents:</label>
+                                        <input type="number"
+                                            onChange={handleChange}
+                                            name="fund_benefits.parents"
+                                            value={fundSettings.fund_benefits.parents}
+                                            placeholder="Benefit amount for Parents" className="w-full p-2 border border-gray-300 rounded-md text-black text-right" />
+                                    </div>
+                                    <div>
+                                        <label>Other (Guardians or close friends):</label>
+                                        <input type="number"
+                                            onChange={handleChange}
+                                            name="fund_benefits.other"
+                                            value={fundSettings.fund_benefits.other}
+                                            placeholder="Benefit amount for Other" className="w-full p-2 border border-gray-300 rounded-md text-black text-right" />
+                                    </div>
+                                </div>
+                            </section>
 
-                <section className="mt-5 w-full">
-                    <h2 className="text-lg font-semibold text-white">6. In-kind support</h2>
-                    <label className="block text-sm font-medium text-neutral-300">In-kind support description:</label>
-                    <textarea
-                        onChange={handleChange}
-                        name="in_kind_support"
-                        value={fundSettings.in_kind_support}
-                        placeholder="Describe in-kind support options..."
-                        className="w-full p-2 mt-1 border border-gray-300 rounded-md text-black"
-                    ></textarea>
-                    {
-                        isLoading ? <LoadingButton /> : <Button onClick={handleSubmit} className='bg-blue-500 w-full mt-5 justify-self-start'>Save</Button>
-                    }
-                </section>
+                            <section className="mt-5">
+                                <h2 className="text-lg font-semibold text-white">5. Incident contribution fee</h2>
+                                <label className="block text-sm font-medium text-neutral-300">Set contribution fee per incident:</label>
+                                <input
+                                    type="number"
+                                    onChange={handleChange}
+                                    name="incident_contribution_fee"
+                                    value={fundSettings.incident_contribution_fee}
+                                    placeholder="Enter incident contribution fee"
+                                    className="w-full p-2 mt-1 border border-gray-300 rounded-md text-black text-right"
+                                />
+                            </section>
+
+                            <section className="mt-5 w-full">
+                                <h2 className="text-lg font-semibold text-white">6. In-kind support</h2>
+                                <label className="block text-sm font-medium text-neutral-300">In-kind support description:</label>
+                                <textarea
+                                    onChange={handleChange}
+                                    name="in_kind_support"
+                                    value={fundSettings.in_kind_support}
+                                    placeholder="Describe in-kind support options..."
+                                    className="w-full p-2 mt-1 border border-gray-300 rounded-md text-black"
+                                ></textarea>
+                                {
+                                    isLoading ? <LoadingButton /> : (
+                                        <div className="w-full flex items-center gap-2 mt-5 ">
+                                            <Button onClick={handleSubmit} className="bg-blue-500 w-full justify-self-start">Save</Button>
+                                            <Button onClick={() => setIsEditing(false)} className="bg-gray-500 w-full mt-2 justify-self-start">Cancel</Button>
+                                        </div>
+                                    )
+                                }
+                            </section>
+                        </>
+                    ) : (
+                        <div className="bg-gray-900 p-6 rounded-lg shadow-md">
+                            <h2 className="text-2xl font-semibold text-white mb-4">Fund Settings Overview</h2>
+                                <p>
+                                    wallet: {groupBF?.walletAddress}
+                                </p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-white mt-5">
+                                <div>
+                                    <h3 className="font-semibold text-lg">Number of Beneficiaries per Principal</h3>
+                                    <p>Minimum: {fundSettings.minBeneficiaries}</p>
+                                    <p>Maximum: {fundSettings.maxBeneficiaries}</p>
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold text-lg">Membership Fee</h3>
+                                    <p>{fundSettings.membership_fee} UGX</p>
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold text-lg">Subscription Costs</h3>
+                                    <p>Youth: {fundSettings.subscription_costs.youth} UGX</p>
+                                    <p>Children: {fundSettings.subscription_costs.children} UGX</p>
+                                    <p>Elders: {fundSettings.subscription_costs.elders} UGX</p>
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold text-lg">Fund Benefits</h3>
+                                    <p>Principal: {fundSettings.fund_benefits.principal} UGX</p>
+                                    <p>Spouse: {fundSettings.fund_benefits.spouse} UGX</p>
+                                    <p>Children: {fundSettings.fund_benefits.children} UGX</p>
+                                    <p>Parents: {fundSettings.fund_benefits.parents} UGX</p>
+                                    <p>Other: {fundSettings.fund_benefits.other} UGX</p>
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold text-lg">Incident Contribution Fee</h3>
+                                    <p>{fundSettings.incident_contribution_fee} UGX</p>
+                                </div>
+                                <div className="sm:col-span-2 lg:col-span-3">
+                                    <h3 className="font-semibold text-lg">In-Kind Support</h3>
+                                    <p>{fundSettings.in_kind_support || "N/A"}</p>
+                                </div>
+                            </div>
+                            <Button onClick={() => setIsEditing(true)} className="bg-blue-500 mt-6">Edit Settings</Button>
+                        </div>
+                    )
+                }
 
                 <section className="mt-5">
                     <div className="p-2 flex items-center justify-between w-full">
@@ -355,7 +410,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                                                                 setBfMembers: setNewBfMembers
                                                                             });
 
-                                                                            status && setNewBfMembers((prev: any) => ([...prev,{ ...newMember, user: member, role, createdAt: new Date() }]))
+                                                                            status && setNewBfMembers((prev: any) => ([...prev, { ...newMember, user: member, role, createdAt: new Date() }]))
                                                                         }}
                                                                     >
                                                                         {role}
