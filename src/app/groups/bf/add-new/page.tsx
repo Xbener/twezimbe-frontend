@@ -118,7 +118,6 @@ function BereavementFundPage({ }: Props) {
                     </select>
                 </div>
 
-                {/* Account Info / Wallet Address */}
                 <div>
                     <label className="block text-black text-sm font-semibold mb-2">
                         {accountType === 'wallet' ? 'Wallet Address' : 'Account Info'}
@@ -128,11 +127,12 @@ function BereavementFundPage({ }: Props) {
                         {...register("accountInfo", {
                             required: accountType === 'wallet' ? "Wallet address is required" : "Account info is required",
                         })}
-                        className={`w-full px-4 py-2 border ${errors.accountInfo ? 'border-red-500' : 'border-gray-300'} rounded-md focus:border-blue-800 focus:ring focus:ring-blue-200`}
+                        disabled={accountType==='wallet'}
+                        className={`w-full px-4 py-2 border disabled:cursor-not-allowed ${errors.accountInfo ? 'border-red-500' : 'border-gray-300'} rounded-md focus:border-blue-800 focus:ring focus:ring-blue-200`}
                         // value={}
                         placeholder={
                             accountType === 'wallet'
-                                ? 'Enter virtual wallet address'
+                                ? 'The virtual address will be generated automatically'
                                 : 'Enter account number or mobile money details'
                         }
                     />
