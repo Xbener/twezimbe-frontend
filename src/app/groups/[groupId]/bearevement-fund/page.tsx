@@ -9,7 +9,7 @@ import LoadingButton from '@/components/LoadingButton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { iconTextGenerator } from '@/lib/iconTextGenerator';
-import { acceptRequest, addBfMember, declineRequest, getCases, updateUserRole } from '@/lib/bf';
+import { acceptRequest, addBfMember, declineRequest, fileCase, getCases, updateUserRole } from '@/lib/bf';
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useGetProfileData } from '@/api/auth';
@@ -35,74 +35,14 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
     const [newBfMembers, setNewBfMembers] = useState(bfMembers)
     const [allMembers, setAllMembers] = useState(group?.members)
     const router = useRouter()
+    const [dialogOpen, setDialogOpen] = useState(false)
+    const [newCase, setNewCase] = useState({
+        name: '',
+        description: '',
+        principalId: currentUser?._id
+    })
     const [isEditing, setIsEditing] = useState(false)
-    const [cases, setCases] = useState<Case[]>([
-        {
-            name: "Test case",
-            description: "This is a test case for bereavement funds",
-            createdAt: new Date(),
-            _id: "",
-            status: "Open",
-            contributionStatus: "Incomplete",
-            principal: group?.members[0]!
-        }, {
-            name: "Test case",
-            description: "This is a test case for bereavement funds",
-            createdAt: new Date(),
-            _id: "",
-            status: "Open",
-            contributionStatus: "Incomplete",
-            principal: group?.members[0]!
-        }, {
-            name: "Test case",
-            description: "This is a test case for bereavement funds",
-            createdAt: new Date(),
-            _id: "",
-            status: "Open",
-            contributionStatus: "Incomplete",
-            principal: group?.members[0]!
-        }, {
-            name: "Test case",
-            description: "This is a test case for bereavement funds",
-            createdAt: new Date(),
-            _id: "",
-            status: "Open",
-            contributionStatus: "Incomplete",
-            principal: group?.members[0]!
-        }, {
-            name: "Test case",
-            description: "This is a test case for bereavement funds",
-            createdAt: new Date(),
-            _id: "",
-            status: "Open",
-            contributionStatus: "Incomplete",
-            principal: group?.members[0]!
-        }, {
-            name: "Test case",
-            description: "This is a test case for bereavement funds",
-            createdAt: new Date(),
-            _id: "",
-            status: "Open",
-            contributionStatus: "Incomplete",
-            principal: group?.members[0]!
-        }, {
-            name: "Test case",
-            description: "This is a test case for bereavement funds",
-            createdAt: new Date(),
-            _id: "",
-            status: "Open",
-            contributionStatus: "Incomplete",
-            principal: group?.members[0]!
-        }, {
-            name: "Test case",
-            description: "This is a test case for bereavement funds",
-            createdAt: new Date(),
-            _id: "",
-            status: "Open",
-            contributionStatus: "Incomplete",
-            principal: group?.members[0]!
-        },
-    ])
+    const [cases, setCases] = useState<Case[]>([])
 
     useEffect(() => {
         setFundSettings(bfSettings as FundSettings)
@@ -111,7 +51,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
     useEffect(() => {
         const getData = async () => {
             const { cases, status } = await getCases(groupBF?._id!)
-            // if (status) setCases(cases)
+            if (status) setCases(cases)
         }
         if (groupBF) {
             getData()
@@ -600,9 +540,79 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                 }
 
                 <section className="mt-5">
-                    <div className="p-2 flex items-start w-full flex-col max-h-[300px] overflow-auto">
+                    <div className="p-2 flex items-start w-full flex-col max-h-[500px] overflow-auto">
                         <h2 className="text-lg font-semibold text-white text-left">5. Filed cases</h2>
+                        <div className="flex items-center gap-3 mt-3">
+                            <Button className="bg-transparent text-white border">
+                                filter
+                            </Button>
+                            <Dialog>
+                                <DialogTrigger>
+                                    <Button onClick={() => setDialogOpen(true)} className="bg-blue-500 text-white">
+                                        file a case
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent
+                                    className="w-full bg-white"
+                                >
+                                    <DialogHeader>
+                                        File a new case
+                                    </DialogHeader>
+                                    <div className="p-4 rounded-md shadow-md w-full">
+                                        <h3 className="text-xl font-bold text-white mb-4">File a New Case</h3>
+                                        <form>
+                                            {/* Name Input */}
+                                            <div className="mb-4">
+                                                <label htmlFor="name" className="block text-sm font-medium ">Case Name</label>
+                                                <input
+                                                    type="text"
+                                                    id="name"
+                                                    onChange={(e) => setNewCase(prev => ({ ...prev, name: e.target.value }))}
+                                                    name="name"
+                                                    className="mt-1 p-2 w-full border border-gray-700 rounded "
+                                                    placeholder="Enter case name"
+                                                    required
+                                                />
+                                            </div>
 
+                                            {/* Description Input */}
+                                            <div className="mb-4">
+                                                <label htmlFor="description" className="block text-sm font-medium ">Description</label>
+                                                <textarea
+                                                    id="description"
+                                                    name="description"
+                                                    className="mt-1 p-2 w-full border border-gray-700 rounded-md"
+                                                    onChange={(e) => setNewCase(prev => ({ ...prev, description: e.target.value }))}
+                                                    placeholder="Enter case description"
+                                                    rows={3}
+                                                    required
+                                                ></textarea>
+                                            </div>
+
+                                            {/* Submit Button */}
+                                            <button
+                                                disabled={isLoading}
+                                                onClick={async (e) => {
+                                                    setIsLoading(true)
+                                                    e.preventDefault()
+                                                    const { status, case: returnedCase } = await fileCase(groupBF?._id!, newCase)
+                                                    setIsLoading(false)
+                                                    if (status) {
+                                                        setCases(prev => [...prev, returnedCase])
+                                                        setDialogOpen(false)
+                                                    }
+                                                }}
+                                                type="submit"
+                                                className="w-full bg-blue-600 disabled:cursor-pointer-allowed hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded mt-2"
+                                            >
+                                                Submit Case
+                                            </button>
+                                        </form>
+                                    </div>
+
+                                </DialogContent>
+                            </Dialog>
+                        </div>
                         <div className="grid grid-cols-3 gap-4 w-full mt-5">
                             {
                                 cases.length ? (
@@ -622,33 +632,33 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                                 </p>
                                                 <div className="flex flex-col space-y-1">
                                                     <p className="text-sm">
-                                                        <span className="font-semibold text-gray-300">Status:</span>
+                                                        <span className="font-semibold ">Status:</span>
                                                         <span className={`ml-1 text-${caseItem.status === 'Open' ? 'green-400' : 'red-400'}`}>
                                                             {caseItem.status}
                                                         </span>
                                                     </p>
                                                     <p className="text-sm">
-                                                        <span className="font-semibold text-gray-300">Contribution status:</span>
+                                                        <span className="font-semibold ">Contribution status:</span>
                                                         <span className={`ml-1 ${caseItem.contributionStatus === 'Complete' ? 'text-green-400' : 'text-red-400'}`}>
                                                             {caseItem.contributionStatus}
                                                         </span>
                                                     </p>
                                                     <p className="text-sm text-gray-400">
-                                                        <span className="font-semibold text-gray-300">File on:</span> {new Date(caseItem.createdAt).toLocaleDateString()}
+                                                        <span className="font-semibold ">File on:</span> {new Date(caseItem.createdAt).toLocaleDateString()}
                                                     </p>
                                                 </div>
-                                               <div className='w-full flex gap-2 mt-2'>
-                                                 <Button
-                                                className="bg-green-500 text-white w-full"
-                                                >
-                                                    contribute
-                                                </Button>
-                                                 <Button
+                                                <div className='w-full flex gap-2 mt-2'>
+                                                    <Button
+                                                        className="bg-green-500 text-white w-full"
+                                                    >
+                                                        contribute
+                                                    </Button>
+                                                    <Button
                                                         className="bg-blue-500 text-white w-full"
-                                                >
-                                                    more
-                                                </Button>
-                                               </div>
+                                                    >
+                                                        more
+                                                    </Button>
+                                                </div>
                                             </div>
                                         );
                                     })
@@ -658,9 +668,9 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                             }
                         </div>
                     </div>
-                </section>
+                </section >
 
-            </div>
+            </div >
         );
     }
 }

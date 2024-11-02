@@ -238,7 +238,7 @@ export const getCases = async (bfId: string) => {
         console.log('error getting cases settings', error)
     }
 }
-export const fileCase = async (bfId: string, body: Case) => {
+export const fileCase = async (bfId: string, body: {name:string, description:string, principalId?:string}) => {
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bf/cases/${bfId}`, {
             method: 'POST',
@@ -251,7 +251,7 @@ export const fileCase = async (bfId: string, body: Case) => {
 
         const data = await res.json()
         if (!data.status) return toast.error(data.message || data.errors || "failed to file case. please try again")
-        toast.success(data.message)
+        toast.success('case filed successfully')
         return data
     } catch (error) {
         console.log('error filing case', error)
