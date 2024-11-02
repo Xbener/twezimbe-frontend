@@ -548,7 +548,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                             </Button>
                             <Dialog>
                                {
-                                groupBF?.role.includes('principal') &&(
+                                (groupBF?.role && groupBF?.role?.includes('principal')) &&(
                                      <DialogTrigger>
                                     <Button onClick={() => setDialogOpen(true)} className="bg-blue-500 text-white">
                                         file a case
