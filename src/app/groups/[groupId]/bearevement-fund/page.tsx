@@ -547,11 +547,15 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                 filter
                             </Button>
                             <Dialog>
-                                <DialogTrigger>
+                               {
+                                groupBF?.role.includes('principal') &&(
+                                     <DialogTrigger>
                                     <Button onClick={() => setDialogOpen(true)} className="bg-blue-500 text-white">
                                         file a case
                                     </Button>
                                 </DialogTrigger>
+                                )
+                               }
                                 <DialogContent
                                     className="w-full bg-white"
                                 >
