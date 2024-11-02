@@ -405,7 +405,6 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                                                         {roles.current.map((role, index) => (
 
                                                                             <span
-                                                                            disabled={true}
                                                                                 className="cursor-pointer p-2 rounded-md w-full text-white hover:bg-white hover:text-blue-500"
                                                                                 key={index}
                                                                                 onClick={async () => {

@@ -521,3 +521,14 @@ export type Beneficiary = {
     principal: User
     beneficiary: User
 }
+
+
+export type Case = {
+    principal :User
+    status: string
+    contributionStatus: string
+    description: string
+    createdAt: Date
+    name:string
+    _id: string
+}

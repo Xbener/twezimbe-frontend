@@ -1,6 +1,6 @@
 import { toast } from "sonner"
 import Cookies from 'js-cookie'
-import { PrincipalType, User } from "@/types"
+import { Case, PrincipalType, User } from "@/types"
 
 
 export const updateUserRole = async (userId: string, new_role: string, bf_id: string) => {
@@ -218,5 +218,63 @@ export const getPrincipalSettings = async (principalId: string) => {
         return data
     } catch (error) {
         console.log('error getting principal settings', error)
+    }
+}
+
+export const getCases = async (bfId: string) => {
+    const token = Cookies.get("access-token")
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bf/cases/${bfId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+        })
+
+        const data = await res.json()
+        if (!data.status) return toast.error(data.errors || data.message)
+        return data
+    } catch (error) {
+        console.log('error getting cases settings', error)
+    }
+}
+export const fileCase = async (bfId: string, body: Case) => {
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bf/cases/${bfId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Cookies.get('access-token')}`
+            },
+            body: JSON.stringify(body)
+        })
+
+        const data = await res.json()
+        if (!data.status) return toast.error(data.message || data.errors || "failed to file case. please try again")
+        toast.success(data.message)
+        return data
+    } catch (error) {
+        console.log('error filing case', error)
+    }
+}
+export const updateCase = async (caseId: string, body?: Case) => {
+    const token = Cookies.get("access-token")
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bf/cases/${caseId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(body)
+        })
+
+        const data = await res.json()
+        if (!data.status) return toast.error(data.errors || data.message)
+        toast.success("case updated")
+        return data
+    } catch (error) {
+        console.log('error updating case', error)
+        toast.error("failed to update case")
     }
 }
