@@ -9,11 +9,11 @@ import LoadingButton from '@/components/LoadingButton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { iconTextGenerator } from '@/lib/iconTextGenerator';
-import { acceptRequest, addBfMember, declineRequest, updateUserRole } from '@/lib/bf';
+import { acceptRequest, addBfMember, declineRequest, getCases, updateUserRole } from '@/lib/bf';
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useGetProfileData } from '@/api/auth';
-import { FundSettings } from '@/types';
+import { Case, FundSettings } from '@/types';
 import { useRouter } from 'next/navigation';
 import { XIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -36,12 +36,87 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
     const [allMembers, setAllMembers] = useState(group?.members)
     const router = useRouter()
     const [isEditing, setIsEditing] = useState(false)
+    const [cases, setCases] = useState<Case[]>([
+        {
+            name: "Test case",
+            description: "This is a test case for bereavement funds",
+            createdAt: new Date(),
+            _id: "",
+            status: "Open",
+            contributionStatus: "Incomplete",
+            principal: group?.members[0]!
+        }, {
+            name: "Test case",
+            description: "This is a test case for bereavement funds",
+            createdAt: new Date(),
+            _id: "",
+            status: "Open",
+            contributionStatus: "Incomplete",
+            principal: group?.members[0]!
+        }, {
+            name: "Test case",
+            description: "This is a test case for bereavement funds",
+            createdAt: new Date(),
+            _id: "",
+            status: "Open",
+            contributionStatus: "Incomplete",
+            principal: group?.members[0]!
+        }, {
+            name: "Test case",
+            description: "This is a test case for bereavement funds",
+            createdAt: new Date(),
+            _id: "",
+            status: "Open",
+            contributionStatus: "Incomplete",
+            principal: group?.members[0]!
+        }, {
+            name: "Test case",
+            description: "This is a test case for bereavement funds",
+            createdAt: new Date(),
+            _id: "",
+            status: "Open",
+            contributionStatus: "Incomplete",
+            principal: group?.members[0]!
+        }, {
+            name: "Test case",
+            description: "This is a test case for bereavement funds",
+            createdAt: new Date(),
+            _id: "",
+            status: "Open",
+            contributionStatus: "Incomplete",
+            principal: group?.members[0]!
+        }, {
+            name: "Test case",
+            description: "This is a test case for bereavement funds",
+            createdAt: new Date(),
+            _id: "",
+            status: "Open",
+            contributionStatus: "Incomplete",
+            principal: group?.members[0]!
+        }, {
+            name: "Test case",
+            description: "This is a test case for bereavement funds",
+            createdAt: new Date(),
+            _id: "",
+            status: "Open",
+            contributionStatus: "Incomplete",
+            principal: group?.members[0]!
+        },
+    ])
 
     useEffect(() => {
         setFundSettings(bfSettings as FundSettings)
     }, [bfSettings])
 
-
+    useEffect(() => {
+        const getData = async () => {
+            const { cases, status } = await getCases(groupBF?._id!)
+            // if (status) setCases(cases)
+        }
+        if (groupBF) {
+            getData()
+        }
+    }, [])
 
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
@@ -523,6 +598,67 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                         </section>
                     )
                 }
+
+                <section className="mt-5">
+                    <div className="p-2 flex items-start w-full flex-col max-h-[300px] overflow-auto">
+                        <h2 className="text-lg font-semibold text-white text-left">5. Filed cases</h2>
+
+                        <div className="grid grid-cols-3 gap-4 w-full mt-5">
+                            {
+                                cases.length ? (
+                                    cases.map((caseItem: Case) => {
+                                        return (
+                                            <div
+                                                className="bg-gray-800 p-4 rounded-md shadow-md "
+                                                key={caseItem._id}
+                                            >
+                                                <h3 className="text-xl font-bold text-white mb-2">
+                                                    {caseItem.name}
+                                                </h3>
+                                                <p className="text-sm text-gray-400 mb-2">
+                                                    {caseItem.description.length > 100
+                                                        ? `${caseItem.description.slice(0, 100)}...`
+                                                        : caseItem.description}
+                                                </p>
+                                                <div className="flex flex-col space-y-1">
+                                                    <p className="text-sm">
+                                                        <span className="font-semibold text-gray-300">Status:</span>
+                                                        <span className={`ml-1 text-${caseItem.status === 'Open' ? 'green-400' : 'red-400'}`}>
+                                                            {caseItem.status}
+                                                        </span>
+                                                    </p>
+                                                    <p className="text-sm">
+                                                        <span className="font-semibold text-gray-300">Contribution status:</span>
+                                                        <span className={`ml-1 ${caseItem.contributionStatus === 'Complete' ? 'text-green-400' : 'text-red-400'}`}>
+                                                            {caseItem.contributionStatus}
+                                                        </span>
+                                                    </p>
+                                                    <p className="text-sm text-gray-400">
+                                                        <span className="font-semibold text-gray-300">File on:</span> {new Date(caseItem.createdAt).toLocaleDateString()}
+                                                    </p>
+                                                </div>
+                                               <div className='w-full flex gap-2 mt-2'>
+                                                 <Button
+                                                className="bg-green-500 text-white w-full"
+                                                >
+                                                    contribute
+                                                </Button>
+                                                 <Button
+                                                        className="bg-blue-500 text-white w-full"
+                                                >
+                                                    more
+                                                </Button>
+                                               </div>
+                                            </div>
+                                        );
+                                    })
+                                ) : (
+                                    <p className="text-white col-span-3 text-center">No cases available</p>
+                                )
+                            }
+                        </div>
+                    </div>
+                </section>
 
             </div>
         );
