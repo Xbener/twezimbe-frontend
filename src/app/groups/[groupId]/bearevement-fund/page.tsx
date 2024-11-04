@@ -35,6 +35,13 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
     const [newBfMembers, setNewBfMembers] = useState(bfMembers)
     const [allMembers, setAllMembers] = useState(group?.members)
     const router = useRouter()
+    const [payForm, setPayForm] = useState({
+        open: false,
+        data: {
+            amount: 0,
+            phone: ""
+        }
+    })
     const [dialogOpen, setDialogOpen] = useState(false)
     const [newCase, setNewCase] = useState({
         name: '',
@@ -165,6 +172,35 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
     useEffect(() => {
         filteredBfMembers = filterBfMembers(bfQuery)
     }, [bfQuery, bfMembers])
+
+    function makePayment() {
+        FlutterwaveCheckout({
+            public_key: "FLWPUBK_TEST-61fd8c76063ac4c81570ea26a682c719-X",
+            tx_ref: "txref-DI0NzMx13",
+            amount: payForm.data.amount,
+            currency: "UGX",
+            payment_options: "mobilemoneyrwanda, mobilemoneyuganda",
+            meta: {
+                source: "docs-inline-test",
+                consumer_mac: "92a3-912ba-1192a",
+            },
+            customer: {
+                email: currentUser?.email,
+                phone_number: payForm.data.phone,
+                name: `${currentUser?.firstName} ${currentUser?.lastName}`,
+            },
+            customizations: {
+                title: "Deposit funds",
+                description: "Add funds to your Bearevement Fund",
+                logo: "https://checkout.flutterwave.com/assets/img/rave-logo.png",
+            },
+            // callback: () => handleUpgrade(),
+            onclose: function () {
+                console.log("Payment cancelled!");
+            }
+        });
+    }
+
     if (fundSettings) {
         return (
             <div className="max-w-2xl mx-auto p-6 text-white rounded-lg shadow-md mt-10 bg-[rgba(26,65,116,0.36)] ">
@@ -336,18 +372,55 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                     ) : (
                         <div className="bg-gray-900 p-6 rounded-lg shadow-md">
                             <h2 className="text-2xl font-semibold text-white mb-4">Fund Settings Overview</h2>
-                           <div className="flex flex-col gap-2 items-start justify-start">
-                             <p>
-                                wallet: {groupBF?.walletAddress}
-                            </p> <p>
-                                Deposited funds: 0 UGX
-                            </p>
-                            <p>
-                                Deposited funds by you: 0 UGX
-                            </p>
-                            <Button className="bg-blue-500">
-                                Deposit funds 
-                                </Button>       
+                            <div className="flex flex-col gap-2 items-start justify-start">
+                                <p>
+                                    wallet: {groupBF?.walletAddress}
+                                </p> <p>
+                                    Deposited funds: 0 UGX
+                                </p>
+                                <p>
+                                    Deposited funds by you: 0 UGX
+                                </p>
+                                <Button
+                                    onClick={() => setPayForm(prev=>({...prev, open:true}))}
+                                    className="bg-blue-500">
+                                    Deposit funds
+                                </Button>
+                                {
+                                    payForm.open && (
+                                        <div className="flex flex-col gap-2 ">
+                                            <Input
+                                            className="text-black"
+                                                type="number"
+                                                name="amount"
+                                                placeholder="Enter amount to deposit"
+                                                value={payForm.data.amount}
+                                                onChange={(e) => setPayForm(prev => ({ ...prev, data: { ...prev.data, amount: e.target.value } }))}
+                                            />
+                                            <Input
+                                            className="text-black"
+                                                type="text"
+                                                name="phone"
+                                                placeholder="Enter phone number"
+                                                value={payForm.data.phone}
+                                                onChange={(e) => setPayForm(prev => ({ ...prev, data: { ...prev.data, phone: e.target.value } }))}
+                                            />
+                                            <div className="flex gap-2 mt-3">
+                                                <Button
+                                                disabled={payForm.data.amount===0||payForm.data.phone===""}
+                                                    onClick={makePayment}
+                                                    className="bg-blue-500">
+                                                    Confirm
+                                                </Button>
+                                                <Button
+                                                    onClick={() => setPayForm({ open: false, data: { amount: 0, phone: "" } })}
+                                                    className="bg-transparent border-orange-500">
+                                                    Cancel
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    )
+                                }
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-white mt-5">
                                 <div>
@@ -557,15 +630,15 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                 filter
                             </Button>
                             <Dialog>
-                               {
-                                (groupBF?.role && groupBF?.role?.includes('principal')) &&(
-                                     <DialogTrigger>
-                                    <Button onClick={() => setDialogOpen(true)} className="bg-blue-500 text-white">
-                                        file a case
-                                    </Button>
-                                </DialogTrigger>
-                                )
-                               }
+                                {
+                                    (groupBF?.role && groupBF?.role?.includes('principal')) && (
+                                        <DialogTrigger>
+                                            <Button onClick={() => setDialogOpen(true)} className="bg-blue-500 text-white">
+                                                file a case
+                                            </Button>
+                                        </DialogTrigger>
+                                    )
+                                }
                                 <DialogContent
                                     className="w-full bg-white"
                                 >
