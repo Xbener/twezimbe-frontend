@@ -395,7 +395,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                                 name="amount"
                                                 placeholder="Enter amount to deposit"
                                                 value={payForm.data.amount}
-                                                onChange={(e) => setPayForm(prev => ({ ...prev, data: { ...prev.data, amount: e.target.value } }))}
+                                                onChange={(e) => setPayForm(prev => ({ ...prev, data: { ...prev.data, amount: parseFloat(e.target.value) } }))}
                                             />
                                             <Input
                                             className="text-black"
