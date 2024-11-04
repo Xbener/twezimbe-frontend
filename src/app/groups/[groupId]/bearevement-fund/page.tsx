@@ -341,8 +341,8 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                 wallet: {groupBF?.walletAddress}
                             </p> <p>
                                 Deposited funds: 0 UGX
-                            </p> 
-                            </p> <p>
+                            </p>
+                            <p>
                                 Deposited funds by you: 0 UGX
                             </p>
                             <Button className="bg-blue-500">
