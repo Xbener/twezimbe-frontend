@@ -336,9 +336,19 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                     ) : (
                         <div className="bg-gray-900 p-6 rounded-lg shadow-md">
                             <h2 className="text-2xl font-semibold text-white mb-4">Fund Settings Overview</h2>
-                            <p>
+                           <div className="flex flex-col gap-2 items-start justify-start">
+                             <p>
                                 wallet: {groupBF?.walletAddress}
+                            </p> <p>
+                                Deposited funds: 0 UGX
+                            </p> 
+                            </p> <p>
+                                Deposited funds by you: 0 UGX
                             </p>
+                            <Button className="bg-blue-500">
+                                Deposit funds 
+                                </Button>       
+                            </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-white mt-5">
                                 <div>
                                     <h3 className="font-semibold text-lg">Number of Beneficiaries per Principal</h3>
