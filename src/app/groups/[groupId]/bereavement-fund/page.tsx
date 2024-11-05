@@ -139,7 +139,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
             setFundSettings(data.settings)
             setIsEditing(false)
         } catch (error: any) {
-            console.log('error updating Bearevement fund', error)
+            console.log('error updating Bereavement fund', error)
             toast.error(error.message)
         } finally {
             setIsLoading(false)
@@ -191,7 +191,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
             },
             customizations: {
                 title: "Deposit funds",
-                description: "Add funds to your Bearevement Fund",
+                description: "Add funds to your Bereavement Fund",
                 logo: "https://checkout.flutterwave.com/assets/img/rave-logo.png",
             },
             // callback: () => handleUpgrade(),
@@ -414,7 +414,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                                 </Button>
                                                 <Button
                                                     onClick={() => setPayForm({ open: false, data: { amount: 0, phone: "" } })}
-                                                    className="bg-transparent border-orange-500">
+                                                    className="bg-transparent border-orange-500 border text-orange-500">
                                                     Cancel
                                                 </Button>
                                             </div>
@@ -477,7 +477,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                     <DialogContent className="bg-white max-h-[400px] overflow-auto">
                                         <DialogHeader className='flex flex-col'>
                                             <h1>
-                                                Add new members to your bearevement fund
+                                                Add new members to your bereavement fund
                                             </h1>
                                             <Input
                                                 value={groupQuery}
@@ -547,7 +547,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                             value={bfQuery}
                             type='text'
                             className="text-neutral-700 mb-5"
-                            placeholder={`Search Bearevement fund officers ...`}
+                            placeholder={`Search Bereavement fund officers ...`}
                         />
                         {
                             newBfMembers?.length ? filteredBfMembers?.map((member) => {
@@ -629,7 +629,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                             <Button className="bg-transparent text-white border">
                                 filter
                             </Button>
-                            <Dialog>
+                            <Dialog open={dialogOpen}>
                                 {
                                     (groupBF?.role && groupBF?.role?.includes('principal')) && (
                                         <DialogTrigger>
@@ -677,7 +677,9 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                             </div>
 
                                             {/* Submit Button */}
-                                            <button
+                                           <div className="flex items-center gap-3 mt-3">
+
+                                             <button
                                                 disabled={isLoading}
                                                 onClick={async (e) => {
                                                     setIsLoading(true)
@@ -694,19 +696,28 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                             >
                                                 Submit Case
                                             </button>
+
+                                                <button
+                                                 className="w-full bg-transparent border border-orange-500 text-orange font-semibold py-2 px-4 rounded mt-2"
+                                                onClick={()=>setDialogOpen(false)}
+                                                >
+
+                                                    cancel
+                                                    </button>
+                                            </div>
                                         </form>
                                     </div>
 
                                 </DialogContent>
                             </Dialog>
                         </div>
-                        <div className="grid grid-cols-3 gap-4 w-full mt-5">
+                        <div className="grid sm:grid-cols-3 grid-cols-1 gap-4 w-full mt-5">
                             {
                                 cases.length ? (
                                     cases.map((caseItem: Case) => {
                                         return (
                                             <div
-                                                className="bg-gray-800 p-4 rounded-md shadow-md "
+                                                className="bg-gray-800 p-3 rounded-md"
                                                 key={caseItem._id}
                                             >
                                                 <h3 className="text-xl font-bold text-white mb-2">
@@ -736,12 +747,12 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                                 </div>
                                                 <div className='w-full flex gap-2 mt-2'>
                                                     <Button
-                                                        className="bg-green-500 text-white w-full"
+                                                        className="bg-green-500 text-white w-1/2"
                                                     >
                                                         contribute
                                                     </Button>
                                                     <Button
-                                                        className="bg-blue-500 text-white w-full"
+                                                        className="bg-blue-500 text-white w-1/2"
                                                     >
                                                         more
                                                     </Button>
