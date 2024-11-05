@@ -257,7 +257,7 @@ export const fileCase = async (bfId: string, body: {name:string, description:str
         console.log('error filing case', error)
     }
 }
-export const updateCase = async (caseId: string, body?: Case) => {
+export const updateCase = async (caseId: string, body?: any) => {
     const token = Cookies.get("access-token")
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bf/cases/${caseId}`, {

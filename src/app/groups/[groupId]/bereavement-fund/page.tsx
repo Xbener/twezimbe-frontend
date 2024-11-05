@@ -9,7 +9,7 @@ import LoadingButton from '@/components/LoadingButton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { iconTextGenerator } from '@/lib/iconTextGenerator';
-import { acceptRequest, addBfMember, declineRequest, fileCase, getCases, updateUserRole } from '@/lib/bf';
+import { acceptRequest, addBfMember, declineRequest, fileCase, getCases, updateUserRole, updateCase } from '@/lib/bf';
 import { Dialog, DialogContent, DialogHeader, DialogTrigger, DialogClose } from '@/components/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useGetProfileData } from '@/api/auth';
@@ -69,7 +69,6 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
         }
     }, [])
 
-    const updateCase = (id?:string, status?:string, newStatus?:string) =>{}
     const handleCountryCodeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const countryCode = e.target.value;
         setPayForm(prev => ({ ...prev, data: { ...prev.data, countryCode } }));
@@ -184,33 +183,33 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
     }, [bfQuery, bfMembers])
 
     function makePayment() {
-        if(payForm.data.amount!==""&&payForm.data.amount!=="0"&&payForm.data.phone!==""){
+        if (payForm.data.amount !== "" && payForm.data.amount !== "0" && payForm.data.phone !== "") {
             FlutterwaveCheckout({
-            public_key: "FLWPUBK_TEST-61fd8c76063ac4c81570ea26a682c719-X",
-            tx_ref: "txref-DI0NzMx13",
-            amount: payForm.data.amount,
-            currency: "UGX",
-            payment_options: "mobilemoneyrwanda, mobilemoneyuganda",
-            meta: {
-                source: "docs-inline-test",
-                consumer_mac: "92a3-912ba-1192a",
-            },
-            customer: {
-                email: currentUser?.email,
-                phone_number: `${payForm.data.countryCode}${payForm.data.phone}`,
-                name: `${currentUser?.firstName} ${currentUser?.lastName}`,
-            },
-            customizations: {
-                title: "Deposit funds",
-                description: "Add funds to your Bereavement Fund",
-                logo: "https://checkout.flutterwave.com/assets/img/rave-logo.png",
-            },
-            // callback: () => handleUpgrade(),
-            onclose: function () {
-                console.log("Payment cancelled!");
-            }
-        });
-        }else{
+                public_key: "FLWPUBK_TEST-61fd8c76063ac4c81570ea26a682c719-X",
+                tx_ref: "txref-DI0NzMx13",
+                amount: payForm.data.amount,
+                currency: "UGX",
+                payment_options: "mobilemoneyrwanda, mobilemoneyuganda",
+                meta: {
+                    source: "docs-inline-test",
+                    consumer_mac: "92a3-912ba-1192a",
+                },
+                customer: {
+                    email: currentUser?.email,
+                    phone_number: `${payForm.data.countryCode}${payForm.data.phone}`,
+                    name: `${currentUser?.firstName} ${currentUser?.lastName}`,
+                },
+                customizations: {
+                    title: "Deposit funds",
+                    description: "Add funds to your Bereavement Fund",
+                    logo: "https://checkout.flutterwave.com/assets/img/rave-logo.png",
+                },
+                // callback: () => handleUpgrade(),
+                onclose: function () {
+                    console.log("Payment cancelled!");
+                }
+            });
+        } else {
             toast.error("Enter the required info to make a contribution")
         }
     }
@@ -402,19 +401,19 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                 {
                                     payForm.open && (
                                         <div className="flex flex-col gap-2 ">
-                                                <Input
-                                                    className="text-black border-2 border-blue-500"
-                                                    type="text"
-                                                    name="amount"
-                                                    placeholder="Enter amount to deposit"
-                                                    value={payForm.data.amount}
-                                                    onChange={(e) => {
-                                                        const input = e.target.value;
-                                                        if (/^\d*$/.test(input)) { // Allows only digits
-                                                            setPayForm(prev => ({ ...prev, data: { ...prev.data, amount: input } }));
-                                                        }
-                                                    }}
-                                                />
+                                            <Input
+                                                className="text-black border-2 border-blue-500"
+                                                type="text"
+                                                name="amount"
+                                                placeholder="Enter amount to deposit"
+                                                value={payForm.data.amount}
+                                                onChange={(e) => {
+                                                    const input = e.target.value;
+                                                    if (/^\d*$/.test(input)) { // Allows only digits
+                                                        setPayForm(prev => ({ ...prev, data: { ...prev.data, amount: input } }));
+                                                    }
+                                                }}
+                                            />
 
                                             <div className="w-full flex cursor-pointer border-2 border-blue-500 rounded-md">
                                                 <select
@@ -429,25 +428,25 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                                         </option>
                                                     ))}
                                                 </select>
-                                                    <input
-                                                        className="text-black p-2 rounded-r w-full"
-                                                        type="text"
-                                                        name="phone"
-                                                        maxLength={9}
-                                                        placeholder="Enter mobile phone number"
-                                                        value={payForm.data.phone}
-                                                        onChange={(e) => {
-                                                            const input = e.target.value;
-                                                            if (/^\d*$/.test(input)) { // Allows only digits
-                                                                setPayForm(prev => ({ ...prev, data: { ...prev.data, phone: input } }));
-                                                            }
-                                                        }}
-                                                    />
+                                                <input
+                                                    className="text-black p-2 rounded-r w-full"
+                                                    type="text"
+                                                    name="phone"
+                                                    maxLength={9}
+                                                    placeholder="Enter mobile phone number"
+                                                    value={payForm.data.phone}
+                                                    onChange={(e) => {
+                                                        const input = e.target.value;
+                                                        if (/^\d*$/.test(input)) { // Allows only digits
+                                                            setPayForm(prev => ({ ...prev, data: { ...prev.data, phone: input } }));
+                                                        }
+                                                    }}
+                                                />
 
                                             </div>
                                             <div className="flex gap-2 mt-3">
                                                 <Button
-                                                    disabled={payForm.data.amount === "" || payForm.data.amount!=="0" || payForm.data.phone === ""}
+                                                    disabled={payForm.data.amount === "" || payForm.data.amount !== "0" || payForm.data.phone === ""}
                                                     onClick={makePayment}
                                                     className="bg-blue-500">
                                                     Confirm
@@ -871,12 +870,22 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                                             </p>
                                                             <div className="flex items-center gap-4 mt-4">
                                                                 <Button
-                                                                    onClick={() => updateCase(caseItem._id, 'status', caseItem.status === 'Open' ? 'Closed' : 'Open')}
+                                                                    onClick={async () => {
+                                                                        const { status, case: updatedCase} = await updateCase(caseItem._id, { status: caseItem.status === 'Open' ? 'Closed' : 'Open' })
+                                                                        if(status){
+                                                                            setCases(prev=>prev.map(prevCase=>prevCase?._id === caseItem?._id? {...updatedCase, status: caseItem.status === 'Open' ? 'Closed' : 'Open' }: {...caseItem}))
+                                                                        }
+                                                                    }}  
                                                                     className={`text-white px-4 py-2 rounded ${caseItem.status === 'Open' ? 'bg-red-500' : 'bg-green-500'}`}>
                                                                     Mark as {caseItem.status === 'Open' ? 'Closed' : 'Open'}
                                                                 </Button>
                                                                 <Button
-                                                                    onClick={() => updateCase(caseItem._id, 'contributionStatus', caseItem.contributionStatus === 'Complete' ? 'Incomplete' : 'Complete')}
+                                                                    onClick={async () => {
+                                                                        const { status,  case: updatedCase} = await updateCase(caseItem._id, {contributionStatus: caseItem.contributionStatus === 'Complete' ? 'Incomplete' : 'Complete' })
+                                                                        if(status){
+                                                                            setCases(prev=>prev.map(prevCase=>prevCase?._id === caseItem?._id? {...updatedCase, contributionStatus: caseItem.contributionStatus === 'Complete' ? 'Incomplete' : 'Complete' }: {...caseItem}))
+                                                                        }
+                                                                    }}
                                                                     className={`text-white px-4 py-2 rounded ${caseItem.contributionStatus === 'Complete' ? 'bg-red-500' : 'bg-green-500'}`}>
                                                                     Mark Contribution {caseItem.contributionStatus === 'Complete' ? 'Incomplete' : 'Complete'}
                                                                 </Button>
@@ -898,9 +907,9 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                             }
                         </div>
                     </div>
-                </section >
+                </section>
 
-            </div >
+            </div>
         );
     }
 }
