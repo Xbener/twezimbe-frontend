@@ -41,7 +41,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
     const [payForm, setPayForm] = useState({
         open: false,
         data: {
-            amount: 0,
+            amount: "",
             phone: "",
             countryCode: countryCodes[0].code
         }
@@ -184,7 +184,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
     }, [bfQuery, bfMembers])
 
     function makePayment() {
-        if(payForm.data.amount!==0&&payForm.data.phone!==""){
+        if(payForm.data.amount!==""&&payForm.data.amount!=="0"&&payForm.data.phone!==""){
             FlutterwaveCheckout({
             public_key: "FLWPUBK_TEST-61fd8c76063ac4c81570ea26a682c719-X",
             tx_ref: "txref-DI0NzMx13",
@@ -239,8 +239,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                     <div className="w-full">
                                         <label className="block text-sm font-medium text-neutral-300">Minimum beneficiaries:</label>
                                         <input
-                                            type="number"
-                                            name="minBeneficiaries"
+                                            type="number" name="minBeneficiaries"
                                             value={(fundSettings.minBeneficiaries)}
                                             onChange={handleChange}
                                             min={1}
@@ -250,8 +249,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                     <div className="w-full">
                                         <label className="block text-sm font-medium text-neutral-300">Maximum beneficiaries:</label>
                                         <input
-                                            type="number"
-                                            value={fundSettings.maxBeneficiaries}
+                                            type="number" value={fundSettings.maxBeneficiaries}
                                             name="maxBeneficiaries"
                                             onChange={handleChange}
                                             min={1}
@@ -267,6 +265,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                 <label className="block text-sm font-medium text-neutral-300">Set membership fee:</label>
                                 <input
                                     type="number"
+                                    min={0}
                                     placeholder="Enter membership fee (UGX)"
                                     className="w-full p-2 mt-1 border border-gray-300 rounded-md text-black text-right"
                                     name="membership_fee"
@@ -280,7 +279,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                 <div className="gap-5 grid grid-cols-2">
                                     <div>
                                         <label>Youth (18-60):</label>
-                                        <input type="number"
+                                        <input type="number" min={0}
                                             onChange={handleChange}
                                             name="subscription_costs.youth"
                                             value={fundSettings.subscription_costs.youth}
@@ -288,7 +287,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                     </div>
                                     <div>
                                         <label>Children (17 or less):</label>
-                                        <input type="number"
+                                        <input type="number" min={0}
                                             name="subscription_costs.children"
                                             onChange={handleChange}
                                             value={fundSettings.subscription_costs.children}
@@ -296,7 +295,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                     </div>
                                     <div>
                                         <label>Elders (61+):</label>
-                                        <input type="number"
+                                        <input type="number" min={0}
                                             name="subscription_costs.elders"
                                             onChange={handleChange}
                                             value={fundSettings.subscription_costs.elders}
@@ -309,7 +308,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                 <div className="gap-5 grid grid-cols-2">
                                     <div>
                                         <label>Principal:</label>
-                                        <input type="number"
+                                        <input type="number" min={0}
                                             onChange={handleChange}
                                             name="fund_benefits.principal"
                                             value={fundSettings.fund_benefits.principal}
@@ -317,7 +316,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                     </div>
                                     <div>
                                         <label>Spouse:</label>
-                                        <input type="number"
+                                        <input type="number" min={0}
                                             onChange={handleChange}
                                             name="fund_benefits.spouse"
                                             value={fundSettings.fund_benefits.spouse}
@@ -325,7 +324,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                     </div>
                                     <div>
                                         <label>Children:</label>
-                                        <input type="number"
+                                        <input type="number" min={0}
                                             onChange={handleChange}
                                             name="fund_benefits.children"
                                             value={fundSettings.fund_benefits.children}
@@ -333,7 +332,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                     </div>
                                     <div>
                                         <label>Parents:</label>
-                                        <input type="number"
+                                        <input type="number" min={0}
                                             onChange={handleChange}
                                             name="fund_benefits.parents"
                                             value={fundSettings.fund_benefits.parents}
@@ -341,7 +340,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                     </div>
                                     <div>
                                         <label>Other (Guardians or close friends):</label>
-                                        <input type="number"
+                                        <input type="number" min={0}
                                             onChange={handleChange}
                                             name="fund_benefits.other"
                                             value={fundSettings.fund_benefits.other}
@@ -354,7 +353,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                 <h2 className="text-lg font-semibold text-white">5. Incident contribution fee</h2>
                                 <label className="block text-sm font-medium text-neutral-300">Set contribution fee per incident:</label>
                                 <input
-                                    type="number"
+                                    type="number" min={0}
                                     onChange={handleChange}
                                     name="incident_contribution_fee"
                                     value={fundSettings.incident_contribution_fee}
@@ -403,17 +402,24 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                 {
                                     payForm.open && (
                                         <div className="flex flex-col gap-2 ">
-                                            <Input
-                                                className="text-black"
-                                                type="number"
-                                                name="amount"
-                                                placeholder="Enter amount to deposit"
-                                                value={payForm.data.amount}
-                                                onChange={(e) => setPayForm(prev => ({ ...prev, data: { ...prev.data, amount: parseFloat(e.target.value) } }))}
-                                            />
-                                            <div className="w-full flex cursor-pointer">
+                                                <Input
+                                                    className="text-black border-2 border-blue-500"
+                                                    type="text"
+                                                    name="amount"
+                                                    placeholder="Enter amount to deposit"
+                                                    value={payForm.data.amount}
+                                                    onChange={(e) => {
+                                                        const input = e.target.value;
+                                                        if (/^\d*$/.test(input)) { // Allows only digits
+                                                            setPayForm(prev => ({ ...prev, data: { ...prev.data, amount: input } }));
+                                                        }
+                                                    }}
+                                                />
+
+                                            <div className="w-full flex cursor-pointer border-2 border-blue-500 rounded-md">
                                                 <select
-                                                    className="text-black"
+                                                    className="text-black rounded-l-md pl-3"
+                                                    defaultValue={"+256"}
                                                     value={payForm.data.countryCode}
                                                     onChange={handleCountryCodeChange}
                                                 >
@@ -423,24 +429,31 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                                         </option>
                                                     ))}
                                                 </select>
-                                                <input
-                                                    className="text-black p-2 border border-l-0 border-gray-300 rounded-r w-full"
-                                                    type="text"
-                                                    name="phone"
-                                                    placeholder="Enter mobile phone number"
-                                                    value={payForm.data.phone}
-                                                    onChange={(e) => setPayForm(prev => ({ ...prev, data: { ...prev.data, phone: e.target.value } }))}
-                                                />
+                                                    <input
+                                                        className="text-black p-2 rounded-r w-full"
+                                                        type="text"
+                                                        name="phone"
+                                                        maxLength={9}
+                                                        placeholder="Enter mobile phone number"
+                                                        value={payForm.data.phone}
+                                                        onChange={(e) => {
+                                                            const input = e.target.value;
+                                                            if (/^\d*$/.test(input)) { // Allows only digits
+                                                                setPayForm(prev => ({ ...prev, data: { ...prev.data, phone: input } }));
+                                                            }
+                                                        }}
+                                                    />
+
                                             </div>
                                             <div className="flex gap-2 mt-3">
                                                 <Button
-                                                    disabled={payForm.data.amount === 0 || payForm.data.phone === ""}
+                                                    disabled={payForm.data.amount === "" || payForm.data.amount!=="0" || payForm.data.phone === ""}
                                                     onClick={makePayment}
                                                     className="bg-blue-500">
                                                     Confirm
                                                 </Button>
                                                 <Button
-                                                    onClick={() => setPayForm({ open: false, data: { amount: 0, phone: "", countryCode: countryCodes[0].code } })}
+                                                    onClick={() => setPayForm({ open: false, data: { amount: "", phone: "", countryCode: countryCodes[0].code } })}
                                                     className="bg-transparent border-orange-500 border text-orange-500">
                                                     Cancel
                                                 </Button>
@@ -479,7 +492,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                 </div>
                                 <div className="sm:col-span-2 lg:col-span-3">
                                     <h3 className="font-semibold text-lg">In-Kind Support</h3>
-                                    <p>{fundSettings.in_kind_support || "N/A"}</p>
+                                    <p>{fundSettings.in_kind_support || ""}</p>
                                 </div>
                             </div>
                             {
@@ -777,16 +790,20 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                                         <DialogContent className="w-full bg-white p-6 rounded-lg">
                                                             <DialogHeader className="text-xl font-bold mb-4">Make a Contribution</DialogHeader>
                                                             <div className="mb-4">
-                                                                <input
-                                                                    type="number"
-                                                                    id="amount"
+                                                                <Input
+                                                                    className="text-black border-2 border-blue-500"
+                                                                    type="text"
                                                                     name="amount"
-                                                                    className="mt-1 p-2 w-full border border-gray-300 rounded"
-                                                                    placeholder="Enter amount"
-                                                                    required
+                                                                    placeholder="Enter amount to deposit"
                                                                     value={payForm.data.amount}
-                                                                    onChange={(e) => setPayForm(prev => ({ ...prev, data: { ...prev.data, amount: parseFloat(e.target.value) } }))}
+                                                                    onChange={(e) => {
+                                                                        const input = e.target.value;
+                                                                        if (/^\d*$/.test(input)) { // Allows only digits
+                                                                            setPayForm(prev => ({ ...prev, data: { ...prev.data, amount: input } }));
+                                                                        }
+                                                                    }}
                                                                 />
+
                                                                 <div className="w-full flex cursor-pointer mt-3">
                                                                     <select
                                                                         className="text-black border border-gray-300 rounded-l p-2"
@@ -800,12 +817,18 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                                                         ))}
                                                                     </select>
                                                                     <input
-                                                                        className="text-black p-2 border border-l-0 border-gray-300 rounded-r w-full"
+                                                                        className="text-black p-2 rounded-r w-full"
                                                                         type="text"
                                                                         name="phone"
-                                                                        placeholder="782610333"
+                                                                        maxLength={9}
+                                                                        placeholder="Enter mobile phone number"
                                                                         value={payForm.data.phone}
-                                                                        onChange={(e) => setPayForm(prev => ({ ...prev, data: { ...prev.data, phone: e.target.value } }))}
+                                                                        onChange={(e) => {
+                                                                            const input = e.target.value;
+                                                                            if (/^\d*$/.test(input)) { // Allows only digits
+                                                                                setPayForm(prev => ({ ...prev, data: { ...prev.data, phone: input } }));
+                                                                            }
+                                                                        }}
                                                                     />
                                                                 </div>
                                                             </div>
@@ -820,7 +843,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                                                 </DialogClose>
                                                                 <DialogClose>
                                                                     <Button
-                                                                        onClick={() => setPayForm({ open: false, data: { amount: 0, phone: "", countryCode: countryCodes[0].code } })}
+                                                                        onClick={() => setPayForm({ open: false, data: { amount: "", phone: "", countryCode: countryCodes[0].code } })}
                                                                         className="bg-transparent border-orange-500 border text-orange-500">
                                                                         Cancel
                                                                     </Button>

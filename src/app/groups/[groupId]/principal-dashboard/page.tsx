@@ -105,11 +105,10 @@ function page({ }: Props) {
                                 <h2 className="text-lg font-semibold text-white">1. One-off membership fee</h2>
                                 <label className="block text-sm font-medium text-neutral-300">Set membership fee (UGX):</label>
                                 <input
-                                    type="number"
+                                    type="number" min={0}
                                     name="membershipFee"
                                     value={formValues.membershipFee}
                                     onChange={handleInputChange}
-                                    min={0}
                                     className="w-full p-2 mt-1 border border-gray-300 rounded-md text-black"
                                 />
                             </section>
@@ -118,11 +117,10 @@ function page({ }: Props) {
                                 <h2 className="text-lg font-semibold text-white">2. Annual subscription</h2>
                                 <label className="block text-sm font-medium text-neutral-300">Annual subscription fee (UGX):</label>
                                 <input
-                                    type="number"
+                                    type="number" min={0}
                                     name="annualSubscription"
                                     value={formValues.annualSubscription}
                                     onChange={handleInputChange}
-                                    min={0}
                                     className="w-full p-2 mt-1 border border-gray-300 rounded-md text-black"
                                 />
                             </section>
