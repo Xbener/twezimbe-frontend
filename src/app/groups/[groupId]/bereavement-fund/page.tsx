@@ -184,7 +184,8 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
     }, [bfQuery, bfMembers])
 
     function makePayment() {
-        FlutterwaveCheckout({
+        if(payForm.data.amount!==0&&payForm.data.phone!==""){
+            FlutterwaveCheckout({
             public_key: "FLWPUBK_TEST-61fd8c76063ac4c81570ea26a682c719-X",
             tx_ref: "txref-DI0NzMx13",
             amount: payForm.data.amount,
@@ -209,6 +210,9 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                 console.log("Payment cancelled!");
             }
         });
+        }else{
+            toast.error("Enter the required info to make a contribution")
+        }
     }
 
     if (fundSettings) {
@@ -423,7 +427,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                                     className="text-black p-2 border border-l-0 border-gray-300 rounded-r w-full"
                                                     type="text"
                                                     name="phone"
-                                                    placeholder="Enter phone number"
+                                                    placeholder="Enter mobile phone number"
                                                     value={payForm.data.phone}
                                                     onChange={(e) => setPayForm(prev => ({ ...prev, data: { ...prev.data, phone: e.target.value } }))}
                                                 />
@@ -774,7 +778,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                                             <DialogHeader className="text-xl font-bold mb-4">Make a Contribution</DialogHeader>
                                                             <div className="mb-4">
                                                                 <input
-                                                                    type="text"
+                                                                    type="number"
                                                                     id="amount"
                                                                     name="amount"
                                                                     className="mt-1 p-2 w-full border border-gray-300 rounded"
@@ -799,7 +803,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                                                         className="text-black p-2 border border-l-0 border-gray-300 rounded-r w-full"
                                                                         type="text"
                                                                         name="phone"
-                                                                        placeholder="Enter phone number"
+                                                                        placeholder="Enter mobile phone number"
                                                                         value={payForm.data.phone}
                                                                         onChange={(e) => setPayForm(prev => ({ ...prev, data: { ...prev.data, phone: e.target.value } }))}
                                                                     />
@@ -808,7 +812,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                                             <div className="flex gap-2 mt-3">
                                                                 <DialogClose>
                                                                     <Button
-                                                                        disabled={payForm.data.amount === 0 || payForm.data.phone === ""}
+                                                                        // disabled={payForm.data.amount === 0 || payForm.data.phone === ""}
                                                                         onClick={makePayment}
                                                                         className="bg-blue-500 text-white disabled:cursor-not-allowed">
                                                                         Confirm
