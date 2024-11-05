@@ -23,7 +23,7 @@ function BereavementFundHero({ }: Props) {
   const router = useRouter()
   useEffect(() => {
     if (selectedGroup) {
-      return router.push(`/groups/${selectedGroup._id}/bs/add-new`)
+      return router.push(`/groups/bf/add-new`)
     }
   }, [selectedGroup])
 
@@ -57,7 +57,6 @@ function BereavementFundHero({ }: Props) {
                       <div className={`p-2 mt-3 border-2 border-gray-800 rounded-md cursor-pointer flex items-center justify-between hover:bg-neutral-100 transition duration-75 ${selectedGroup?._id === group?._id && 'bg-orange-100 hover:bg-neutral-100'}`}
                         onClick={() => {
                           setSelectedGroup(group)
-                          router.push('/groups/bf/add-new')
                         }}
                       >
                         <div className="flex items-center gap-4 ">
