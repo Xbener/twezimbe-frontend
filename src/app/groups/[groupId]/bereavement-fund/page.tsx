@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { iconTextGenerator } from '@/lib/iconTextGenerator';
 import { acceptRequest, addBfMember, declineRequest, fileCase, getCases, updateUserRole } from '@/lib/bf';
-import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTrigger, DialogClose } from '@/components/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useGetProfileData } from '@/api/auth';
 import { Case, FundSettings } from '@/types';
@@ -18,6 +18,7 @@ import { useRouter } from 'next/navigation';
 import { XIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { formatNumberWithCommas } from '@/utils/formatNumber';
+import { countryCodes } from '@/constants';
 type Beneficiary = {
     name: string;
     id: number;
@@ -39,7 +40,8 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
         open: false,
         data: {
             amount: 0,
-            phone: ""
+            phone: "",
+            countryCode: countryCodes[0].code
         }
     })
     const [dialogOpen, setDialogOpen] = useState(false)
@@ -64,6 +66,11 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
             getData()
         }
     }, [])
+
+    const handleCountryCodeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const countryCode = e.target.value;
+        setPayForm(prev => ({ ...prev, data: { ...prev.data, countryCode } }));
+    };
 
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
@@ -186,7 +193,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
             },
             customer: {
                 email: currentUser?.email,
-                phone_number: payForm.data.phone,
+                phone_number: `${payForm.data.countryCode}${payForm.data.phone}`,
                 name: `${currentUser?.firstName} ${currentUser?.lastName}`,
             },
             customizations: {
@@ -382,7 +389,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                     Deposited funds by you: 0 UGX
                                 </p>
                                 <Button
-                                    onClick={() => setPayForm(prev=>({...prev, open:true}))}
+                                    onClick={() => setPayForm(prev => ({ ...prev, open: true }))}
                                     className="bg-blue-500">
                                     Deposit funds
                                 </Button>
@@ -390,30 +397,43 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                     payForm.open && (
                                         <div className="flex flex-col gap-2 ">
                                             <Input
-                                            className="text-black"
+                                                className="text-black"
                                                 type="number"
                                                 name="amount"
                                                 placeholder="Enter amount to deposit"
                                                 value={payForm.data.amount}
                                                 onChange={(e) => setPayForm(prev => ({ ...prev, data: { ...prev.data, amount: parseFloat(e.target.value) } }))}
                                             />
-                                            <Input
-                                            className="text-black"
-                                                type="text"
-                                                name="phone"
-                                                placeholder="Enter phone number"
-                                                value={payForm.data.phone}
-                                                onChange={(e) => setPayForm(prev => ({ ...prev, data: { ...prev.data, phone: e.target.value } }))}
-                                            />
+                                            <div className="w-full flex cursor-pointer">
+                                                <select
+                                                    className="text-black"
+                                                    value={payForm.data.countryCode}
+                                                    onChange={handleCountryCodeChange}
+                                                >
+                                                    {countryCodes.map((country) => (
+                                                        <option key={country.code} value={country.code}>
+                                                            {country.label} ({country.code})
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                                <input
+                                                    className="text-black p-2 border border-l-0 border-gray-300 rounded-r w-full"
+                                                    type="text"
+                                                    name="phone"
+                                                    placeholder="Enter phone number"
+                                                    value={payForm.data.phone}
+                                                    onChange={(e) => setPayForm(prev => ({ ...prev, data: { ...prev.data, phone: e.target.value } }))}
+                                                />
+                                            </div>
                                             <div className="flex gap-2 mt-3">
                                                 <Button
-                                                disabled={payForm.data.amount===0||payForm.data.phone===""}
+                                                    disabled={payForm.data.amount === 0 || payForm.data.phone === ""}
                                                     onClick={makePayment}
                                                     className="bg-blue-500">
                                                     Confirm
                                                 </Button>
                                                 <Button
-                                                    onClick={() => setPayForm({ open: false, data: { amount: 0, phone: "" } })}
+                                                    onClick={() => setPayForm({ open: false, data: { amount: 0, phone: "", countryCode: countryCodes[0].code } })}
                                                     className="bg-transparent border-orange-500 border text-orange-500">
                                                     Cancel
                                                 </Button>
@@ -677,33 +697,33 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                             </div>
 
                                             {/* Submit Button */}
-                                           <div className="flex items-center gap-3 mt-3">
-
-                                             <button
-                                                disabled={isLoading}
-                                                onClick={async (e) => {
-                                                    setIsLoading(true)
-                                                    e.preventDefault()
-                                                    const { status, case: returnedCase } = await fileCase(groupBF?._id!, newCase)
-                                                    setIsLoading(false)
-                                                    if (status) {
-                                                        setCases(prev => [...prev, returnedCase])
-                                                        setDialogOpen(false)
-                                                    }
-                                                }}
-                                                type="submit"
-                                                className="w-full bg-blue-600 disabled:cursor-pointer-allowed hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded mt-2"
-                                            >
-                                                Submit Case
-                                            </button>
+                                            <div className="flex items-center gap-3 mt-3">
 
                                                 <button
-                                                 className="w-full bg-transparent border border-orange-500 text-orange font-semibold py-2 px-4 rounded mt-2"
-                                                onClick={()=>setDialogOpen(false)}
+                                                    disabled={isLoading}
+                                                    onClick={async (e) => {
+                                                        setIsLoading(true)
+                                                        e.preventDefault()
+                                                        const { status, case: returnedCase } = await fileCase(groupBF?._id!, newCase)
+                                                        setIsLoading(false)
+                                                        if (status) {
+                                                            setCases(prev => [...prev, returnedCase])
+                                                            setDialogOpen(false)
+                                                        }
+                                                    }}
+                                                    type="submit"
+                                                    className="w-full bg-blue-600 disabled:cursor-pointer-allowed hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded mt-2"
+                                                >
+                                                    Submit Case
+                                                </button>
+
+                                                <button
+                                                    className="w-full bg-transparent border border-orange-500 text-orange font-semibold py-2 px-4 rounded mt-2"
+                                                    onClick={() => setDialogOpen(false)}
                                                 >
 
                                                     cancel
-                                                    </button>
+                                                </button>
                                             </div>
                                         </form>
                                     </div>
@@ -746,11 +766,74 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                                     </p>
                                                 </div>
                                                 <div className='w-full flex gap-2 mt-2'>
-                                                    <Button
-                                                        className="bg-green-500 text-white w-1/2"
-                                                    >
-                                                        contribute
-                                                    </Button>
+                                                    <Dialog>
+
+                                                        <DialogTrigger className="w-1/2">
+
+                                                            <Button
+                                                                className="bg-green-500 text-white w-full"
+                                                            >
+                                                                contribute
+                                                            </Button>
+                                                        </DialogTrigger>
+
+                                                        <DialogContent className="w-full bg-white">
+                                                            <DialogHeader>
+                                                                
+                                                            </DialogHeader>
+                                                            <div className="mb-4">
+                                                                <input
+                                                                    type="text"
+                                                                    id="amount"
+                                                                    name="amount"
+                                                                    className="mt-1 p-2 w-full border border-gray-700 rounded "
+                                                                    placeholder="Enter amount"
+                                                                    required
+                                                                     value={payForm.data.amount}
+                                                                    onChange={(e) => setPayForm(prev => ({ ...prev, data: { ...prev.data, amount: parseFloat(e.target.value) } }))}
+                                                                />
+                                                                <div className="w-full flex cursor-pointer">
+                                                                    <select
+                                                                        className="text-black"
+                                                                        value={payForm.data.countryCode}
+                                                                        onChange={handleCountryCodeChange}
+                                                                    >
+                                                                        {countryCodes.map((country) => (
+                                                                            <option key={country.code} value={country.code}>
+                                                                                {country.label} ({country.code})
+                                                                            </option>
+                                                                        ))}
+                                                                    </select>
+                                                                    <input
+                                                                        className="text-black p-2 border border-l-0 border-gray-300 rounded-r w-full"
+                                                                        type="text"
+                                                                        name="phone"
+                                                                        placeholder="Enter phone number"
+                                                                        value={payForm.data.phone}
+                                                                        onChange={(e) => setPayForm(prev => ({ ...prev, data: { ...prev.data, phone: e.target.value } }))}
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                              <div className="flex gap-2 mt-3">
+                                                                  <DialogClose>
+                                                                    <Button
+                                                                        disabled={payForm.data.amount === 0 || payForm.data.phone === ""}
+                                                                        onClick={makePayment}
+                                                                        className="bg-blue-500 text-white disabled:cursor-not-allowed">
+                                                                        Confirm
+                                                                    </Button>
+                                                                    </DialogClose> 
+                                                                   <DialogClose>
+                                                                     <Button
+                                                                        onClick={() => setPayForm({ open: false, data: { amount: 0, phone: "", countryCode: countryCodes[0].code } })}
+                                                                        className="bg-transparent border-orange-500 border text-orange-500">
+                                                                        Cancel
+                                                                    </Button>
+                                                                    </DialogClose>
+                                                              </div>
+                                                        </DialogContent>
+
+                                                    </Dialog>
                                                     <Button
                                                         className="bg-blue-500 text-white w-1/2"
                                                     >
