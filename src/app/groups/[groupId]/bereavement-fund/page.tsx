@@ -803,7 +803,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                                                         className="text-black p-2 border border-l-0 border-gray-300 rounded-r w-full"
                                                                         type="text"
                                                                         name="phone"
-                                                                        placeholder="Enter mobile phone number"
+                                                                        placeholder="782610333"
                                                                         value={payForm.data.phone}
                                                                         onChange={(e) => setPayForm(prev => ({ ...prev, data: { ...prev.data, phone: e.target.value } }))}
                                                                     />
