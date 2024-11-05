@@ -19,6 +19,8 @@ import { XIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { formatNumberWithCommas } from '@/utils/formatNumber';
 import { countryCodes } from '@/constants';
+import moment from 'moment'
+
 type Beneficiary = {
     name: string;
     id: number;
@@ -67,6 +69,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
         }
     }, [])
 
+    const updateCase = (id?:string, status?:string, newStatus?:string) =>{}
     const handleCountryCodeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const countryCode = e.target.value;
         setPayForm(prev => ({ ...prev, data: { ...prev.data, countryCode } }));
@@ -736,10 +739,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                 cases.length ? (
                                     cases.map((caseItem: Case) => {
                                         return (
-                                            <div
-                                                className="bg-gray-800 p-3 rounded-md"
-                                                key={caseItem._id}
-                                            >
+                                            <div className="bg-gray-800 p-3 rounded-md" key={caseItem._id}>
                                                 <h3 className="text-xl font-bold text-white mb-2">
                                                     {caseItem.name}
                                                 </h3>
@@ -762,39 +762,30 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                                         </span>
                                                     </p>
                                                     <p className="text-sm text-gray-400">
-                                                        <span className="font-semibold ">File on:</span> {new Date(caseItem.createdAt).toLocaleDateString()}
+                                                        <span className="font-semibold ">File on:</span> {moment(caseItem.createdAt).format('LL')}
                                                     </p>
                                                 </div>
                                                 <div className='w-full flex gap-2 mt-2'>
                                                     <Dialog>
-
                                                         <DialogTrigger className="w-1/2">
-
-                                                            <Button
-                                                                className="bg-green-500 text-white w-full"
-                                                            >
-                                                                contribute
-                                                            </Button>
+                                                            <Button className="bg-green-500 text-white w-full">contribute</Button>
                                                         </DialogTrigger>
-
-                                                        <DialogContent className="w-full bg-white">
-                                                            <DialogHeader>
-                                                                
-                                                            </DialogHeader>
+                                                        <DialogContent className="w-full bg-white p-6 rounded-lg">
+                                                            <DialogHeader className="text-xl font-bold mb-4">Make a Contribution</DialogHeader>
                                                             <div className="mb-4">
                                                                 <input
                                                                     type="text"
                                                                     id="amount"
                                                                     name="amount"
-                                                                    className="mt-1 p-2 w-full border border-gray-700 rounded "
+                                                                    className="mt-1 p-2 w-full border border-gray-300 rounded"
                                                                     placeholder="Enter amount"
                                                                     required
-                                                                     value={payForm.data.amount}
+                                                                    value={payForm.data.amount}
                                                                     onChange={(e) => setPayForm(prev => ({ ...prev, data: { ...prev.data, amount: parseFloat(e.target.value) } }))}
                                                                 />
-                                                                <div className="w-full flex cursor-pointer">
+                                                                <div className="w-full flex cursor-pointer mt-3">
                                                                     <select
-                                                                        className="text-black"
+                                                                        className="text-black border border-gray-300 rounded-l p-2"
                                                                         value={payForm.data.countryCode}
                                                                         onChange={handleCountryCodeChange}
                                                                     >
@@ -814,31 +805,62 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                                                     />
                                                                 </div>
                                                             </div>
-                                                              <div className="flex gap-2 mt-3">
-                                                                  <DialogClose>
+                                                            <div className="flex gap-2 mt-3">
+                                                                <DialogClose>
                                                                     <Button
                                                                         disabled={payForm.data.amount === 0 || payForm.data.phone === ""}
                                                                         onClick={makePayment}
                                                                         className="bg-blue-500 text-white disabled:cursor-not-allowed">
                                                                         Confirm
                                                                     </Button>
-                                                                    </DialogClose> 
-                                                                   <DialogClose>
-                                                                     <Button
+                                                                </DialogClose>
+                                                                <DialogClose>
+                                                                    <Button
                                                                         onClick={() => setPayForm({ open: false, data: { amount: 0, phone: "", countryCode: countryCodes[0].code } })}
                                                                         className="bg-transparent border-orange-500 border text-orange-500">
                                                                         Cancel
                                                                     </Button>
-                                                                    </DialogClose>
-                                                              </div>
+                                                                </DialogClose>
+                                                            </div>
                                                         </DialogContent>
-
                                                     </Dialog>
-                                                    <Button
-                                                        className="bg-blue-500 text-white w-1/2"
-                                                    >
-                                                        more
-                                                    </Button>
+                                                    <Dialog>
+                                                        <DialogTrigger className="w-1/2">
+                                                            <Button className="bg-blue-500 text-white w-full">more</Button>
+                                                        </DialogTrigger>
+                                                        <DialogContent className="w-full bg-white p-6 rounded-lg">
+                                                            <DialogHeader className="text-xl font-bold mb-4">Case Details</DialogHeader>
+                                                            <p className="text-sm text-gray-600 mb-2">
+                                                                <span className="font-semibold">Name:</span> {caseItem.name}
+                                                            </p>
+                                                            <p className="text-sm text-gray-600 mb-2">
+                                                                <span className="font-semibold">Created by:</span> {caseItem.principal.firstName} {caseItem.principal.lastName}
+                                                            </p>
+                                                            <p className="text-sm text-gray-600 mb-2">
+                                                                <span className="font-semibold">Description:</span> {caseItem.description}
+                                                            </p>
+                                                            <p className="text-sm text-gray-600 mb-2">
+                                                                <span className="font-semibold">Filed on:</span> {moment(caseItem.createdAt).format('LL')}
+                                                            </p>
+                                                            <div className="flex items-center gap-4 mt-4">
+                                                                <Button
+                                                                    onClick={() => updateCase(caseItem._id, 'status', caseItem.status === 'Open' ? 'Closed' : 'Open')}
+                                                                    className={`text-white px-4 py-2 rounded ${caseItem.status === 'Open' ? 'bg-red-500' : 'bg-green-500'}`}>
+                                                                    Mark as {caseItem.status === 'Open' ? 'Closed' : 'Open'}
+                                                                </Button>
+                                                                <Button
+                                                                    onClick={() => updateCase(caseItem._id, 'contributionStatus', caseItem.contributionStatus === 'Complete' ? 'Incomplete' : 'Complete')}
+                                                                    className={`text-white px-4 py-2 rounded ${caseItem.contributionStatus === 'Complete' ? 'bg-red-500' : 'bg-green-500'}`}>
+                                                                    Mark Contribution {caseItem.contributionStatus === 'Complete' ? 'Incomplete' : 'Complete'}
+                                                                </Button>
+                                                            </div>
+                                                            <DialogClose>
+                                                                <Button className="mt-6 bg-gray-500 text-white px-4 py-2 rounded w-full">
+                                                                    Close
+                                                                </Button>
+                                                            </DialogClose>
+                                                        </DialogContent>
+                                                    </Dialog>
                                                 </div>
                                             </div>
                                         );
