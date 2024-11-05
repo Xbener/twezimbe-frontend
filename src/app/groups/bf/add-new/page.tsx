@@ -114,7 +114,7 @@ function BereavementFundPage({ }: Props) {
                     >
                         <option value="bank">Bank Account</option>
                         <option value="mobile">Mobile Money Account</option>
-                        <option value="wallet">BF Virtual Wallet</option>
+                        {/* <option value="wallet">BF Virtual Wallet</option> */}
                     </select>
                 </div>
 
