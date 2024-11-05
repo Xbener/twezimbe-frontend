@@ -34,7 +34,7 @@ const PrimaryMenu = () => {
                     <a href={'/'} className="text-[#2f578b]">Book Demo</a>
                     <a href={'/#process'} className="text-[#2f578b]">Process</a>
                     <a href={'/groups'} className="text-[#2f578b]">Group</a>
-                    <a href={'/groups/bf'} className="text-[#2f578b]">Bearevement Fund</a>
+                    <a href={'/groups/bf'} className="text-[#2f578b]">Bereavement Fund</a>
                 </span>
             </div>
 

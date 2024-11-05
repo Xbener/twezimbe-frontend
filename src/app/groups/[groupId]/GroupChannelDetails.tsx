@@ -105,7 +105,7 @@ function ChannelDetails({ }: Props) {
     const menuItems = [
         { name: "Group settings", link: `/groups/${group?._id}/settings`, icon: <Settings />, privilege: 'user' },
         {
-            name: "Create a bearevement fund", link: `/groups/bf/add-new`, onClick: () => {
+            name: "Create a bereavement fund", link: `/groups/bf/add-new`, onClick: () => {
                 if (group) {
                     setSelectedGroup(group)
                     router.push('/groups/bf/add-new')
@@ -131,7 +131,7 @@ function ChannelDetails({ }: Props) {
         if (item.name === "Upgrade Plan" && group?.upgraded) {
             return false;
         }
-        if (item.name === "Create a bearevement fund" && group?.has_bf) {
+        if (item.name === "Create a bereavement fund" && group?.has_bf) {
             return false
         }
         return item.privilege !== 'admin' || (currentUser?._id === group?.created_by[0]?._id);
@@ -205,14 +205,14 @@ function ChannelDetails({ }: Props) {
                 {
                     (group?.has_bf && groupBF) && (
                         <div className="flex flex-col items-start justify-start text-[0.9rem]">
-                            <h1 className="font-bold">Group Bearevement Fund</h1>
+                            <h1 className="font-bold">Group Bereavement Fund</h1>
 
                             <div className='mt-5 flex flex-col w-full'>
                                 <span className="p-2 w-full bg-transparent hover:bg-[rgba(255,255,255,0.29)] cursor-pointer rounded-md duration-100 mb-3"
                                     onClick={() => {
                                         setIsMemberListOpen(false)
                                         setIsSideBarOpen(false)
-                                        router.push(`/groups/${group?._id}/bearevement-fund`)
+                                        router.push(`/groups/${group?._id}/bereavement-fund`)
                                     }}
                                 >
                                     {groupBF?.fundName}
@@ -220,18 +220,18 @@ function ChannelDetails({ }: Props) {
                                 {
                                     groupBF?.role?.includes('principal') && (
                                         <span className="p-2 w-full bg-transparent hover:bg-[rgba(255,255,255,0.29)] cursor-pointer rounded-md duration-100 mb-3"
-                                    onClick={() => {
-                                        setIsSideBarOpen(false)
-                                        setIsMemberListOpen(false)
-                                        router.push(`/groups/${group?._id}/principal-dashboard`)
-                                    }}
-                                >
-                                    Principal dashboard
-                                </span>
+                                            onClick={() => {
+                                                setIsSideBarOpen(false)
+                                                setIsMemberListOpen(false)
+                                                router.push(`/groups/${group?._id}/principal-dashboard`)
+                                            }}
+                                        >
+                                            Principal dashboard
+                                        </span>
                                     )
                                 }
                                 {
-                                    bfMembers && !bfMembers?.find(member=>member?.user?._id===currentUser?._id) && (
+                                    bfMembers && !bfMembers?.find(member => member?.user?._id === currentUser?._id) && (
                                         <span className="p-2 w-full bg-transparent hover:bg-[rgba(255,255,255,0.29)] cursor-pointer rounded-md duration-100 mb-3"
                                             onClick={async () => {
                                                 const request = await applyToJoinBF({ userId: currentUser?._id!, bf_id: groupBF?._id! })

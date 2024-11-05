@@ -90,7 +90,7 @@ function GroupProvider({ children }: Props) {
                 if (!data.status) throw new Error(data.error || data.message || data.errors)
                 setBfJoinRequests(data.requests)
             } catch (error) {
-                console.log('error getting group bearevement fund', error)
+                console.log('error getting group bereavement fund', error)
             }
         }
         if (groupBF) {
@@ -113,7 +113,7 @@ function GroupProvider({ children }: Props) {
                 if (!data.status) throw new Error(data.error || data.message || data.errors)
                 setGroupBF({ ...data.bf.fund, role: data.bf.role })
             } catch (error) {
-                console.log('error getting group bearevement fund', error)
+                console.log('error getting group bereavement fund', error)
             }
         }
 
