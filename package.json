@@ -70,6 +70,7 @@
     "react-spinners": "^0.14.1",
     "react-tailwindcss-select": "^1.8.5",
     "react-textarea-mention": "^1.0.11",
+    "recharts": "^2.13.3",
     "socket.io-client": "^4.8.0",
     "sonner": "^1.7.0",
     "tailwind-merge": "^2.5.4",

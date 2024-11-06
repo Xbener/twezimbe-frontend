@@ -1,5 +1,7 @@
 'use client'
 import { useGetProfileData } from '@/api/auth'
+import AreaChartComponent from '@/components/charts/AreaChart'
+import {PieChartComponent } from '@/components/charts/PieChart'
 import GroupMemberItem from '@/components/groups/GroupMemberItem'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog'
@@ -93,7 +95,7 @@ function page({ }: Props) {
     cases
   ])
   return (
-    <div>
+    <div className='bg-white text-neutral-700'>
       <div className='w-full p-2 flex justify-between border-b'>
         <div className='flex items-center gap-2'>
           <LucideOrigami />
@@ -127,6 +129,16 @@ function page({ }: Props) {
           }
         </div>
 
+        <div className="flex p-2 w-full items-start justify-start">
+         <div className='w-1/2 flex flex-col gap-3'>
+          <h1 className='text-[1.2rem] font-bold mb-2 text-center'>Balance history</h1>
+            <AreaChartComponent />
+         </div>
+         <div className='w-1/2 flex flex-col gap-3'>
+          <h1 className='text-[1.2rem] font-bold mb-2 text-center'>Member deposits</h1>
+            <PieChartComponent />
+         </div>
+        </div>
         <div className='w-full flex gap-4 items-start mt-5'>
           <div className=' mt-5 w-[70%] '>
             <div className='w-1/2'>
@@ -425,7 +437,7 @@ function page({ }: Props) {
             </div>
           </div>
 
-          <div className='w-[30%] h-auto shadow-md p-4 rounded-md flex flex-col gap-2 bg-[rgba(29,68,117,0.33)]'>
+          <div className='w-[30%] h-auto shadow-md p-4 rounded-md flex flex-col gap-2 bg-neutral-100'>
             <h1 className="text-[1.3rem] text-center font-bold capitalize">{groupBF?.fundName}</h1>
             <p>Details: {groupBF?.fundDetails}</p>
             <p>Wallet: {groupBF?.walletAddress}</p>
