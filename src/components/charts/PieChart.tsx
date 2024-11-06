@@ -1,23 +1,30 @@
 'use client'
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, PieChart, Pie, Tooltip, Cell, Legend } from 'recharts'
 
-// Example data for member deposits
-const data = [
-    { name: "John Doe", deposit: 15900 },
-    { name: "Jane Smith", deposit: 12000 },
-    { name: "Mark Johnson", deposit: 8500 },
-    { name: "Emily Davis", deposit: 2000 },
-    { name: "Paul Brown", deposit: 5000 },
-];
-const COLORS = ['#76D7C4', '#F39C12', '#E74C3C', '#3498DB', '#2ECC71'];
-export const PieChartComponent = () => {
+interface Props {
+    data: {
+        name?: string
+        amount?: any
+    }[]
+}
+
+// Define initial colors
+const BASE_COLORS = ['#76D7C4', '#F39C12', '#E74C3C', '#3498DB', '#2ECC71'];
+
+// Function to generate a new color based on an index
+const generateColor = (index: number) => {
+    const hue = (index * 137) % 360; // Using a prime-based offset to get varied hues
+    return `hsl(${hue}, 70%, 50%)`;
+}
+
+export const PieChartComponent = ({ data }: Props) => {
     return (
         <PieChart width={500} height={300} className="text-white">
             <Tooltip />
             {/* <Legend /> */}
             <Pie
                 data={data}
-                dataKey="deposit"
+                dataKey="amount"
                 nameKey="name"
                 cx="50%"
                 cy="50%"
@@ -26,7 +33,10 @@ export const PieChartComponent = () => {
                 label
             >
                 {data.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell
+                        key={`cell-${index}`}
+                        fill={index < BASE_COLORS.length ? BASE_COLORS[index] : generateColor(index)}
+                    />
                 ))}
             </Pie>
         </PieChart>

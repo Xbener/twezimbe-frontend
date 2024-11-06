@@ -1,7 +1,7 @@
 'use client'
 import { useGetProfileData } from '@/api/auth'
 import AreaChartComponent from '@/components/charts/AreaChart'
-import {PieChartComponent } from '@/components/charts/PieChart'
+import { PieChartComponent } from '@/components/charts/PieChart'
 import GroupMemberItem from '@/components/groups/GroupMemberItem'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog'
@@ -11,7 +11,7 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 import { countryCodes } from '@/constants'
 import { GroupContext } from '@/context/GroupContext'
 import { fileCase, getCases, updateCase } from '@/lib/bf'
-import { Case } from '@/types'
+import { Case, Wallet } from '@/types'
 import { makePayment } from '@/utils/makePayment'
 import { LucideOrigami, Settings } from 'lucide-react'
 import moment from 'moment'
@@ -32,6 +32,7 @@ function page({ }: Props) {
   const { currentUser } = useGetProfileData()
   let [metadata, setMetadata] = useState<MetaData[] | null>(null)
   const [cases, setCases] = useState<Case[]>([])
+  const userDepositsRef = useRef<any[]>([])
   const [payForm, setPayForm] = useState({
     open: false,
     data: {
@@ -49,6 +50,36 @@ function page({ }: Props) {
   })
   const [isLoading, setIsLoading] = useState(false)
   const memberFilters = ['All', 'Admins', 'Principals']
+  const processWalletData = () => {
+    const userAmountMap: { [key: string]: number } = {};
+
+    groupBF?.wallet?.transactionHistory.forEach((transaction) => {
+      if (transaction.amount) {
+        // Ensure the amount is treated as a number
+        const amount = typeof transaction.amount === 'string' ? parseFloat(transaction.amount) : transaction.amount;
+
+        // Create a unique key for the user using first and last name
+        const userName = `${transaction.user.firstName} ${transaction.user.lastName}`;
+
+        // Group amounts by user and sum them
+        if (userAmountMap[userName]) {
+          userAmountMap[userName] += amount;
+        } else {
+          userAmountMap[userName] = amount;
+        }
+      }
+    });
+
+    // Convert the map to an array of UserAmount objects
+    const userAmountArray = Object.keys(userAmountMap).map((name) => ({
+      name,
+      amount: userAmountMap[name],
+    }));
+
+    return userAmountArray;
+  };
+
+
 
   const handleCountryCodeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const countryCode = e.target.value;
@@ -89,11 +120,15 @@ function page({ }: Props) {
         value: groupBF?.contributions?.length
       }
     ])
+
+    userDepositsRef.current = processWalletData()
   }, [
     group,
     groupBF,
     cases
   ])
+
+
   return (
     <div className='bg-white text-neutral-700'>
       <div className='w-full p-2 flex justify-between border-b'>
@@ -130,14 +165,14 @@ function page({ }: Props) {
         </div>
 
         <div className="flex p-2 w-full items-start justify-start">
-         <div className='w-1/2 flex flex-col gap-3'>
-          <h1 className='text-[1.2rem] font-bold mb-2 text-center'>Balance history</h1>
+          <div className='w-1/2 flex flex-col gap-3'>
+            <h1 className='text-[1.2rem] font-bold mb-2 text-center'>Balance history</h1>
             <AreaChartComponent />
-         </div>
-         <div className='w-1/2 flex flex-col gap-3'>
-          <h1 className='text-[1.2rem] font-bold mb-2 text-center'>Member deposits</h1>
-            <PieChartComponent />
-         </div>
+          </div>
+          <div className='w-1/2 flex flex-col gap-3'>
+            <h1 className='text-[1.2rem] font-bold mb-2 text-center'>Member deposits</h1>
+            <PieChartComponent data={userDepositsRef.current} />
+          </div>
         </div>
         <div className='w-full flex gap-4 items-start mt-5'>
           <div className=' mt-5 w-[70%] '>
