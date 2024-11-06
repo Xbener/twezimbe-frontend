@@ -1,4 +1,5 @@
 'use client'
+import { useGetProfileData } from '@/api/auth'
 import GroupMemberItem from '@/components/groups/GroupMemberItem'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog'
@@ -6,7 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { countryCodes } from '@/constants'
 import { GroupContext } from '@/context/GroupContext'
-import { getCases, updateCase } from '@/lib/bf'
+import { fileCase, getCases, updateCase } from '@/lib/bf'
 import { Case } from '@/types'
 import { LucideOrigami, Settings } from 'lucide-react'
 import moment from 'moment'
@@ -24,6 +25,7 @@ function page({ }: Props) {
 
   const { groupBF, group, bfMembers } = React.useContext(GroupContext)
   const router = useRouter()
+  const {currentUser} = useGetProfileData()
   let [metadata, setMetadata] = useState<MetaData[] | null>(null)
   const [cases, setCases] = useState<Case[]>([])
   const [payForm, setPayForm] = useState({
@@ -34,6 +36,13 @@ function page({ }: Props) {
       countryCode: countryCodes[0].code
     }
   })
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [newCase, setNewCase] = useState({
+    name: '',
+    description: '',
+    principalId: currentUser?._id
+  })
+  const [isLoading, setIsLoading] = useState(false)
   const memberFilters = ['All', 'Admins', 'Principals']
 
   const handleCountryCodeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -135,8 +144,91 @@ function page({ }: Props) {
             </div>
               
             <div className='w-full shadow-md mt-5 p-2'>
-              <h1 className='text-[1.2rem] mb-4 p-2'>Available Cases</h1>
-              <Table className="border bg-white rounded-md">
+            <div className="w-full flex items-center justify-between">
+                <h1 className='text-[1.2rem] mb-4 p-2'>Available Cases</h1>
+                <Dialog open={dialogOpen}>
+                  {
+                    (groupBF?.role && groupBF?.role?.includes('principal')) && (
+                      <DialogTrigger>
+                        <Button onClick={() => setDialogOpen(true)} className="bg-blue-500 text-white">
+                          file a case
+                        </Button>
+                      </DialogTrigger>
+                    )
+                  }
+                  <DialogContent
+                    className="w-full bg-white"
+                  >
+                    <DialogHeader>
+                      File a new case
+                    </DialogHeader>
+                    <div className="p-4 rounded-md shadow-md w-full">
+                      <h3 className="text-xl font-bold text-white mb-4">File a New Case</h3>
+                      <form>
+                        {/* Name Input */}
+                        <div className="mb-4">
+                          <label htmlFor="name" className="block text-sm font-medium ">Case Name</label>
+                          <input
+                            type="text"
+                            id="name"
+                            onChange={(e) => setNewCase(prev => ({ ...prev, name: e.target.value }))}
+                            name="name"
+                            className="mt-1 p-2 w-full border border-gray-700 rounded "
+                            placeholder="Enter case name"
+                            required
+                          />
+                        </div>
+
+                        {/* Description Input */}
+                        <div className="mb-4">
+                          <label htmlFor="description" className="block text-sm font-medium ">Description</label>
+                          <textarea
+                            id="description"
+                            name="description"
+                            className="mt-1 p-2 w-full border border-gray-700 rounded-md"
+                            onChange={(e) => setNewCase(prev => ({ ...prev, description: e.target.value }))}
+                            placeholder="Enter case description"
+                            rows={3}
+                            required
+                          ></textarea>
+                        </div>
+
+                        {/* Submit Button */}
+                        <div className="flex items-center gap-3 mt-3">
+
+                          <button
+                            disabled={isLoading}
+                            onClick={async (e) => {
+                              setIsLoading(true)
+                              e.preventDefault()
+                              const { status, case: returnedCase } = await fileCase(groupBF?._id!, newCase)
+                              setIsLoading(false)
+                              if (status) {
+                                setCases(prev => [...prev, returnedCase])
+                                setDialogOpen(false)
+                              }
+                            }}
+                            type="submit"
+                            className="w-full bg-blue-600 disabled:cursor-pointer-allowed hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded mt-2"
+                          >
+                            Submit Case
+                          </button>
+
+                          <button
+                            className="w-full bg-transparent border border-orange-500 text-orange font-semibold py-2 px-4 rounded mt-2"
+                            onClick={() => setDialogOpen(false)}
+                          >
+
+                            cancel
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+
+                  </DialogContent>
+                </Dialog>
+            </div>
+              <Table className="border max-h-[500px] overflow-scroll bg-white rounded-md">
                 <TableCaption>Latest Cases</TableCaption>
                 <TableHeader className="border-b text-neutral-700 font-bold">
                   <TableHead>Name</TableHead>
@@ -239,7 +331,7 @@ function page({ }: Props) {
 
             <div className='w-full shadow-md mt-5 p-2'>
               <h1 className='text-[1.2rem] mb-4 p-2'>Latest transactions</h1>
-              <Table className='border bg-white  rounded-md'>
+              <Table className='border max-h-[500px] overflow-scroll bg-white  rounded-md'>
                 <TableCaption>Latest transactions</TableCaption>
                 <TableHeader className='border-b text-neutral-700 font-bold' >
                   <TableHead>Billing name</TableHead>

@@ -701,6 +701,254 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                 )
             }
 
+            <section className="mt-5">
+                <div className="p-2 flex items-start w-full flex-col max-h-[500px] overflow-auto">
+                    <h2 className="text-lg font-semibold text-white text-left">5. Filed cases</h2>
+                    <div className="flex items-center gap-3 mt-3">
+                        <Button className="bg-transparent text-white border">
+                            filter
+                        </Button>
+                        <Dialog open={dialogOpen}>
+                            {
+                                (groupBF?.role && groupBF?.role?.includes('principal')) && (
+                                    <DialogTrigger>
+                                        <Button onClick={() => setDialogOpen(true)} className="bg-blue-500 text-white">
+                                            file a case
+                                        </Button>
+                                    </DialogTrigger>
+                                )
+                            }
+                            <DialogContent
+                                className="w-full bg-white"
+                            >
+                                <DialogHeader>
+                                    File a new case
+                                </DialogHeader>
+                                <div className="p-4 rounded-md shadow-md w-full">
+                                    <h3 className="text-xl font-bold text-white mb-4">File a New Case</h3>
+                                    <form>
+                                        {/* Name Input */}
+                                        <div className="mb-4">
+                                            <label htmlFor="name" className="block text-sm font-medium ">Case Name</label>
+                                            <input
+                                                type="text"
+                                                id="name"
+                                                onChange={(e) => setNewCase(prev => ({ ...prev, name: e.target.value }))}
+                                                name="name"
+                                                className="mt-1 p-2 w-full border border-gray-700 rounded "
+                                                placeholder="Enter case name"
+                                                required
+                                            />
+                                        </div>
+
+                                        {/* Description Input */}
+                                        <div className="mb-4">
+                                            <label htmlFor="description" className="block text-sm font-medium ">Description</label>
+                                            <textarea
+                                                id="description"
+                                                name="description"
+                                                className="mt-1 p-2 w-full border border-gray-700 rounded-md"
+                                                onChange={(e) => setNewCase(prev => ({ ...prev, description: e.target.value }))}
+                                                placeholder="Enter case description"
+                                                rows={3}
+                                                required
+                                            ></textarea>
+                                        </div>
+
+                                        {/* Submit Button */}
+                                        <div className="flex items-center gap-3 mt-3">
+
+                                            <button
+                                                disabled={isLoading}
+                                                onClick={async (e) => {
+                                                    setIsLoading(true)
+                                                    e.preventDefault()
+                                                    const { status, case: returnedCase } = await fileCase(groupBF?._id!, newCase)
+                                                    setIsLoading(false)
+                                                    if (status) {
+                                                        setCases(prev => [...prev, returnedCase])
+                                                        setDialogOpen(false)
+                                                    }
+                                                }}
+                                                type="submit"
+                                                className="w-full bg-blue-600 disabled:cursor-pointer-allowed hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded mt-2"
+                                            >
+                                                Submit Case
+                                            </button>
+
+                                            <button
+                                                className="w-full bg-transparent border border-orange-500 text-orange font-semibold py-2 px-4 rounded mt-2"
+                                                onClick={() => setDialogOpen(false)}
+                                            >
+
+                                                cancel
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                            </DialogContent>
+                        </Dialog>
+                    </div>
+                    <div className="grid sm:grid-cols-3 grid-cols-1 gap-4 w-full mt-5">
+                        {
+                            cases.length ? (
+                                cases.map((caseItem: Case) => {
+                                    return (
+                                        <div className="bg-gray-800 p-3 rounded-md" key={caseItem._id}>
+                                            <h3 className="text-xl font-bold text-white mb-2">
+                                                {caseItem.name}
+                                            </h3>
+                                            <p className="text-sm text-gray-400 mb-2">
+                                                {caseItem.description.length > 100
+                                                    ? `${caseItem.description.slice(0, 100)}...`
+                                                    : caseItem.description}
+                                            </p>
+                                            <div className="flex flex-col space-y-1">
+                                                <p className="text-sm">
+                                                    <span className="font-semibold ">Status:</span>
+                                                    <span className={`ml-1 text-${caseItem.status === 'Open' ? 'green-400' : 'red-400'}`}>
+                                                        {caseItem.status}
+                                                    </span>
+                                                </p>
+                                                <p className="text-sm">
+                                                    <span className="font-semibold ">Contribution status:</span>
+                                                    <span className={`ml-1 ${caseItem.contributionStatus === 'Complete' ? 'text-green-400' : 'text-red-400'}`}>
+                                                        {caseItem.contributionStatus}
+                                                    </span>
+                                                </p>
+                                                <p className="text-sm text-gray-400">
+                                                    <span className="font-semibold ">File on:</span> {moment(caseItem.createdAt).format('LL')}
+                                                </p>
+                                            </div>
+                                            <div className='w-full flex gap-2 mt-2'>
+                                                <Dialog>
+                                                    <DialogTrigger className="w-1/2">
+                                                        <Button className="bg-green-500 text-white w-full">contribute</Button>
+                                                    </DialogTrigger>
+                                                    <DialogContent className="w-full bg-white p-6 rounded-lg">
+                                                        <DialogHeader className="text-xl font-bold mb-4">Make a Contribution</DialogHeader>
+                                                        <div className="mb-4">
+                                                            <Input
+                                                                className="text-black border-2 border-blue-500"
+                                                                type="text"
+                                                                name="amount"
+                                                                placeholder="Enter amount to deposit"
+                                                                value={payForm.data.amount}
+                                                                onChange={(e) => {
+                                                                    const input = e.target.value;
+                                                                    if (/^\d*$/.test(input)) { // Allows only digits
+                                                                        setPayForm(prev => ({ ...prev, data: { ...prev.data, amount: input } }));
+                                                                    }
+                                                                }}
+                                                            />
+
+                                                            <div className="w-full flex cursor-pointer mt-3">
+                                                                <select
+                                                                    className="text-black border border-gray-300 rounded-l p-2"
+                                                                    value={payForm.data.countryCode}
+                                                                    onChange={handleCountryCodeChange}
+                                                                >
+                                                                    {countryCodes.map((country) => (
+                                                                        <option key={country.code} value={country.code}>
+                                                                            {country.label} ({country.code})
+                                                                        </option>
+                                                                    ))}
+                                                                </select>
+                                                                <input
+                                                                    className="text-black p-2 rounded-r w-full"
+                                                                    type="text"
+                                                                    name="phone"
+                                                                    maxLength={9}
+                                                                    placeholder="Enter mobile phone number"
+                                                                    value={payForm.data.phone}
+                                                                    onChange={(e) => {
+                                                                        const input = e.target.value;
+                                                                        if (/^\d*$/.test(input)) { // Allows only digits
+                                                                            setPayForm(prev => ({ ...prev, data: { ...prev.data, phone: input } }));
+                                                                        }
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex gap-2 mt-3">
+                                                            <DialogClose>
+                                                                <Button
+                                                                    // disabled={payForm.data.amount === 0 || payForm.data.phone === ""}
+                                                                    onClick={makePayment}
+                                                                    className="bg-blue-500 text-white disabled:cursor-not-allowed">
+                                                                    Confirm
+                                                                </Button>
+                                                            </DialogClose>
+                                                            <DialogClose>
+                                                                <Button
+                                                                    onClick={() => setPayForm({ open: false, data: { amount: "", phone: "", countryCode: countryCodes[0].code } })}
+                                                                    className="bg-transparent border-orange-500 border text-orange-500">
+                                                                    Cancel
+                                                                </Button>
+                                                            </DialogClose>
+                                                        </div>
+                                                    </DialogContent>
+                                                </Dialog>
+                                                <Dialog>
+                                                    <DialogTrigger className="w-1/2">
+                                                        <Button className="bg-blue-500 text-white w-full">more</Button>
+                                                    </DialogTrigger>
+                                                    <DialogContent className="w-full bg-white p-6 rounded-lg">
+                                                        <DialogHeader className="text-xl font-bold mb-4">Case Details</DialogHeader>
+                                                        <p className="text-sm text-gray-600 mb-2">
+                                                            <span className="font-semibold">Name:</span> {caseItem.name}
+                                                        </p>
+                                                        <p className="text-sm text-gray-600 mb-2">
+                                                            <span className="font-semibold">Created by:</span> {caseItem.principal.firstName} {caseItem.principal.lastName}
+                                                        </p>
+                                                        <p className="text-sm text-gray-600 mb-2">
+                                                            <span className="font-semibold">Description:</span> {caseItem.description}
+                                                        </p>
+                                                        <p className="text-sm text-gray-600 mb-2">
+                                                            <span className="font-semibold">Filed on:</span> {moment(caseItem.createdAt).format('LL')}
+                                                        </p>
+                                                        <div className="flex items-center gap-4 mt-4">
+                                                            <Button
+                                                                onClick={async () => {
+                                                                    const { status, case: updatedCase } = await updateCase(caseItem._id, { status: caseItem.status === 'Open' ? 'Closed' : 'Open' })
+                                                                    if (status) {
+                                                                        setCases(prev => prev.map(prevCase => prevCase?._id === caseItem?._id ? { ...updatedCase, status: caseItem.status === 'Open' ? 'Closed' : 'Open' } : { ...caseItem }))
+                                                                    }
+                                                                }}
+                                                                className={`text-white px-4 py-2 rounded ${caseItem.status === 'Open' ? 'bg-red-500' : 'bg-green-500'}`}>
+                                                                Mark as {caseItem.status === 'Open' ? 'Closed' : 'Open'}
+                                                            </Button>
+                                                            <Button
+                                                                onClick={async () => {
+                                                                    const { status, case: updatedCase } = await updateCase(caseItem._id, { contributionStatus: caseItem.contributionStatus === 'Complete' ? 'Incomplete' : 'Complete' })
+                                                                    if (status) {
+                                                                        setCases(prev => prev.map(prevCase => prevCase?._id === caseItem?._id ? { ...updatedCase, contributionStatus: caseItem.contributionStatus === 'Complete' ? 'Incomplete' : 'Complete' } : { ...caseItem }))
+                                                                    }
+                                                                }}
+                                                                className={`text-white px-4 py-2 rounded ${caseItem.contributionStatus === 'Complete' ? 'bg-red-500' : 'bg-green-500'}`}>
+                                                                Mark Contribution {caseItem.contributionStatus === 'Complete' ? 'Incomplete' : 'Complete'}
+                                                            </Button>
+                                                        </div>
+                                                        <DialogClose>
+                                                            <Button className="mt-6 bg-gray-500 text-white px-4 py-2 rounded w-full">
+                                                                Close
+                                                            </Button>
+                                                        </DialogClose>
+                                                    </DialogContent>
+                                                </Dialog>
+                                            </div>
+                                        </div>
+                                    );
+                                })
+                            ) : (
+                                <p className="text-white col-span-3 text-center">No cases available</p>
+                            )
+                        }
+                    </div>
+                </div>
+            </section>
+
         </div>
     );
 }
