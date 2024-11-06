@@ -1,7 +1,7 @@
 'use client'
 import React, { useContext, useEffect } from 'react'
 import Aside from './Aside'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams, usePathname, useRouter } from 'next/navigation'
 import { useGetGroup } from '@/api/group'
 import { GroupContext } from '@/context/GroupContext'
 import MemberList from './MemberList'
@@ -24,6 +24,7 @@ function GroupIdLayout({ children }: Props) {
     const { setChannelList, setCurrentChannel, channelList } = useMyContext()
     const { currentUser } = useGetProfileData()
     const router = useRouter()
+    const pathname = usePathname()
 
     useEffect(() => {
         const fetchGroup = async () => {
@@ -66,12 +67,16 @@ function GroupIdLayout({ children }: Props) {
                 <div className="w-full sm:w-[75%] md:w-[70%] lg:w-[65%] xl:w-[85%] overflow-auto flex-grow relative">
                     {children}
                 </div>
-                <MemberList
-                    isLoading={isLoading}
-                    admins={admins}
-                    moderators={moderators}
-                    members={members}
-                />
+              {
+                !pathname.includes('/dashboard') && (
+                        <MemberList
+                            isLoading={isLoading}
+                            admins={admins}
+                            moderators={moderators}
+                            members={members}
+                        />
+                ) 
+              }
             </div>
         </div>
     )

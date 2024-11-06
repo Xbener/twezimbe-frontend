@@ -105,7 +105,7 @@ function Groups({ }: Props) {
       if (data.status) {
         toast.success('Request sent successfully. Wait for approval from admins');
         setFormattedGroups(prev => prev?.filter(prevGroup => prevGroup?._id !== group._id));
-      } else {
+      } else { 
         toast.error(data.errors || data.message);
       }
     } catch (error) {

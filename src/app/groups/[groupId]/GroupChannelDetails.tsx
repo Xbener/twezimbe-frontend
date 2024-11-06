@@ -212,7 +212,7 @@ function ChannelDetails({ }: Props) {
                                     onClick={() => {
                                         setIsMemberListOpen(false)
                                         setIsSideBarOpen(false)
-                                        router.push(`/groups/${group?._id}/bereavement-fund`)
+                                        router.push(`/groups/${group?._id}/bf/dashboard`)
                                     }}
                                 >
                                     {groupBF?.fundName}

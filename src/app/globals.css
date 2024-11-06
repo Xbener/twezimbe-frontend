@@ -22,12 +22,6 @@
 
 body {
   color: var(--foreground-rgb);
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      var(--background-end-rgb)
-    )
-    var(--background-start-rgb);
 }
 
 @layer utilities {
@@ -35,8 +29,6 @@ body {
     text-wrap: balance;
   }
 }
-
-
 
 button{
   @apply disabled:cursor-not-allowed
