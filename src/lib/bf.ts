@@ -238,7 +238,7 @@ export const getCases = async (bfId: string) => {
         console.log('error getting cases settings', error)
     }
 }
-export const fileCase = async (bfId: string, body: {name:string, description:string, principalId?:string}) => {
+export const fileCase = async (bfId: string, body: { name: string, description: string, principalId?: string }) => {
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bf/cases/${bfId}`, {
             method: 'POST',
@@ -280,8 +280,8 @@ export const updateCase = async (caseId: string, body?: any) => {
 }
 
 
-export const updateWalletBalance = async (body: {userId:string, walletAddress: string, amount: number}) => {
-        const token = Cookies.get("access-token")
+export const updateWalletBalance = async (body: { userId: string, walletAddress: string, amount: number }) => {
+    const token = Cookies.get("access-token")
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bf/wallet`, {
             method: 'PUT',
@@ -303,6 +303,23 @@ export const updateWalletBalance = async (body: {userId:string, walletAddress: s
 }
 
 
-export const makeContribution = async () => {
-    alert("under development")
+export const makeContribution = async (body: { walletAddress: string, contributor: string, amount: number, contribute_case: string }) => {
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bf/contributions`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Cookies.get('access-token')}`
+            },
+            body: JSON.stringify(body)
+        })
+
+        const data = await res.json()
+        if (!data.status) return toast.error(data.message || data.errors || "failed to contribute. please try again")
+        toast.success(data.message)
+        window.location.reload()
+        return data
+    } catch (error) {
+        console.log('error contributing', error)
+    }
 }

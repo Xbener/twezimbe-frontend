@@ -467,6 +467,14 @@ export interface Wallet {
     }]
 }
 
+export interface Contribution  {
+    contributor: User
+    amount: number
+    walletAddress: string
+    case: string
+    date: Date
+}
+
 export interface BF {
     fundName: string;
     fundDetails: string;
@@ -478,7 +486,10 @@ export interface BF {
     _id?: string;
     role?:string;
     wallet?: Wallet
+    contributions?: Contribution[]
 }
+
+
 
 export interface IBFMember {
     user: User

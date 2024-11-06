@@ -111,7 +111,7 @@ function GroupProvider({ children }: Props) {
                 const data = await res.json()
                 console.log('group fund', data)
                 if (!data.status) throw new Error(data.error || data.message || data.errors)
-                setGroupBF({ ...data.bf.fund, role: data.bf.role, wallet: data.bf.wallet })
+                setGroupBF({ ...data.bf.fund, role: data.bf.role, wallet: data.bf.wallet, contributions: data.bf.contributions })
             } catch (error) {
                 console.log('error getting group bereavement fund', error)
             }
