@@ -457,6 +457,16 @@ export type UserSettings = {
 };
 
 
+export interface Wallet { 
+    walletAddress: string
+    balance: number
+    transactionHistory: [{
+        amount?:number|string
+        date?: Date
+        user: User
+    }]
+}
+
 export interface BF {
     fundName: string;
     fundDetails: string;
@@ -467,6 +477,7 @@ export interface BF {
     createdBy: User[];
     _id?: string;
     role?:string;
+    wallet?: Wallet
 }
 
 export interface IBFMember {

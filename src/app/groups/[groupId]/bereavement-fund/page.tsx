@@ -9,7 +9,7 @@ import LoadingButton from '@/components/LoadingButton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { iconTextGenerator } from '@/lib/iconTextGenerator';
-import { acceptRequest, addBfMember, declineRequest, fileCase, getCases, updateUserRole, updateCase } from '@/lib/bf';
+import { acceptRequest, addBfMember, declineRequest, fileCase, getCases, updateUserRole, updateCase, updateWalletBalance } from '@/lib/bf';
 import { Dialog, DialogContent, DialogHeader, DialogTrigger, DialogClose } from '@/components/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useGetProfileData } from '@/api/auth';
@@ -204,7 +204,11 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                     description: "Add funds to your Bereavement Fund",
                     logo: "https://checkout.flutterwave.com/assets/img/rave-logo.png",
                 },
-                // callback: () => handleUpgrade(),
+                callback: async (e: any) => {
+                    await updateWalletBalance({userId:currentUser?._id!, walletAddress: groupBF?.wallet?.walletAddress!, amount: parseFloat(payForm.data.amount)})
+                    console.log("paid successfully", e)
+
+                },
                 onclose: function () {
                     console.log("Payment cancelled!");
                 }
@@ -384,20 +388,62 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                     ) : (
                         <div className="bg-gray-900 p-6 rounded-lg shadow-md">
                             <h2 className="text-2xl font-semibold text-white mb-4">Fund Settings Overview</h2>
-                            <div className="flex flex-col gap-2 items-start justify-start">
-                                <p>
+                            <div className="flex flex-col gap-2 items-start justify-start w-full">
+                               <div className="w-full flex jusitfy-between flex-col">
+                                <div className="flex flex-col gap-2">
+                                     <p>
                                     wallet: {groupBF?.walletAddress}
                                 </p> <p>
-                                    Deposited funds: 0 UGX
+                                    Deposited funds: {groupBF?.wallet?.balance} UGX
                                 </p>
-                                <p>
-                                    Deposited funds by you: 0 UGX
-                                </p>
-                                <Button
+                                </div>
+                               <div className="flex mt-3 gap-2">
+                                 <Button
                                     onClick={() => setPayForm(prev => ({ ...prev, open: true }))}
-                                    className="bg-blue-500">
+                                    className="bg-blue-500 ">
                                     Deposit funds
                                 </Button>
+                                <Dialog>
+                                    <DialogTrigger>
+                                         <Button
+                                    className="bg-blue-500 ">
+                                    history
+                                </Button>
+                                    </DialogTrigger>
+                                <DialogContent 
+                                className="w-full bg-white"
+                                >
+                                    <DialogHeader className="text-[1.2rem]">
+                                        {groupBF?.fundName} transaction history
+                                    </DialogHeader>
+                                                                            <table className="w-full border-collapse shadow-lg rounded-lg overflow-hidden">
+    <thead>
+        <tr className="bg-blue-500 text-white">
+            {/* <th className="px-4 py-2 text-left font-semibold">Type</th> */}
+            <th className="px-4 py-2 text-left font-semibold">User</th>
+            <th className="px-4 py-2 text-left font-semibold">Amount</th>
+            <th className="px-4 py-2 text-left font-semibold">Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {
+            groupBF?.wallet?.transactionHistory?.map((transaction)=>(
+                        <tr className="bg-white border-b hover:bg-gray-100">
+            {/* <td className="px-4 py-3">{transaction.type}</td> */}
+            <td className="px-4 py-3">{transaction.user?.lastName} {transaction.user?.firstName}</td>
+            <td className="px-4 py-3">{transaction?.amount} UGX</td>
+            <td className="px-4 py-3">{moment(transaction.date).format('MMM Do YYYY, h:mm a')}</td>
+        </tr>
+            ))
+        }
+
+    </tbody>
+</table>
+                                </DialogContent>
+                                </Dialog>
+                               </div>
+                               </div>
+
                                 {
                                     payForm.open && (
                                         <div className="flex flex-col gap-2 ">
@@ -446,7 +492,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                                             </div>
                                             <div className="flex gap-2 mt-3">
                                                 <Button
-                                                    disabled={payForm.data.amount === "" || payForm.data.amount !== "0" || payForm.data.phone === ""}
+                                                    disabled={payForm.data.amount === "" || payForm.data.amount === "0" || payForm.data.phone === ""}
                                                     onClick={makePayment}
                                                     className="bg-blue-500">
                                                     Confirm

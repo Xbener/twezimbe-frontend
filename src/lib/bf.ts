@@ -278,3 +278,26 @@ export const updateCase = async (caseId: string, body?: any) => {
         toast.error("failed to update case")
     }
 }
+
+
+export const updateWalletBalance = async (body: {userId:string, walletAddress: string, amount: number}) => {
+        const token = Cookies.get("access-token")
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bf/wallet`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(body)
+        })
+
+        const data = await res.json()
+        if (!data.status) return toast.error(data.errors || data.message)
+        toast.success(data.message)
+        window.location.reload()
+    } catch (error) {
+        console.log('error adding balance', error)
+        toast.error("failed to add balance")
+    }
+}
