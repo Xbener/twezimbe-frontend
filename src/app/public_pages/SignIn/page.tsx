@@ -11,10 +11,10 @@ const SignIn = () => {
   }
 
   return (
-    <div className="flex w-full flex-wrap justify-center">
+    <div className="flex w-full flex-wrap justify-center ">
       <HelmetComponent title="Sign in to your account" />
 
-      <div className="mx-auto w-1/2 hidden lg:flex">
+      <div className="mx-auto w-1/2 hidden lg:flex rounded-md overflow-hidden">
         <img src="/assets/progress3.png" alt="signin" />
       </div>
       <div className="flex flex-col w-full lg:w-1/2 border-2  border-neutral-100 p-4 rounded-md shadow-xl items-center justify-center">
