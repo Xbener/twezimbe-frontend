@@ -3,12 +3,14 @@ import { useGetProfileData } from '@/api/auth'
 import GroupMemberItem from '@/components/groups/GroupMemberItem'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { countryCodes } from '@/constants'
 import { GroupContext } from '@/context/GroupContext'
 import { fileCase, getCases, updateCase } from '@/lib/bf'
 import { Case } from '@/types'
+import { makePayment } from '@/utils/makePayment'
 import { LucideOrigami, Settings } from 'lucide-react'
 import moment from 'moment'
 import { usePathname, useRouter } from 'next/navigation'
@@ -25,7 +27,7 @@ function page({ }: Props) {
 
   const { groupBF, group, bfMembers } = React.useContext(GroupContext)
   const router = useRouter()
-  const {currentUser} = useGetProfileData()
+  const { currentUser } = useGetProfileData()
   let [metadata, setMetadata] = useState<MetaData[] | null>(null)
   const [cases, setCases] = useState<Case[]>([])
   const [payForm, setPayForm] = useState({
@@ -33,7 +35,8 @@ function page({ }: Props) {
     data: {
       amount: "",
       phone: "",
-      countryCode: countryCodes[0].code
+      countryCode: countryCodes[0].code,
+      type: ""
     }
   })
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -127,8 +130,8 @@ function page({ }: Props) {
                 <div className="flex w-full justify-between items-center">
                   <h1 className='text-[1.2rem] mb-4 p-2'>Members</h1>
                   <span className='flex items-center gap-2'>
-                      All
-                     <AiFillCaretDown />
+                    All
+                    <AiFillCaretDown />
                   </span>
                 </div>
                 {
@@ -142,9 +145,9 @@ function page({ }: Props) {
               </div>
               <div></div>
             </div>
-              
+
             <div className='w-full shadow-md mt-5 p-2'>
-            <div className="w-full flex items-center justify-between">
+              <div className="w-full flex items-center justify-between">
                 <h1 className='text-[1.2rem] mb-4 p-2'>Available Cases</h1>
                 <Dialog open={dialogOpen}>
                   {
@@ -227,7 +230,7 @@ function page({ }: Props) {
 
                   </DialogContent>
                 </Dialog>
-            </div>
+              </div>
               <Table className="border max-h-[500px] overflow-scroll bg-white rounded-md">
                 <TableCaption>Latest Cases</TableCaption>
                 <TableHeader className="border-b text-neutral-700 font-bold">
@@ -318,7 +321,72 @@ function page({ }: Props) {
                                 </DialogClose>
                               </DialogContent>
                             </Dialog>
-                            <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">contribute</button>
+                            <Dialog>
+                              <DialogTrigger className="w-full">
+                            <button
+                                  onClick={() => setPayForm(prev => ({ ...prev, open: true, type: "contribution" }))}
+                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">contribute</button>
+                              </DialogTrigger>
+                              <DialogContent className="bg-white">
+                                <DialogHeader className='font-bold text-[1.2rem] text-neutral-700'>
+                                  Contribute to {caseItem.name}
+                                </DialogHeader>
+
+                                <div className="flex flex-col gap-2 ">
+                                  <Input
+                                    className="text-black border-2 "
+                                    type="text"
+                                    name="amount"
+                                    placeholder="Enter amount to deposit"
+                                    value={payForm.data.amount}
+                                    onChange={(e) => {
+                                      const input = e.target.value;
+                                      if (/^\d*$/.test(input)) { // Allows only digits
+                                        setPayForm(prev => ({ ...prev, data: { ...prev.data, amount: input } }));
+                                      }
+                                    }}
+                                  />
+
+                                  <div className="w-full flex cursor-pointer border-2  rounded-md">
+                                    <select
+                                      className="text-black rounded-l-md pl-3"
+                                      defaultValue={"+256"}
+                                      value={payForm.data.countryCode}
+                                      onChange={handleCountryCodeChange}
+                                    >
+                                      {countryCodes.map((country) => (
+                                        <option key={country.code} value={country.code}>
+                                          {country.label} ({country.code})
+                                        </option>
+                                      ))}
+                                    </select>
+                                    <input
+                                      className="text-black p-2 rounded-r w-full"
+                                      type="text"
+                                      name="phone"
+                                      maxLength={9}
+                                      placeholder="Enter mobile phone number"
+                                      value={payForm.data.phone}
+                                      onChange={(e) => {
+                                        const input = e.target.value;
+                                        if (/^\d*$/.test(input)) { // Allows only digits
+                                          setPayForm(prev => ({ ...prev, data: { ...prev.data, phone: input } }));
+                                        }
+                                      }}
+                                    />
+
+                                  </div>
+                                  <div className="flex gap-2 mt-3">
+                                    <Button
+                                      disabled={payForm.data.amount === "" || payForm.data.amount === "0" || payForm.data.phone === ""}
+                                      onClick={() => makePayment(payForm, currentUser!, groupBF!)}
+                                      className="bg-blue-500">
+                                      Confirm
+                                    </Button>
+                                  </div>
+                                </div>
+                              </DialogContent>
+                            </Dialog>
                           </PopoverContent>
                         </Popover>
 
@@ -357,11 +425,74 @@ function page({ }: Props) {
             <h1 className="text-[1.3rem] text-center font-bold capitalize">{groupBF?.fundName}</h1>
             <p>Details: {groupBF?.fundDetails}</p>
             <p>Wallet: {groupBF?.walletAddress}</p>
-            <Button
-              onClick={() => setPayForm(prev => ({ ...prev, open: true }))}
-              className="bg-blue-500 ">
-              Deposit funds
-            </Button>
+            <Dialog>
+              <DialogTrigger className="w-full">
+                <Button
+                  onClick={() => setPayForm(prev => ({ ...prev, open: true, type: "deposit" }))}
+                  className="bg-blue-500 w-full">
+                  Deposit funds
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-white"> 
+                <DialogHeader className='font-bold text-[1.2rem] text-neutral-700'>
+                  Make a deposit to {groupBF?.fundName}
+                </DialogHeader>
+
+                  <div className="flex flex-col gap-2 ">
+                    <Input
+                      className="text-black border-2 "
+                      type="text"
+                      name="amount"
+                      placeholder="Enter amount to deposit"
+                      value={payForm.data.amount}
+                      onChange={(e) => {
+                        const input = e.target.value;
+                        if (/^\d*$/.test(input)) { // Allows only digits
+                          setPayForm(prev => ({ ...prev, data: { ...prev.data, amount: input } }));
+                        }
+                      }}
+                    />
+
+                    <div className="w-full flex cursor-pointer border-2  rounded-md">
+                      <select
+                        className="text-black rounded-l-md pl-3"
+                        defaultValue={"+256"}
+                        value={payForm.data.countryCode}
+                        onChange={handleCountryCodeChange}
+                      >
+                        {countryCodes.map((country) => (
+                          <option key={country.code} value={country.code}>
+                            {country.label} ({country.code})
+                          </option>
+                        ))}
+                      </select>
+                      <input
+                        className="text-black p-2 rounded-r w-full"
+                        type="text"
+                        name="phone"
+                        maxLength={9}
+                        placeholder="Enter mobile phone number"
+                        value={payForm.data.phone}
+                        onChange={(e) => {
+                          const input = e.target.value;
+                          if (/^\d*$/.test(input)) { // Allows only digits
+                            setPayForm(prev => ({ ...prev, data: { ...prev.data, phone: input } }));
+                          }
+                        }}
+                      />
+
+                    </div>
+                    <div className="flex gap-2 mt-3">
+                      <Button
+                        disabled={payForm.data.amount === "" || payForm.data.amount === "0" || payForm.data.phone === ""}
+                      onClick={()=>makePayment(payForm, currentUser!, groupBF!)}
+                        className="bg-blue-500">
+                        Confirm
+                      </Button>
+                    </div>
+                  </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
       </div>

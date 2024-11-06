@@ -301,3 +301,8 @@ export const updateWalletBalance = async (body: {userId:string, walletAddress: s
         toast.error("failed to add balance")
     }
 }
+
+
+export const makeContribution = async () => {
+    alert("under development")
+}
