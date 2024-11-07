@@ -14,7 +14,7 @@ import { fileCase, getCases, updateCase } from '@/lib/bf'
 import { Case, Wallet } from '@/types'
 import { exportToCSV, exportToExcel, exportToPDF } from '@/utils/export'
 import { makePayment } from '@/utils/makePayment'
-import { Download, LucideOrigami, Settings } from 'lucide-react'
+import { ArrowUpAz, Download, LucideOrigami, Settings } from 'lucide-react'
 import moment from 'moment'
 import { usePathname, useRouter } from 'next/navigation'
 import React, { useEffect, useRef, useState } from 'react'
@@ -33,6 +33,8 @@ function page({ }: Props) {
   const { currentUser } = useGetProfileData()
   let [metadata, setMetadata] = useState<MetaData[] | null>(null)
   const [cases, setCases] = useState<Case[]>([])
+  const [sortColumn, setSortColumn] = useState<any>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const userDepositsRef = useRef<any[]>([])
   const [payForm, setPayForm] = useState({
     open: false,
@@ -130,6 +132,36 @@ function page({ }: Props) {
   ])
 
   if (!groupBF) return ('loading ...')
+
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+  };
+
+  const sortedTransactions = [...(groupBF?.wallet?.transactionHistory || [])].sort((a: any, b: any) => {
+    if (!sortColumn) return 0;
+
+    let valueA, valueB;
+    if (sortColumn === 'date') {
+      valueA = new Date(a.date).getTime(); // Convert to timestamp
+      valueB = new Date(b.date).getTime();
+    } else if (sortColumn === 'amount') {
+      valueA = a[sortColumn];
+      valueB = b[sortColumn];
+    } else {
+      valueA = a.user[sortColumn];
+      valueB = b.user[sortColumn];
+    }
+
+    if (valueA < valueB) return sortDirection === 'asc' ? -1 : 1;
+    if (valueA > valueB) return sortDirection === 'asc' ? 1 : -1;
+    return 0;
+  });
+
 
   return (
     <div className='bg-white text-neutral-700'>
@@ -479,13 +511,19 @@ function page({ }: Props) {
               <Table className='border max-h-[500px] overflow-scroll bg-white  rounded-md'>
                 <TableCaption>Latest transactions</TableCaption>
                 <TableHeader className='border-b text-neutral-700 font-bold' >
-                  <TableHead>Billing name</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Date</TableHead>
+                  <TableHead onClick={() => handleSort('lastName')} className='cursor-pointer '>
+                    <span className='flex items-center gap-3 '>Billing name {sortColumn === 'lastName' ? (sortDirection === 'asc' ? '▲' : "") : <ArrowUpAz className='size-3' />}</span>
+                  </TableHead>
+                  <TableHead onClick={() => handleSort('amount')} className='cursor-pointer '>
+                    <span className='flex items-center gap-3 '>Amount {sortColumn === 'amount' ? (sortDirection === 'asc' ? '▲' : '▼') : <ArrowUpAz className='size-3' />}</span>
+                  </TableHead>
+                  <TableHead onClick={() => handleSort('date')} className='cursor-pointer '>
+                    <span className='flex items-center gap-3 '>Date {sortColumn === 'date' ? (sortDirection === 'asc' ? '▲' : '▼') : <ArrowUpAz className='size-3' />}</span>
+                  </TableHead>
                 </TableHeader>
                 <TableBody>
                   {
-                    groupBF?.wallet?.transactionHistory?.map((transaction, index) => (
+                    sortedTransactions?.map((transaction, index) => (
                       <TableRow className='cursor-pointer text-neutral-700 hover:bg-neutral-100'>
                         <TableCell>{transaction.user.lastName} {transaction.user.firstName}</TableCell>
                         <TableCell>{transaction.amount}</TableCell>
