@@ -12,8 +12,9 @@ import { countryCodes } from '@/constants'
 import { GroupContext } from '@/context/GroupContext'
 import { fileCase, getCases, updateCase } from '@/lib/bf'
 import { Case, Wallet } from '@/types'
+import { exportToCSV, exportToExcel, exportToPDF } from '@/utils/export'
 import { makePayment } from '@/utils/makePayment'
-import { LucideOrigami, Settings } from 'lucide-react'
+import { Download, LucideOrigami, Settings } from 'lucide-react'
 import moment from 'moment'
 import { usePathname, useRouter } from 'next/navigation'
 import React, { useEffect, useRef, useState } from 'react'
@@ -128,7 +129,7 @@ function page({ }: Props) {
     cases
   ])
 
-  if(!groupBF) return ('loading ...')
+  if (!groupBF) return ('loading ...')
 
   return (
     <div className='bg-white text-neutral-700'>
@@ -450,7 +451,31 @@ function page({ }: Props) {
             </div>
 
             <div className='w-full shadow-md mt-5 p-2'>
-              <h1 className='text-[1.2rem] mb-4 p-2'>Latest transactions</h1>
+              <div className='w-full flex items-center justify-between'>
+                <h1 className='text-[1.2rem] mb-4 p-2'>Latest transactions</h1>
+                <Popover>
+                  <PopoverTrigger className='flex items-center gap-3 border-blue-500 border p-2 rounded-md text-blue-500'>
+                    <Download /> Export
+                  </PopoverTrigger>
+                  <PopoverContent className='bg-white w-auto'>
+                    <Button
+                      onClick={() => exportToPDF(groupBF?.wallet?.transactionHistory.map((transaction) => ({ ...transaction, user: `${transaction.user.lastName} ${transaction.user.firstName}` }))!, `${groupBF?.fundName}_transaction_history.pdf`)}
+                      className='w-full hover:bg-neutral-100'>
+                      PDF
+                    </Button>
+                    <Button
+                      onClick={() => exportToCSV(groupBF?.wallet?.transactionHistory.map((transaction) => ({ ...transaction, user: `${transaction.user.lastName} ${transaction.user.firstName}` }))!, `${groupBF?.fundName}_transaction_history.csv`)}
+                      className='w-full hover:bg-neutral-100'>
+                      CSV
+                    </Button>
+                    <Button
+                      onClick={() => exportToExcel(groupBF?.wallet?.transactionHistory.map((transaction) => ({ ...transaction, user: `${transaction.user.lastName} ${transaction.user.firstName}` }))!, `${groupBF?.fundName}_transaction_history.xlsx`)}
+                      className='w-full hover:bg-neutral-100'>
+                      Excel
+                    </Button>
+                  </PopoverContent>
+                </Popover>
+              </div>
               <Table className='border max-h-[500px] overflow-scroll bg-white  rounded-md'>
                 <TableCaption>Latest transactions</TableCaption>
                 <TableHeader className='border-b text-neutral-700 font-bold' >
