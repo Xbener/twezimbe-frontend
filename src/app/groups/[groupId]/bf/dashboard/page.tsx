@@ -238,7 +238,9 @@ function page({ }: Props) {
                   {
                     (groupBF?.role && groupBF?.role?.includes('principal')) && (
                       <DialogTrigger>
-                        <Button onClick={() => setDialogOpen(true)} className="bg-blue-500 text-white">
+                        <Button onClick={() => setDialogOpen(true)}
+                          className="bg-blue-600 disabled:cursor-pointer-allowed hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
+                        >
                           file a case
                         </Button>
                       </DialogTrigger>
@@ -303,7 +305,7 @@ function page({ }: Props) {
                           </button>
 
                           <button
-                            className="w-full bg-transparent border border-orange-500 text-orange font-semibold py-2 px-4 rounded mt-2"
+                            className="w-full bg-transparent border text-orange-500 border-orange-500 text-orange font-semibold py-2 px-4 rounded mt-2"
                             onClick={() => setDialogOpen(false)}
                           >
 
@@ -465,9 +467,17 @@ function page({ }: Props) {
                                     <Button
                                       disabled={payForm.data.amount === "" || payForm.data.amount === "0" || payForm.data.phone === ""}
                                       onClick={() => makePayment({ ...payForm, type: "contribution" }, currentUser!, groupBF!, caseItem._id)}
-                                      className="bg-blue-500">
+                                      className="bg-blue-600 disabled:cursor-pointer-allowed hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
+                                      >
                                       Confirm
                                     </Button>
+
+                                    <DialogClose>
+                                      <Button
+                                        className="bg-transparent text-orange-500 border border-orange-500 ">
+                                        Cancel
+                                      </Button>
+                                    </DialogClose>
                                   </div>
                                 </div>
                               </DialogContent>
@@ -520,6 +530,10 @@ function page({ }: Props) {
                   <TableHead onClick={() => handleSort('date')} className='cursor-pointer '>
                     <span className='flex items-center gap-3 '>Date {sortColumn === 'date' ? (sortDirection === 'asc' ? '▲' : '▼') : <ArrowUpAz className='size-3' />}</span>
                   </TableHead>
+
+                  <TableHead className='cursor-pointer '>
+                    Details
+                  </TableHead>
                 </TableHeader>
                 <TableBody>
                   {
@@ -527,7 +541,7 @@ function page({ }: Props) {
                       <TableRow className='cursor-pointer text-neutral-700 hover:bg-neutral-100'>
                         <TableCell>{transaction.user.lastName} {transaction.user.firstName}</TableCell>
                         <TableCell>{transaction.amount}</TableCell>
-                        <TableCell>{moment(transaction.date).format('MM DD YY, HH:mm')}</TableCell>
+                        <TableCell>{moment(transaction.date).format('MM/DD/YY')}</TableCell>
                       </TableRow>
                     ))
                   }
@@ -544,7 +558,8 @@ function page({ }: Props) {
               <DialogTrigger className="w-full">
                 <Button
                   onClick={() => setPayForm(prev => ({ ...prev, open: true, type: "deposit" }))}
-                  className="bg-blue-500 w-full">
+                  className="w-full bg-blue-600 disabled:cursor-pointer-allowed hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
+                >
                   Deposit funds
                 </Button>
               </DialogTrigger>
@@ -601,9 +616,18 @@ function page({ }: Props) {
                     <Button
                       disabled={payForm.data.amount === "" || payForm.data.amount === "0" || payForm.data.phone === ""}
                       onClick={() => makePayment(payForm, currentUser!, groupBF!)}
-                      className="bg-blue-500">
+                      className="bg-blue-600 disabled:cursor-pointer-allowed hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
+                    >
                       Confirm
                     </Button>
+
+                    <DialogClose>
+                      <Button
+                        className="bg-transparent text-orange-500 border border-orange-500 ">
+                        Cancel
+                      </Button>
+                    </DialogClose>
+
                   </div>
                 </div>
               </DialogContent>
