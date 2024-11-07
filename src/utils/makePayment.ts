@@ -8,7 +8,7 @@ export function makePayment(payForm: any, currentUser: User, groupBF: BF, contri
             public_key: "FLWPUBK_TEST-61fd8c76063ac4c81570ea26a682c719-X",
             tx_ref: "txref-DI0NzMx13",
             amount: payForm.data.amount,
-            currency: "UGX",
+            currency: "RWF",
             payment_options: "mobilemoneyrwanda, mobilemoneyuganda",
             meta: {
                 source: "docs-inline-test",

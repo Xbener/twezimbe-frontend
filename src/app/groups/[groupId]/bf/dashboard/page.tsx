@@ -128,6 +128,7 @@ function page({ }: Props) {
     cases
   ])
 
+  if(!groupBF) return ('loading ...')
 
   return (
     <div className='bg-white text-neutral-700'>

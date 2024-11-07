@@ -7,7 +7,7 @@ import {
 import { iconTextGenerator } from "@/lib/iconTextGenerator";
 import { User } from "@/types";
 import Cookies from "js-cookie";
-import { File, LucideCircleUser } from "lucide-react";
+import { DoorOpen, File, LucideCircleUser } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
@@ -49,20 +49,22 @@ const PrimaryMenu = () => {
                             </Avatar>
                             <p className="text-[#2f578b]">{userInfo.firstName}</p>
                         </PopoverTrigger>
-                        <PopoverContent className="flex flex-col gap-2 bg-[#2f578b]">
-                            <Link href={'/public_pages/Profile'} className="flex items-center justify-between px-3 py-1 rounded-sm text-white hover:bg-blue-700">
+                        <PopoverContent className="flex flex-col w-auto gap-2 bg-[#2f578b]">
+                            <Link href={'/public_pages/Profile'} className="flex items-center justify-between px-3 gap-3 py-1 rounded-sm text-white hover:bg-blue-700">
                                 <span>Profile</span>
                                 <LucideCircleUser />
                             </Link>
-                            <Link href={'/account/applications'} className="flex items-center justify-between px-3 py-1 rounded-sm text-white hover:bg-blue-700">
+                            <Link href={'/account/applications'} className="flex items-center justify-between gap-3 px-3 py-1 rounded-sm text-white hover:bg-blue-700">
                                 <span>Applications</span>
                                 <File />
                             </Link>
-                            <Button variant={'secondary'} className="text-white" size={'sm'} onClick={() => {
+                            <Button variant={'secondary'} className="text-white flex items-center justify-between gap-3 hover:bg-red-700" size={'sm'} onClick={() => {
                                 Cookies.remove('access-token');
                                 window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/public_pages/SignIn`
                                 // setUser(false);
-                            }}>Sign out</Button>
+                            }}>Sign out
+                                <DoorOpen />
+                            </Button>
                         </PopoverContent>
                     </Popover>
                     :

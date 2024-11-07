@@ -14,6 +14,7 @@ import React, { useState, ChangeEvent, useContext, useEffect } from 'react'
 import { toast } from 'sonner';
 import Cookies from 'js-cookie'
 import LoadingButton from '@/components/LoadingButton';
+import { formatWithCommas } from '@/utils/formatNumber';
 type Props = {}
 function page({ }: Props) {
 
@@ -201,12 +202,12 @@ function page({ }: Props) {
                         <div className="space-y-6 bg-gray-800 p-6 rounded-lg shadow-md text-white w-full col-span-2">
                             <section>
                                 <h2 className="text-lg font-semibold">1. One-off Membership Fee</h2>
-                                <p className="text-neutral-300">UGX {formValues.membershipFee.toLocaleString()}</p>
+                                    <p className="text-neutral-300">UGX {formatWithCommas(formValues.membershipFee.toLocaleString())}</p>
                             </section>
 
                             <section>
                                 <h2 className="text-lg font-semibold">2. Annual Subscription</h2>
-                                <p className="text-neutral-300">UGX {formValues.annualSubscription.toLocaleString()}</p>
+                                    <p className="text-neutral-300">UGX {formatWithCommas(formValues.annualSubscription.toLocaleString())}</p>
                             </section>
 
                             <section>

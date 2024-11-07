@@ -17,10 +17,10 @@ import { Case, FundSettings } from '@/types';
 import { useRouter } from 'next/navigation';
 import { XIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { formatNumberWithCommas } from '@/utils/formatNumber';
 import { countryCodes } from '@/constants';
 import moment from 'moment'
 import { makePayment } from '@/utils/makePayment';
+import { formatWithCommas } from '@/utils/formatNumber';
 
 type FundSettingsPageProps = {}
 
@@ -93,7 +93,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                 current[nameParts[nameParts.length - 1] as keyof typeof current] = rawValue; // Set unformatted value in state
 
                 // Display formatted value with commas
-                e.target.value = formatNumberWithCommas(rawValue);
+                e.target.value = formatWithCommas(rawValue);
             } else {
                 // Set the new value for the last part of the name for non-number inputs
                 current[nameParts[nameParts.length - 1] as keyof typeof current] = value;
@@ -350,7 +350,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                     <div className="bg-gray-900 p-6 rounded-lg shadow-md">
                         <h2 className="text-2xl font-semibold text-white mb-4">Fund Settings Overview</h2>
                         
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-white mt-5">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 text-white mt-5">
                             <div>
                                 <h3 className="font-semibold text-lg">Number of Beneficiaries per Principal</h3>
                                 <p>Minimum: {fundSettings.minBeneficiaries}</p>
@@ -358,25 +358,25 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                             </div>
                             <div>
                                 <h3 className="font-semibold text-lg">Membership Fee</h3>
-                                <p>{fundSettings.membership_fee} UGX</p>
+                                    <p>{formatWithCommas(fundSettings.membership_fee)} UGX</p>
                             </div>
                             <div>
                                 <h3 className="font-semibold text-lg">Subscription Costs</h3>
-                                <p>Youth: {fundSettings.subscription_costs.youth} UGX</p>
-                                <p>Children: {fundSettings.subscription_costs.children} UGX</p>
-                                <p>Elders: {fundSettings.subscription_costs.elders} UGX</p>
+                                    <p>Youth: {formatWithCommas(fundSettings.subscription_costs.youth)} UGX</p>
+                                    <p>Children: {formatWithCommas(fundSettings.subscription_costs.children)} UGX</p>
+                                    <p>Elders: {formatWithCommas(fundSettings.subscription_costs.elders)} UGX</p>
                             </div>
                             <div>
                                 <h3 className="font-semibold text-lg">Fund Benefits</h3>
-                                <p>Principal: {fundSettings.fund_benefits.principal} UGX</p>
-                                <p>Spouse: {fundSettings.fund_benefits.spouse} UGX</p>
-                                <p>Children: {fundSettings.fund_benefits.children} UGX</p>
-                                <p>Parents: {fundSettings.fund_benefits.parents} UGX</p>
-                                <p>Other: {fundSettings.fund_benefits.other} UGX</p>
+                                    <p>Principal: {formatWithCommas(fundSettings.fund_benefits.principal)} UGX</p>
+                                    <p>Spouse: {formatWithCommas(fundSettings.fund_benefits.spouse)} UGX</p>
+                                    <p>Children: {(formatWithCommas(fundSettings.fund_benefits.children))} UGX</p>
+                                    <p>Parents: {formatWithCommas(fundSettings.fund_benefits.parents)} UGX</p>
+                                    <p>Other: {formatWithCommas(fundSettings.fund_benefits.other)} UGX</p>
                             </div>
                             <div>
                                 <h3 className="font-semibold text-lg">Incident Contribution Fee</h3>
-                                <p>{fundSettings.incident_contribution_fee} UGX</p>
+                                    <p>{formatWithCommas(fundSettings.incident_contribution_fee)} UGX</p>
                             </div>
                             <div className="sm:col-span-2 lg:col-span-3">
                                 <h3 className="font-semibold text-lg">In-Kind Support</h3>
