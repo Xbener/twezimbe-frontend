@@ -468,7 +468,7 @@ function page({ }: Props) {
                                       disabled={payForm.data.amount === "" || payForm.data.amount === "0" || payForm.data.phone === ""}
                                       onClick={() => makePayment({ ...payForm, type: "contribution" }, currentUser!, groupBF!, caseItem._id)}
                                       className="bg-blue-600 disabled:cursor-pointer-allowed hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
-                                      >
+                                    >
                                       Confirm
                                     </Button>
 
@@ -496,23 +496,23 @@ function page({ }: Props) {
               <div className='w-full flex items-center justify-between'>
                 <h1 className='text-[1.2rem] mb-4 p-2'>Latest transactions</h1>
                 <Popover>
-                  <PopoverTrigger className='flex items-center gap-3 border-blue-500 border p-2 rounded-md text-blue-500'>
+                  <PopoverTrigger className='flex items-center gap-3 border-blue-500 p-2 border rounded-md text-blue-500'>
                     <Download /> Export
                   </PopoverTrigger>
-                  <PopoverContent className='bg-white w-auto'>
+                  <PopoverContent className='bg-white w-auto flex flex-col'>
                     <Button
                       onClick={() => exportToPDF(groupBF?.wallet?.transactionHistory.map((transaction) => ({ ...transaction, user: `${transaction.user.lastName} ${transaction.user.firstName}` }))!, `${groupBF?.fundName}_transaction_history.pdf`)}
-                      className='w-full hover:bg-neutral-100'>
+                      className='hover:bg-neutral-100 w-auto'>
                       PDF
                     </Button>
                     <Button
                       onClick={() => exportToCSV(groupBF?.wallet?.transactionHistory.map((transaction) => ({ ...transaction, user: `${transaction.user.lastName} ${transaction.user.firstName}` }))!, `${groupBF?.fundName}_transaction_history.csv`)}
-                      className='w-full hover:bg-neutral-100'>
+                      className='w-auto hover:bg-neutral-100'>
                       CSV
                     </Button>
                     <Button
                       onClick={() => exportToExcel(groupBF?.wallet?.transactionHistory.map((transaction) => ({ ...transaction, user: `${transaction.user.lastName} ${transaction.user.firstName}` }))!, `${groupBF?.fundName}_transaction_history.xlsx`)}
-                      className='w-full hover:bg-neutral-100'>
+                      className='w-auto hover:bg-neutral-100'>
                       Excel
                     </Button>
                   </PopoverContent>
@@ -534,6 +534,9 @@ function page({ }: Props) {
                   <TableHead className='cursor-pointer '>
                     Details
                   </TableHead>
+                  <TableHead className='cursor-pointer '>
+                    Wallet
+                  </TableHead>
                 </TableHeader>
                 <TableBody>
                   {
@@ -542,6 +545,12 @@ function page({ }: Props) {
                         <TableCell>{transaction.user.lastName} {transaction.user.firstName}</TableCell>
                         <TableCell>{transaction.amount}</TableCell>
                         <TableCell>{moment(transaction.date).format('MM/DD/YY')}</TableCell>
+                        <TableCell>
+                          {groupBF?.fundDetails.length > 20
+                            ? `${groupBF.fundDetails.slice(0, 20)}...`
+                            : groupBF.fundDetails}
+                        </TableCell>
+                        <TableCell>{groupBF?.walletAddress}</TableCell>
                       </TableRow>
                     ))
                   }
