@@ -116,7 +116,10 @@ const GroupNav = () => {
                         {(sendMsgGroupId === group?.group_id) && groupNotificationFlag && (
                             <div className="absolute top-0 right-0 w-4 h-4 bg-red-500 rounded-full border-2 border-[#d4d6f3]" />
                         )}
-                        <img width={48} height={48} src={group?.group_picture} className='object-fill w-full h-full' alt='group' />
+                        <Avatar className='w-full h-full'>
+                            <AvatarImage src={group?.group_picture} className="bg-black  rounded-full" />
+                            <AvatarFallback className='bg-blue-500 font-extrabold text-2xl overflow-hidden'>{iconTextGenerator(group?.group_name[0] as string, group?.group_name[1] as string)}</AvatarFallback>
+                        </Avatar>
                     </NavLink>
                 );
             })}

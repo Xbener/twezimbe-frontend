@@ -212,8 +212,9 @@ function Groups({ }: Props) {
                 >
                   {/* Image Placeholder */}
                   <div className='h-[100px] w-full bg-gray-300 mb-3'>
+
                     <img
-                      src={group.group_picture}
+                      src={group.group_picture || 'https://res.cloudinary.com/djehh7gum/image/upload/v1729070790/ura0gnomuhpti7sbi79r.png'}
                       className="w-full h-[100px] object-cover"
                     />
                   </div>

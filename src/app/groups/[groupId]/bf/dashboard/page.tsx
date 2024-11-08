@@ -13,6 +13,7 @@ import { GroupContext } from '@/context/GroupContext'
 import { fileCase, getCases, updateCase } from '@/lib/bf'
 import { Case, Wallet } from '@/types'
 import { exportToCSV, exportToExcel, exportToPDF } from '@/utils/export'
+import { formatWithCommas } from '@/utils/formatNumber'
 import { makePayment } from '@/utils/makePayment'
 import { ArrowUpAz, Download, LucideOrigami, Settings } from 'lucide-react'
 import moment from 'moment'
@@ -188,10 +189,10 @@ function page({ }: Props) {
             metadata?.length ? metadata.map((card, index) => {
               return (
                 <div
-                  className={`flex-1 min-w-[200px] flex-col  max-w-[15%] border border-white p-4 rounded-lg shadow-md flex justify-around `}
+                  className={`flex-1 min-w-auto flex-col max-w-[15%] border border-white p-4 rounded-lg shadow-md flex justify-around `}
                 >
-                  <div className="text-md font-semibold ">{card.title}</div>
-                  <div className="text-[1.5rem] font-bold">{card.value}</div>
+                  <div className="text-sm font-semibold ">{card.title}</div>
+                  <div className="text-[1.2rem] font-bold">{card.value}</div>
                 </div>
               )
             }) : null
@@ -365,7 +366,7 @@ function page({ }: Props) {
                               <DialogTrigger className="w-full">
                                 <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">View</button>
                               </DialogTrigger>
-                              <DialogContent className="w-full bg-white p-6 overflow-scroll max-h-[600px] rounded-lg">
+                              <DialogContent className="w-auto bg-white p-6 overflow-scroll max-h-[600px] rounded-lg">
                                 <DialogHeader className="text-xl font-bold mb-4">Case Details</DialogHeader>
                                 <p className="text-sm text-gray-600 mb-2">
                                   <span className="font-semibold">Name:</span> {caseItem.name}
@@ -379,7 +380,7 @@ function page({ }: Props) {
                                 <p className="text-sm text-gray-600 mb-2">
                                   <span className="font-semibold">Filed on:</span> {moment(caseItem.createdAt).format('LL')}
                                 </p>
-                                <div className="flex items-center gap-4 mt-4">
+                                <div className="flex items-center gap-4 mt-4 w-full justify-normal">
                                   <Button
                                     onClick={async () => {
                                       const { status, case: updatedCase } = await updateCase(caseItem._id, { status: caseItem.status === 'Open' ? 'Closed' : 'Open' })
@@ -387,7 +388,7 @@ function page({ }: Props) {
                                         setCases(prev => prev.map(prevCase => prevCase?._id === caseItem?._id ? { ...updatedCase, status: caseItem.status === 'Open' ? 'Closed' : 'Open' } : { ...caseItem }))
                                       }
                                     }}
-                                    className={`text-white px-4 py-2 rounded ${caseItem.status === 'Open' ? 'bg-red-500' : 'bg-green-500'}`}>
+                                    className={`text-white px-4 py-2 rounded ${caseItem.status === 'Open' ? 'bg-red-500' : 'bg-green-500'} w-1/2`}>
                                     Mark as {caseItem.status === 'Open' ? 'Closed' : 'Open'}
                                   </Button>
                                   <Button
@@ -397,7 +398,7 @@ function page({ }: Props) {
                                         setCases(prev => prev.map(prevCase => prevCase?._id === caseItem?._id ? { ...updatedCase, contributionStatus: caseItem.contributionStatus === 'Complete' ? 'Incomplete' : 'Complete' } : { ...caseItem }))
                                       }
                                     }}
-                                    className={`text-white px-4 py-2 rounded ${caseItem.contributionStatus === 'Complete' ? 'bg-red-500' : 'bg-green-500'}`}>
+                                    className={`text-white px-4 py-2 rounded ${caseItem.contributionStatus === 'Complete' ? 'bg-red-500' : 'bg-green-500'} w-full`}>
                                     Mark Contribution {caseItem.contributionStatus === 'Complete' ? 'Incomplete' : 'Complete'}
                                   </Button>
                                 </div>
@@ -524,7 +525,7 @@ function page({ }: Props) {
                   <TableHead onClick={() => handleSort('lastName')} className='cursor-pointer '>
                     <span className='flex items-center gap-3 '>Billing name {sortColumn === 'lastName' ? (sortDirection === 'asc' ? '▲' : "") : <ArrowUpAz className='size-3' />}</span>
                   </TableHead>
-                  <TableHead onClick={() => handleSort('amount')} className='cursor-pointer '>
+                  <TableHead onClick={() => handleSort('amount')} className='cursor-pointer w-[100px]'>
                     <span className='flex items-center gap-3 '>Amount {sortColumn === 'amount' ? (sortDirection === 'asc' ? '▲' : '▼') : <ArrowUpAz className='size-3' />}</span>
                   </TableHead>
                   <TableHead onClick={() => handleSort('date')} className='cursor-pointer '>
@@ -543,7 +544,7 @@ function page({ }: Props) {
                     sortedTransactions?.map((transaction, index) => (
                       <TableRow className='cursor-pointer text-neutral-700 hover:bg-neutral-100'>
                         <TableCell>{transaction.user.lastName} {transaction.user.firstName}</TableCell>
-                        <TableCell>{transaction.amount}</TableCell>
+                        <TableCell>{formatWithCommas(transaction.amount)}</TableCell>
                         <TableCell>{moment(transaction.date).format('MM/DD/YY')}</TableCell>
                         <TableCell>
                           {groupBF?.fundDetails.length > 20
