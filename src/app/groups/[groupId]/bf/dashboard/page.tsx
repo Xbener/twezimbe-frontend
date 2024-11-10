@@ -42,7 +42,7 @@ function page({ }: Props) {
     data: {
       amount: "",
       phone: "",
-      countryCode: countryCodes[0].code,
+      countryCode: countryCodes[0].value,
       type: ""
     }
   })
@@ -109,7 +109,7 @@ function page({ }: Props) {
       },
       {
         title: "Balance",
-        value: `${groupBF?.wallet?.balance} UGX`
+        value: `${groupBF&&formatWithCommas(groupBF?.wallet?.balance)} UGX`
       },
       {
         title: "Total transactions",
@@ -199,12 +199,12 @@ function page({ }: Props) {
           }
         </div>
 
-        <div className="flex p-2 w-full items-start justify-start">
-          <div className='w-1/2 flex flex-col gap-3'>
+        <div className="flex p-2 w-full items-start justify-start gap-3">
+          <div className='w-1/2 flex flex-col gap-3 shadow-lg p-2 rounded-md'>
             <h1 className='text-[1.2rem] font-bold mb-2 text-center'>Balance history</h1>
             <AreaChartComponent />
           </div>
-          <div className='w-1/2 flex flex-col gap-3'>
+          <div className='w-1/2 flex flex-col gap-3 shadow-lg p-2 rounded-md'>
             <h1 className='text-[1.2rem] font-bold mb-2 text-center'>Member deposits</h1>
             <PieChartComponent data={userDepositsRef.current} />
           </div>
@@ -215,10 +215,10 @@ function page({ }: Props) {
               <div className='shadow-md p-2'>
                 <div className="flex w-full justify-between items-center">
                   <h1 className='text-[1.2rem] mb-4 p-2'>Members</h1>
-                  <span className='flex items-center gap-2'>
+                  {/* <span className='flex items-center gap-2'>
                     All
                     <AiFillCaretDown />
-                  </span>
+                  </span> */}
                 </div>
                 {
                   bfMembers?.map((member) => {
@@ -443,7 +443,7 @@ function page({ }: Props) {
                                       onChange={handleCountryCodeChange}
                                     >
                                       {countryCodes.map((country) => (
-                                        <option key={country.code} value={country.code}>
+                                        <option key={country.code} value={country.value}>
                                           {country.label} ({country.code})
                                         </option>
                                       ))}
@@ -523,9 +523,9 @@ function page({ }: Props) {
                 <TableCaption>Latest transactions</TableCaption>
                 <TableHeader className='border-b text-neutral-700 font-bold' >
                   <TableHead onClick={() => handleSort('lastName')} className='cursor-pointer '>
-                    <span className='flex items-center gap-3 '>Billing name {sortColumn === 'lastName' ? (sortDirection === 'asc' ? '▲' : "") : <ArrowUpAz className='size-3' />}</span>
+                    <span className='flex items-center gap-3 '>Billing name {sortColumn === 'lastName' ? (sortDirection === 'asc' ? '▲' : "▼") : <ArrowUpAz className='size-3' />}</span>
                   </TableHead>
-                  <TableHead onClick={() => handleSort('amount')} className='cursor-pointer w-[100px]'>
+                  <TableHead onClick={() => handleSort('amount')} className='cursor-pointer w-auto'>
                     <span className='flex items-center gap-3 '>Amount {sortColumn === 'amount' ? (sortDirection === 'asc' ? '▲' : '▼') : <ArrowUpAz className='size-3' />}</span>
                   </TableHead>
                   <TableHead onClick={() => handleSort('date')} className='cursor-pointer '>
@@ -601,7 +601,7 @@ function page({ }: Props) {
                       onChange={handleCountryCodeChange}
                     >
                       {countryCodes.map((country) => (
-                        <option key={country.code} value={country.code}>
+                        <option key={country.code} value={country.value}>
                           {country.label} ({country.code})
                         </option>
                       ))}

@@ -295,7 +295,7 @@ export const updateWalletBalance = async (body: { userId: string, walletAddress:
         const data = await res.json()
         if (!data.status) return toast.error(data.errors || data.message)
         toast.success(data.message)
-        window.location.reload()
+        // window.location.reload()
     } catch (error) {
         console.log('error adding balance', error)
         toast.error("failed to add balance")
@@ -317,7 +317,7 @@ export const makeContribution = async (body: { walletAddress: string, contributo
         const data = await res.json()
         if (!data.status) return toast.error(data.message || data.errors || "failed to contribute. please try again")
         toast.success(data.message)
-        window.location.reload()
+        // window.location.reload()
         return data
     } catch (error) {
         console.log('error contributing', error)

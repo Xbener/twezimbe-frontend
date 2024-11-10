@@ -1,18 +1,13 @@
 "use client"
 import { LogOut, Mail, Menu, Users } from "lucide-react"
 import Link from "next/link"
-import React, { useState } from "react"
+import React, { useContext, useState } from "react"
 import GeneralIcon from "./icons/GeneralIcon"
 import ManagersIcon from "./icons/Managers"
+import { AdminContext } from "@/context/AdminContext"
 
 const ManagerDashBoardSideMenuBar = () => {
-    const [isVisible, setIsVisible] = useState(true);
-
-    const toggleSideBar = () => {
-        setIsVisible(!isVisible);
-        console.log(`hidden md:${isVisible ? `flex` : `hidden`} h-screen flex-1 flex-col justify-between border-e bg-blue-950 cursor-pointer`);
-    }
-
+    const { isVisible, toggleSideBar } = useContext(AdminContext)
     const logout = (e: React.FormEvent) => {
         e.preventDefault();
         console.log("Logged out");
@@ -21,93 +16,6 @@ const ManagerDashBoardSideMenuBar = () => {
 
     return (
         <div className="flex min-h-screen">
-            <div className="flex min-h-screen w-16 flex-col justify-between border-e bg-blue-950">
-                <div>
-                    <div className="inline-flex size-16 items-center justify-center">
-                        <span className="grid size-10 place-content-center rounded-lg text-xs text-gray-600 cursor-pointer">
-                            <Menu onClick={toggleSideBar} size={30} color="white" />
-                        </span>
-                    </div>
-
-                    <div className="">
-                        <div className="px-2">
-                            <div className="py-4">
-                                <Link href="/manager" className="t group relative flex justify-center rounded bg-blue-50 px-2 py-1.5 text-blue-700">
-                                    <GeneralIcon />
-                                    <span className="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white group-hover:visible">
-                                        General
-                                    </span>
-                                </Link>
-                            </div>
-
-                            <ul className="space-y-1 pt-4">
-                                <li>
-                                    <Link href="/manager/managers" className="group relative flex justify-center rounded px-2 py-1.5 text-slate-200 hover:bg-gray-50 hover:text-gray-700">
-                                        <ManagersIcon />
-                                        <span className="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white group-hover:visible">
-                                            Loan Applications
-                                        </span>
-                                    </Link>
-                                </li>
-
-                                <li>
-                                    <Link href="/manager/responses" className="group relative flex justify-center rounded px-2 py-1.5 text-slate-200 hover:bg-gray-50 hover:text-gray-700">
-                                        <Mail size={18} />
-                                        <span className="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white group-hover:visible">
-                                            Responses
-                                        </span>
-                                    </Link>
-                                </li>
-
-                                <li>
-                                    <Link href="/manager/teachers" className="group relative flex justify-center rounded px-2 py-1.5 text-slate-200 hover:bg-gray-50 hover:text-gray-700">
-                                        <Users size={18} />
-                                        <span className="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white group-hover:visible">
-                                            Users
-                                        </span>
-                                    </Link>
-                                </li>
-
-
-
-                                <li>
-                                    <Link href="/manager/profile" className="group relative flex justify-center rounded px-2 py-1.5 text-slate-200 hover:bg-gray-50 hover:text-gray-700">
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            className="size-5 opacity-75"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                                            />
-                                        </svg>
-
-                                        <span className="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white group-hover:visible">
-                                            Account
-                                        </span>
-                                    </Link>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="sticky inset-x-0 bottom-0 bg-blue-950 p-2">
-                    <form onSubmit={logout}>
-                        <button type="button" className="group relative flex w-full justify-center rounded-lg px-2 py-1.5 text-sm text-slate-200 hover:bg-gray-50 hover:text-gray-700">
-                            <LogOut />
-                            <span className="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white group-hover:visible">
-                                Logout
-                            </span>
-                        </button>
-                    </form>
-                </div>
-            </div>
 
             {isVisible &&
                 <div className={`hidden md:flex min-h-screen flex-1 flex-col justify-between border-e bg-blue-950 cursor-pointer`}>
@@ -129,7 +37,7 @@ const ManagerDashBoardSideMenuBar = () => {
                                     Loans
                                 </Link>
                             </li>
-                            
+
                             <li>
                                 <Link href="/manager/responses" className="block rounded-lg px-4 py-2 text-sm font-medium text-slate-200 hover:bg-gray-100 hover:text-gray-700">
                                     Responses
@@ -181,6 +89,17 @@ const ManagerDashBoardSideMenuBar = () => {
                                 </details>
                             </li>
                         </ul>
+                    </div>
+
+                    <div className="sticky inset-x-0 bottom-0 bg-blue-950 p-2">
+                        <form onSubmit={logout}>
+                            <button type="button" className="group relative flex w-full justify-center rounded-lg px-2 py-1.5 text-sm text-slate-200 hover:bg-gray-50 hover:text-gray-700">
+                                <LogOut />
+                                <span className="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white group-hover:visible">
+                                    Logout
+                                </span>
+                            </button>
+                        </form>
                     </div>
                 </div>
             }

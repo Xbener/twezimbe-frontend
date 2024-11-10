@@ -19,7 +19,7 @@ const generateColor = (index: number) => {
 
 export const PieChartComponent = ({ data }: Props) => {
     return (
-        <PieChart width={500} height={300} className="text-white">
+        <PieChart width={500} height={250} className="text-white">
             <Tooltip />
             {/* <Legend /> */}
             <Pie

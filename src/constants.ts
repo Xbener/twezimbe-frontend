@@ -18,11 +18,11 @@ export const mimeTypeToSvg: Record<string, string> = {
 
 
 export const countryCodes = [
-    { code: '+256', label: 'Uganda' },
-    { code: '+234', label: 'Nigeria' },
-    { code: '+254', label: 'Kenya' },
-    { code: '+27', label: 'South Africa' },
-    { code: '+233', label: 'Ghana' },
-    { code: '+250', label: 'Rwanda' },
+    { code: '+256', value: "256", label: 'Uganda' },
+    { code: '+234', value: "234", label: 'Nigeria' },
+    { code: '+254', value: "254", label: 'Kenya' },
+    { code: '+27', value: "27", label: 'South Africa' },
+    { code: '+233', value: "233", label: 'Ghana' },
+    { code: '+250', value: "250", label: 'Rwanda' },
     // Add more as needed
 ];

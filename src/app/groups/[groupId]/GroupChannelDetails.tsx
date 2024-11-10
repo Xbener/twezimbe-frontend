@@ -208,15 +208,20 @@ function ChannelDetails({ }: Props) {
                             <h1 className="font-bold">Group Bereavement Fund</h1>
 
                             <div className='mt-5 flex flex-col w-full'>
-                                <span className="p-2 w-full bg-transparent hover:bg-[rgba(255,255,255,0.29)] cursor-pointer rounded-md duration-100 mb-3"
-                                    onClick={() => {
-                                        setIsMemberListOpen(false)
-                                        setIsSideBarOpen(false)
-                                        router.push(`/groups/${group?._id}/bf/dashboard`)
-                                    }}
-                                >
-                                    {groupBF?.fundName}
-                                </span>
+
+                                {
+                                    bfMembers && bfMembers?.find(member => member?.user?._id === currentUser?._id) && (
+                                        <span className="p-2 w-full bg-transparent hover:bg-[rgba(255,255,255,0.29)] cursor-pointer rounded-md duration-100 mb-3"
+                                            onClick={() => {
+                                                setIsMemberListOpen(false)
+                                                setIsSideBarOpen(false)
+                                                router.push(`/groups/${group?._id}/bf/dashboard`)
+                                            }}
+                                        >
+                                            {groupBF?.fundName}
+                                        </span>
+                                    )
+                                }
                                 {
                                     groupBF?.role?.includes('principal') && (
                                         <span className="p-2 w-full bg-transparent hover:bg-[rgba(255,255,255,0.29)] cursor-pointer rounded-md duration-100 mb-3"
