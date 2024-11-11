@@ -3,14 +3,16 @@ import { useGetAllGroups } from '@/api/group'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { AdminContext } from '@/context/AdminContext'
 import { formatWithCommas } from '@/utils/formatNumber'
 import moment from 'moment'
-import React from 'react'
+import React, { useContext } from 'react'
 
 type Props = {}
 
 function page({ }: Props) {
-    const { groups, isLoading } = useGetAllGroups()
+    const { isLoading, groups } = useContext(AdminContext)
+
     return (
         <div className='w-full  text-neutral-700'>
             <div className='w-full flex items-center justify-between p-2'>

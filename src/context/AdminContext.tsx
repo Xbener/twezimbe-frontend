@@ -1,8 +1,10 @@
 'use client'
 
-import { useGetProfileData } from '@/api/auth'
-import { User } from '@/types'
-import React, { useState } from 'react'
+import { useGetAllUsers, useGetProfileData } from '@/api/auth'
+import { useGetAllGroups } from '@/api/group'
+import { getAllBfs } from '@/lib/bf'
+import { BF, GroupTypes, User } from '@/types'
+import React, { useEffect, useState } from 'react'
 
 type Props = {
     children: React.ReactNode
@@ -12,6 +14,10 @@ export interface AdminContextTypes {
     isVisible?: boolean
     toggleSideBar?: () => void
     currentUser?: User
+    bfs?: BF[]
+    groups?: GroupTypes[]
+    users?: User[]
+    isLoading?: boolean
 }
 
 export const AdminContext = React.createContext<AdminContextTypes>({})
@@ -19,7 +25,16 @@ export const AdminContext = React.createContext<AdminContextTypes>({})
 function AdminContextProvider({ children }: Props) {
     const [isVisible, setIsVisible] = useState(false)
     const { currentUser } = useGetProfileData()
-
+    const { users: allUsers, isLoading } = useGetAllUsers()
+    const { groups } = useGetAllGroups()
+    const [bfs, setBfs] = useState([])
+    useEffect(() => {
+        const getData = async () => {
+            const bfs = await getAllBfs()
+            setBfs(bfs)
+        }
+        getData()
+    }, [])
     const toggleSideBar = () => {
         setIsVisible(!isVisible);
     }
@@ -28,7 +43,11 @@ function AdminContextProvider({ children }: Props) {
         <AdminContext.Provider value={{
             isVisible,
             toggleSideBar,
-            currentUser
+            currentUser,
+            users: allUsers,
+            groups,
+            bfs,
+            isLoading
         }}>
             {children}
         </AdminContext.Provider>

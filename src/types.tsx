@@ -472,6 +472,11 @@ export interface Contribution {
     date: Date
 }
 
+export interface MetaData {
+    title: string
+    value?: any
+}
+
 export interface BF {
     fundName: string;
     fundDetails: string;

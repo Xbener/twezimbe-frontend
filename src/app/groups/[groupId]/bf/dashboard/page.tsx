@@ -11,7 +11,7 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 import { countryCodes } from '@/constants'
 import { GroupContext } from '@/context/GroupContext'
 import { fileCase, getCases, updateCase } from '@/lib/bf'
-import { Case, Wallet } from '@/types'
+import { Case, MetaData, Wallet } from '@/types'
 import { exportToCSV, exportToExcel, exportToPDF } from '@/utils/export'
 import { formatWithCommas } from '@/utils/formatNumber'
 import { makePayment } from '@/utils/makePayment'
@@ -22,10 +22,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { AiFillCaretDown } from 'react-icons/ai'
 type Props = {}
 
-interface MetaData {
-  title: string
-  value?: any
-}
+
 
 function page({ }: Props) {
 

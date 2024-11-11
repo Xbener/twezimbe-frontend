@@ -2,26 +2,17 @@
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { AdminContext } from '@/context/AdminContext'
 import { getAllBfs } from '@/lib/bf'
 import { BF } from '@/types'
 import { formatWithCommas } from '@/utils/formatNumber'
 import moment from 'moment'
-import React, { use, useEffect, useState } from 'react'
+import React, { use, useContext, useEffect, useState } from 'react'
 
 type Props = {}
 
 function page({ }: Props) {
-    const [bfs, setBfs] = useState([])
-    const [isLoading, setIsLoading] = useState(true)
-    useEffect(() => {
-        const getData = async () => {
-            setIsLoading(true)
-            const bfs = await getAllBfs()
-            setIsLoading(false)
-            setBfs(bfs)
-        }
-        getData()
-    }, [])
+    const { isLoading, bfs } = useContext(AdminContext)
     return (
         <div className='w-full  text-neutral-700'>
             <div className='w-full flex items-center justify-between p-2'>
