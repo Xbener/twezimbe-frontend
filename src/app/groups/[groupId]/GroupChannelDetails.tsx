@@ -6,7 +6,7 @@ import { GroupContext } from '@/context/GroupContext'
 import { iconTextGenerator } from '@/lib/iconTextGenerator'
 import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar'
 import { CaretDownIcon } from '@radix-ui/react-icons'
-import { Bell, Edit, Lock, LogOut, MessageCirclePlus, PlusIcon, PlusSquare, Settings, Upload, X } from 'lucide-react'
+import { Bell, Calendar, Edit, Lock, LogOut, MessageCirclePlus, PlusIcon, PlusSquare, Settings, Upload, X } from 'lucide-react'
 import Link from 'next/link'
 import { userInfo } from 'os'
 import React, { useContext, useState, useLayoutEffect } from 'react'
@@ -114,6 +114,7 @@ function ChannelDetails({ }: Props) {
         },
         { name: "Group join requests", link: `/groups/${group?._id}/requests`, icon: <MessageCirclePlus />, privilege: 'admin' },
         { name: "Upgrade plan", link: `#`, onClick: () => handleUpgrade(), icon: <Upload />, privilege: 'admin' },
+        { name: "Events", link: `/groups/${group?._id}/events`, icon: <Calendar />, privilege: 'user' },
     ]
 
     const settingsItems = [

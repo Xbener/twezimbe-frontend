@@ -18,6 +18,7 @@ const Profile = () => {
             currentUser={currentUser}
             onSave={(data)=>{
               updateAccount(data)
+              window.location.reload();
             }
             }
             isLoading={isLoading}

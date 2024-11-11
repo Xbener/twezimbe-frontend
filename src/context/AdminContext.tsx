@@ -20,9 +20,19 @@ export interface AdminContextTypes {
     users?: User[]
     isLoading?: boolean
     transactions?: Transaction[]
+    selectedUser?: User | null
+    setSelectedUser: (vl: any) => void
+    selectedGroup?: GroupTypes | null
+    setSelectedGroup: (vl: any) => void
+    selectedBf?: BF | null
+    setSelectedBf: (vl: any) => void
 }
 
-export const AdminContext = React.createContext<AdminContextTypes>({})
+export const AdminContext = React.createContext<AdminContextTypes>({
+    setSelectedBf(vl) { },
+    setSelectedGroup(vl) { },
+    setSelectedUser(vl) { },
+})
 
 function AdminContextProvider({ children }: Props) {
     const [isVisible, setIsVisible] = useState(false)
@@ -30,6 +40,9 @@ function AdminContextProvider({ children }: Props) {
     const { users: allUsers, isLoading } = useGetAllUsers()
     const { groups } = useGetAllGroups()
     const [transactions, setTransactions] = useState<Transaction[]>([])
+    const [selectedUser, setSelectedUser] = useState<User | null>(null)
+    const [selectedGroup, setSelectedGroup] = useState<GroupTypes | null>(null)
+    const [selectedBf, setSelectedBf] = useState<BF | null>(null)
     const [bfs, setBfs] = useState([])
     useEffect(() => {
         const getData = async () => {
@@ -53,7 +66,13 @@ function AdminContextProvider({ children }: Props) {
             groups,
             bfs,
             isLoading,
-            transactions
+            transactions,
+            selectedBf,
+            selectedGroup,
+            selectedUser,
+            setSelectedBf,
+            setSelectedGroup,
+            setSelectedUser
         }}>
             {children}
         </AdminContext.Provider>

@@ -262,7 +262,6 @@ export const useUpdateUserAccount = () => {
 
     if (isSuccess) {
         toast.success("User profile updated!");
-        window.location.reload();
     }
 
     if (error) {
