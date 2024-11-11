@@ -24,7 +24,7 @@ export default function ManagerDashboardLayout({
     <AdminContextProvider>
       <div className="flex min-h-screen w-full ">
         <ManagerDashBoardSideMenuBar />
-        <div className="flex flex-col w-full bg-slate-100 overflow-y-scroll">
+        <div className="flex flex-col w-full flex-grow bg-slate-100 overflow-y-scroll">
           <Header />
           <DashboardTopBar />
           <div className="p-5">

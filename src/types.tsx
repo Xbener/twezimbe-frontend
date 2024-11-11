@@ -18,10 +18,7 @@ export type User = {
     del_falg: number;
     verified: boolean;
     salt: string;
-    role: {
-        role_name: string;
-        role_id: string;
-    }
+    role: any
     otp: number;
     otpExpiryTime: Date;
     profile_pic?: string;
@@ -457,17 +454,17 @@ export type UserSettings = {
 };
 
 
-export interface Wallet { 
+export interface Wallet {
     walletAddress: string
     balance: number
     transactionHistory: [{
-        amount?:number|string
+        amount?: number | string
         date?: Date
         user: User
     }]
 }
 
-export interface Contribution  {
+export interface Contribution {
     contributor: User
     amount: number
     walletAddress: string
@@ -484,7 +481,7 @@ export interface BF {
     groupId: string;
     createdBy: User[];
     _id?: string;
-    role?:string;
+    role?: string;
     wallet?: Wallet
     contributions?: Contribution[]
 }
@@ -546,11 +543,11 @@ export type Beneficiary = {
 
 
 export type Case = {
-    principal :User
+    principal: User
     status: string
     contributionStatus: string
     description: string
     createdAt: Date
-    name:string
+    name: string
     _id: string
 }

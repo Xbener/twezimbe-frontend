@@ -21,10 +21,16 @@ function Header({ }: Props) {
             </div>
 
             <div>
-                <Avatar>
-                    <AvatarFallback></AvatarFallback>
-                    <AvatarImage />
-                </Avatar>
+                <div className='flex items-start justify-normal p-2 gap-2 cursor-pointer hover:bg-slate-50 rounded-md transition duration-75'>
+                    <Avatar className='size-11'>
+                        <AvatarFallback></AvatarFallback>
+                        <AvatarImage src={currentUser?.profile_pic} />
+                    </Avatar>
+                    <div className='flex flex-col gap-0'>
+                        <h1 className='text-neutral-500 font-bold text-md'>{currentUser?.lastName} {currentUser?.firstName}</h1>
+                        <span className='text-sm text-slate-500'>{currentUser?.role}</span>
+                    </div>
+                </div>
             </div>
         </div>
     )

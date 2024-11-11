@@ -92,7 +92,11 @@ const DashBoardSideMenuBar = () => {
             {isVisible &&
                 <div className={`hidden md:flex min-h-screen flex-1 flex-col justify-between border-e bg-black`}>
                     <div className="px-4 py-4">
-                        <Link href={'/'} className="text-3xl font-bold tracking-tight text-white">Twezimbe</Link>
+                        <Link href={'/'} className="text-3xl font-bold tracking-tight text-white">
+                        <img 
+                            src="/Twezimbe Logo Final PNG.png"
+                        />
+                        </Link>
                         <ul className="mt-6 space-y-1">
                             <li>
                                 <Link href="/admin" className="block rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700">
@@ -173,13 +177,13 @@ const DashBoardSideMenuBar = () => {
                                             </Link>
                                         </li>
 
-                                        <li>
+                                        {/* <li>
                                             <form onSubmit={logout}>
                                                 <button type="submit" className="w-full rounded-lg px-4 py-2 text-sm font-medium text-slate-200 [text-align:_inherit] hover:bg-gray-100 hover:text-gray-700">
                                                     Logout
                                                 </button>
                                             </form>
-                                        </li>
+                                        </li> */}
                                     </ul>
                                 </details>
                             </li>

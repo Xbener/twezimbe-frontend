@@ -1,54 +1,62 @@
 "use client"
-import { LogOut, Mail, Menu, Users } from "lucide-react"
+import { ArrowLeft, LogOut, Mail, Menu, Users } from "lucide-react"
 import Link from "next/link"
 import React, { useContext, useState } from "react"
 import GeneralIcon from "./icons/GeneralIcon"
 import ManagersIcon from "./icons/Managers"
 import { AdminContext } from "@/context/AdminContext"
+import { usePathname } from "next/navigation"
 
 const ManagerDashBoardSideMenuBar = () => {
     const { isVisible, toggleSideBar } = useContext(AdminContext)
+    const pathname = usePathname()
     const logout = (e: React.FormEvent) => {
         e.preventDefault();
         console.log("Logged out");
 
     }
 
-    return (
-        <div className="flex min-h-screen">
+    if (isVisible) {
 
-            {isVisible &&
-                <div className={`hidden md:flex min-h-screen flex-1 flex-col justify-between border-e bg-blue-950 cursor-pointer`}>
-                    <div className="px-4 py-4">
-                        <Link href={'/'} className="text-3xl font-bold tracking-tight text-white">Twezimbe</Link>
+        return (
+            <div className="absolute md:relative md:flex min-h-screen shadow-sm min-w-1/2 md:min-w-[20%]">
+
+                <div className={`min-h-screen flex-1 flex-col justify-between border-e bg-blue-950 cursor-pointer`}>
+                    <div className="px-4 py-4" >
+                        <div className="flex">
+                            <ArrowLeft className='items-center cursor-pointer md:hidden block text-white' onClick={toggleSideBar} />
+                            <Link href={'/'} className="text-3xl font-bold tracking-tight text-white">
+                                <img
+                                    src="/assets/Twezimbe Logo Final PNG.png"
+                                    width={100}
+                                    height={100}
+                                />
+                            </Link>
+                        </div>
                         <ul className="mt-6 space-y-1">
                             <li>
-                                <Link href="/manager" className="block rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700">
+                                <Link href="/"
+                                    className={`block rounded-lg ${pathname === '/manager_pages' && 'bg-gray-100 text-slate-800'} px-4 py-2 text-sm font-medium text-slate-200 hover:bg-gray-100 hover:text-gray-700`}>
                                     General
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/manager_pages/Role" className="block rounded-lg px-4 py-2 text-sm font-medium text-slate-200 hover:bg-gray-100 hover:text-gray-700">
-                                    Role
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/manager/loans" className="block rounded-lg px-4 py-2 text-sm font-medium text-slate-200 hover:bg-gray-100 hover:text-gray-700">
-                                    Loans
-                                </Link>
-                            </li>
-
-                            <li>
-                                <Link href="/manager/responses" className="block rounded-lg px-4 py-2 text-sm font-medium text-slate-200 hover:bg-gray-100 hover:text-gray-700">
-                                    Responses
-                                </Link>
-                            </li>
-
-                            <li>
-                                <Link href="/manager/teachers" className="block rounded-lg px-4 py-2 text-sm font-medium text-slate-200 hover:bg-gray-100 hover:text-gray-700">
+                                <Link href="/manager_pages/users" className={`block rounded-lg ${pathname.includes('/users') && 'bg-gray-100 text-slate-800'} px-4 py-2 text-sm font-medium text-slate-200 hover:bg-gray-100 hover:text-gray-700`}>
                                     Users
                                 </Link>
                             </li>
+                            <li>
+                                <Link href="/manager_pages/groups" className={`block rounded-lg ${pathname.includes('/groups') && 'bg-gray-100 text-slate-800'} px-4 py-2 text-sm font-medium text-slate-200 hover:bg-gray-100 hover:text-gray-700`}>
+                                    Groups
+                                </Link>
+                            </li>
+
+                            <li>
+                                <Link href="/manager_pages/bfs" className={`block rounded-lg ${pathname.includes('/bfs') && 'bg-gray-100 text-slate-800'} px-4 py-2 text-sm font-medium text-slate-200 hover:bg-gray-100 hover:text-gray-700`}>
+                                    Bereavement Funds
+                                </Link>
+                            </li>
+
 
                             <li>
                                 <details className="group [&_summary::-webkit-details-marker]:hidden">
@@ -73,18 +81,11 @@ const ManagerDashBoardSideMenuBar = () => {
 
                                     <ul className="mt-2 space-y-1 px-4">
                                         <li>
-                                            <Link href="/manager/profile" className="block rounded-lg px-4 py-2 text-sm font-medium text-slate-200 hover:bg-gray-100 hover:text-gray-700">
+                                            <Link href="/manager_pages/profile" className="block rounded-lg px-4 py-2 text-sm font-medium text-slate-200 hover:bg-gray-100 hover:text-gray-700">
                                                 Profile
                                             </Link>
                                         </li>
 
-                                        <li>
-                                            <form onSubmit={logout}>
-                                                <button type="submit" className="w-full rounded-lg px-4 py-2 text-sm font-medium text-slate-200 [text-align:_inherit] hover:bg-gray-100 hover:text-gray-700">
-                                                    Logout
-                                                </button>
-                                            </form>
-                                        </li>
                                     </ul>
                                 </details>
                             </li>
@@ -93,7 +94,7 @@ const ManagerDashBoardSideMenuBar = () => {
 
                     <div className="sticky inset-x-0 bottom-0 bg-blue-950 p-2">
                         <form onSubmit={logout}>
-                            <button type="button" className="group relative flex w-full justify-center rounded-lg px-2 py-1.5 text-sm text-slate-200 hover:bg-gray-50 hover:text-gray-700">
+                            <button type="button" className="group relative flex w-full justify-start rounded-lg px-2 py-1.5 text-sm text-slate-200 hover:bg-gray-50 hover:text-gray-700">
                                 <LogOut />
                                 <span className="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white group-hover:visible">
                                     Logout
@@ -102,9 +103,9 @@ const ManagerDashBoardSideMenuBar = () => {
                         </form>
                     </div>
                 </div>
-            }
-        </div>
-    )
+            </div >
+        )
+    }
 }
 
 export default ManagerDashBoardSideMenuBar;
