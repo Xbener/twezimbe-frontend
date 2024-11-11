@@ -1,7 +1,7 @@
 'use client'
-import { useGetAllUsers } from '@/api/auth'
+import { useDeleteAccount, useGetAllUsers } from '@/api/auth'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { AdminContext } from '@/context/AdminContext'
@@ -16,7 +16,12 @@ function page({ }: Props) {
 
     const { isLoading, users: allUsers, setSelectedUser } = useContext(AdminContext)
     const router = useRouter()
+    const { deleteAccount, isLoading: deleteLoading } = useDeleteAccount()
 
+    const handleDelete = async (userId: string) => {
+        const res = await deleteAccount(userId)
+        window.location.reload()
+    }
     return (
         <div className='w-full  text-neutral-700'>
             <div className='w-full flex items-center justify-between p-2'>
@@ -64,10 +69,36 @@ function page({ }: Props) {
                                                                 router.push(`/manager_pages/users/${user.id}`)
                                                             }}
                                                             className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit</button>
-                                                        <button
-                                                            className="w-full text-left px-4 py-2 text-sm text-white rounded-md hover:bg-red-300 bg-red-500">
-                                                            Delete
-                                                        </button>
+                                                        <Dialog>
+                                                            <DialogTrigger>
+                                                                <button
+                                                                    className="w-full text-left px-4 py-2 text-sm text-white rounded-md hover:bg-red-300 bg-red-500">
+                                                                    Delete
+                                                                </button>
+                                                            </DialogTrigger>
+                                                            <DialogContent className='bg-white'>
+                                                                <DialogHeader className='w-full text-md font-bold'>
+                                                                    Are you sure of this operation?
+                                                                </DialogHeader>
+
+                                                                <div>
+                                                                    Confirm this action.
+                                                                </div>
+
+                                                                <div className='w-full flex gap-2'>
+                                                                    <Button
+                                                                        onClick={() => handleDelete(user._id! || user?.id)}
+                                                                        className='text-white bg-red-500 '>
+                                                                        Confirm
+                                                                    </Button>
+                                                                    <DialogClose>
+                                                                        <Button className='bg-transparent text-orange-500 border border-orange-500'>
+                                                                            Cancel
+                                                                        </Button>
+                                                                    </DialogClose>
+                                                                </div>
+                                                            </DialogContent>
+                                                        </Dialog>
                                                     </PopoverContent>
                                                 </Popover>
 

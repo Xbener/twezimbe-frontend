@@ -239,6 +239,24 @@ export const useGetProfileData = () => {
 };
 
 
+export const useDeleteAccount = () => {
+    const deleteUserAccount = async (userId: string) => {
+        const accessToken = Cookies.get('access-token');
+        const response = await fetch(`${API_BASE_URL}/api/v1/auth/${userId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+            },
+        });
+    }
+    const { mutateAsync: deleteAccount, isLoading, isSuccess, error } = useMutation(deleteUserAccount);
+    return {
+        deleteAccount,
+        isLoading
+    }
+
+}
+
 export const useUpdateUserAccount = () => {
     const updateUserAccountRequest = async (user: UpdateUserTypes) => {
         const accessToken = Cookies.get('access-token');
