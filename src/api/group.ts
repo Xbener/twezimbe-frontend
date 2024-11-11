@@ -226,7 +226,6 @@ export const useUpdateGroup = () => {
 
     if (isSuccess) {
         toast.success("Group updated Succesfully!");
-        window.location.reload()
     }
 
     if (error) {

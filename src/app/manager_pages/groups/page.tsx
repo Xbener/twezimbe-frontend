@@ -6,13 +6,14 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 import { AdminContext } from '@/context/AdminContext'
 import { formatWithCommas } from '@/utils/formatNumber'
 import moment from 'moment'
+import { useRouter } from 'next/navigation'
 import React, { useContext } from 'react'
 
 type Props = {}
 
 function page({ }: Props) {
-    const { isLoading, groups } = useContext(AdminContext)
-
+    const { isLoading, groups, setSelectedGroup } = useContext(AdminContext)
+    const router = useRouter()
     return (
         <div className='w-full  text-neutral-700'>
             <div className='w-full flex items-center justify-between p-2'>
@@ -53,7 +54,12 @@ function page({ }: Props) {
                                                         </button>
                                                     </PopoverTrigger>
                                                     <PopoverContent className="origin-top-right absolute right-0 mt-2 w-auto rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 p-0">
-                                                        <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">View</button>
+                                                        <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                        onClick={()=>{
+                                                            setSelectedGroup(group)
+                                                            router.push(`/manager_pages/groups/${group?._id}`)
+                                                        }}
+                                                        >Edit</button>
                                                         <button
                                                             className="w-full text-left px-4 py-2 text-sm text-white rounded-md hover:bg-red-300 bg-red-500">
                                                             Delete

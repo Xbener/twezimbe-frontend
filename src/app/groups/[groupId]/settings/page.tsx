@@ -100,6 +100,7 @@ function GroupSettings({ }: Props) {
         try {
             setUploading(true)
             const res = await updateGroup({ ...groupData, group_id: group?._id! })
+            window.location.reload()
         } catch (error) {
             console.error("An error occurred. Please refresh the page")
         } finally {
