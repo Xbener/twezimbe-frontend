@@ -9,7 +9,6 @@ interface Props {
 
 
 function AreaChartComponent({ data }: Props) {
-    console.log('data', data)
     return (
         <AreaChart className='w-full' width={500} height={250} data={data}
             margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>

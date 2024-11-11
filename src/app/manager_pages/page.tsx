@@ -4,6 +4,7 @@ import { GroupedBarChartComponent } from "@/components/charts/AdminDateChart"
 import AreaChartComponent from "@/components/charts/AreaChart"
 import { AdminContext } from "@/context/AdminContext"
 import { MetaData, Transaction } from "@/types"
+import { formatWithCommas } from "@/utils/formatNumber"
 import { useContext, useEffect, useState } from "react"
 
 const formatDate = (date: Date) => {
