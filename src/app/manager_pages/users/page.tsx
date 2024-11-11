@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { formatWithCommas } from '@/utils/formatNumber'
 import moment from 'moment'
 import React from 'react'
 
@@ -15,7 +16,7 @@ function page({ }: Props) {
     return (
         <div className='w-full  text-neutral-700'>
             <div className='w-full flex items-center justify-between p-2'>
-                <h1 className='text-lg text-neutral-700 font-bold'>Platform users</h1>
+                <h1 className='text-lg text-neutral-700 font-bold'>Platform users {allUsers?.length && `(${formatWithCommas(allUsers.length)})`}</h1>
                 <Button className='bg-blue-500 text-white'>
                     Add new user
                 </Button>
@@ -42,7 +43,7 @@ function page({ }: Props) {
                                             <TableCell>{index + 1}</TableCell>
                                             <TableCell>{user.firstName}</TableCell>
                                             <TableCell>{user.lastName}</TableCell>
-                                            <TableCell>{moment(user.createdAt).format('DD/mm/yyyy')}</TableCell>
+                                            <TableCell>{moment(user.createdAt).format('DD/MM/yyyy')}</TableCell>
                                             <TableCell>{user.role}</TableCell>
                                             <TableCell>
                                                 <Popover>
@@ -55,7 +56,7 @@ function page({ }: Props) {
                                                         <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">View</button>
                                                         <button
                                                             className="w-full text-left px-4 py-2 text-sm text-white rounded-md hover:bg-red-300 bg-red-500">
-                                                                Delete
+                                                            Delete
                                                         </button>
                                                     </PopoverContent>
                                                 </Popover>
