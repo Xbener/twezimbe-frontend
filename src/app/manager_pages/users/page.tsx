@@ -16,7 +16,7 @@ function page({ }: Props) {
     return (
         <div className='w-full  text-neutral-700'>
             <div className='w-full flex items-center justify-between p-2'>
-                <h1 className='text-lg text-neutral-700 font-bold'>Platform users {allUsers?.length && `(${formatWithCommas(allUsers.length)})`}</h1>
+                <h1 className='text-lg text-neutral-700 font-bold'>Platform users {allUsers?.length ? `(${formatWithCommas(allUsers.length)})` : ''}</h1>
                 <Button className='bg-blue-500 text-white'>
                     Add new user
                 </Button>

@@ -1,19 +1,31 @@
+'use client'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { getAllBfs } from '@/lib/bf'
 import { BF } from '@/types'
 import { formatWithCommas } from '@/utils/formatNumber'
 import moment from 'moment'
-import React from 'react'
+import React, { use, useEffect, useState } from 'react'
 
 type Props = {}
 
 function page({ }: Props) {
-    const { bfs, isLoading } = { bfs: [], isLoading: false }
+    const [bfs, setBfs] = useState([])
+    const [isLoading, setIsLoading] = useState(true)
+    useEffect(() => {
+        const getData = async () => {
+            setIsLoading(true)
+            const bfs = await getAllBfs()
+            setIsLoading(false)
+            setBfs(bfs)
+        }
+        getData()
+    }, [])
     return (
         <div className='w-full  text-neutral-700'>
             <div className='w-full flex items-center justify-between p-2'>
-                <h1 className='text-lg text-neutral-700 font-bold'>Platform bearevement funds {bfs?.length && `(${formatWithCommas(bfs.length)})`}</h1>
+                <h1 className='text-lg text-neutral-700 font-bold'>Platform bearevement funds {bfs?.length ? `(${formatWithCommas(bfs.length)})` : ''}</h1>
                 <Button className='bg-blue-500 text-white'>
                     Add new Breavement fund
                 </Button>
@@ -26,7 +38,7 @@ function page({ }: Props) {
                             <TableHead>No</TableHead>
                             <TableHead>Name</TableHead>
                             <TableHead>Created at</TableHead>
-                            <TableHead>Total members</TableHead>
+                            {/* <TableHead>Total members</TableHead> */}
                             <TableHead>Created by</TableHead>
                             <TableHead>Wallet</TableHead>
                             <TableHead>Actions</TableHead>
@@ -41,7 +53,7 @@ function page({ }: Props) {
                                             <TableCell>{index + 1}</TableCell>
                                             <TableCell>{bf.fundName}</TableCell>
                                             <TableCell>{moment(bf.createdAt).format('DD/MM/yyyy')}</TableCell>
-                                            <TableCell>{bf?.members?.length}</TableCell>
+                                            {/* <TableCell>{bf?.members?.length}</TableCell> */}
                                             <TableCell>{bf?.createdBy?.firstName} {bf?.createdBy?.lastName}</TableCell>
                                             <TableCell>{bf.walletAddress}</TableCell>
                                             <TableCell>
