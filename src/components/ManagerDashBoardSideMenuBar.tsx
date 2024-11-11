@@ -6,6 +6,7 @@ import GeneralIcon from "./icons/GeneralIcon"
 import ManagersIcon from "./icons/Managers"
 import { AdminContext } from "@/context/AdminContext"
 import { usePathname } from "next/navigation"
+import Cookies from 'js-cookie'
 
 const ManagerDashBoardSideMenuBar = () => {
     const { isVisible, toggleSideBar } = useContext(AdminContext)
@@ -13,7 +14,9 @@ const ManagerDashBoardSideMenuBar = () => {
     const logout = (e: React.FormEvent) => {
         e.preventDefault();
         console.log("Logged out");
-
+        Cookies.remove('access-token');
+        Cookies.remove('admin')
+        window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/manager_pages/SignIn`
     }
 
     if (isVisible) {
@@ -94,9 +97,9 @@ const ManagerDashBoardSideMenuBar = () => {
 
                     <div className="sticky inset-x-0 bottom-0 bg-blue-950 p-2">
                         <form onSubmit={logout}>
-                            <button type="button" className="group relative flex w-full justify-start rounded-lg px-2 py-1.5 text-sm text-slate-200 hover:bg-gray-50 hover:text-gray-700">
+                            <button type="submit" className="group relative flex w-full justify-start rounded-lg px-2 py-1.5 text-sm text-slate-200 hover:bg-gray-50 hover:text-gray-700 items-center gap-3">
                                 <LogOut />
-                                <span className="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white group-hover:visible">
+                                <span >
                                     Logout
                                 </span>
                             </button>
