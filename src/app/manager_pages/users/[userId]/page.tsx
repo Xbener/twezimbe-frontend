@@ -30,7 +30,7 @@ function Page({ }: Props) {
 
     const onSubmit = async (data: Partial<User>) => {
         try {
-            const res = await updateAccount(data)
+            const res = await updateAccount({ ...data, _id: userId as string })
             window.location.href = `/manager_pages/users`;
         } catch (error) {
             toast.error("Something went wrong. Please try again")
@@ -119,12 +119,15 @@ function Page({ }: Props) {
 
                 <div className="flex flex-col">
                     <label>Role</label>
-                    <input
-                        type="text"
+                    <select
                         {...register('role')}
                         className="border p-2 rounded"
-                    />
+                    >
+                        <option value="Admin">Admin</option>
+                        <option value="User">User</option>
+                    </select>
                 </div>
+
 
             </form>
         </div>

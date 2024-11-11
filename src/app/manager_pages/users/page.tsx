@@ -20,7 +20,7 @@ function page({ }: Props) {
 
     const handleDelete = async (userId: string) => {
         const res = await deleteAccount(userId)
-        window.location.reload()
+
     }
     return (
         <div className='w-full  text-neutral-700'>
@@ -87,7 +87,10 @@ function page({ }: Props) {
 
                                                                 <div className='w-full flex gap-2'>
                                                                     <Button
-                                                                        onClick={() => handleDelete(user._id! || user?.id)}
+                                                                        onClick={async () => {
+                                                                            await handleDelete(user._id! || user?.id)
+                                                                            window.location.reload()
+                                                                        }}
                                                                         className='text-white bg-red-500 '>
                                                                         Confirm
                                                                     </Button>

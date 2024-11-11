@@ -225,11 +225,14 @@ export const useGetProfileData = () => {
         });
 
         const responseData = await response.json();
-
+        if (responseData.message === "User not found") {
+            Cookies.remove('access-token')
+            Cookies.remove('admin')
+            toast.error("This session was not found. Please login again")
+        }
         if (!response.ok) {
             throw new Error(responseData.errors);
         }
-
         return responseData;
     };
 
@@ -250,6 +253,10 @@ export const useDeleteAccount = () => {
         });
     }
     const { mutateAsync: deleteAccount, isLoading, isSuccess, error } = useMutation(deleteUserAccount);
+
+    if (isSuccess) {
+        window.location.reload()
+    }
     return {
         deleteAccount,
         isLoading
@@ -260,7 +267,7 @@ export const useDeleteAccount = () => {
 export const useUpdateUserAccount = () => {
     const updateUserAccountRequest = async (user: UpdateUserTypes) => {
         const accessToken = Cookies.get('access-token');
-        const response = await fetch(`${API_BASE_URL}/api/v1/auth/update`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/auth/update/${user._id}`, {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${accessToken}`,

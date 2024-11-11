@@ -16,7 +16,7 @@ const Profile = () => {
           <h2 className='text-2xl font-bold'>Profile</h2>
           <UserProfileForm
             currentUser={currentUser}
-            onSave={(data)=>{
+            onSave={(data) => {
               updateAccount(data)
               window.location.reload();
             }

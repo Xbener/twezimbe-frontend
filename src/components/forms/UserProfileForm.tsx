@@ -39,6 +39,7 @@ import { useUpdateUserAccount } from "@/api/auth";
 import { CheckCircle, XCircleIcon, XIcon } from "lucide-react";
 
 const formSchema = z.object({
+    _id: z.string(),
     title: z.enum(["Mr.", "Ms.", "Mrs.", "Dr.", "Prof."]),
     email: z.string(),
     firstName: z.string(),
