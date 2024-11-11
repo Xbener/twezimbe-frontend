@@ -1,4 +1,3 @@
-
 'use client'
 
 import { AdminContext } from "@/context/AdminContext"
@@ -8,6 +7,7 @@ import { useContext, useEffect, useState } from "react"
 const ManagerDashboard = () => {
   let [metadata, setMetadata] = useState<MetaData[] | null>(null)
   const { users, groups, bfs, isLoading } = useContext(AdminContext)
+
   useEffect(() => {
     setMetadata([
       {
@@ -23,23 +23,20 @@ const ManagerDashboard = () => {
         value: bfs?.length
       }
     ])
-
-  }, [
-    isLoading, groups, bfs, users
-  ])
-
+  }, [isLoading, groups, bfs, users])
 
   return (
     <div className="w-full p-3 mt-5 flex flex-col items-start gap-2">
-      <div className='flex gap-2 w-full flex-wrap'>
+      <div className='flex gap-2 w-full flex-wrap items-start justify-start'>
         {
           metadata?.length ? metadata.map((card, index) => {
             return (
               <div
-                className={`flex-1 min-w-auto flex-col max-w-[15%] border border-white p-4 rounded-lg shadow-md flex justify-around bg-white `}
+                key={index}
+                className="flex min-w-[15%] flex-col border border-white p-4 rounded-lg shadow-md bg-white justify-around items-start"
               >
-                <div className="text-sm font-semibold ">{card.title}</div>
-                <div className="text-[1.2rem] font-bold">{card.value}</div>
+                <div className="text-sm font-semibold text-center">{card.title}</div>
+                <div className="text-[1.2rem] font-bold text-center">{card.value}</div>
               </div>
             )
           }) : null
