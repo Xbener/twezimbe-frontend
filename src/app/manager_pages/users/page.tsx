@@ -1,14 +1,15 @@
 'use client'
 import { useDeleteAccount, useGetAllUsers } from '@/api/auth'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { AdminContext } from '@/context/AdminContext'
 import { formatWithCommas } from '@/utils/formatNumber'
 import moment from 'moment'
 import { useRouter } from 'next/navigation'
-import React, { useContext } from 'react'
+import React, { ReactEventHandler, useContext, useState } from 'react'
+import { toast } from 'sonner'
 
 type Props = {}
 
@@ -18,10 +19,52 @@ function page({ }: Props) {
     const router = useRouter()
     const { deleteAccount, isLoading: deleteLoading } = useDeleteAccount()
 
+    const [formData, setFormData] = useState({
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+        phone: ''
+    });
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData((prevData) => ({
+            ...prevData,
+            [name]: value
+        }));
+    };
+
+    const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        try {
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/auth/signup`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': "application/json",
+                    },
+                    body: JSON.stringify(formData)
+                }
+            )
+
+            const data = await res.json()
+            if (!res.ok) throw new Error(data.errors || data.message || "Something went wrong. Please try again")
+            toast.success(data.message)
+            window.location.reload()
+        } catch (error: any) {
+            console.log(error)
+            toast.error(error.message)
+        }
+    };
+
+
     const handleDelete = async (userId: string) => {
         const res = await deleteAccount(userId)
 
     }
+
+
     return (
         <div className='w-full  text-neutral-700'>
             <div className='w-full flex items-center justify-between p-2'>
@@ -33,10 +76,7 @@ function page({ }: Props) {
                         </Button>
                     </DialogTrigger>
                     <DialogContent className='bg-white w-auto text-neutral-600'>
-                        <DialogHeader className='font-bold'>
-                            Add a new user to the platform
-                        </DialogHeader>
-
+                        <DialogTitle>Add a new user to the platform</DialogTitle>
                         <div className="w-full flex flex-col space-y-4">
                             {/* First Name */}
                             <div className="flex flex-col">
@@ -45,6 +85,8 @@ function page({ }: Props) {
                                     type="text"
                                     id="firstName"
                                     name="firstName"
+                                    value={formData.firstName}
+                                    onChange={handleChange}
                                     className="p-2 rounded-md bg-transparent border"
                                     placeholder="Enter First Name"
                                 />
@@ -56,6 +98,8 @@ function page({ }: Props) {
                                 <input
                                     type="text"
                                     id="lastName"
+                                    value={formData.lastName}
+                                    onChange={handleChange}
                                     name="lastName"
                                     className="p-2 rounded-md bg-transparent border"
                                     placeholder="Enter Last Name"
@@ -68,6 +112,8 @@ function page({ }: Props) {
                                 <input
                                     type="email"
                                     id="email"
+                                    value={formData.email}
+                                    onChange={handleChange}
                                     name="email"
                                     className="p-2 rounded-md bg-transparent border"
                                     placeholder="Enter Email"
@@ -81,6 +127,8 @@ function page({ }: Props) {
                                     type="password"
                                     id="password"
                                     name="password"
+                                    value={formData.password}
+                                    onChange={handleChange}
                                     className="p-2 rounded-md bg-transparent border"
                                     placeholder="Enter Password"
                                 />
@@ -93,13 +141,17 @@ function page({ }: Props) {
                                     type="tel"
                                     id="phone"
                                     name="phone"
+                                    value={formData.phone}
+                                    onChange={handleChange}
                                     className="p-2 rounded-md bg-transparent border"
                                     placeholder="Enter Phone Number"
                                 />
                             </div>
 
-                            <div className='w-full flex items-center'>
-                                <Button className='bg-blue-500 text-slate-50'>
+                            <div className='w-full flex items-center gap-2'>
+                                <Button
+                                    onClick={handleSubmit}
+                                    className='bg-blue-500 text-slate-50'>
                                     Create account
                                 </Button>
                                 <DialogClose>
