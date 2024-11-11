@@ -26,9 +26,92 @@ function page({ }: Props) {
         <div className='w-full  text-neutral-700'>
             <div className='w-full flex items-center justify-between p-2'>
                 <h1 className='text-lg text-neutral-700 font-bold'>Platform users {allUsers?.length ? `(${formatWithCommas(allUsers.length)})` : ''}</h1>
-                <Button className='bg-blue-500 text-white'>
-                    Add new user
-                </Button>
+                <Dialog>
+                    <DialogTrigger>
+                        <Button className='bg-blue-500 text-white'>
+                            Add new user
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className='bg-white w-auto text-neutral-600'>
+                        <DialogHeader className='font-bold'>
+                            Add a new user to the platform
+                        </DialogHeader>
+
+                        <div className="w-full flex flex-col space-y-4">
+                            {/* First Name */}
+                            <div className="flex flex-col">
+                                <label htmlFor="firstName" className="mb-1">First Name</label>
+                                <input
+                                    type="text"
+                                    id="firstName"
+                                    name="firstName"
+                                    className="p-2 rounded-md bg-transparent border"
+                                    placeholder="Enter First Name"
+                                />
+                            </div>
+
+                            {/* Last Name */}
+                            <div className="flex flex-col">
+                                <label htmlFor="lastName" className="mb-1">Last Name</label>
+                                <input
+                                    type="text"
+                                    id="lastName"
+                                    name="lastName"
+                                    className="p-2 rounded-md bg-transparent border"
+                                    placeholder="Enter Last Name"
+                                />
+                            </div>
+
+                            {/* Email */}
+                            <div className="flex flex-col">
+                                <label htmlFor="email" className="mb-1">Email</label>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    className="p-2 rounded-md bg-transparent border"
+                                    placeholder="Enter Email"
+                                />
+                            </div>
+
+                            {/* Password */}
+                            <div className="flex flex-col">
+                                <label htmlFor="password" className="mb-1">Password</label>
+                                <input
+                                    type="password"
+                                    id="password"
+                                    name="password"
+                                    className="p-2 rounded-md bg-transparent border"
+                                    placeholder="Enter Password"
+                                />
+                            </div>
+
+                            {/* Phone */}
+                            <div className="flex flex-col">
+                                <label htmlFor="phone" className="mb-1">Phone</label>
+                                <input
+                                    type="tel"
+                                    id="phone"
+                                    name="phone"
+                                    className="p-2 rounded-md bg-transparent border"
+                                    placeholder="Enter Phone Number"
+                                />
+                            </div>
+
+                            <div className='w-full flex items-center'>
+                                <Button className='bg-blue-500 text-slate-50'>
+                                    Create account
+                                </Button>
+                                <DialogClose>
+                                    <Button className="bg-transparent border border-blue-500 text-blue-500">
+                                        Cancel
+                                    </Button>
+                                </DialogClose>
+                            </div>
+                        </div>
+
+                    </DialogContent>
+                </Dialog>
             </div>
 
             <div className='flex flex-col gap-3 mt-5'>
