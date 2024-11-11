@@ -17,15 +17,15 @@ const ManagerDashboard = () => {
   useEffect(() => {
     setMetadata([
       {
-        title: "Total users",
+        title: "Joined users",
         value: users?.length || 0
       },
       {
-        title: "Total groups",
+        title: "Created groups",
         value: groups?.length || 0
       },
       {
-        title: "Total bereavement funds",
+        title: "created bereavement funds",
         value: bfs?.length || 0
       },
       {

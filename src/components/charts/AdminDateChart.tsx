@@ -30,9 +30,9 @@ export const GroupedBarChartComponent = ({ data }: Props) => {
                 <Legend />
 
                 {/* Bars for each category */}
-                <Bar dataKey="users" fill={COLORS.users} name="Total Users" />
-                <Bar dataKey="groups" fill={COLORS.groups} name="Total Groups" />
-                <Bar dataKey="bfs" fill={COLORS.bfs} name="Total BFs" />
+                <Bar dataKey="users" fill={COLORS.users} name="Joined Users" />
+                <Bar dataKey="groups" fill={COLORS.groups} name="Created groups" />
+                <Bar dataKey="bfs" fill={COLORS.bfs} name="Created Funds" />
             </BarChart>
         </ResponsiveContainer>
     );
