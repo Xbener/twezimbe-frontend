@@ -57,7 +57,7 @@ function AreaChartComponent({ }: Props) {
                     <stop offset="95%" stopColor="#82ca9d" stopOpacity={0} />
                 </linearGradient>
             </defs>
-            <XAxis  dataKey="name" />
+            <XAxis  dataKey={"name"} />
             <YAxis  />
             {/* <CartesianGrid strokeDasharray="3 3" /> */}
             <Tooltip />
