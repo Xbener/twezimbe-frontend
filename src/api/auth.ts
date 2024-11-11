@@ -279,7 +279,7 @@ export const useUpdateUserAccount = () => {
 export const useGetAllUsers = () => {
     const accessToken = Cookies.get('access-token');
     const getAllUsersRequest = async (): Promise<User[]> => {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/auth/allUser`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/auth/users`, {
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
             },
@@ -287,17 +287,17 @@ export const useGetAllUsers = () => {
 
         const responseData = await response.json();
 
-        const { allUsers } = responseData
+        const { users } = responseData
         if (!response.ok) {
             throw new Error(responseData.errors || responseData.message);
         }
 
-        return allUsers;
+        return users;
     };
 
-    const { data: allUsers, isLoading } = useQuery("allUsers", () => getAllUsersRequest());
+    const { data: users, isLoading } = useQuery("users", () => getAllUsersRequest());
 
-    return { allUsers, isLoading }
+    return { users, isLoading }
 };
 
 
