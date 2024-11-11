@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 type Props = {}
 
 function Header({ }: Props) {
-    const { isVisible, toggleSideBar } = useContext(AdminContext)
+    const { isVisible, toggleSideBar, currentUser } = useContext(AdminContext)
     return (
         <div className='w-full p-2 bg-transparent backdrop:blur-lg  flex justify-between border-b-2'>
             <div className='w-auto flex items-center gap-3'>
