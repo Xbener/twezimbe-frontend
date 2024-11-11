@@ -88,7 +88,7 @@ const ManagerDashboard = () => {
 
       <div className="w-full flex items-start justify-normal bg-white p-2 rounded-md">
        <div className="text-center font-bold text-neutral-600">
-        <h1>Groups, Members and Bereavement funds by creation date</h1>
+        <h1>Groups, users and Bereavement funds by creation date</h1>
           <GroupedBarChartComponent data={groupedData} />
        </div>
       </div>
