@@ -1,49 +1,15 @@
 import React from 'react'
 import { Area, AreaChart, CartesianGrid, Tooltip, XAxis, YAxis } from 'recharts'
-
-type Props = {}
-
-
-const data = [
-    {
-        "name": "Nov",
-        "uv": 4000,
-
-    },
-    {
-        "name": "Dec",
-        "uv": 3000,
-
-    },
-    {
-        "name": "Jan",
-        "uv": 2000,
-
-    },
-    {
-        "name": "Feb",
-        "uv": 2780,
-
-    },
-    {
-        "name": "Mar",
-        "uv": 1890,
-
-    },
-    {
-        "name": "April",
-        "uv": 2390,
-
-    },
-    {
-        "name": "May",
-        "uv": 3490,
-
-    }
-]
+interface Props {
+    data: {
+        date?: string
+        amount?: any
+    }[]
+}
 
 
-function AreaChartComponent({ }: Props) {
+function AreaChartComponent({ data }: Props) {
+    console.log('data', data)
     return (
         <AreaChart className='w-full' width={500} height={250} data={data}
             margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
@@ -57,11 +23,11 @@ function AreaChartComponent({ }: Props) {
                     <stop offset="95%" stopColor="#82ca9d" stopOpacity={0} />
                 </linearGradient>
             </defs>
-            <XAxis  dataKey={"name"} />
-            <YAxis  />
+            <XAxis dataKey={"date"} />
+            <YAxis dataKey={"amount"} />
             {/* <CartesianGrid strokeDasharray="3 3" /> */}
             <Tooltip />
-            <Area type="monotone" dataKey="uv" stroke="#82ca9d" fillOpacity={1} fill="url(#colorPv)" />
+            <Area type="monotone" dataKey={"amount"} stroke="#82ca9d" fillOpacity={1} fill="url(#colorPv)" />
         </AreaChart>
     )
 }

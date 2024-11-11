@@ -453,28 +453,12 @@ export type UserSettings = {
     };
 };
 
-
-export interface Wallet {
-    walletAddress: string
-    balance: number
-    transactionHistory: [{
-        amount?: number | string
-        date?: Date
-        user: User
-    }]
-}
-
-export interface Contribution {
-    contributor: User
-    amount: number
-    walletAddress: string
-    case: string
-    date: Date
-}
-
-export interface MetaData {
-    title: string
-    value?: any
+export interface Transaction {
+    amount?: number | string
+    createdAt?: Date
+    date?: Date
+    user?: User,
+    wallet?: string
 }
 
 export interface BF {
@@ -491,6 +475,25 @@ export interface BF {
     contributions?: Contribution[]
     createdAt?: Date
     members?: User[]
+}
+
+export interface Wallet {
+    walletAddress: string
+    balance: number
+    transactionHistory: Transaction[]
+}
+
+export interface Contribution {
+    contributor: User
+    amount: number
+    walletAddress: string
+    case: string
+    date: Date
+}
+
+export interface MetaData {
+    title: string
+    value?: any
 }
 
 

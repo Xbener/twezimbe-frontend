@@ -2,8 +2,9 @@
 
 import { useGetAllUsers, useGetProfileData } from '@/api/auth'
 import { useGetAllGroups } from '@/api/group'
+import { fetchAllTransactions } from '@/api/transaction'
 import { getAllBfs } from '@/lib/bf'
-import { BF, GroupTypes, User } from '@/types'
+import { BF, GroupTypes, Transaction, User } from '@/types'
 import React, { useEffect, useState } from 'react'
 
 type Props = {
@@ -18,6 +19,7 @@ export interface AdminContextTypes {
     groups?: GroupTypes[]
     users?: User[]
     isLoading?: boolean
+    transactions?: Transaction[]
 }
 
 export const AdminContext = React.createContext<AdminContextTypes>({})
@@ -27,11 +29,14 @@ function AdminContextProvider({ children }: Props) {
     const { currentUser } = useGetProfileData()
     const { users: allUsers, isLoading } = useGetAllUsers()
     const { groups } = useGetAllGroups()
+    const [transactions, setTransactions] = useState<Transaction[]>([])
     const [bfs, setBfs] = useState([])
     useEffect(() => {
         const getData = async () => {
             const bfs = await getAllBfs()
+            const transactions = await fetchAllTransactions()
             setBfs(bfs)
+            setTransactions(transactions)
         }
         getData()
     }, [])
@@ -47,7 +52,8 @@ function AdminContextProvider({ children }: Props) {
             users: allUsers,
             groups,
             bfs,
-            isLoading
+            isLoading,
+            transactions
         }}>
             {children}
         </AdminContext.Provider>

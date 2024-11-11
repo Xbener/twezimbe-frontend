@@ -6,7 +6,7 @@ export const getAllBfs = async () => {
     try {
         const token = Cookies.get("access-token")
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bf`, {
-            method:"GET",
+            method: "GET",
             headers: {
                 'Authorization': `Bearer ${token}`
             },
@@ -312,7 +312,7 @@ export const updateWalletBalance = async (body: { userId: string, walletAddress:
         const data = await res.json()
         if (!data.status) return toast.error(data.errors || data.message)
         toast.success(data.message)
-        // window.location.reload()
+        window.location.reload()
     } catch (error) {
         console.log('error adding balance', error)
         toast.error("failed to add balance")

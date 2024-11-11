@@ -60,7 +60,7 @@ function page({ }: Props) {
         const amount = typeof transaction.amount === 'string' ? parseFloat(transaction.amount) : transaction.amount;
 
         // Create a unique key for the user using first and last name
-        const userName = `${transaction.user.firstName} ${transaction.user.lastName}`;
+        const userName = `${transaction.user?.firstName} ${transaction.user?.lastName}`;
 
         // Group amounts by user and sum them
         if (userAmountMap[userName]) {
@@ -199,7 +199,7 @@ function page({ }: Props) {
         <div className="flex p-2 w-full items-start justify-start gap-3">
           <div className='w-1/2 flex flex-col gap-3 shadow-lg p-2 rounded-md'>
             <h1 className='text-[1.2rem] font-bold mb-2 text-center'>Balance history</h1>
-            <AreaChartComponent />
+            <AreaChartComponent data={[]} />
           </div>
           <div className='w-1/2 flex flex-col gap-3 shadow-lg p-2 rounded-md'>
             <h1 className='text-[1.2rem] font-bold mb-2 text-center'>Member deposits</h1>
@@ -499,17 +499,17 @@ function page({ }: Props) {
                   </PopoverTrigger>
                   <PopoverContent className='bg-white w-auto flex flex-col'>
                     <Button
-                      onClick={() => exportToPDF(groupBF?.wallet?.transactionHistory.map((transaction) => ({ ...transaction, user: `${transaction.user.lastName} ${transaction.user.firstName}` }))!, `${groupBF?.fundName}_transaction_history.pdf`)}
+                      onClick={() => exportToPDF(groupBF?.wallet?.transactionHistory.map((transaction) => ({ ...transaction, user: `${transaction?.user?.lastName} ${transaction?.user?.firstName}` }))!, `${groupBF?.fundName}_transaction_history.pdf`)}
                       className='hover:bg-neutral-100 w-auto'>
                       PDF
                     </Button>
                     <Button
-                      onClick={() => exportToCSV(groupBF?.wallet?.transactionHistory.map((transaction) => ({ ...transaction, user: `${transaction.user.lastName} ${transaction.user.firstName}` }))!, `${groupBF?.fundName}_transaction_history.csv`)}
+                      onClick={() => exportToCSV(groupBF?.wallet?.transactionHistory.map((transaction) => ({ ...transaction, user: `${transaction.user?.lastName} ${transaction.user?.firstName}` }))!, `${groupBF?.fundName}_transaction_history.csv`)}
                       className='w-auto hover:bg-neutral-100'>
                       CSV
                     </Button>
                     <Button
-                      onClick={() => exportToExcel(groupBF?.wallet?.transactionHistory.map((transaction) => ({ ...transaction, user: `${transaction.user.lastName} ${transaction.user.firstName}` }))!, `${groupBF?.fundName}_transaction_history.xlsx`)}
+                      onClick={() => exportToExcel(groupBF?.wallet?.transactionHistory.map((transaction) => ({ ...transaction, user: `${transaction.user?.lastName} ${transaction.user?.firstName}` }))!, `${groupBF?.fundName}_transaction_history.xlsx`)}
                       className='w-auto hover:bg-neutral-100'>
                       Excel
                     </Button>
@@ -540,7 +540,7 @@ function page({ }: Props) {
                   {
                     sortedTransactions?.map((transaction, index) => (
                       <TableRow className='cursor-pointer text-neutral-700 hover:bg-neutral-100'>
-                        <TableCell>{transaction.user.lastName} {transaction.user.firstName}</TableCell>
+                        <TableCell>{transaction.user?.lastName} {transaction.user?.firstName}</TableCell>
                         <TableCell>{formatWithCommas(transaction.amount)}</TableCell>
                         <TableCell>{moment(transaction.date).format('MM/DD/YY')}</TableCell>
                         <TableCell>
