@@ -16,7 +16,7 @@ const ManagerDashBoardSideMenuBar = () => {
         console.log("Logged out");
         Cookies.remove('access-token');
         Cookies.remove('admin')
-        window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/manager_pages/SignIn`
+        window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/manager_pages/signin`
     }
 
     if (isVisible) {

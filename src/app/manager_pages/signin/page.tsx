@@ -13,12 +13,12 @@ type FormValues = {
 type Props = {}
 
 function AdminLoginPage({ }: Props) {
-    const { register, handleSubmit, formState: { errors } } = useForm<FormValues>()
+    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormValues>()
     const router = useRouter()
 
-    useEffect(()=>{
-        if (Cookies.get('access-token')&&Cookies.get('admin')==='true') router.push('/manager_pages')
-    },[])
+    useEffect(() => {
+        if (Cookies.get('access-token') && Cookies.get('admin') === 'true') router.push('/manager_pages')
+    }, [])
     const onSubmit: SubmitHandler<FormValues> = async data => {
         try {
 
@@ -38,7 +38,7 @@ function AdminLoginPage({ }: Props) {
 
             Cookies.set('access-token', responseData.token, {});
             Cookies.set('admin', 'true', {})
-            router.push('/manager_pages')
+            window.location.href = '/manager_pages'
         } catch (error: any) {
             toast.error(error.message)
         }
@@ -75,6 +75,7 @@ function AdminLoginPage({ }: Props) {
                     </div>
 
                     <button
+                        disabled={isSubmitting}
                         type="submit"
                         className="w-full mt-4 p-2 bg-white text-blue-500 font-semibold rounded-md hover:bg-gray-200"
                     >
