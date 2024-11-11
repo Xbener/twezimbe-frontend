@@ -15,7 +15,7 @@ type Props = {}
 
 function page({ }: Props) {
 
-    const { isLoading, users: allUsers, setSelectedUser } = useContext(AdminContext)
+    const { isLoading, users: allUsers, setSelectedUser, currentUser } = useContext(AdminContext)
     const router = useRouter()
     const { deleteAccount, isLoading: deleteLoading } = useDeleteAccount()
 
@@ -207,6 +207,7 @@ function page({ }: Props) {
                                                         <Dialog>
                                                             <DialogTrigger>
                                                                 <button
+                                                                    disabled={currentUser?._id === user.id}
                                                                     className="w-full text-left px-4 py-2 text-sm text-white rounded-md hover:bg-red-300 bg-red-500">
                                                                     Delete
                                                                 </button>

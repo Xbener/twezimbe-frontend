@@ -21,7 +21,7 @@ type User = {
 type Props = {};
 
 function Page({ }: Props) {
-    const { selectedUser } = useContext(AdminContext);
+    const { selectedUser, currentUser } = useContext(AdminContext);
     const { userId } = useParams();
     const { updateAccount, isLoading } = useUpdateUserAccount()
     const { register, handleSubmit, formState: { errors } } = useForm<User>({
@@ -120,8 +120,9 @@ function Page({ }: Props) {
                 <div className="flex flex-col">
                     <label>Role</label>
                     <select
+                        disabled={currentUser?._id === userId}
                         {...register('role')}
-                        className="border p-2 rounded"
+                        className="border p-2 rounded w-auto disabled:cursor-not-allowed"
                     >
                         <option value="Admin">Admin</option>
                         <option value="User">User</option>
