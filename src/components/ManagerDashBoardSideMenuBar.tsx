@@ -84,7 +84,7 @@ const ManagerDashBoardSideMenuBar = () => {
 
                                     <ul className="mt-2 space-y-1 px-4">
                                         <li>
-                                            <Link href="/manager_pages/profile" className="block rounded-lg px-4 py-2 text-sm font-medium text-slate-200 hover:bg-gray-100 hover:text-gray-700">
+                                            <Link href="/public_pages/Profile" className="block rounded-lg px-4 py-2 text-sm font-medium text-slate-200 hover:bg-gray-100 hover:text-gray-700">
                                                 Profile
                                             </Link>
                                         </li>

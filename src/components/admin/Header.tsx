@@ -8,6 +8,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import Link from 'next/link'
 import { AiOutlineProfile } from 'react-icons/ai'
 import { Button } from '../ui/button'
+import Cookies from 'js-cookie'
 
 type Props = {}
 
@@ -39,11 +40,17 @@ function Header({ }: Props) {
                         </div>
                     </PopoverTrigger>
                     <PopoverContent className='bg-white w-auto flex flex-col gap-1 items-start justify-normal p-0'>
-                        <Link href={`/manager_pages/profile`} className='flex p-3 rounded-md items-center gap-2 hover:bg-neutral-100 w-full'>
+                        <Link href={`/public_pages/Profile`} className='flex p-3 rounded-md items-center gap-2 hover:bg-neutral-100 w-full'>
                             <AiOutlineProfile />
                             Profile
                         </Link>
-                        <Button className='flex items-center gap-2 hover:bg-red-500 hover:text-slate-100'>
+                        <Button
+                            onClick={() => {
+                                Cookies.remove('access-token')
+                                Cookies.remove('admin')
+                                window.location.href = '/manager_pages/signin'
+                            }}
+                            className='flex items-center gap-2 hover:bg-red-500 hover:text-slate-100'>
                             <DoorClosed />
                             Logout
                         </Button>
