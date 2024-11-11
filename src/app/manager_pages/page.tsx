@@ -17,15 +17,15 @@ const ManagerDashboard = () => {
     setMetadata([
       {
         title: "Total users",
-        value: users?.length
+        value: users?.length || 0
       },
       {
         title: "Total groups",
-        value: groups?.length
+        value: groups?.length || 0
       },
       {
         title: "Total bereavement funds",
-        value: bfs?.length
+        value: bfs?.length || 0
       }
     ])
   }, [isLoading, groups, bfs, users])
@@ -87,10 +87,10 @@ const ManagerDashboard = () => {
       </div>
 
       <div className="w-full flex items-start justify-normal bg-white p-2 rounded-md">
-       <div className="text-center font-bold text-neutral-600">
-        <h1>Groups, users and Bereavement funds by creation date</h1>
+        <div className="text-center font-bold text-neutral-600">
+          <h1>Groups, users and Bereavement funds by creation date</h1>
           <GroupedBarChartComponent data={groupedData} />
-       </div>
+        </div>
       </div>
     </div>
   )
