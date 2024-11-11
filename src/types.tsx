@@ -479,11 +479,13 @@ export interface BF {
     accountInfo: string;
     walletAddress?: string;
     groupId: string;
-    createdBy: User[];
+    createdBy: User;
     _id?: string;
     role?: string;
     wallet?: Wallet
     contributions?: Contribution[]
+    createdAt?: Date
+    members?: User[]
 }
 
 
