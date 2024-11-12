@@ -267,6 +267,7 @@ export type FriendTypes = {
 
 export type GroupTypes = {
     _id: string
+    name?:string;
     group_name: string;
     group_type: string;
     group_picture: string;
@@ -471,7 +472,8 @@ export interface BF {
     accountType: 'bank' | 'mobile' | 'wallet';
     accountInfo: string;
     walletAddress?: string;
-    groupId: string;
+    groupId?: string;
+    group?: GroupTypes
     createdBy: User;
     _id?: string;
     role?: string;

@@ -127,7 +127,7 @@ function BereavementFundPage({ }: Props) {
                         {...register("accountInfo", {
                             required: accountType === 'wallet' ? "Wallet address is required" : "Account info is required",
                         })}
-                        disabled={accountType==='wallet'}
+                        disabled={accountType === 'wallet'}
                         className={`w-full px-4 py-2 border disabled:cursor-not-allowed ${errors.accountInfo ? 'border-red-500' : 'border-gray-300'} rounded-md focus:border-blue-800 focus:ring focus:ring-blue-200`}
                         // value={}
                         placeholder={
