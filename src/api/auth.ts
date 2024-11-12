@@ -253,10 +253,6 @@ export const useDeleteAccount = () => {
         });
     }
     const { mutateAsync: deleteAccount, isLoading, isSuccess, error } = useMutation(deleteUserAccount);
-
-    if (isSuccess) {
-        window.location.reload()
-    }
     return {
         deleteAccount,
         isLoading

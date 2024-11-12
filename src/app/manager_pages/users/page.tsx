@@ -5,10 +5,11 @@ import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTr
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { AdminContext } from '@/context/AdminContext'
+import { User } from '@/types'
 import { formatWithCommas } from '@/utils/formatNumber'
 import moment from 'moment'
 import { useRouter } from 'next/navigation'
-import React, { ReactEventHandler, useContext, useState } from 'react'
+import React, { ReactEventHandler, useContext, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 type Props = {}
@@ -16,6 +17,7 @@ type Props = {}
 function page({ }: Props) {
 
     const { isLoading, users: allUsers, setSelectedUser, currentUser } = useContext(AdminContext)
+    const [users, setUsers] = useState<User[]>([])
     const router = useRouter()
     const { deleteAccount, isLoading: deleteLoading } = useDeleteAccount()
 
@@ -26,6 +28,7 @@ function page({ }: Props) {
         password: '',
         phone: ''
     });
+
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -51,7 +54,7 @@ function page({ }: Props) {
             const data = await res.json()
             if (!res.ok) throw new Error(data.errors || data.message || "Something went wrong. Please try again")
             toast.success(data.message)
-            window.location.reload()
+            setUsers(prev => [...prev, data.user])
         } catch (error: any) {
             console.log(error)
             toast.error(error.message)
@@ -61,10 +64,14 @@ function page({ }: Props) {
 
     const handleDelete = async (userId: string) => {
         const res = await deleteAccount(userId)
-
+        setUsers(prev => prev.filter(user => (user._id === userId || user.id === userId)))
     }
 
-
+    useEffect(() => {
+        if (allUsers) {
+            setUsers(allUsers)
+        }
+    }, [allUsers])
     return (
         <div className='w-full  text-neutral-700'>
             <div className='w-full flex items-center justify-between p-2'>
@@ -149,11 +156,13 @@ function page({ }: Props) {
                             </div>
 
                             <div className='w-full flex items-center gap-2'>
-                                <Button
-                                    onClick={handleSubmit}
-                                    className='bg-blue-500 text-slate-50'>
-                                    Create account
-                                </Button>
+                                <DialogClose>
+                                    <Button
+                                        onClick={handleSubmit}
+                                        className='bg-blue-500 text-slate-50'>
+                                        Create account
+                                    </Button>
+                                </DialogClose>
                                 <DialogClose>
                                     <Button className="bg-transparent border border-blue-500 text-blue-500">
                                         Cancel
@@ -180,7 +189,7 @@ function page({ }: Props) {
                         <TableCaption>All twezimbe platform users</TableCaption>
                         <TableBody>
                             {
-                                allUsers?.map((user, index) => {
+                                users?.map((user, index) => {
 
                                     return (
                                         <TableRow key={user._id}>
@@ -222,14 +231,16 @@ function page({ }: Props) {
                                                                 </div>
 
                                                                 <div className='w-full flex gap-2'>
-                                                                    <Button
-                                                                        onClick={async () => {
-                                                                            const data = await handleSuspension(user._id! || user?.id)
-                                                                            window.location.reload()
-                                                                        }}
-                                                                        className='text-white bg-red-500 '>
-                                                                        Confirm
-                                                                    </Button>
+                                                                  <DialogClose>
+                                                                        <Button
+                                                                            onClick={async () => {
+                                                                                const data = await handleSuspension(user._id! || user?.id)
+                                                                                setUsers(prev => prev.map(prevUser => (prevUser?._id === user._id || prevUser?._id === user.id) ? { ...prevUser, ...data } : prevUser))
+                                                                            }}
+                                                                            className='text-white bg-red-500 '>
+                                                                            Confirm
+                                                                        </Button>
+                                                                  </DialogClose>
                                                                     <DialogClose>
                                                                         <Button className='bg-transparent text-orange-500 border border-orange-500'>
                                                                             Cancel
@@ -259,7 +270,6 @@ function page({ }: Props) {
                                                                     <Button
                                                                         onClick={async () => {
                                                                             await handleDelete(user._id! || user?.id)
-                                                                            window.location.reload()
                                                                         }}
                                                                         className='text-white bg-red-500 '>
                                                                         Confirm
