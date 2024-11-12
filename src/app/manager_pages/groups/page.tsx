@@ -1,5 +1,5 @@
 'use client'
-import { handleGroupSuspension, useGetAllGroups } from '@/api/group'
+import { deleteGroup, handleGroupSuspension, useGetAllGroups } from '@/api/group'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -72,7 +72,6 @@ function page({ }: Props) {
                                                         <Dialog>
                                                             <DialogTrigger className='w-full'>
                                                                 <button
-                                                                    // disabled={currentUser?._id === user.id}
                                                                     className="w-full text-left px-4 py-2 text-sm text-neutral-700 rounded-md hover:bg-slate-100 ">
                                                                     {group?.suspended ? 'unsuspend' : 'suspend'}
                                                                 </button>
@@ -105,10 +104,39 @@ function page({ }: Props) {
                                                                 </div>
                                                             </DialogContent>
                                                         </Dialog>
-                                                        <button
-                                                            className="w-full text-left px-4 py-2 text-sm text-white rounded-md hover:bg-red-300 bg-red-500">
-                                                            Delete
-                                                        </button>
+                                                        <Dialog>
+                                                            <DialogTrigger className='w-full'>
+                                                                <button
+                                                                    className="w-full text-left px-4 py-2 text-sm text-white rounded-md hover:bg-red-300 bg-red-500">
+                                                                    Delete
+                                                                </button>
+                                                            </DialogTrigger>
+                                                            <DialogContent className='bg-white'>
+                                                                <DialogHeader className='w-full text-md font-bold'>
+                                                                    Are you sure of this operation?
+                                                                </DialogHeader>
+
+                                                                <div>
+                                                                    Confirm this action.
+                                                                </div>
+
+                                                                <div className='w-full flex gap-2'>
+                                                                    <Button
+                                                                        onClick={async () => {
+                                                                            const res = await deleteGroup(group?._id)
+                                                                            res && setGroups(prev => prev.filter(prevGroup => prevGroup._id !== group?._id))
+                                                                        }}
+                                                                        className='text-white bg-red-500 '>
+                                                                        Confirm
+                                                                    </Button>
+                                                                    <DialogClose>
+                                                                        <Button className='bg-transparent text-orange-500 border border-orange-500'>
+                                                                            Cancel
+                                                                        </Button>
+                                                                    </DialogClose>
+                                                                </div>
+                                                            </DialogContent>
+                                                        </Dialog>
                                                     </PopoverContent>
                                                 </Popover>
 

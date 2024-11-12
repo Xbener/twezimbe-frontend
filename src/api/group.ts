@@ -265,3 +265,26 @@ export const handleGroupSuspension = async (groupId: string) => {
         toast.error(error.message)
     }
 }
+
+export const deleteGroup = async (groupId: string) => {
+    try {
+        const accessToken = Cookies.get('access-token');
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/groups/${groupId}`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                },
+            }
+        )
+
+        const data = await res.json()
+        if (!data.status) throw new Error(data.message || data.errors || "Something went wrong. Please try again")
+        toast.success(data.message)
+        return data.status
+    } catch (error: any) {
+        toast.error(error.message)
+    }
+}
