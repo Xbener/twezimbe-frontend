@@ -348,3 +348,26 @@ export const changeActiveStatus = async (userId: string, status: string, socket:
         console.log('error changing active status')
     }
 }
+
+export const handleSuspension = async (userId: string) => {
+    try {
+        const accessToken = Cookies.get('access-token');
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/auth/suspend/${userId}`,
+            {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                },
+            }
+        )
+
+        const data = await res.json()
+        if (!data.status) throw new Error(data.message || data.errors || "Something went wrong. Please try again")
+        toast.success(data.message)
+        return data.user
+    } catch (error: any) {
+        toast.error(error.message)
+    }
+}

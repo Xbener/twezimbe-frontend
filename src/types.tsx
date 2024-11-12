@@ -15,6 +15,7 @@ export type User = {
     preferred_date?: string;
     last_login: Date;
     date_joined: Date;
+    suspended?: boolean
     del_falg: number;
     verified: boolean;
     salt: string;
