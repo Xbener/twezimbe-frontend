@@ -212,7 +212,7 @@ function page({ }: Props) {
                                                                 <button
                                                                     disabled={currentUser?._id === user.id}
                                                                     className="w-full text-left px-4 py-2 text-sm text-neutral-700 rounded-md hover:bg-slate-100 ">
-                                                                    {user.suspended ? 'unsuspend' : 'suspend'}
+                                                                    {user.suspended ? 'Unsuspend' : 'Suspend'}
                                                                 </button>
                                                             </DialogTrigger>
                                                             <DialogContent className='bg-white'>
