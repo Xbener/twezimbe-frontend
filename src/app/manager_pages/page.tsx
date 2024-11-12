@@ -36,23 +36,29 @@ const ManagerDashboard = () => {
     ])
   }, [isLoading, groups, bfs, users])
   const groupByCreationDate = (items: { createdAt?: Date }[] = []) => {
-    return items.reduce((acc, item) => {
-      if (item.createdAt) {
-        const formattedDate = formatDate(new Date(item.createdAt));
-        acc[formattedDate] = (acc[formattedDate] || 0) + 1;
-      }
-      return acc;
-    }, {} as Record<string, number>);
+    if(items.length){
+      return items?.reduce((acc, item) => {
+        if (item.createdAt) {
+          const formattedDate = formatDate(new Date(item.createdAt));
+          acc[formattedDate] = (acc[formattedDate] || 0) + 1;
+        }
+        return acc;
+      }, {} as Record<string, number>);
+    }
+    return {}
   };
 
   const groupTransactionsByDate = (items: Transaction[]) => {
-    return items.reduce((acc, item) => {
-      if (item.createdAt && item.amount) {
-        const formattedDate = formatDate(new Date(item.createdAt));
-        acc[formattedDate] = (acc[formattedDate] || 0) + parseFloat(`${item.amount}` as string);
-      }
-      return acc;
-    }, {} as Record<string, number>);
+    if(items.length){
+      return items?.reduce((acc, item) => {
+        if (item.createdAt && item.amount) {
+          const formattedDate = formatDate(new Date(item.createdAt));
+          acc[formattedDate] = (acc[formattedDate] || 0) + parseFloat(`${item.amount}` as string);
+        }
+        return acc;
+      }, {} as Record<string, number>);
+    }
+    return {}
   };
   let usersByDate = groupByCreationDate(users!);
   let groupsByDate = groupByCreationDate(groups!);
