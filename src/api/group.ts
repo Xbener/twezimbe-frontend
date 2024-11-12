@@ -148,6 +148,7 @@ export const useGetGroup = () => {
     if (error) {
         toast.error(error.toString());
         reset();
+        window.location.href = '/groups'
     }
 
     return {
@@ -240,3 +241,27 @@ export const useUpdateGroup = () => {
         isSuccess
     }
 };
+
+
+export const handleGroupSuspension = async (groupId: string) => {
+    try {
+        const accessToken = Cookies.get('access-token');
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/groups/suspend/${groupId}`,
+            {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                },
+            }
+        )
+
+        const data = await res.json()
+        if (!data.status) throw new Error(data.message || data.errors || "Something went wrong. Please try again")
+        toast.success(data.message)
+        return data.group
+    } catch (error: any) {
+        toast.error(error.message)
+    }
+}

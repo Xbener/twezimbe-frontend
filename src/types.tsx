@@ -282,6 +282,7 @@ export type GroupTypes = {
     group_state: string;
     upgraded: boolean;
     tags: string;
+    suspended?:boolean
 };
 
 export type CreateGroupTypes = {
