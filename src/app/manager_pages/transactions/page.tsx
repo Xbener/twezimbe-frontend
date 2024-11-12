@@ -6,11 +6,35 @@ import { AdminContext } from '@/context/AdminContext'
 import { formatWithCommas } from '@/utils/formatNumber'
 import moment from 'moment'
 import React, { useContext } from 'react'
+import { toast } from 'sonner'
+import Cookies from 'js-cookie'
+import { Transaction } from '@/types'
+import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 
 type Props = {}
 
 function page({ }: Props) {
     const { transactions, setTransactions, isLoading } = useContext(AdminContext)
+    const handleDeleteTransaction = async (transactionId: string) => {
+        try {
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/transactions/${transactionId}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        'Authorization': `Bearer ${Cookies.get('access-token')}`
+                    }
+                }
+
+            )
+            const data = await res.json()
+            if (!data.status) throw new Error("Failed. Please try again")
+            toast.success("Transaction removed successfully")
+            setTransactions((prev: Transaction[]) => prev.filter(transaction => transaction._id !== transactionId))
+        } catch (error: any) {
+            toast.error(error.message)
+        }
+    }
     return (
         <div className='w-full  text-neutral-700'>
             <div className='w-full flex items-center justify-between p-2'>
@@ -46,9 +70,34 @@ function page({ }: Props) {
                                             <TableCell>{transaction.user?.firstName} {transaction.user?.lastName}</TableCell>
                                             <TableCell>{transaction.type}</TableCell>
                                             <TableCell>
-                                                <Button className="bg-red-500 text-slate-50">
-                                                    Delete
-                                                </Button>
+                                                <Dialog>
+                                                    <DialogTrigger className=''>
+                                                        <Button className='bg-red-500 text-slate-50'>
+                                                            Delete
+                                                        </Button>
+                                                    </DialogTrigger>
+                                                    <DialogContent className='bg-white'>
+                                                        <DialogTitle>
+                                                            Confirm this action
+                                                        </DialogTitle>
+
+                                                        Are you sure of this action? it cannot be undone.
+
+                                                        <div className='w-full flex items-center gap-2 mt-2'>
+                                                            <DialogClose>
+                                                                <Button
+                                                                    onClick={() => handleDeleteTransaction(transaction._id!)}
+                                                                    className="bg-red-500 text-slate-50">
+                                                                    Confirm
+                                                                </Button>
+                                                            </DialogClose>
+                                                            <DialogClose>
+                                                                <Button className='bg-transparent border border-orange-500 text-orange-500'>Cancel</Button>
+                                                            </DialogClose>
+                                                        </div>
+                                                    </DialogContent>
+
+                                                </Dialog>
                                             </TableCell>
                                         </TableRow>
                                     )
