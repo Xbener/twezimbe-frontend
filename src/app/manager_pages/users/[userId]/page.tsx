@@ -53,7 +53,7 @@ function Page({ }: Props) {
                 </Button>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-4 grid grid-cols-2 gap-2">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-4">
                 <div className="flex flex-col">
                     <label>First Name</label>
                     <input
@@ -72,62 +72,67 @@ function Page({ }: Props) {
                     />
                 </div>
 
-                <div className="flex flex-col">
-                    <label>Email</label>
-                    <input
-                        type="email"
-                        {...register('email')}
-                        className="border p-2 rounded"
-                    />
+            <div className="w-full flex items-center justify-normal gap-3">
+                    <div className="flex flex-col w-full">
+                        <label>Email</label>
+                        <input
+                            type="email"
+                            {...register('email')}
+                            className="border p-2 rounded"
+                        />
+                    </div>
+
+                    <div className="flex flex-col w-full">
+                        <label>Phone</label>
+                        <input
+                            type="text"
+                            {...register('phone')}
+                            className="border p-2 rounded"
+                        />
+                    </div>
+            </div>
+
+                <div className="w-full flex items-center justify-start gap-3">
+                    <div classNamew-full ="flex flex-col ">
+                        <label>Birthday</label>
+                        <input
+                            type="date"
+                            {...register('birthday')}
+                            className="border p-2 rounded"
+                        />
+                    </div>
+                    <div className="w-full flex flex-col"> 
+                        <label>Home Address</label>
+                        <input
+                            type="text"
+                            {...register('home_address')}
+                            className="border p-2 rounded"
+                        />
+                    </div>
+
+                    <div className="w-full flex flex-col"> 
+                        <label>Office Address</label>
+                        <input
+                            type="text"
+                            {...register('office_address')}
+                            className="border p-2 rounded"
+                        />
+                    </div>
+
+                    <div className="w-full flex flex-col"> 
+                        <label>Role</label>
+                        <select
+                            disabled={currentUser?._id === userId}
+                            {...register('role')}
+                            className="border p-2 rounded w-auto disabled:cursor-not-allowed"
+                        >
+                            <option value="Admin">Admin</option>
+                            <option value="User">User</option>
+                        </select>
+                    </div>
                 </div>
 
-                <div className="flex flex-col">
-                    <label>Phone</label>
-                    <input
-                        type="text"
-                        {...register('phone')}
-                        className="border p-2 rounded"
-                    />
-                </div>
 
-                <div className="flex flex-col">
-                    <label>Birthday</label>
-                    <input
-                        type="date"
-                        {...register('birthday')}
-                        className="border p-2 rounded"
-                    />
-                </div>
-
-                <div className="flex flex-col">
-                    <label>Home Address</label>
-                    <input
-                        type="text"
-                        {...register('home_address')}
-                        className="border p-2 rounded"
-                    />
-                </div>
-
-                <div className="flex flex-col">
-                    <label>Office Address</label>
-                    <input
-                        type="text"
-                        {...register('office_address')}
-                        className="border p-2 rounded"
-                    />
-                </div>
-
-                <div className="flex flex-col">
-                    <label>Role</label>
-                    <select
-                        disabled={currentUser?._id === userId}
-                        {...register('role')}
-                        className="border p-2 rounded w-auto disabled:cursor-not-allowed"
-                    >
-                        <option value="Admin">Admin</option>
-                        <option value="User">User</option>
-                    </select>
-                </div>
 
 
             </form>

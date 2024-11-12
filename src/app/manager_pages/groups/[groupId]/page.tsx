@@ -59,7 +59,7 @@ const Page: React.FC<Props> = () => {
                     Update
                 </Button>
             </div>
-            <form onSubmit={handleSubmit(onSubmit)} className="w-full text-neutral-600 p-4 space-y-4 grid grid-cols-2 gap-3">
+            <form onSubmit={handleSubmit(onSubmit)} className="w-full text-neutral-600 p-4 space-y-4">
                 <div className="W-full flex flex-col gap-2">
                     <label>Group name</label>
                     <input
@@ -69,38 +69,41 @@ const Page: React.FC<Props> = () => {
                     />
                     {errors.group_name && <p>{errors.group_name?.message}</p>}
                 </div>
-                <div className="W-full flex flex-col gap-2">
-                    <label>Group Type</label>
-                    <Select
-                        value={groupType}
-                        onChange={(e: any) => {
-                            setGroupType(e);
-                            setValue('group_type', e.value);
-                        }}
-                        options={[
-                            { value: "Social", label: "Social" },
-                            { value: "Professional", label: "Professional" },
-                            { value: "Educational", label: "Educational" },
-                            { value: "Other", label: "Other" },
-                        ]}
-                        primaryColor="blue"
-                    />
-                </div>
+                
+                <div className='w-full flex items-center gap-3'>
+                    <div className="W-full flex flex-col gap-2 w-full">
+                        <label>Group Type</label>
+                        <Select
+                            value={groupType}
+                            onChange={(e: any) => {
+                                setGroupType(e);
+                                setValue('group_type', e.value);
+                            }}
+                            options={[
+                                { value: "Social", label: "Social" },
+                                { value: "Professional", label: "Professional" },
+                                { value: "Educational", label: "Educational" },
+                                { value: "Other", label: "Other" },
+                            ]}
+                            primaryColor="blue"
+                        />
+                    </div>
 
-                <div className="W-full flex flex-col gap-2">
-                    <label>Group State</label>
-                    <Select
-                        value={groupState}
-                        onChange={(e: any) => {
-                            setGroupState(e);
-                            setValue('group_state', e.value);
-                        }}
-                        options={[
-                            { value: "Public", label: "Public" },
-                            { value: "Private", label: "Private" },
-                        ]}
-                        primaryColor="#e3e2de"
-                    />
+                    <div className="W-full flex flex-col gap-2 w-full">
+                        <label>Group State</label>
+                        <Select
+                            value={groupState}
+                            onChange={(e: any) => {
+                                setGroupState(e);
+                                setValue('group_state', e.value);
+                            }}
+                            options={[
+                                { value: "Public", label: "Public" },
+                                { value: "Private", label: "Private" },
+                            ]}
+                            primaryColor="#e3e2de"
+                        />
+                    </div>
                 </div>
 
                 <div className="W-full flex flex-col gap-2">
@@ -118,6 +121,7 @@ const Page: React.FC<Props> = () => {
                     <textarea
                         {...register('description')}
                         className="bg-white border-2 placeholder:text-gray-600 p-2"
+                        cols={30}
                         placeholder="Group Description"
                     />
                     {errors.description && <p>{errors.description.message}</p>}

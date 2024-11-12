@@ -27,12 +27,12 @@ import { Plus } from "./icons"
 import { useGetProfileData } from "@/api/auth"
 
 const formSchema = z.object({
-    name: z.string().optional(),
-    group_type: z.string().optional(),
-    group_state: z.string().optional(),
+    name: z.string(),
+    group_type: z.string(),
+    group_state: z.string(),
     tags: z.string().optional(),
-    description: z.string().optional(),
-    created_by: z.string().optional(),
+    description: z.string(),
+    created_by: z.string(),
 });
 
 export type GroupFormData = z.infer<typeof formSchema>;
@@ -83,9 +83,9 @@ const GroupCreateDialog = ({ }: Props) => {
         }
     });
 
-    useEffect(()=>{
-                setSelectedUsersId([`${currentUser?._id}`])
-    },[currentUser])
+    useEffect(() => {
+        setSelectedUsersId([`${currentUser?._id}`])
+    }, [currentUser])
 
 
     const onSubmit = async (GroupData: GroupFormData) => {
@@ -122,7 +122,7 @@ const GroupCreateDialog = ({ }: Props) => {
         }
 
         const res = await addGroup(newData)
-        if (res.group._id!==null) {
+        if (res.group._id !== null) {
             window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups/${res.group._id}`
         }
     }
@@ -227,7 +227,7 @@ const GroupCreateDialog = ({ }: Props) => {
                                     )}
                                 />
 
-                             
+
                                 <FormField
                                     control={form.control}
                                     name='group_type'
