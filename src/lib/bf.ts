@@ -340,3 +340,23 @@ export const makeContribution = async (body: { walletAddress: string, contributo
         console.log('error contributing', error)
     }
 }
+
+export const deleteBf = async (bfId: string) => {
+    try {
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bf/${bfId}`,
+            {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${Cookies.get('access-token')}`
+                }
+            }
+        )
+
+        const data = await res.json()
+        if (!data.status) throw new Error(data.errors || data.message || 'Something went wrong. Please try again')
+        return data.status
+    } catch (error: any) {
+        toast.error(error.message)
+    }
+}

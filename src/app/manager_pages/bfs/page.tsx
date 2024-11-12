@@ -1,9 +1,10 @@
 'use client'
 import { Button } from '@/components/ui/button'
+import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { AdminContext } from '@/context/AdminContext'
-import { getAllBfs } from '@/lib/bf'
+import { deleteBf, getAllBfs } from '@/lib/bf'
 import { BF } from '@/types'
 import { formatWithCommas } from '@/utils/formatNumber'
 import moment from 'moment'
@@ -12,7 +13,15 @@ import React, { use, useContext, useEffect, useState } from 'react'
 type Props = {}
 
 function page({ }: Props) {
-    const { isLoading, bfs } = useContext(AdminContext)
+    const { isLoading, bfs, setBfs } = useContext(AdminContext)
+    const [isEditing, setIsEditing] = useState(false)
+
+    const handleDeleteBf = async (bfId: string) => {
+        const res = await deleteBf(bfId)
+        if (res) {
+            setBfs((prev: BF[]) => prev.filter(bf => bf._id !== bfId))
+        }
+    }
     return (
         <div className='w-full  text-neutral-700'>
             <div className='w-full flex items-center justify-between p-2'>
@@ -29,7 +38,7 @@ function page({ }: Props) {
                             <TableHead>No</TableHead>
                             <TableHead>Name</TableHead>
                             <TableHead>Created at</TableHead>
-                            {/* <TableHead>Total members</TableHead> */}
+                            <TableHead>Accumulated balance</TableHead>
                             <TableHead>Created by</TableHead>
                             <TableHead>Wallet</TableHead>
                             <TableHead>Actions</TableHead>
@@ -44,7 +53,7 @@ function page({ }: Props) {
                                             <TableCell>{index + 1}</TableCell>
                                             <TableCell>{bf.fundName}</TableCell>
                                             <TableCell>{moment(bf.createdAt).format('DD/MM/yyyy')}</TableCell>
-                                            {/* <TableCell>{bf?.members?.length}</TableCell> */}
+                                            <TableCell>{formatWithCommas(bf?.wallet?.balance)} UGX</TableCell>
                                             <TableCell>{bf?.createdBy?.firstName} {bf?.createdBy?.lastName}</TableCell>
                                             <TableCell>{bf.walletAddress}</TableCell>
                                             <TableCell>
@@ -56,10 +65,36 @@ function page({ }: Props) {
                                                     </PopoverTrigger>
                                                     <PopoverContent className="origin-top-right absolute right-0 mt-2 w-auto rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 p-0">
                                                         <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">View</button>
-                                                        <button
-                                                            className="w-full text-left px-4 py-2 text-sm text-white rounded-md hover:bg-red-300 bg-red-500">
-                                                            Delete
-                                                        </button>
+                                                        <Dialog>
+                                                            <DialogTrigger>
+                                                                <button
+                                                                    className="w-full text-left px-4 py-2 text-sm text-white rounded-md hover:bg-red-300 bg-red-500">
+                                                                    Delete
+                                                                </button>
+                                                            </DialogTrigger>
+                                                            <DialogContent className='bg-white'>
+                                                                <DialogTitle>
+                                                                    Confirm this action
+                                                                </DialogTitle>
+                                                                This cannot be undone
+
+                                                                <div className='w-full flex items-center gap-2 mt-2'>
+                                                                    <DialogClose>
+                                                                        <Button
+                                                                            onClick={() => handleDeleteBf(bf._id!)}
+                                                                            className='bg-red-500 text-slate-50'>
+
+                                                                            Confirm
+                                                                        </Button>
+                                                                    </DialogClose>
+                                                                    <DialogClose>
+                                                                        <Button className='bg-transparent border border-orange-500 text-orange-500'>
+                                                                            Cancel
+                                                                        </Button>
+                                                                    </DialogClose>
+                                                                </div>
+                                                            </DialogContent>
+                                                        </Dialog>
                                                     </PopoverContent>
                                                 </Popover>
 
