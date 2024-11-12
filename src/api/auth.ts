@@ -65,7 +65,9 @@ export const useSignIn = () => {
             secure: environment === "production" ? true : false,
             expires: 1 / 24
         });
-
+        if (responseData?.rest?.role === 'Admin') {
+            Cookies.set('admin', 'true')
+        }
 
     };
 
