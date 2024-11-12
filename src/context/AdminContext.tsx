@@ -28,6 +28,7 @@ export interface AdminContextTypes {
     setSelectedBf: (vl: any) => void
     setUsers: (vl: any) => void
     setGroups: (vl: any) => void
+    setTransactions: (vl: any) => void
 }
 
 export const AdminContext = React.createContext<AdminContextTypes>({
@@ -36,6 +37,7 @@ export const AdminContext = React.createContext<AdminContextTypes>({
     setSelectedUser(vl) { },
     setGroups(vl) { },
     setUsers(vl) { },
+    setTransactions(vl) { },
 })
 
 function AdminContextProvider({ children }: Props) {
@@ -86,7 +88,8 @@ function AdminContextProvider({ children }: Props) {
             setSelectedBf,
             setSelectedGroup,
             setSelectedUser,
-            setGroups, setUsers
+            setGroups, setUsers,
+            setTransactions
         }}>
             {children}
         </AdminContext.Provider>

@@ -461,6 +461,8 @@ export interface Transaction {
     date?: Date
     user?: User,
     wallet?: string
+    _id?:string
+    type?:string
 }
 
 export interface BF {
