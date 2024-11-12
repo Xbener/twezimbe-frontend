@@ -15,7 +15,7 @@ const SignIn = () => {
       <HelmetComponent title="Sign in to your account" />
 
       <div className="mx-auto w-1/2 hidden lg:flex rounded-md overflow-hidden">
-        <img src="/assets/progress3.png" alt="signin" />
+        <img src="/logo.png" className="object-contain" alt="signin" />
       </div>
       <div className="flex flex-col w-full lg:w-1/2 border-2  border-neutral-100 p-4 rounded-md shadow-xl items-center justify-center">
         <h1 className="text-3xl text-center md:text-start my-3 font-bold">Sign in to your account</h1>
