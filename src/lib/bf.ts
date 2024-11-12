@@ -300,7 +300,7 @@ export const updateCase = async (caseId: string, body?: any) => {
 export const updateWalletBalance = async (body: { userId: string, walletAddress: string, amount: number }) => {
     const token = Cookies.get("access-token")
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bf/wallet`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bf/wallet/balance`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
