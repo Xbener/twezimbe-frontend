@@ -13,9 +13,8 @@ import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 
-const PrimaryMenu = () => {
+const PrimaryMenu = ({ currentUser }: { currentUser: User }) => {
     const [userInfo, setUserInfo] = useState<User>();
-    const { currentUser } = useGetProfileData();
 
     useEffect(() => {
         if (currentUser) {
@@ -35,6 +34,9 @@ const PrimaryMenu = () => {
                     <a href={'/#process'} className="text-[#2f578b]">Process</a>
                     <a href={'/groups'} className="text-[#2f578b]">Group</a>
                     <a href={'/groups/bf'} className="text-[#2f578b]">Bereavement Fund</a>
+                    {
+                        currentUser?.role === 'Admin' && <a href="/manager_pages" className="text-[#2f578b]">Admin</a>
+                    }
                 </span>
             </div>
 

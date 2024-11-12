@@ -1,11 +1,13 @@
+import { User } from "@/types";
 import Cookies from "js-cookie";
 import Link from "next/link";
 
 type Props = {
     handleClose: () => void
+    currentUser: User
 }
 
-const MobileMenu = ({ handleClose }: Props) => {
+const MobileMenu = ({ handleClose, currentUser }: Props) => {
     return (
         <>
             {/* Mobile Menu  */}
@@ -22,6 +24,9 @@ const MobileMenu = ({ handleClose }: Props) => {
                             <a href={'/groups'} onClick={handleClose} className="text-white p-2 hover:bg-blue-50 hover:text-blue-500 border w-1/2 place-self-center mb-1">Groups </a>
                             <a href={'/groups/bf'} onClick={handleClose} className="text-white p-2 hover:bg-blue-50 hover:text-blue-500 border w-1/2 place-self-center mb-1">Bereavement Fund</a>
                             <a href={'/account/applications'} onClick={handleClose} className="text-white p-2 hover:bg-blue-50 hover:text-blue-500 border w-1/2 place-self-center mb-1">Applications</a>
+                            {
+                                currentUser?.role === 'Admin' && <a href="/manager_pages" className="text-white p-2 hover:bg-blue-50 hover:text-blue-500 border w-1/2 place-self-center mb-1">Admin</a>
+                            }
                         </>
                         :
                         <Link href={'/SignIn'} onClick={handleClose} className="text-white p-2  border-white py-2 hover:bg-blue-50 hover:text-blue-500 border w-1/2 place-self-center mb-10 focus:bg-blue-500">Sign In</Link>

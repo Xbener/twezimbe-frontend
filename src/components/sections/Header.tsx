@@ -1,4 +1,5 @@
 "use client"
+import { useGetProfileData } from "@/api/auth";
 import MobileMenu from "@/components/MobileMenu";
 import PrimaryMenu from "@/components/PrimaryMenu";
 import { Menu } from "lucide-react";
@@ -8,6 +9,7 @@ import { useState } from "react";
 
 const Header = () => {
   const [isClosed, setIsClosed] = useState(false);
+  const { currentUser } = useGetProfileData();
 
   const handleClose = () => {
     setIsClosed(!isClosed);
@@ -21,9 +23,9 @@ const Header = () => {
 
           <Menu onClick={handleClose} className="text-[#2f578b] text-xl cursor-pointer block md:hidden" />
 
-          {isClosed && <MobileMenu handleClose={handleClose} />}
+          {isClosed && <MobileMenu currentUser={currentUser!} handleClose={handleClose} />}
 
-          <PrimaryMenu />
+          <PrimaryMenu currentUser={currentUser!} />
         </div>
       </div>
     </>
