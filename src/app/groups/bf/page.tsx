@@ -46,11 +46,10 @@ function BereavementFundHero({ }: Props) {
               Learn More
             </button> */}
             <div className="p-3 mt-5">
-              <h1>These are the groups you are admin of. Choose one to create BF for: </h1>
+              <h1>These are the groups you can create Fund for. Choose one to create BF for: </h1>
 
               {
                 joinedGroupList?.length && joinedGroupList?.map((group: GroupTypes, index: number) => {
-                  console.log(group, currentUser?._id)
 
                   if (group?.created_by === currentUser?._id && !group?.has_bf) {
                     return (

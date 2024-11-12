@@ -31,7 +31,9 @@ export const useGetAllGroups = () => {
 
 export const useAddGroup = () => {
     const accessToken = Cookies.get('access-token');
+
     const GroupRequest = async (groupData: CreateGroupTypes) => {
+        console.log(groupData)
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/groups`, {
             method: 'POST',
             headers: {

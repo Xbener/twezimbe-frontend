@@ -27,12 +27,12 @@ import { Plus } from "./icons"
 import { useGetProfileData } from "@/api/auth"
 
 const formSchema = z.object({
-    name: z.string(),
-    group_type: z.string(),
-    group_state: z.string(),
+    name: z.string().optional(),
+    group_type: z.string().optional(),
+    group_state: z.string().optional(),
     tags: z.string().optional(),
-    description: z.string(),
-    created_by: z.string(),
+    description: z.string().optional(),
+    created_by: z.string().optional(),
 });
 
 export type GroupFormData = z.infer<typeof formSchema>;

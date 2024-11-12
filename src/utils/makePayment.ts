@@ -9,7 +9,7 @@ export function makePayment(payForm: any, currentUser: User, groupBF: BF, contri
 
         const handleFlutterwavePayment = useFlutterwave({
             amount: payForm.data.amount,
-            currency: "RWF",
+            currency: "UGX",
             public_key: "FLWPUBK_TEST-61fd8c76063ac4c81570ea26a682c719-X",
             customer: {
                 email: currentUser?.email,
