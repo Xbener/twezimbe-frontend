@@ -39,8 +39,7 @@ interface SelectValue {
 
 
 function page({ }: Props) {
-    const { isLoading, groups: allGroups, setSelectedGroup, currentUser } = useContext(AdminContext)
-    const [groups, setGroups] = useState<GroupTypes[]>([])
+    const { isLoading, groups, setGroups, setSelectedGroup, currentUser } = useContext(AdminContext)
     const [groupName, setGroupName] = useState("")
     const { addGroup } = useAddGroup()
     const [group_type, setGroupType] = useState<SelectValue>({
@@ -81,12 +80,6 @@ function page({ }: Props) {
         }
     }
 
-
-    useEffect(() => {
-        if (allGroups) {
-            setGroups(allGroups)
-        }
-    }, [allGroups])
     return (
         <div className='w-full  text-neutral-700'>
             <div className='w-full flex items-center justify-between p-2'>
@@ -295,7 +288,7 @@ function page({ }: Props) {
                                                                         <Button
                                                                             onClick={async () => {
                                                                                 const data = await handleGroupSuspension(group?._id)
-                                                                                setGroups(prev => prev.map(prevGroup => prevGroup?._id === group._id ? { ...prevGroup, ...data } : prevGroup))
+                                                                                setGroups((prev: GroupTypes[]) => prev.map((prevGroup: GroupTypes) => prevGroup?._id === group._id ? { ...prevGroup, ...data } : prevGroup))
                                                                             }}
                                                                             className='text-white bg-red-500 '>
                                                                             Confirm
@@ -329,7 +322,7 @@ function page({ }: Props) {
                                                                     <Button
                                                                         onClick={async () => {
                                                                             const res = await deleteGroup(group?._id)
-                                                                            res && setGroups(prev => prev.filter(prevGroup => prevGroup._id !== group?._id))
+                                                                            res && setGroups((prev: GroupTypes[]) => prev.filter(prevGroup => prevGroup._id !== group?._id))
                                                                         }}
                                                                         className='text-white bg-red-500 '>
                                                                         Confirm

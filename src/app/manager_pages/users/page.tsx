@@ -16,8 +16,7 @@ type Props = {}
 
 function page({ }: Props) {
 
-    const { isLoading, users: allUsers, setSelectedUser, currentUser } = useContext(AdminContext)
-    const [users, setUsers] = useState<User[]>([])
+    const { isLoading, users, setUsers, setSelectedUser, currentUser } = useContext(AdminContext)
     const router = useRouter()
     const { deleteAccount, isLoading: deleteLoading } = useDeleteAccount()
 
@@ -54,7 +53,7 @@ function page({ }: Props) {
             const data = await res.json()
             if (!res.ok) throw new Error(data.errors || data.message || "Something went wrong. Please try again")
             toast.success(data.message)
-            setUsers(prev => [...prev, data.user])
+            setUsers((prev: User[]) => [...prev, data.user])
         } catch (error: any) {
             console.log(error)
             toast.error(error.message)
@@ -64,18 +63,13 @@ function page({ }: Props) {
 
     const handleDelete = async (userId: string) => {
         const res = await deleteAccount(userId)
-        setUsers(prev => prev.filter(user => (user._id === userId || user.id === userId)))
+        setUsers((prev: User[]) => prev.filter(user => (user._id === userId || user.id === userId)))
     }
 
-    useEffect(() => {
-        if (allUsers) {
-            setUsers(allUsers)
-        }
-    }, [allUsers])
     return (
         <div className='w-full  text-neutral-700'>
             <div className='w-full flex items-center justify-between p-2'>
-                <h1 className='text-lg text-neutral-700 font-bold'>Platform users {allUsers?.length ? `(${formatWithCommas(allUsers.length)})` : ''}</h1>
+                <h1 className='text-lg text-neutral-700 font-bold'>Platform users {users?.length ? `(${formatWithCommas(users.length)})` : ''}</h1>
                 <Dialog>
                     <DialogTrigger>
                         <Button className='bg-blue-500 text-white'>
@@ -231,16 +225,16 @@ function page({ }: Props) {
                                                                 </div>
 
                                                                 <div className='w-full flex gap-2'>
-                                                                  <DialogClose>
+                                                                    <DialogClose>
                                                                         <Button
                                                                             onClick={async () => {
                                                                                 const data = await handleSuspension(user._id! || user?.id)
-                                                                                setUsers(prev => prev.map(prevUser => (prevUser?._id === user._id || prevUser?._id === user.id) ? { ...prevUser, ...data } : prevUser))
+                                                                                setUsers((prev: User[]) => prev.map(prevUser => (prevUser?._id === user._id || prevUser?._id === user.id) ? { ...prevUser, ...data } : prevUser))
                                                                             }}
                                                                             className='text-white bg-red-500 '>
                                                                             Confirm
                                                                         </Button>
-                                                                  </DialogClose>
+                                                                    </DialogClose>
                                                                     <DialogClose>
                                                                         <Button className='bg-transparent text-orange-500 border border-orange-500'>
                                                                             Cancel

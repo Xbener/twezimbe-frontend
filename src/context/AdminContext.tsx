@@ -26,24 +26,30 @@ export interface AdminContextTypes {
     setSelectedGroup: (vl: any) => void
     selectedBf?: BF | null
     setSelectedBf: (vl: any) => void
+    setUsers: (vl: any) => void
+    setGroups: (vl: any) => void
 }
 
 export const AdminContext = React.createContext<AdminContextTypes>({
     setSelectedBf(vl) { },
     setSelectedGroup(vl) { },
     setSelectedUser(vl) { },
+    setGroups(vl) { },
+    setUsers(vl) { },
 })
 
 function AdminContextProvider({ children }: Props) {
     const [isVisible, setIsVisible] = useState(false)
     const { currentUser } = useGetProfileData()
     const { users: allUsers, isLoading } = useGetAllUsers()
-    const { groups } = useGetAllGroups()
+    const { groups: allGroups } = useGetAllGroups()
     const [transactions, setTransactions] = useState<Transaction[]>([])
     const [selectedUser, setSelectedUser] = useState<User | null>(null)
     const [selectedGroup, setSelectedGroup] = useState<GroupTypes | null>(null)
     const [selectedBf, setSelectedBf] = useState<BF | null>(null)
     const [bfs, setBfs] = useState([])
+    const [groups, setGroups] = useState<GroupTypes[]>([])
+    const [users, setUsers] = useState<User[]>([])
     useEffect(() => {
         const getData = async () => {
             const bfs = await getAllBfs()
@@ -56,13 +62,20 @@ function AdminContextProvider({ children }: Props) {
     const toggleSideBar = () => {
         setIsVisible(!isVisible);
     }
-
+    useEffect(() => {
+        setGroups(allGroups)
+    }, [allGroups])
+    useEffect(() => {
+        if (allUsers) {
+            setUsers(allUsers)
+        }
+    }, [allUsers])
     return (
         <AdminContext.Provider value={{
             isVisible,
             toggleSideBar,
             currentUser,
-            users: allUsers,
+            users,
             groups,
             bfs,
             isLoading,
@@ -72,7 +85,8 @@ function AdminContextProvider({ children }: Props) {
             selectedUser,
             setSelectedBf,
             setSelectedGroup,
-            setSelectedUser
+            setSelectedUser,
+            setGroups, setUsers
         }}>
             {children}
         </AdminContext.Provider>
