@@ -20,6 +20,8 @@ function page({ }: Props) {
     const router = useRouter()
     const { deleteAccount, isLoading: deleteLoading } = useDeleteAccount()
 
+    
+
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -65,6 +67,7 @@ function page({ }: Props) {
         const res = await deleteAccount(userId)
         setUsers((prev: User[]) => prev.filter(user => (user._id === userId || user.id === userId)))
     }
+
 
     return (
         <div className='w-full  text-neutral-700'>

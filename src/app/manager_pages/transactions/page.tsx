@@ -5,16 +5,20 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 import { AdminContext } from '@/context/AdminContext'
 import { formatWithCommas } from '@/utils/formatNumber'
 import moment from 'moment'
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import { toast } from 'sonner'
 import Cookies from 'js-cookie'
 import { Transaction } from '@/types'
 import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { ArrowUpAz } from 'lucide-react'
+import { indexOf } from 'lodash'
 
 type Props = {}
 
 function page({ }: Props) {
     const { transactions, setTransactions, isLoading } = useContext(AdminContext)
+    const [sortColumn, setSortColumn] = useState<any>(null);
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
     const handleDeleteTransaction = async (transactionId: string) => {
         try {
             const res = await fetch(
@@ -35,6 +39,41 @@ function page({ }: Props) {
             toast.error(error.message)
         }
     }
+
+    const handleSort = (column: string) => {
+        if (sortColumn === column) {
+            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortColumn(column);
+            setSortDirection('asc');
+        }
+    };
+
+    const sortedTransactions = [...(transactions || [])].sort((a: any, b: any) => {
+        if (!sortColumn) return 0;
+
+        let valueA, valueB;
+        if (sortColumn === 'no') {
+            valueA = a.index
+            valueB = b.index
+        }
+        if (sortColumn === 'date') {
+            valueA = new Date(a.date).getTime(); // Convert to timestamp
+            valueB = new Date(b.date).getTime();
+        } else if (sortColumn === 'amount') {
+            valueA = a[sortColumn];
+            valueB = b[sortColumn];
+        } else {
+            valueA = a.user[sortColumn];
+            valueB = b.user[sortColumn];
+        }
+
+        if (valueA < valueB) return sortDirection === 'asc' ? -1 : 1;
+        if (valueA > valueB) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+    });
+
+
     return (
         <div className='w-full  text-neutral-700'>
             <div className='w-full flex items-center justify-between p-2'>
@@ -46,19 +85,27 @@ function page({ }: Props) {
                 {isLoading ? 'loading ...' : (
                     <Table className='bg-white'>
                         <TableHeader>
-                            <TableHead>No</TableHead>
-                            <TableHead>Receiving wallet</TableHead>
-                            <TableHead>Amount</TableHead>
-                            <TableHead>Currency</TableHead>
-                            <TableHead>Done at</TableHead>
-                            <TableHead>Done by</TableHead>
-                            <TableHead>Type</TableHead>
-                            <TableHead>Actions</TableHead>
+                            <TableHead className='cursor-pointer' onClick={() => handleSort('no')}>
+                                <span className='flex items-center gap-3 '>No {sortColumn === 'no' ? (sortDirection === 'asc' ? '▲' : '▼') : <ArrowUpAz className='size-3' />}</span>
+                            </TableHead>
+                            <TableHead className='cursor-pointer'>Receiving wallet</TableHead>
+                            <TableHead className='cursor-pointer' onClick={() => handleSort('amount')}>
+                                <span className='flex items-center gap-3 '>Amount {sortColumn === 'amount' ? (sortDirection === 'asc' ? '▲' : '▼') : <ArrowUpAz className='size-3' />}</span>
+                            </TableHead>
+                            <TableHead className='cursor-pointer'>Currency</TableHead>
+                            <TableHead className='cursor-pointer' onClick={() => handleSort('date')}>
+                                <span className='flex items-center gap-3 '>Done at {sortColumn === 'date' ? (sortDirection === 'asc' ? '▲' : '▼') : <ArrowUpAz className='size-3' />}</span>
+                            </TableHead>
+                            <TableHead className='cursor-pointer' onClick={() => handleSort('lastName')}>
+                                <span className='flex items-center gap-3 '>Done by {sortColumn === 'lastName' ? (sortDirection === 'asc' ? '▲' : '▼') : <ArrowUpAz className='size-3' />}</span>
+                            </TableHead>
+                            <TableHead className='cursor-pointer'>Type</TableHead>
+                            <TableHead className='cursor-pointer'>Actions</TableHead>
                         </TableHeader>
                         <TableCaption>All twezimbe platform transactions</TableCaption>
                         <TableBody>
                             {
-                                transactions?.map((transaction, index) => {
+                                sortedTransactions?.map((transaction, index) => {
 
                                     return (
                                         <TableRow key={transaction._id}>
