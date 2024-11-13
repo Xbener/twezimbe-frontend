@@ -20,9 +20,6 @@ function Header({ }: Props) {
                 {
                     isVisible ? <ArrowLeft className='cursor-pointer' onClick={toggleSideBar} /> : <Menu className='cursor-pointer' onClick={toggleSideBar} size={30} />
                 }
-                <Input
-                    placeholder='search ...'
-                />
             </div>
 
             <div>
