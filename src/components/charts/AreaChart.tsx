@@ -1,5 +1,6 @@
 import React from 'react'
-import { Area, AreaChart, CartesianGrid, Tooltip, XAxis, YAxis } from 'recharts'
+import { Area, AreaChart, CartesianGrid, Tooltip, XAxis, YAxis, Label } from 'recharts'
+
 interface Props {
     data: {
         date?: string
@@ -7,10 +8,9 @@ interface Props {
     }[]
 }
 
-
 function AreaChartComponent({ data }: Props) {
     return (
-        <AreaChart className='w-full' width={500} height={250} data={data}
+        <AreaChart className='w-full z-50' width={550} height={300} data={data}
             margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
             <defs>
                 <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
@@ -22,11 +22,14 @@ function AreaChartComponent({ data }: Props) {
                     <stop offset="95%" stopColor="#82ca9d" stopOpacity={0} />
                 </linearGradient>
             </defs>
-            <XAxis dataKey={"date"} />
-            <YAxis dataKey={"amount"} />
-            {/* <CartesianGrid strokeDasharray="3 3" /> */}
+            <XAxis dataKey="date">
+                {/* <Label value="Date" offset={-1} position="insideBottom" /> */}
+            </XAxis>
+            <YAxis dataKey="amount">
+                <Label value="Amount" angle={-90} offset={5} position="insideLeft" style={{ textAnchor: 'middle' }} />
+            </YAxis>
             <Tooltip />
-            <Area type="monotone" dataKey={"amount"} stroke="#82ca9d" fillOpacity={1} fill="url(#colorPv)" />
+            <Area type="monotone" dataKey="amount" stroke="#82ca9d" fillOpacity={1} fill="url(#colorPv)" />
         </AreaChart>
     )
 }

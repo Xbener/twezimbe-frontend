@@ -5,11 +5,29 @@ import AreaChartComponent from "@/components/charts/AreaChart"
 import { AdminContext } from "@/context/AdminContext"
 import { MetaData, Transaction } from "@/types"
 import { formatWithCommas } from "@/utils/formatNumber"
+import moment from "moment"
 import { useContext, useEffect, useState } from "react"
 
 const formatDate = (date: Date) => {
+  return moment(date).format("D")
+};
+
+const formatOtherDates = (date: Date) => {
   return `${date.toLocaleString('default', { month: 'short' })} ${date.getFullYear()}`
 }
+
+const getCurrentMonthDates = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth();
+
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const dates = Array.from({ length: daysInMonth }, (_, i) => {
+    const date = new Date(year, month, i + 1);
+    return formatDate(date);
+  });
+  return dates;
+};
 
 const ManagerDashboard = () => {
   let [metadata, setMetadata] = useState<MetaData[] | null>(null)
@@ -36,10 +54,10 @@ const ManagerDashboard = () => {
     ])
   }, [isLoading, groups, bfs, users])
   const groupByCreationDate = (items: { createdAt?: Date }[] = []) => {
-    if(items.length){
+    if (items.length) {
       return items?.reduce((acc, item) => {
         if (item.createdAt) {
-          const formattedDate = formatDate(new Date(item.createdAt));
+          const formattedDate = formatOtherDates(new Date(item.createdAt));
           acc[formattedDate] = (acc[formattedDate] || 0) + 1;
         }
         return acc;
@@ -49,35 +67,34 @@ const ManagerDashboard = () => {
   };
 
   const groupTransactionsByDate = (items: Transaction[]) => {
-    if(items.length){
-      return items?.reduce((acc, item) => {
+    if (items.length) {
+      return items.reduce((acc, item) => {
         if (item.createdAt && item.amount) {
           const formattedDate = formatDate(new Date(item.createdAt));
-          acc[formattedDate] = (acc[formattedDate] || 0) + parseFloat(`${item.amount}` as string);
+          acc[formattedDate] = (acc[formattedDate] || 0) + parseFloat(`${item.amount}`);
         }
         return acc;
       }, {} as Record<string, number>);
     }
-    return {}
+    return {};
   };
+
+
   let usersByDate = groupByCreationDate(users!);
   let groupsByDate = groupByCreationDate(groups!);
   let bfsByDate = groupByCreationDate(bfs!);
-  let transactionsByDate = groupTransactionsByDate(transactions!)
+  const transactionsByDate = groupTransactionsByDate(transactions!);
 
   const combineGroupedData = (
     usersByDate: Record<string, number>,
     groupsByDate: Record<string, number>,
     bfsByDate: Record<string, number>,
-    transactionsByDate: Record<string, number>
   ) => {
-    const combinedData: { date: string; users: number; groups: number; bfs: number, amount: number }[] = [];
-    console.log('transactions by date', transactionsByDate)
+    const combinedData: { date: string; users: number; groups: number; bfs: number }[] = [];
     const allDates = Array.from(new Set([
       ...Object.keys(usersByDate),
       ...Object.keys(groupsByDate),
       ...Object.keys(bfsByDate),
-      ...Object.keys(transactionsByDate)
     ]));
 
     allDates.forEach(date => {
@@ -86,7 +103,6 @@ const ManagerDashboard = () => {
         users: usersByDate[date] || 0,
         groups: groupsByDate[date] || 0,
         bfs: bfsByDate[date] || 0,
-        amount: transactionsByDate[date] || 0
       });
     });
 
@@ -97,8 +113,13 @@ const ManagerDashboard = () => {
     usersByDate,
     groupsByDate,
     bfsByDate,
-    transactionsByDate
+    // transactionsByDate
   );
+
+  const areaChartData = getCurrentMonthDates().map(date => ({
+    date,
+    amount: transactionsByDate[date] || 0
+  }));
   return (
     <div className="w-full p-3 mt-5 flex flex-col items-start gap-2">
       <div className='flex gap-2 w-full flex-wrap items-start justify-start'>
@@ -124,8 +145,8 @@ const ManagerDashboard = () => {
         </div>
 
         <div className="text-center font-bold text-neutral-600 mt-5">
-          <h1>Total transactions made each month</h1>
-          <AreaChartComponent data={groupedData} />
+          <h1>Total transactions made each day {moment().format("MMMM - YYYY")}</h1>
+          <AreaChartComponent data={areaChartData} />
         </div>
       </div>
     </div>
