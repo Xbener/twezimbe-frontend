@@ -267,7 +267,7 @@ export type FriendTypes = {
 
 export type GroupTypes = {
     _id: string
-    name?:string;
+    name?: string;
     group_name: string;
     group_type: string;
     group_picture: string;
@@ -283,7 +283,7 @@ export type GroupTypes = {
     group_state: string;
     upgraded: boolean;
     tags: string;
-    suspended?:boolean
+    suspended?: boolean
 };
 
 export type CreateGroupTypes = {
@@ -462,8 +462,8 @@ export interface Transaction {
     date?: Date
     user?: User,
     wallet?: string
-    _id?:string
-    type?:string
+    _id?: string
+    type?: string
 }
 
 export interface BF {
@@ -566,4 +566,21 @@ export type Case = {
     createdAt: Date
     name: string
     _id: string
+}
+
+
+export type SystemMessage = {
+    email?: string
+    fullName?: string
+    response?: string
+    message?: string
+    responded?: boolean
+    _id?: string
+    createdAt?:Date
+}
+
+export type FAQ = {
+    question?: string
+    answer?: string
+    _id?: string
 }

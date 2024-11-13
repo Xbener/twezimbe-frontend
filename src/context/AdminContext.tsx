@@ -2,9 +2,10 @@
 
 import { useGetAllUsers, useGetProfileData } from '@/api/auth'
 import { useGetAllGroups } from '@/api/group'
+import { getAllQuestions } from '@/api/inquries'
 import { fetchAllTransactions } from '@/api/transaction'
 import { getAllBfs } from '@/lib/bf'
-import { BF, GroupTypes, Transaction, User } from '@/types'
+import { BF, FAQ, GroupTypes, SystemMessage, Transaction, User } from '@/types'
 import React, { useEffect, useState } from 'react'
 
 type Props = {
@@ -30,6 +31,10 @@ export interface AdminContextTypes {
     setGroups: (vl: any) => void
     setBfs: (vl: any) => void
     setTransactions: (vl: any) => void
+    messages?: SystemMessage[]
+    setMessages: (vl: any) => void
+    faqs?: FAQ[]
+    setFaqs: (vl: any) => void
 }
 
 export const AdminContext = React.createContext<AdminContextTypes>({
@@ -40,6 +45,8 @@ export const AdminContext = React.createContext<AdminContextTypes>({
     setUsers(vl) { },
     setBfs(vl) { },
     setTransactions(vl) { },
+    setFaqs(vl) { },
+    setMessages(vl) { },
 })
 
 function AdminContextProvider({ children }: Props) {
@@ -54,10 +61,14 @@ function AdminContextProvider({ children }: Props) {
     const [bfs, setBfs] = useState([])
     const [groups, setGroups] = useState<GroupTypes[]>([])
     const [users, setUsers] = useState<User[]>([])
+    const [faqs, setFaqs] = useState<FAQ[]>([])
+    const [messages, setMessages] = useState<SystemMessage[]>([])
     useEffect(() => {
         const getData = async () => {
             const bfs = await getAllBfs()
             const transactions = await fetchAllTransactions()
+            const messages = await getAllQuestions()
+            setMessages(messages)
             setBfs(bfs)
             setTransactions(transactions)
         }
@@ -92,7 +103,10 @@ function AdminContextProvider({ children }: Props) {
             setSelectedUser,
             setGroups, setUsers,
             setTransactions,
-            setBfs
+            setBfs,
+            setFaqs, setMessages,
+            faqs,
+            messages
         }}>
             {children}
         </AdminContext.Provider>

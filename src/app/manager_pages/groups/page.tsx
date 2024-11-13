@@ -303,7 +303,7 @@ function page({ }: Props) {
                                                                     {group?.suspended ? 'Unsuspend' : 'Suspend'}
                                                                 </button>
                                                             </DialogTrigger>
-                                                            <DialogContent className='bg-white'>
+                                                            <DialogContent className='bg-white grid place-content-center w-auto'>
                                                                 <DialogHeader className='w-full text-md font-bold'>
                                                                     Are you sure of this operation?
                                                                 </DialogHeader>
@@ -338,7 +338,7 @@ function page({ }: Props) {
                                                                     Delete
                                                                 </button>
                                                             </DialogTrigger>
-                                                            <DialogContent className='bg-white'>
+                                                            <DialogContent className='bg-white grid place-content-center w-auto'>
                                                                 <DialogHeader className='w-full text-md font-bold'>
                                                                     Are you sure of this operation?
                                                                 </DialogHeader>

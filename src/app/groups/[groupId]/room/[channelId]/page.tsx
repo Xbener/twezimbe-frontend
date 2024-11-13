@@ -1217,7 +1217,7 @@ function Page({ }: Props) {
                                                     Leave
                                                 </Button>
                                             </DialogTrigger>
-                                            <DialogContent className="bg-white text-black">
+                                            <DialogContent className="bg-white text-black grid place-content-center w-auto">
                                                 <DialogHeader>
                                                     {/* <Warn */}
                                                     Confirm Leaving this channel
@@ -1247,7 +1247,7 @@ function Page({ }: Props) {
                                                             Delete
                                                         </Button>
                                                     </DialogTrigger>
-                                                    <DialogContent className="bg-white text-black">
+                                                    <DialogContent className="bg-white text-black grid place-content-center w-auto">
                                                         <DialogHeader>
                                                             {/* <Warn */}
                                                             Confirm Deleting this channel

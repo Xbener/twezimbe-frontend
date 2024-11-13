@@ -168,7 +168,7 @@ function page({ }: Props) {
                                                                     Delete
                                                                 </button>
                                                             </DialogTrigger>
-                                                            <DialogContent className='bg-white'>
+                                                            <DialogContent className='bg-white grid place-content-center w-auto'>
                                                                 <DialogTitle>
                                                                     Confirm this action
                                                                 </DialogTitle>
