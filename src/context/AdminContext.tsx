@@ -43,7 +43,7 @@ export const AdminContext = React.createContext<AdminContextTypes>({
 })
 
 function AdminContextProvider({ children }: Props) {
-    const [isVisible, setIsVisible] = useState(false)
+    const [isVisible, setIsVisible] = useState(true)
     const { currentUser } = useGetProfileData()
     const { users: allUsers, isLoading } = useGetAllUsers()
     const { groups: allGroups } = useGetAllGroups()
