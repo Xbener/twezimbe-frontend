@@ -162,7 +162,7 @@ function page({ }: Props) {
 
 
   return (
-    <div className='bg-white text-neutral-700'>
+    <div className='bg-neutral-100 text-neutral-700'>
       <div className='w-full p-2 flex justify-between border-b'>
         <div className='flex items-center gap-2'>
           <LucideOrigami />
@@ -186,7 +186,7 @@ function page({ }: Props) {
             metadata?.length ? metadata.map((card, index) => {
               return (
                 <div
-                  className={`flex-1 min-w-auto flex-col max-w-[15%] border border-white p-4 rounded-lg shadow-md flex justify-around `}
+                  className={`flex-1 min-w-auto flex-col max-w-[15%] border border-white p-4 rounded-lg shadow-md flex justify-around  bg-white`}
                 >
                   <div className="text-sm font-semibold ">{card.title}</div>
                   <div className="text-[1.2rem] font-bold">{card.value}</div>
@@ -197,18 +197,18 @@ function page({ }: Props) {
         </div>
 
         <div className="flex p-2 w-full items-start justify-start gap-3">
-          <div className='w-1/2 flex flex-col gap-3 shadow-lg p-2 rounded-md'>
+          <div className='w-1/2 flex flex-col gap-3 shadow-lg p-2 rounded-md bg-white'>
             <h1 className='text-[1.2rem] font-bold mb-2 text-center'>Balance history</h1>
             <AreaChartComponent data={[]} />
           </div>
-          <div className='w-1/2 flex flex-col gap-3 shadow-lg p-2 rounded-md'>
+          <div className='w-1/2 flex flex-col gap-3 shadow-lg p-2 rounded-md bg-white'>
             <h1 className='text-[1.2rem] font-bold mb-2 text-center'>Member deposits</h1>
             <PieChartComponent data={userDepositsRef.current} />
           </div>
         </div>
         <div className='w-full flex gap-4 items-start mt-5'>
           <div className=' mt-5 w-[70%] '>
-            <div className='w-1/2'>
+            <div className='w-1/2 bg-white'>
               <div className='shadow-md p-2'>
                 <div className="flex w-full justify-between items-center">
                   <h1 className='text-[1.2rem] mb-4 p-2'>Members</h1>
@@ -316,7 +316,7 @@ function page({ }: Props) {
                   </DialogContent>
                 </Dialog>
               </div>
-              <Table className="border max-h-[500px] overflow-scroll bg-white rounded-md">
+              <Table className="border max-h-[500px] overflow-scroll bg-white rounded-md ">
                 <TableCaption>Latest Cases</TableCaption>
                 <TableHeader className="border-b text-neutral-700 font-bold">
                   <TableHead>Name</TableHead>
@@ -557,7 +557,7 @@ function page({ }: Props) {
             </div>
           </div>
 
-          <div className='w-[30%] h-auto shadow-md p-4 rounded-md flex flex-col gap-2 bg-neutral-100'>
+          <div className='w-[30%] h-auto shadow-md p-4 rounded-md flex flex-col gap-2 border-2 bg-white'>
             <h1 className="text-[1.3rem] text-center font-bold capitalize">{groupBF?.fundName}</h1>
             <p>Details: {groupBF?.fundDetails}</p>
             <p>Wallet: {groupBF?.walletAddress}</p>
