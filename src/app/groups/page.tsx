@@ -224,7 +224,7 @@ function Groups({ }: Props) {
                     {group.group_name} {group.group_state === 'Public' ? <Eye /> : <EyeClosedIcon />}
                   </h1>
                   <p className='flex-grow'>
-                    {group.description.length < 50 ? group.description : `${group.description.substring(0, 50)} ...`}
+                    {group.description.length < 30 ? group.description : `${group.description.substring(0, 30)} ...`}
                   </p>
                   <p>{group.memberCount} {group.memberCount > 1 ? "members" : 'member'}</p>
 
