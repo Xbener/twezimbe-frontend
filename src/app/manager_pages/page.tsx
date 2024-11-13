@@ -44,7 +44,7 @@ const ManagerDashboard = () => {
         value: groups?.length || 0
       },
       {
-        title: "created bereavement funds",
+        title: "Created bereavement funds",
         value: bfs?.length || 0
       },
       {

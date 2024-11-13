@@ -134,9 +134,6 @@ function Page({ }: Props) {
         setValidUserNames(group?.members.map(member => `@${member.lastName}`) || [])
     }, [group])
 
-    useEffect(() => {
-        console.log(validUserNames)
-    }, [validUserNames])
 
     const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         const value = e.target.value;
