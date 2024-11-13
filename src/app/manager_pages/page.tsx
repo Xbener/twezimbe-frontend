@@ -47,15 +47,15 @@ const ManagerDashboard = () => {
         value: groups?.length || 0
       },
       {
-        title: "Created bereavement funds",
+        title: "Bereavement funds",
         value: bfs?.length || 0
       },
       {
-        title: "Total platform transactions",
+        title: "Platform transactions",
         value: transactions?.length || 0
       },
       {
-        title: "Total system messages",
+        title: "System messages",
         value: messages?.length || 0
       },
       {
@@ -142,12 +142,12 @@ const ManagerDashboard = () => {
 
   return (
     <div className="w-full p-3 mt-5 flex flex-col items-start gap-2">
-      <div className='flex gap-2 w-full flex-wrap items-start justify-start'>
+      <div className='md:flex grid sm:grid-cols-3 grid-cols-2 gap-2 w-full  flex-wrap items-start justify-start '>
         {metadata?.length ? metadata.map((card, index) => {
           return (
             <div
               key={index}
-              className="flex min-w-[15%] flex-col border border-white p-4 rounded-lg shadow-md bg-white justify-around items-start"
+              className="flex min-w-[15%] flex-col border border-white p-4 rounded-lg shadow-md bg-white justify-normal  items-start"
             >
               <div className="text-sm font-semibold text-center">{card.title}</div>
               <div className="text-[1.2rem] font-bold text-center">{card.value}</div>
@@ -188,7 +188,7 @@ const ManagerDashboard = () => {
           </select>
         </div>
       </div>
-      <div className="w-full flex items-start bg-white p-2 rounded-md justify-around">
+      <div className="w-full flex items-start bg-white p-2 rounded-md justify-around flex-col lg:flex-row  overflow-auto">
 
         <div className="text-center font-bold text-neutral-600 mt-5">
           <h1>Groups, users and Bereavement funds by {selectedYear}</h1>
