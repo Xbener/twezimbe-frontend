@@ -22,7 +22,7 @@ function AreaChartComponent({ data }: Props) {
                     <stop offset="95%" stopColor="#82ca9d" stopOpacity={0} />
                 </linearGradient>
             </defs>
-            <XAxis dataKey="date">
+            <XAxis interval={2} dataKey="date">
                 {/* <Label value="Date" offset={-1} position="insideBottom" /> */}
             </XAxis>
             <YAxis dataKey="amount">

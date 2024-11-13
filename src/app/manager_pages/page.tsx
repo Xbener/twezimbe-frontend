@@ -8,6 +8,7 @@ import { formatWithCommas } from "@/utils/formatNumber"
 import moment from "moment"
 import { useContext, useEffect, useState } from "react"
 
+// Format functions remain unchanged
 const formatDate = (date: Date) => {
   return moment(date).format("D")
 };
@@ -30,7 +31,9 @@ const getCurrentMonthDates = () => {
 };
 
 const ManagerDashboard = () => {
-  let [metadata, setMetadata] = useState<MetaData[] | null>(null)
+  const [metadata, setMetadata] = useState<MetaData[] | null>(null)
+  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear()) // Default to current year
+  const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth()) // Default to current month
   const { users, groups, bfs, isLoading, transactions, messages, faqs } = useContext(AdminContext)
 
   useEffect(() => {
@@ -61,12 +64,16 @@ const ManagerDashboard = () => {
       }
     ])
   }, [isLoading, groups, bfs, users])
-  const groupByCreationDate = (items: { createdAt?: Date }[] = []) => {
+
+  const groupByCreationDate = (items: { createdAt?: Date }[] = [], year: number, month: number) => {
     if (items.length) {
-      return items?.reduce((acc, item) => {
+      return items.reduce((acc, item) => {
         if (item.createdAt) {
-          const formattedDate = formatOtherDates(new Date(item.createdAt));
-          acc[formattedDate] = (acc[formattedDate] || 0) + 1;
+          const createdDate = new Date(item.createdAt);
+          if (createdDate.getFullYear() === year && createdDate.getMonth() === month) {
+            const formattedDate = formatOtherDates(createdDate);
+            acc[formattedDate] = (acc[formattedDate] || 0) + 1;
+          }
         }
         return acc;
       }, {} as Record<string, number>);
@@ -74,12 +81,15 @@ const ManagerDashboard = () => {
     return {}
   };
 
-  const groupTransactionsByDate = (items: Transaction[]) => {
+  const groupTransactionsByDate = (items: Transaction[], year: number, month: number) => {
     if (items.length) {
       return items.reduce((acc, item) => {
         if (item.createdAt && item.amount) {
-          const formattedDate = formatDate(new Date(item.createdAt));
-          acc[formattedDate] = (acc[formattedDate] || 0) + parseFloat(`${item.amount}`);
+          const createdDate = new Date(item.createdAt);
+          if (createdDate.getFullYear() === year && createdDate.getMonth() === month) {
+            const formattedDate = formatDate(createdDate);
+            acc[formattedDate] = (acc[formattedDate] || 0) + parseFloat(`${item.amount}`);
+          }
         }
         return acc;
       }, {} as Record<string, number>);
@@ -87,11 +97,10 @@ const ManagerDashboard = () => {
     return {};
   };
 
-
-  let usersByDate = groupByCreationDate(users!);
-  let groupsByDate = groupByCreationDate(groups!);
-  let bfsByDate = groupByCreationDate(bfs!);
-  const transactionsByDate = groupTransactionsByDate(transactions!);
+  const usersByDate = groupByCreationDate(users!, selectedYear, selectedMonth);
+  const groupsByDate = groupByCreationDate(groups!, selectedYear, selectedMonth);
+  const bfsByDate = groupByCreationDate(bfs!, selectedYear, selectedMonth);
+  const transactionsByDate = groupTransactionsByDate(transactions!, selectedYear, selectedMonth);
 
   const combineGroupedData = (
     usersByDate: Record<string, number>,
@@ -117,48 +126,82 @@ const ManagerDashboard = () => {
     return combinedData;
   };
 
-  const groupedData = combineGroupedData(
-    usersByDate,
-    groupsByDate,
-    bfsByDate,
-    // transactionsByDate
-  );
+  const groupedData = combineGroupedData(usersByDate, groupsByDate, bfsByDate);
 
   const areaChartData = getCurrentMonthDates().map(date => ({
     date,
     amount: transactionsByDate[date] || 0
   }));
+  const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedYear(Number(e.target.value));
+  };
+
+  const handleMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedMonth(Number(e.target.value));
+  };
+
   return (
     <div className="w-full p-3 mt-5 flex flex-col items-start gap-2">
       <div className='flex gap-2 w-full flex-wrap items-start justify-start'>
-        {
-          metadata?.length ? metadata.map((card, index) => {
-            return (
-              <div
-                key={index}
-                className="flex min-w-[15%] flex-col border border-white p-4 rounded-lg shadow-md bg-white justify-around items-start"
-              >
-                <div className="text-sm font-semibold text-center">{card.title}</div>
-                <div className="text-[1.2rem] font-bold text-center">{card.value}</div>
-              </div>
-            )
-          }) : null
-        }
+        {metadata?.length ? metadata.map((card, index) => {
+          return (
+            <div
+              key={index}
+              className="flex min-w-[15%] flex-col border border-white p-4 rounded-lg shadow-md bg-white justify-around items-start"
+            >
+              <div className="text-sm font-semibold text-center">{card.title}</div>
+              <div className="text-[1.2rem] font-bold text-center">{card.value}</div>
+            </div>
+          )
+        }) : null}
       </div>
 
-      <div className="w-full flex items-start bg-white p-2 rounded-md justify-around ">
+
+      <div className="flex items-center gap-3 w-full bg-white p-2">
+        <h1>Filters: </h1>
+        <div className="flex gap-2 items-center">
+          <label htmlFor="year" className="font-semibold">Year</label>
+          <select
+            id="year"
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(Number(e.target.value))}
+            className="mt-2 p-2 border rounded"
+          >
+            {Array.from({ length: 5 }, (_, i) => {
+              const year = new Date().getFullYear() - i;
+              return <option key={year} value={year}>{year}</option>;
+            })}
+          </select>
+        </div>
+
+        <div className="flex gap-2 items-center">
+          <label htmlFor="month" className="font-semibold">Month</label>
+          <select
+            id="month"
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(Number(e.target.value))}
+            className="mt-2 p-2 border rounded"
+          >
+            {Array.from({ length: 12 }, (_, i) => (
+              <option key={i} value={i}>{moment().month(i).format('MMM')}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+      <div className="w-full flex items-start bg-white p-2 rounded-md justify-around">
+
         <div className="text-center font-bold text-neutral-600 mt-5">
-          <h1>Groups, users and Bereavement funds by each month</h1>
+          <h1>Groups, users and Bereavement funds by {selectedYear}</h1>
           <GroupedBarChartComponent data={groupedData} />
         </div>
 
         <div className="text-center font-bold text-neutral-600 mt-5">
-          <h1>Total transactions made each day {moment().format("MMMM - YYYY")}</h1>
+          <h1>transactions made each day {moment(`${selectedMonth + 1}-${selectedYear}`, "M-YYYY").format("MMMM - YYYY")}</h1>
           <AreaChartComponent data={areaChartData} />
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default ManagerDashboard
+export default ManagerDashboard;
