@@ -106,7 +106,7 @@ function page({ }: Props) {
       },
       {
         title: "Balance",
-        value: `${groupBF&&formatWithCommas(groupBF?.wallet?.balance)} UGX`
+        value: `${groupBF?.wallet?.balance ? formatWithCommas(groupBF?.wallet?.balance) : 0} UGX`
       },
       {
         title: "Total transactions",

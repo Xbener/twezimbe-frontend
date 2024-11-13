@@ -505,9 +505,9 @@ function Page({ }: Props) {
 
             })
             const data = await response.json()
-            if (!data.status) {
-                return window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups`
-            }
+            // if (!data.status) {
+            //     return window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups`
+            // }
             setChannel(data.channel)
             setCurrentChannel(channel)
             setChId(channel?._id!)

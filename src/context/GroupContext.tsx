@@ -72,9 +72,6 @@ function GroupProvider({ children }: Props) {
     const [bfSettings, setBfSettings] = useState<FundSettings | null>(null)
 
     const bfMembersRef = useRef(bfMembers)
-    useEffect(() => {
-        console.log("Updated bfMembers:", bfMembers);
-    }, [bfMembers]);
 
     useEffect(() => {
         const getBFJoinRequests = async () => {
@@ -159,7 +156,6 @@ function GroupProvider({ children }: Props) {
             })
             const data = await res.json()
 
-            console.log('members', data)
             // Assuming the API returns the correct structure
             setAdmins(data.members.filter((member: any) => member.role === "GroupManager"));
             setModerators(data.members.filter((member: any) => member.role === "GroupModerator"));

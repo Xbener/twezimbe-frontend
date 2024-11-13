@@ -365,9 +365,9 @@ function Page({ }: Props) {
             })
 
             const data = await res.json()
-            if (!data.status) {
-                return window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups`
-            }
+            // if (!data.status) {
+            //     return window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups`
+            // }
 
             // Set the current DM in context
             setCurrentDM(data.chatroom)
