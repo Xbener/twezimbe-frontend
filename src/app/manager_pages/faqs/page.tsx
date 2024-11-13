@@ -1,5 +1,5 @@
 'use client'
-import { createFaq, updateFaq } from '@/api/inquries'
+import { createFaq, deleteFaq, updateFaq } from '@/api/inquries'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -55,7 +55,7 @@ function page({ }: Props) {
                                 value={newFaq?.answer}
                                 onChange={handleChange}
                             />
-                            <div className='w-full flex mt-3 items-center gap-2'>
+                            <div className='w-full flex mt-3 items-center gap-2 justify-center'>
                                 <DialogClose>
                                     <Button
                                         onClick={async () => {
@@ -69,7 +69,7 @@ function page({ }: Props) {
                                     </Button>
                                 </DialogClose>
                                 <DialogClose>
-                                    <Button className='bg-transparent border-orange-500 text-orange-500'>
+                                    <Button className='bg-transparent border-orange-500 text-orange-500 border'>
                                         Close
                                     </Button>
                                 </DialogClose>
@@ -124,7 +124,7 @@ function page({ }: Props) {
                                                             onChange={handleChange}
                                                         />
 
-                                                        <div className='min-w-full mt-3 flex gap-2'>
+                                                        <div className='min-w-full mt-3 flex gap-2 justify-center'>
                                                             <DialogClose>
                                                                 <Button
                                                                     onClick={async () => {
@@ -140,11 +140,45 @@ function page({ }: Props) {
                                                                 </Button>
                                                             </DialogClose>
                                                             <DialogClose>
-                                                                <Button className='bg-transparent border-orange-500 text-orange-500'>
+                                                                <Button className='bg-transparent border-orange-500 text-orange-500 border'>
                                                                     Close
                                                                 </Button>
                                                             </DialogClose>
                                                         </div>
+                                                    </div>
+                                                </DialogContent>
+                                            </Dialog>
+                                            <Dialog>
+                                                <DialogTrigger>
+                                                    <Button className="bg-transparent border-red-500 text-red-500 border">
+                                                        Delete
+                                                    </Button>
+                                                </DialogTrigger>
+                                                <DialogContent className="grid place-self-center text-center bg-white w-auto">
+                                                    <DialogTitle>
+                                                        Confirm this action
+                                                    </DialogTitle>
+                                                    <p>This cannot be undone.</p>
+
+                                                    <div className='w-full flex items-center gap-2 mt-2 justify-center'>
+                                                        <DialogClose>
+                                                            <Button
+                                                                onClick={async () => {
+                                                                    const res = await deleteFaq(faq._id!)
+                                                                    if (res) {
+                                                                        setFaqs((prev: FAQ[]) => prev.filter(msg => msg._id !== faq._id))
+                                                                    }
+                                                                }}
+                                                                className='bg-red-500 text-slate-50'>
+
+                                                                Confirm
+                                                            </Button>
+                                                        </DialogClose>
+                                                        <DialogClose>
+                                                            <Button className='bg-transparent border border-orange-500 text-orange-500'>
+                                                                Cancel
+                                                            </Button>
+                                                        </DialogClose>
                                                     </div>
                                                 </DialogContent>
                                             </Dialog>

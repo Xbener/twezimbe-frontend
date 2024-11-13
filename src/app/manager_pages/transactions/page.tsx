@@ -123,14 +123,14 @@ function page({ }: Props) {
                                                             Delete
                                                         </Button>
                                                     </DialogTrigger>
-                                                    <DialogContent className='bg-white'>
+                                                    <DialogContent className='bg-white w-auto grid place-content-center text-center'>
                                                         <DialogTitle>
                                                             Confirm this action
                                                         </DialogTitle>
 
-                                                        Are you sure of this action? it cannot be undone.
+                                                       <p>This cannot be undone</p>
 
-                                                        <div className='w-full flex items-center gap-2 mt-2'>
+                                                        <div className='w-full flex items-center gap-2 mt-2 justify-center'>
                                                             <DialogClose>
                                                                 <Button
                                                                     onClick={() => handleDeleteTransaction(transaction._id!)}

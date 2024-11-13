@@ -131,7 +131,7 @@ export const createFaq = async (faq: { question: string, answer: string }) => {
         const data = await res.json()
         if (!data.status) throw new Error(data.errors || data.message || "Something went wrong. Please try again")
         toast.success(data.message)
-    return data
+        return data
     } catch (error: any) {
         toast.error(error.message)
     }
@@ -148,6 +148,28 @@ export const updateFaq = async (faqId: string, faq: { question?: string, answer?
                     'Authorization': `Bearer ${Cookies.get('access-token')}`
                 },
                 body: JSON.stringify({ ...faq })
+            }
+        )
+
+        const data = await res.json()
+        if (!data.status) throw new Error(data.errors || data.message || "Something went wrong. Please try again")
+        toast.success(data.message)
+        return data
+    } catch (error: any) {
+        toast.error(error.message)
+    }
+}
+
+export const deleteFaq = async (faqId: string) => {
+    try {
+
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/faqs/${faqId}`,
+            {
+                method: "DELETE",
+                headers: {
+                    'Authorization': `Bearer ${Cookies.get('access-token')}`
+                },
             }
         )
 

@@ -31,7 +31,7 @@ const getCurrentMonthDates = () => {
 
 const ManagerDashboard = () => {
   let [metadata, setMetadata] = useState<MetaData[] | null>(null)
-  const { users, groups, bfs, isLoading, transactions, messages } = useContext(AdminContext)
+  const { users, groups, bfs, isLoading, transactions, messages, faqs } = useContext(AdminContext)
 
   useEffect(() => {
     setMetadata([
@@ -54,6 +54,10 @@ const ManagerDashboard = () => {
       {
         title: "Total system messages",
         value: messages?.length || 0
+      },
+      {
+        title: "Total FAQs",
+        value: faqs?.length || 0
       }
     ])
   }, [isLoading, groups, bfs, users])

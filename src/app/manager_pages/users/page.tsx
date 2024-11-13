@@ -284,16 +284,16 @@ function page({ }: Props) {
                                                                     Delete
                                                                 </button>
                                                             </DialogTrigger>
-                                                            <DialogContent className='bg-white grid place-content-center w-auto'>
-                                                                <DialogHeader className='w-full text-md font-bold'>
-                                                                    Are you sure of this operation?
-                                                                </DialogHeader>
+                                                            <DialogContent className='bg-white grid place-content-center w-auto text-center'>
+                                                                <DialogTitle>
+                                                                   Confirm this operation
+                                                                </DialogTitle>
 
                                                                 <div>
-                                                                    Confirm this action.
+                                                                    This cannot be undone.
                                                                 </div>
 
-                                                                <div className='w-full flex gap-2'>
+                                                                <div className='w-full flex gap-2 justify-center'>
                                                                     <Button
                                                                         onClick={async () => {
                                                                             await handleDelete(user._id! || user?.id)
