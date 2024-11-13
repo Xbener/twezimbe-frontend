@@ -33,12 +33,11 @@ const SignInForm = ({ onSignIn, isLoading }: Props) => {
     }
   });
 
-  useEffect(() => {
-    if (Cookies.get('access-token')) {
-      console.log('cookie found')
-      window.location.href = '/'
-    }
-  }, [])
+  // useEffect(() => {
+  //   if (Cookies.get('access-token')) {
+  //     window.location.href = '/'
+  //   }
+  // }, [])
 
   return (
     <Form {...form}>
