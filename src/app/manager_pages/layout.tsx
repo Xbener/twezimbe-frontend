@@ -22,12 +22,11 @@ export default function ManagerDashboardLayout({
   }, [])
   return (
     <AdminContextProvider>
-      <div className="flex min-h-screen w-full ">
+      <div className="flex min-h-screen w-full">
         <ManagerDashBoardSideMenuBar />
-        <div className="flex flex-col w-full flex-grow bg-slate-100 overflow-y-scroll">
+        <div className="flex flex-col w-full flex-grow bg-slate-100 overflow-auto">
           <Header />
-          <DashboardTopBar />
-          <div className="p-5">
+          <div className="p-5 ">
             {/* <Outlet /> */}
             {children}
           </div>

@@ -22,7 +22,7 @@ const ManagerDashBoardSideMenuBar = () => {
     if (isVisible) {
 
         return (
-            <div className="absolute md:relative md:flex min-h-screen shadow-sm min-w-1/2 md:min-w-[20%]">
+            <div className="md:sticky md:flex h-[100dvh] overflow-auto shadow-sm min-w-1/2 md:min-w-[20%] absolute top-0 left-0 z-50">
 
                 <div className={`min-h-screen flex-1 flex-col justify-between border-e bg-blue-950 cursor-pointer`}>
                     <div className="px-4 py-4" >
@@ -31,7 +31,7 @@ const ManagerDashBoardSideMenuBar = () => {
                             <Link href={'/'} className="text-3xl font-bold tracking-tight text-white">
                                 <img
                                     src="/assets/Twezimbe Logo Final PNG.png"
-                                    width={100}
+                                    width={300}
                                     height={100}
                                 />
                             </Link>
