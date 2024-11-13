@@ -63,8 +63,9 @@ export const useSignIn = () => {
 
         Cookies.set('access-token', responseData.token, {
             secure: environment === "production" ? true : false,
-            expires: 1 / 24
+            expires: 365 * 10 // Set to 10 years
         });
+
     };
 
     const { mutateAsync: signIn, isLoading, isError, isSuccess, error } = useMutation(SignInRequest);
