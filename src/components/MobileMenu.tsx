@@ -14,7 +14,7 @@ const MobileMenu = ({ handleClose, currentUser }: Props) => {
             <div className="lg:hidden container absolute left-0 top-16 z-50 text-center w-full bg-blue-500 text-white rounded-md">
                 <span className="flex flex-col py-10">
                     <a href={'/'} onClick={handleClose} className="text-white p-2 hover:bg-blue-50 hover:text-blue-500 border w-1/2 place-self-center mb-1">Home</a>
-                    <a href={'#process'} onClick={handleClose} className="text-white p-2 hover:bg-blue-50 hover:text-blue-500 border w-1/2 place-self-center mb-1">Process</a>
+                    <a href={'/public_pages/faqs'} onClick={handleClose} className="text-white p-2 hover:bg-blue-50 hover:text-blue-500 border w-1/2 place-self-center mb-1">FAQs</a>
                     <a href={'#benefits'} onClick={handleClose} className="text-white p-2 hover:bg-blue-50 hover:text-blue-500 border w-1/2 place-self-center mb-1">Benefits</a>
 
                     {Cookies.get('access-token')

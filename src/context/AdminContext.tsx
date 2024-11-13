@@ -2,7 +2,7 @@
 
 import { useGetAllUsers, useGetProfileData } from '@/api/auth'
 import { useGetAllGroups } from '@/api/group'
-import { getAllQuestions } from '@/api/inquries'
+import { getAllQuestions, getFaqs } from '@/api/inquries'
 import { fetchAllTransactions } from '@/api/transaction'
 import { getAllBfs } from '@/lib/bf'
 import { BF, FAQ, GroupTypes, SystemMessage, Transaction, User } from '@/types'
@@ -68,6 +68,8 @@ function AdminContextProvider({ children }: Props) {
             const bfs = await getAllBfs()
             const transactions = await fetchAllTransactions()
             const messages = await getAllQuestions()
+            const faqs = await getFaqs()
+            setFaqs(faqs)
             setMessages(messages)
             setBfs(bfs)
             setTransactions(transactions)

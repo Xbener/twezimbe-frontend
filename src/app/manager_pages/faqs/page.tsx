@@ -1,11 +1,104 @@
-import React from 'react'
+'use client'
+import { updateFaq } from '@/api/inquries'
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Textarea } from '@/components/ui/textarea'
+import { AdminContext } from '@/context/AdminContext'
+import { FAQ } from '@/types'
+import { formatWithCommas } from '@/utils/formatNumber'
+import React, { useContext, useState } from 'react'
 
 type Props = {}
 
-function page({}: Props) {
-  return (
-    <div>page</div>
-  )
+function page({ }: Props) {
+    const { faqs, setFaqs } = useContext(AdminContext)
+    const [selectedFaq, setSelectedFaq] = useState<FAQ | null>(null)
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setSelectedFaq(prev => ({ ...prev, [e.target.name]: e.target.value }))
+    }
+    return (
+        <div className='w-full  text-neutral-700'>
+            <div className='w-full flex items-center justify-between p-2'>
+                <h1 className='text-lg text-neutral-700 font-bold'>FAQs {faqs?.length ? `(${formatWithCommas(faqs.length)})` : ''}</h1>
+            </div>
+
+            <div className='w-full mt-5'>
+                <Table className='bg-white'>
+                    <TableHeader>
+                        <TableHead >Question</TableHead>
+                        <TableHead >Answer</TableHead>
+                        <TableHead className='text-center'>Actions</TableHead>
+                    </TableHeader>
+                    <TableCaption>Frequently asked question</TableCaption>
+                    <TableBody>
+                        {
+                            faqs?.map((faq: FAQ, index) => {
+
+                                return (
+                                    <TableRow key={faq._id}>
+                                        <TableCell>{faq.question}</TableCell>
+                                        <TableCell>{faq.answer}</TableCell>
+                                        <TableCell className='flex gap-1 justify-center'>
+                                            <Dialog>
+                                                <DialogTrigger >
+                                                    <Button onClick={() => setSelectedFaq(faq)} className='bg-transparent border border-blue-500 text-blue-500'>
+                                                        Update
+                                                    </Button>
+                                                </DialogTrigger>
+                                                <DialogContent className='bg-white'>
+                                                    <DialogTitle>
+                                                        Update FAQ
+                                                    </DialogTitle>
+                                                    <div className='w-auto p-2 gap-2 flex flex-col'>
+                                                        <Input
+                                                            name="question"
+                                                            id="question"
+                                                            placeholder='Question'
+                                                            defaultValue={selectedFaq?.question}
+                                                            value={selectedFaq?.question}
+                                                            onChange={handleChange}
+                                                        />
+                                                        <Textarea
+                                                            name="answer"
+                                                            id="answer"
+                                                            placeholder='Answer'
+                                                            defaultValue={selectedFaq?.answer}
+                                                            value={selectedFaq?.answer}
+                                                            onChange={handleChange}
+                                                        />
+
+                                                        <div className='min-w-full mt-3 flex gap-2'>
+                                                            <DialogClose>
+                                                                <Button
+                                                                    onClick={async () => {
+                                                                        if (selectedFaq) {
+                                                                            const res = await updateFaq(faq._id!, selectedFaq)
+                                                                            if (res.status) {
+                                                                                setFaqs((prev: FAQ[]) => prev.map(prevFaq => prevFaq._id === selectedFaq._id ? { ...res.faq } : prevFaq))
+                                                                            }
+                                                                        }
+                                                                    }}
+                                                                    className='bg-blue-500 text-white'>
+                                                                    Update
+                                                                </Button>
+                                                            </DialogClose>
+                                                        </div>
+                                                    </div>
+                                                </DialogContent>
+                                            </Dialog>
+                                        </TableCell>
+                                    </TableRow>
+                                )
+                            })
+                        }
+                    </TableBody>
+                </Table>
+            </div>
+        </div>
+    )
 }
 
 export default page

@@ -31,7 +31,7 @@ const PrimaryMenu = ({ currentUser }: { currentUser: User }) => {
                     <a href={'/'} className="text-[#2f578b]">About Us</a>
                     <a href={'/'} className="text-[#2f578b]">Features</a>
                     <a href={'/'} className="text-[#2f578b]">Book Demo</a>
-                    <a href={'/#process'} className="text-[#2f578b]">Process</a>
+                    <a href={'/public_pages/faqs'} className="text-[#2f578b]">FAQs</a>
                     <a href={'/groups'} className="text-[#2f578b]">Group</a>
                     <a href={'/groups/bf'} className="text-[#2f578b]">Bereavement Fund</a>
                     {
