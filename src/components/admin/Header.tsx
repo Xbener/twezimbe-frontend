@@ -38,8 +38,11 @@ function Header({ }: Props) {
                     </PopoverTrigger>
                     <PopoverContent className='bg-white w-auto flex flex-col gap-1 items-start justify-normal p-0'>
                         <Link href={`/public_pages/Profile`} className='flex p-3 rounded-md items-center gap-2 hover:bg-neutral-100 w-full'>
-                            <AiOutlineProfile />
-                            Profile
+                          <Button
+                                className='flex items-center gap-2 hover:bg-slate-100'>
+                                <AiOutlineProfile />
+                                Profile
+                          </Button>
                         </Link>
                         <Button
                             onClick={() => {
@@ -47,7 +50,7 @@ function Header({ }: Props) {
                                 Cookies.remove('admin')
                                 window.location.href = '/manager_pages/signin'
                             }}
-                            className='flex items-center gap-2 hover:bg-red-500 hover:text-slate-100'>
+                            className='flex items-center gap-2 hover:bg-red-500 hover:text-slate-100 w-full'>
                             <DoorClosed />
                             Logout
                         </Button>
