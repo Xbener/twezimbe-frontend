@@ -131,6 +131,7 @@ export const createFaq = async (faq: { question: string, answer: string }) => {
         const data = await res.json()
         if (!data.status) throw new Error(data.errors || data.message || "Something went wrong. Please try again")
         toast.success(data.message)
+    return data
     } catch (error: any) {
         toast.error(error.message)
     }
