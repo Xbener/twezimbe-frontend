@@ -1,16 +1,15 @@
 "use client"
-import { ArrowLeft, LogOut, Mail, Menu, Users } from "lucide-react"
+import { ArrowLeft, LogOut } from "lucide-react"
 import Link from "next/link"
-import React, { useContext, useState } from "react"
-import GeneralIcon from "./icons/GeneralIcon"
-import ManagersIcon from "./icons/Managers"
+import React, { useContext } from "react"
 import { AdminContext } from "@/context/AdminContext"
 import { usePathname } from "next/navigation"
 import Cookies from 'js-cookie'
 
 const ManagerDashBoardSideMenuBar = () => {
-    const { isVisible, toggleSideBar } = useContext(AdminContext)
+    const { isVisible, toggleSideBar, windowWidth } = useContext(AdminContext)
     const pathname = usePathname()
+
     const logout = (e: React.FormEvent) => {
         e.preventDefault();
         console.log("Logged out");
@@ -19,13 +18,22 @@ const ManagerDashBoardSideMenuBar = () => {
         window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/manager_pages/signin`
     }
 
-    if (isVisible) {
+    // Array of menu items
+    const menuItems = [
+        { href: "/manager_pages", label: "Dashboard" },
+        { href: "/manager_pages/users", label: "Users" },
+        { href: "/manager_pages/groups", label: "Groups" },
+        { href: "/manager_pages/bfs", label: "Bereavement Funds" },
+        { href: "/manager_pages/transactions", label: "Transactions" },
+        { href: "/manager_pages/messages", label: "Messages" },
+        { href: "/manager_pages/faqs", label: "FAQs" },
+    ]
 
+    if (isVisible) {
         return (
             <div className="md:sticky md:flex h-[100dvh] overflow-auto shadow-sm min-w-full md:min-w-[20%] fixed top-0 left-0 z-50 ">
-
                 <div className={`min-h-screen flex-1 flex-col justify-between border-e bg-blue-950 cursor-pointer`}>
-                    <div className="px-4 py-4" >
+                    <div className="px-4 py-4">
                         <div className="flex">
                             <ArrowLeft className='items-center cursor-pointer md:hidden block text-white' onClick={toggleSideBar} />
                             <Link href={'/'} className="text-3xl font-bold tracking-tight text-white">
@@ -36,51 +44,29 @@ const ManagerDashBoardSideMenuBar = () => {
                                 />
                             </Link>
                         </div>
+
+                        {/* Mapping over menuItems */}
                         <ul className="mt-6 space-y-1">
-                            <li>
-                                <Link href="/manager_pages"
-                                    className={`block rounded-lg ${pathname === '/manager_pages' && 'bg-gray-100 text-slate-800'} px-4 py-2 text-sm font-medium text-slate-200 hover:bg-gray-100 hover:text-gray-700`}>
-                                    Dashboard
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/manager_pages/users" className={`block rounded-lg ${pathname.includes('/users') && 'bg-gray-100 text-slate-800'} px-4 py-2 text-sm font-medium text-slate-200 hover:bg-gray-100 hover:text-gray-700`}>
-                                    Users
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/manager_pages/groups" className={`block rounded-lg ${pathname.includes('/groups') && 'bg-gray-100 text-slate-800'} px-4 py-2 text-sm font-medium text-slate-200 hover:bg-gray-100 hover:text-gray-700`}>
-                                    Groups
-                                </Link>
-                            </li>
+                            {menuItems.map(({ href, label }) => (
+                                <li key={href}>
+                                    <Link
+                                        href={href}
+                                        className={`block rounded-lg ${(pathname.includes(href) && pathname === '/manager_pages') && 'bg-gray-100 text-slate-800'} px-4 py-2 text-sm font-medium text-slate-200 hover:bg-gray-100 hover:text-gray-700`}
+                                        onClick={() => {
+                                            // Toggle sidebar if window width is below 770
+                                            if (windowWidth && windowWidth < 770) toggleSideBar()
+                                        }}
+                                    >
+                                        {label}
+                                    </Link>
+                                </li>
+                            ))}
 
-                            <li>
-                                <Link href="/manager_pages/bfs" className={`block rounded-lg ${pathname.includes('/bfs') && 'bg-gray-100 text-slate-800'} px-4 py-2 text-sm font-medium text-slate-200 hover:bg-gray-100 hover:text-gray-700`}>
-                                    Bereavement Funds
-                                </Link>
-                            </li>
-
-                            <li>
-                                <Link href="/manager_pages/transactions" className={`block rounded-lg ${pathname.includes('/transactions') && 'bg-gray-100 text-slate-800'} px-4 py-2 text-sm font-medium text-slate-200 hover:bg-gray-100 hover:text-gray-700`}>
-                                    Transactions
-                                </Link>
-                            </li>
-
-                            <li>    
-                                <Link href="/manager_pages/messages" className={`block rounded-lg ${pathname.includes('/messages') && 'bg-gray-100 text-slate-800'} px-4 py-2 text-sm font-medium text-slate-200 hover:bg-gray-100 hover:text-gray-700`}>
-                                    Messages
-                                </Link>
-                            </li>
-                            <li>
-                                <Link className={`block rounded-lg ${pathname.includes('/transactions') && 'bg-gray-100 text-slate-800'} px-4 py-2 text-sm font-medium text-slate-200 hover:bg-gray-100 hover:text-gray-700`} href="/manager_pages/faqs">
-                                    FAQs
-                                </Link>
-                            </li>
+                            {/* Account section */}
                             <li>
                                 <details className="group [&_summary::-webkit-details-marker]:hidden">
                                     <summary className="flex cursor-pointer items-center justify-between rounded-lg px-4 py-2 text-slate-200 hover:bg-gray-100 hover:text-gray-700">
                                         <span className="text-sm font-medium"> Account</span>
-
                                         <span className="shrink-0 transition duration-300 group-open:-rotate-180">
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
@@ -103,7 +89,6 @@ const ManagerDashBoardSideMenuBar = () => {
                                                 Profile
                                             </Link>
                                         </li>
-
                                     </ul>
                                 </details>
                             </li>
@@ -114,14 +99,12 @@ const ManagerDashBoardSideMenuBar = () => {
                         <form onSubmit={logout}>
                             <button type="submit" className="group relative flex w-full justify-start rounded-lg px-2 py-1.5 text-sm text-slate-200 hover:bg-gray-50 hover:text-gray-700 items-center gap-3">
                                 <LogOut />
-                                <span >
-                                    Logout
-                                </span>
+                                <span>Logout</span>
                             </button>
                         </form>
                     </div>
                 </div>
-            </div >
+            </div>
         )
     }
 }

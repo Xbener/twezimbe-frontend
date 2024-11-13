@@ -80,7 +80,7 @@ function page({ }: Props) {
             </div>
 
             <div className='w-full mt-5'>
-                <Table className='bg-white'>
+                <Table className='bg-white md:w-full w-[1248px]'>
                     <TableHeader>
                         <TableHead >Question</TableHead>
                         <TableHead >Answer</TableHead>

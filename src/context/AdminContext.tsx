@@ -14,7 +14,7 @@ type Props = {
 
 export interface AdminContextTypes {
     isVisible?: boolean
-    toggleSideBar?: () => void
+    toggleSideBar: () => void
     currentUser?: User
     bfs?: BF[]
     groups?: GroupTypes[]
@@ -35,6 +35,7 @@ export interface AdminContextTypes {
     setMessages: (vl: any) => void
     faqs?: FAQ[]
     setFaqs: (vl: any) => void
+    windowWidth?: number
 }
 
 export const AdminContext = React.createContext<AdminContextTypes>({
@@ -47,6 +48,7 @@ export const AdminContext = React.createContext<AdminContextTypes>({
     setTransactions(vl) { },
     setFaqs(vl) { },
     setMessages(vl) { },
+    toggleSideBar() { }
 })
 
 function AdminContextProvider({ children }: Props) {
@@ -59,10 +61,26 @@ function AdminContextProvider({ children }: Props) {
     const [selectedGroup, setSelectedGroup] = useState<GroupTypes | null>(null)
     const [selectedBf, setSelectedBf] = useState<BF | null>(null)
     const [bfs, setBfs] = useState([])
+    const [windowWidth, setWindowWidth] = useState<Window['innerWidth']>(0)
     const [groups, setGroups] = useState<GroupTypes[]>([])
     const [users, setUsers] = useState<User[]>([])
     const [faqs, setFaqs] = useState<FAQ[]>([])
     const [messages, setMessages] = useState<SystemMessage[]>([])
+    useEffect(() => {
+
+        const handleWindowChange = () => {
+            setWindowWidth(window.innerWidth)
+        }
+        window.addEventListener('resize', handleWindowChange)
+
+        return () => window.removeEventListener('resize', handleWindowChange)
+    }, [])
+
+    useEffect(() => {
+        console.log(windowWidth)
+    }, [windowWidth])
+
+
     useEffect(() => {
         const getData = async () => {
             const bfs = await getAllBfs()
@@ -108,7 +126,8 @@ function AdminContextProvider({ children }: Props) {
             setBfs,
             setFaqs, setMessages,
             faqs,
-            messages
+            messages,
+            windowWidth
         }}>
             {children}
         </AdminContext.Provider>

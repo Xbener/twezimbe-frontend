@@ -141,9 +141,6 @@ function GroupProvider({ children }: Props) {
         return () => window.removeEventListener('resize', handleWindowChange)
     }, [])
 
-    useEffect(() => {
-        console.log(windowWidth)
-    }, [windowWidth])
 
     const handleGetMembers = async () => {
         const token = Cookies.get('access-token')
