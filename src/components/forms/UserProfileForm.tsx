@@ -35,7 +35,7 @@ import { toast } from "sonner";
 import Cookies from "js-cookie";
 import { useState } from "react";
 import { GeneralLink } from "../groups/group-nav";
-import { useUpdateUserAccount } from "@/api/auth";
+import { updatePassword, useUpdateUserAccount } from "@/api/auth";
 import { CheckCircle, XCircleIcon, XIcon } from "lucide-react";
 
 const formSchema = z.object({
@@ -118,6 +118,14 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
     const [qrCodeUrl, setQrCodeUrl] = useState('');
     const [token, setToken] = useState('');
     const [isVerified, setIsVerified] = useState(false);
+    const [passwords, setPasswords] = useState({
+        newPassword: "",
+        oldPassword: ""
+    })
+
+    const handlePasswordsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setPasswords(prev => ({ ...prev, [e.target.name]: e.target.value }))
+    }
 
     const setup2FA = async () => {
         const accessToken = Cookies.get('access-token');
@@ -853,7 +861,26 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
             <div className="w-full p-2">
                 <h1 className="font-extrabold text-[1.2rem]">Other Settings</h1>
 
-                <div className="w-full flex flex-col gap-4">
+                <div className="w-full flex flex-col gap-4 mt-5">
+                    {/* change password */}
+                    <div className="flex flex-col gap-3">
+                        <h1>Update password (if you previously logged in with google or facebook, leave old password blank)</h1>
+                        <div className="flex gap-2 items-center">
+                            <Input
+                                value={passwords.oldPassword}
+                                onChange={handlePasswordsChange}
+                                name="oldPassword"
+                                placeholder="Old password" />
+                            <Input
+                                value={passwords.newPassword}
+                                onChange={handlePasswordsChange}
+                                name="newPassword"
+                                placeholder="New password" />
+                            <Button onClick={() => updatePassword(passwords)} className="bg-orange-500 text-white font-bold">
+                                Update
+                            </Button>
+                        </div>
+                    </div>
                     {/* Subscribe to Notifications */}
                     <div className="flex w-full justify-between items-center">
                         <h1>Subscribe to Notifications</h1>

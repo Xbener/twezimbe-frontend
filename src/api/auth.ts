@@ -366,3 +366,29 @@ export const handleSuspension = async (userId: string) => {
         toast.error(error.message)
     }
 }
+
+export const updatePassword = async (body: { oldPassword: string, newPassword: string }) => {
+    const accessToken = Cookies.get('access-token');
+    try {
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/auth/passwords`,
+            {
+                method: "PUT",
+                headers: {
+                    'Content-Type': "application/json",
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify(body)
+            }
+        )
+
+        const data = await res.json()
+        if (!data.status) throw new Error(data.message || data.errors || "Something went wrong please try again.")
+        toast.success(data.message)
+        Cookies.remove('access-token')
+        Cookies.remove('admin')
+        window.location.href = '/public_pages/SignIn'
+    } catch (error: any) {
+        toast.error(error.message)
+    }
+}
