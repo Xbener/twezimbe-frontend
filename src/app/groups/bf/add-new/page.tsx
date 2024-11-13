@@ -5,7 +5,7 @@ import Cookies from 'js-cookie';
 import { useForm } from 'react-hook-form';
 import LoadingButton from '@/components/LoadingButton';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { generateProfileID } from '@/utils/generateID';
 
 type Props = {};
@@ -22,6 +22,7 @@ function BereavementFundPage({ }: Props) {
     const { selectedGroup: group } = useContext(GroupContext);
     const router = useRouter()
     const wallet = useRef("")
+    const searchParams = useSearchParams()
 
     useEffect(() => {
         wallet.current = generateProfileID("")
@@ -59,7 +60,12 @@ function BereavementFundPage({ }: Props) {
             });
             const results = await res.json()
             if (!results.status) throw new Error(results.error || results.errors || results.message)
-            router.push(`/groups/${group?._id}`)
+            toast.success("Fund created successfully. redirecting ...")
+            if (searchParams.get('admin') === 'true') {
+                router.push(`/manager_pages/bfs`)
+            } else {
+                router.push(`/groups/${group?._id}`)
+            }
         } catch (error: any) {
             console.error("Error creating fund:", error);
             toast.error(error.message || "Something went wrong.Please try again")

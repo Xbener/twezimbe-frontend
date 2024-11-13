@@ -12,6 +12,7 @@ import React, { use, useContext, useEffect, useState } from 'react'
 import Cookies from 'js-cookie';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner'
+import Link from 'next/link'
 
 
 type Props = {}
@@ -59,9 +60,11 @@ function page({ }: Props) {
         <div className='w-full  text-neutral-700'>
             <div className='w-full flex items-center justify-between p-2'>
                 <h1 className='text-lg text-neutral-700 font-bold'>Platform bearevement funds {bfs?.length ? `(${formatWithCommas(bfs.length)})` : ''}</h1>
-                <Button className='bg-blue-500 text-white'>
-                    Add new Breavement fund
-                </Button>
+                <Link href={'/groups/bf?admin=true'}>
+                    <Button className='bg-blue-500 text-white'>
+                        Add new Breavement fund
+                    </Button>
+                </Link>
             </div>
 
             <div className='flex flex-col gap-3 mt-5'>
