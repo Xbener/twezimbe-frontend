@@ -19,8 +19,8 @@ function page({ }: Props) {
     const { isLoading, users, setUsers, setSelectedUser, currentUser } = useContext(AdminContext)
     const router = useRouter()
     const { deleteAccount, isLoading: deleteLoading } = useDeleteAccount()
+    const [sortConfig, setSortConfig] = useState({ key: '', direction: 'asc' })
 
-    
 
     const [formData, setFormData] = useState({
         firstName: '',
@@ -68,6 +68,29 @@ function page({ }: Props) {
         setUsers((prev: User[]) => prev.filter(user => (user._id === userId || user.id === userId)))
     }
 
+    const handleSort = (key: string) => {
+        if (users) {
+            let direction = 'asc'
+            if (sortConfig.key === key && sortConfig.direction === 'asc') {
+                direction = 'desc'
+            }
+            setSortConfig({ key, direction })
+
+            const sortedUsers = [...users].sort((a: any, b: any) => {
+                if (a[key] < b[key]) return direction === 'asc' ? -1 : 1
+                if (a[key] > b[key]) return direction === 'asc' ? 1 : -1
+                return 0
+            })
+            setUsers(sortedUsers)
+        }
+    }
+
+    const getSortIndicator = (column: string) => {
+        if (sortConfig.key === column) {
+            return sortConfig.direction === 'asc' ? '↑' : '↓'
+        }
+        return ''
+    }
 
     return (
         <div className='w-full  text-neutral-700'>
@@ -176,12 +199,20 @@ function page({ }: Props) {
                 {isLoading ? 'loading ...' : (
                     <Table className='bg-white'>
                         <TableHeader>
-                            <TableHead>No</TableHead>
-                            <TableHead>First name</TableHead>
-                            <TableHead>Last name</TableHead>
-                            <TableHead>Joined at</TableHead>
-                            <TableHead>Role</TableHead>
-                            <TableHead>Actions</TableHead>
+                          
+                            <TableHead className='cursor-pointer' onClick={() => handleSort('firstName')}>
+                                First name {getSortIndicator('firstName')}
+                            </TableHead>
+                            <TableHead className='cursor-pointer' onClick={() => handleSort('lastName')}>
+                                Last name {getSortIndicator('lastName')}
+                            </TableHead>
+                            <TableHead className='cursor-pointer' onClick={() => handleSort('createdAt')}>
+                                Joined at {getSortIndicator('createdAt')}
+                            </TableHead>
+                            <TableHead className='cursor-pointer' onClick={() => handleSort('role')}>
+                                Role {getSortIndicator('role')}
+                            </TableHead>
+                            <TableHead className='cursor-pointer'>Actions</TableHead>
                         </TableHeader>
                         <TableCaption>All twezimbe platform users</TableCaption>
                         <TableBody>
@@ -190,7 +221,6 @@ function page({ }: Props) {
 
                                     return (
                                         <TableRow key={user._id}>
-                                            <TableCell>{index + 1}</TableCell>
                                             <TableCell>{user.firstName}</TableCell>
                                             <TableCell>{user.lastName}</TableCell>
                                             <TableCell>{moment(user.createdAt).format('DD/MM/yyyy')}</TableCell>

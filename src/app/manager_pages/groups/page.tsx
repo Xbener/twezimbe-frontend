@@ -42,6 +42,7 @@ function page({ }: Props) {
     const { isLoading, groups, setGroups, setSelectedGroup, currentUser } = useContext(AdminContext)
     const [groupName, setGroupName] = useState("")
     const { addGroup } = useAddGroup()
+    const [sortConfig, setSortConfig] = useState({ key: '', direction: 'asc' })
     const [group_type, setGroupType] = useState<SelectValue>({
         value: 'Social' as string,
         label: 'Social' as string
@@ -78,6 +79,30 @@ function page({ }: Props) {
         if (res.group._id !== null) {
             window.location.href = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/groups/${res.group._id}`
         }
+    }
+
+    const handleSort = (key: string) => {
+        if (groups) {
+            let direction = 'asc'
+            if (sortConfig.key === key && sortConfig.direction === 'asc') {
+                direction = 'desc'
+            }
+            setSortConfig({ key, direction })
+
+            const sortedGroups = [...groups].sort((a: any, b: any) => {
+                if (a[key] < b[key]) return direction === 'asc' ? -1 : 1
+                if (a[key] > b[key]) return direction === 'asc' ? 1 : -1
+                return 0
+            })
+            setGroups(sortedGroups)
+        }
+    }
+
+    const getSortIndicator = (column: string) => {
+        if (sortConfig.key === column) {
+            return sortConfig.direction === 'asc' ? '↑' : '↓'
+        }
+        return ''
     }
 
     return (
@@ -234,12 +259,17 @@ function page({ }: Props) {
                 {isLoading ? 'loading ...' : (
                     <Table className='bg-white'>
                         <TableHeader>
-                            <TableHead>No</TableHead>
-                            <TableHead>Name</TableHead>
-                            <TableHead>Created at</TableHead>
-                            <TableHead>Total members</TableHead>
-                            <TableHead>Created by</TableHead>
-                            <TableHead>Actions</TableHead>
+                            <TableHead className='cursor-pointer' onClick={() => handleSort('group_name')}>
+                                Name {getSortIndicator('group_name')}
+                            </TableHead>
+                            <TableHead className='cursor-pointer' onClick={() => handleSort('createdAt')}>
+                                Created at {getSortIndicator('createdAt')}
+                            </TableHead>
+                            <TableHead className='cursor-pointer w-auto'>
+                                Total members
+                            </TableHead>
+                            <TableHead className='cursor-pointer'>Created by</TableHead>
+                            <TableHead className='cursor-pointer'>Actions</TableHead>
                         </TableHeader>
                         <TableCaption>All twezimbe platform groups</TableCaption>
                         <TableBody>
@@ -248,7 +278,6 @@ function page({ }: Props) {
 
                                     return (
                                         <TableRow key={group._id}>
-                                            <TableCell>{index + 1}</TableCell>
                                             <TableCell>{group.group_name}</TableCell>
                                             <TableCell>{moment(group.createdAt).format('DD/MM/yyyy')}</TableCell>
                                             <TableCell>{group.members.length}</TableCell>

@@ -85,9 +85,9 @@ function page({ }: Props) {
                 {isLoading ? 'loading ...' : (
                     <Table className='bg-white'>
                         <TableHeader>
-                            <TableHead className='cursor-pointer' onClick={() => handleSort('no')}>
+                            {/* <TableHead className='cursor-pointer' onClick={() => handleSort('no')}>
                                 <span className='flex items-center gap-3 '>No {sortColumn === 'no' ? (sortDirection === 'asc' ? '▲' : '▼') : <ArrowUpAz className='size-3' />}</span>
-                            </TableHead>
+                            </TableHead> */}
                             <TableHead className='cursor-pointer'>Receiving wallet</TableHead>
                             <TableHead className='cursor-pointer' onClick={() => handleSort('amount')}>
                                 <span className='flex items-center gap-3 '>Amount {sortColumn === 'amount' ? (sortDirection === 'asc' ? '▲' : '▼') : <ArrowUpAz className='size-3' />}</span>
@@ -109,7 +109,7 @@ function page({ }: Props) {
 
                                     return (
                                         <TableRow key={transaction._id}>
-                                            <TableCell>{index + 1}</TableCell>
+                                            {/* <TableCell>{index + 1}</TableCell> */}
                                             <TableCell>{transaction.wallet}</TableCell>
                                             <TableCell>{formatWithCommas(transaction.amount)}</TableCell>
                                             <TableCell>UGX</TableCell>
