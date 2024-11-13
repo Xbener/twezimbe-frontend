@@ -195,20 +195,6 @@ function page({ }: Props) {
                                             </FormItem>
                                         )}
                                     />
-                                    <Select
-                                        value={group_type}
-                                        onChange={(e) => setGroupType(e as SelectValue)}
-                                        options={
-                                            [
-                                                { value: "Social", label: "Social" },
-                                                { value: "Professional", label: "Professional" },
-                                                { value: "Educational", label: "Educational" },
-                                                { value: "Other", label: "Other" },
-                                            ]
-                                        }
-                                        primaryColor="blue"
-
-                                    />
 
                                     <FormField
                                         control={form.control}
