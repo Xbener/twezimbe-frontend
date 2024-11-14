@@ -90,7 +90,7 @@ function page({ }: Props) {
                                             <TableCell>{index + 1}</TableCell>
                                             <TableCell>{bf.fundName}</TableCell>
                                             <TableCell>{moment(bf.createdAt).format('DD/MM/yyyy')}</TableCell>
-                                            <TableCell>{formatWithCommas(bf?.wallet?.balance)} UGX</TableCell>
+                                            <TableCell>{bf?.wallet?.balance ? formatWithCommas(bf?.wallet?.balance) : 0} UGX</TableCell>
                                             <TableCell>{bf?.createdBy?.firstName} {bf?.createdBy?.lastName}</TableCell>
                                             <TableCell>{bf.walletAddress}</TableCell>
                                             <TableCell>{bf.group?.name}</TableCell>
