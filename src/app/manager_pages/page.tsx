@@ -188,7 +188,7 @@ const ManagerDashboard = () => {
           </select>
         </div>
       </div>
-      <div className="w-full flex bg-white p-2 rounded-md justify-around flex-col md:flex-row  overflow-auto items-center">
+      <div className="w-full flex bg-white p-2 rounded-md justify-around flex-col lg:flex-row  overflow-auto items-center">
 
         <div className="text-center font-bold text-neutral-600 mt-5">
           <h1>Groups, users and Bereavement funds by {selectedYear}</h1>
