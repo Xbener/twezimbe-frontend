@@ -255,7 +255,7 @@ export const getCases = async (bfId: string) => {
         console.log('error getting cases settings', error)
     }
 }
-export const fileCase = async (bfId: string, body: { name: string, description: string, principalId?: string }) => {
+export const fileCase = async (bfId: string, body: { name: string, description: string, principalId?: string, affected?: string }) => {
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bf/cases/${bfId}`, {
             method: 'POST',

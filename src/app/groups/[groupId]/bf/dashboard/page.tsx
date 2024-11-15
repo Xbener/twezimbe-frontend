@@ -4,9 +4,10 @@ import AreaChartComponent from '@/components/charts/AreaChart'
 import { PieChartComponent } from '@/components/charts/PieChart'
 import GroupMemberItem from '@/components/groups/GroupMemberItem'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { countryCodes } from '@/constants'
 import { GroupContext } from '@/context/GroupContext'
@@ -47,7 +48,11 @@ function page({ }: Props) {
   const [newCase, setNewCase] = useState({
     name: '',
     description: '',
-    principalId: currentUser?._id
+    principalId: currentUser?._id,
+    affected: {
+      _id: "",
+      is_complete: true
+    }
   })
   const [isLoading, setIsLoading] = useState(false)
   const memberFilters = ['All', 'Admins', 'Principals']
@@ -247,12 +252,11 @@ function page({ }: Props) {
                   <DialogContent
                     className="w-full bg-white"
                   >
-                    <DialogHeader>
+                    <DialogTitle>
                       File a new case
-                    </DialogHeader>
+                    </DialogTitle>
                     <div className="p-4 rounded-md shadow-md w-full">
-                      <h3 className="text-xl font-bold text-white mb-4">File a New Case</h3>
-                      <form>
+                      <form className='flex flex-col gap-2'>
                         {/* Name Input */}
                         <div className="mb-4">
                           <label htmlFor="name" className="block text-sm font-medium ">Case Name</label>
@@ -266,7 +270,29 @@ function page({ }: Props) {
                             required
                           />
                         </div>
-
+                        <Select value={newCase.affected._id} onValueChange={(v) => {
+                          setNewCase(prev => ({
+                            ...prev, affected: {
+                              _id: v,
+                              is_complete: bfMembers?.find(member => member.user._id === v)?.user.is_complete!
+                            }
+                          }))
+                        }}>
+                          <SelectTrigger>
+                            <SelectValue placeholder={"Select affected person"} />
+                          </SelectTrigger>
+                          <SelectContent className='bg-white shadow-lg'>
+                            {
+                              bfMembers?.map((member, index) => {
+                                return (
+                                  <SelectItem className='cursor-pointer flex justify-between w-full' value={member.user?._id!} key={index}>
+                                    <h1>{member.user.firstName} {member.user.lastName}</h1>
+                                  </SelectItem>
+                                )
+                              })
+                            }
+                          </SelectContent>
+                        </Select>
                         {/* Description Input */}
                         <div className="mb-4">
                           <label htmlFor="description" className="block text-sm font-medium ">Description</label>
@@ -280,16 +306,18 @@ function page({ }: Props) {
                             required
                           ></textarea>
                         </div>
-
+                        <div className='p-2 text-center w-full text-sm text-red-500'>
+                          {!newCase.affected.is_complete ? ("*please complete KYC for the affected person") : ("")}
+                        </div>
                         {/* Submit Button */}
                         <div className="flex items-center gap-3 mt-3">
 
                           <button
-                            disabled={isLoading}
+                            disabled={isLoading || !newCase.affected.is_complete}
                             onClick={async (e) => {
                               setIsLoading(true)
                               e.preventDefault()
-                              const { status, case: returnedCase } = await fileCase(groupBF?._id!, newCase)
+                              const { status, case: returnedCase } = await fileCase(groupBF?._id!, { ...newCase, affected: newCase.affected._id })
                               setIsLoading(false)
                               if (status) {
                                 setCases(prev => [...prev, returnedCase])
@@ -320,10 +348,10 @@ function page({ }: Props) {
                 <TableCaption>Latest Cases</TableCaption>
                 <TableHeader className="border-b text-neutral-700 font-bold">
                   <TableHead>Name</TableHead>
-                  {/* <TableHead>Principal</TableHead> */}
+                  <TableHead>Affected person</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Contribution Status</TableHead>
-                  <TableHead>Description</TableHead>
+                  {/* <TableHead>Description</TableHead> */}
                   <TableHead>Created At</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableHeader>
@@ -331,7 +359,7 @@ function page({ }: Props) {
                   {cases.map((caseItem, index) => (
                     <TableRow key={caseItem._id} className="cursor-pointer text-neutral-700 hover:bg-neutral-100">
                       <TableCell>{caseItem.name}</TableCell>
-                      {/* <TableCell>{caseItem.principal.lastName} {caseItem.principal.firstName}</TableCell> */}
+                      <TableCell>{caseItem.affected?.firstName} {caseItem.affected?.lastName}</TableCell>
 
                       {/* Status with conditional color */}
                       <TableCell className={caseItem.status === 'Open' ? 'text-green-500 font-semibold' : 'text-red-500 font-semibold'}>
@@ -343,11 +371,11 @@ function page({ }: Props) {
                         {caseItem.contributionStatus}
                       </TableCell>
 
-                      <TableCell>
+                      {/* <TableCell>
                         {caseItem.description.length > 20
                           ? `${caseItem.description.slice(0, 20)}...`
                           : caseItem.description}
-                      </TableCell>
+                      </TableCell> */}
                       <TableCell>{moment(caseItem.createdAt).format('MM/DD/YY')}</TableCell>
 
                       {/* Actions dropdown */}
@@ -370,6 +398,9 @@ function page({ }: Props) {
                                 </p>
                                 <p className="text-sm text-gray-600 mb-2">
                                   <span className="font-semibold">Created by:</span> {caseItem.principal.firstName} {caseItem.principal.lastName}
+                                </p>
+                                <p className="text-sm text-gray-600 mb-2">
+                                  <span className="font-semibold">Affected:</span> {caseItem.affected?.firstName} {caseItem.affected?.lastName}
                                 </p>
                                 <p className="text-sm text-gray-600 mb-2">
                                   <span className="font-semibold">Description:</span> {caseItem.description}

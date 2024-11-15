@@ -566,6 +566,7 @@ export type Case = {
     createdAt: Date
     name: string
     _id: string
+    affected?: User
 }
 
 
@@ -576,7 +577,7 @@ export type SystemMessage = {
     message?: string
     responded?: boolean
     _id?: string
-    createdAt?:Date
+    createdAt?: Date
 }
 
 export type FAQ = {
