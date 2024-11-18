@@ -38,10 +38,13 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
         open: false,
         data: {
             amount: "",
-            phone: "",
+            phone: currentUser?.phone,
             countryCode: countryCodes[0].code
         }
     })
+    useEffect(() => {
+        setPayForm(prev => ({ ...prev, data: { ...prev.data, phone: currentUser?.phone } }))
+    }, [currentUser])
     const [dialogOpen, setDialogOpen] = useState(false)
     const [newCase, setNewCase] = useState({
         name: '',
@@ -349,7 +352,7 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                 ) : (
                     <div className="bg-gray-900 p-6 rounded-lg shadow-md">
                         <h2 className="text-2xl font-semibold text-white mb-4">Fund Settings Overview</h2>
-                        
+
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 text-white mt-5">
                             <div>
                                 <h3 className="font-semibold text-lg">Number of Beneficiaries per Principal</h3>
@@ -358,25 +361,25 @@ const FundSettingsPage: React.FC<FundSettingsPageProps> = () => {
                             </div>
                             <div>
                                 <h3 className="font-semibold text-lg">Membership Fee</h3>
-                                    <p>{formatWithCommas(fundSettings.membership_fee)} UGX</p>
+                                <p>{formatWithCommas(fundSettings.membership_fee)} UGX</p>
                             </div>
                             <div>
                                 <h3 className="font-semibold text-lg">Subscription Costs</h3>
-                                    <p>Youth: {formatWithCommas(fundSettings.subscription_costs.youth)} UGX</p>
-                                    <p>Children: {formatWithCommas(fundSettings.subscription_costs.children)} UGX</p>
-                                    <p>Elders: {formatWithCommas(fundSettings.subscription_costs.elders)} UGX</p>
+                                <p>Youth: {formatWithCommas(fundSettings.subscription_costs.youth)} UGX</p>
+                                <p>Children: {formatWithCommas(fundSettings.subscription_costs.children)} UGX</p>
+                                <p>Elders: {formatWithCommas(fundSettings.subscription_costs.elders)} UGX</p>
                             </div>
                             <div>
                                 <h3 className="font-semibold text-lg">Fund Benefits</h3>
-                                    <p>Principal: {formatWithCommas(fundSettings.fund_benefits.principal)} UGX</p>
-                                    <p>Spouse: {formatWithCommas(fundSettings.fund_benefits.spouse)} UGX</p>
-                                    <p>Children: {(formatWithCommas(fundSettings.fund_benefits.children))} UGX</p>
-                                    <p>Parents: {formatWithCommas(fundSettings.fund_benefits.parents)} UGX</p>
-                                    <p>Other: {formatWithCommas(fundSettings.fund_benefits.other)} UGX</p>
+                                <p>Principal: {formatWithCommas(fundSettings.fund_benefits.principal)} UGX</p>
+                                <p>Spouse: {formatWithCommas(fundSettings.fund_benefits.spouse)} UGX</p>
+                                <p>Children: {(formatWithCommas(fundSettings.fund_benefits.children))} UGX</p>
+                                <p>Parents: {formatWithCommas(fundSettings.fund_benefits.parents)} UGX</p>
+                                <p>Other: {formatWithCommas(fundSettings.fund_benefits.other)} UGX</p>
                             </div>
                             <div>
                                 <h3 className="font-semibold text-lg">Incident Contribution Fee</h3>
-                                    <p>{formatWithCommas(fundSettings.incident_contribution_fee)} UGX</p>
+                                <p>{formatWithCommas(fundSettings.incident_contribution_fee)} UGX</p>
                             </div>
                             <div className="sm:col-span-2 lg:col-span-3">
                                 <h3 className="font-semibold text-lg">In-Kind Support</h3>

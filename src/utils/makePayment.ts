@@ -3,7 +3,7 @@ import { makeContribution, updateWalletBalance } from "@/lib/bf";
 import { BF, User } from "@/types";
 import { FlutterWaveButton, closePaymentModal, useFlutterwave } from "flutterwave-react-v3";
 
-export function makePayment(payForm: any, currentUser: User, groupBF: BF, contribute_case?: string) {
+export function makePayment(payForm: any, currentUser: User, walletAddress: string, contribute_case?: string) {
     if (payForm.data.amount !== "" && payForm.data.amount !== "0" && payForm.data.phone !== "") {
 
 
@@ -25,7 +25,7 @@ export function makePayment(payForm: any, currentUser: User, groupBF: BF, contri
             payment_options: "mobilemoneyrwanda, mobilemoneyuganda",
             customizations: {
                 title: payForm.type === "deposit" ? "Deposit funds" : "Make contribution",
-                description: payForm.type === "contribution" ? "Add amount and account info to make a contribution " : "Add funds to your Bereavement Fund",
+                description: payForm.type === "contribution" ? "Add amount and account info to make a contribution " : "Add funds to your wallet",
                 logo: "https://checkout.flutterwave.com/assets/img/rave-logo.png",
             },
 
@@ -35,9 +35,9 @@ export function makePayment(payForm: any, currentUser: User, groupBF: BF, contri
             callback: async (e: any) => {
                 if (e.status === 'successful') {
                     if (payForm.type === "contribution") {
-                        await makeContribution({ walletAddress: groupBF?.walletAddress!, amount: payForm.data.amount, contributor: currentUser?._id!, contribute_case: contribute_case! })
+                        await makeContribution({ walletAddress, amount: payForm.data.amount, contributor: currentUser?._id!, contribute_case: contribute_case! })
                     } else {
-                        await updateWalletBalance({ userId: currentUser?._id!, walletAddress: groupBF?.wallet?.walletAddress!, amount: parseFloat(payForm.data.amount) })
+                        await updateWalletBalance({ userId: currentUser?._id!, walletAddress, amount: parseFloat(payForm.data.amount) })
                     }
 
                     console.log("paid successfully", e)
@@ -86,6 +86,6 @@ export function makePayment(payForm: any, currentUser: User, groupBF: BF, contri
         //     }
         // });
     } else {
-        toast.error("Enter the required info to make a contribution")
+        toast.error("Enter the required info to make a payment")
     }
 }

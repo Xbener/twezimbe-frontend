@@ -3,6 +3,7 @@ export type User = {
     userId?: string;
     firstName: string;
     lastName: string;
+    wallet?: Wallet;
     email: string;
     phone: string;
     password: string;

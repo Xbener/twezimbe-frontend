@@ -206,7 +206,7 @@ function ChannelDetails({ }: Props) {
                 {
                     (group?.has_bf && groupBF) && (
                         <div className="flex flex-col items-start justify-start text-[0.9rem]">
-                            <h1 className="font-bold">Group Bereavement Fund</h1>
+                            <h1 className="font-bold">Bereavement Fund</h1>
 
                             <div className='mt-5 flex flex-col w-full'>
 

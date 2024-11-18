@@ -40,11 +40,14 @@ function page({ }: Props) {
     open: false,
     data: {
       amount: "",
-      phone: "",
+      phone: currentUser?.phone,
       countryCode: countryCodes[0].value,
       type: ""
     }
   })
+  useEffect(() => {
+    setPayForm(prev => ({ ...prev, data: { ...prev.data, phone: currentUser?.phone } }))
+  }, [currentUser])
   const [dialogOpen, setDialogOpen] = useState(false)
   const [newCase, setNewCase] = useState({
     name: '',
@@ -489,7 +492,7 @@ function page({ }: Props) {
                                       className="text-black p-2 rounded-r w-full"
                                       type="text"
                                       name="phone"
-                                      maxLength={9}
+                                      maxLength={10}
                                       defaultValue={currentUser?.phone}
                                       placeholder="Enter mobile phone number"
                                       // value={payForm.data.phone}
@@ -504,8 +507,8 @@ function page({ }: Props) {
                                   </div>
                                   <div className="flex gap-2 mt-3">
                                     <Button
-                                      disabled={payForm.data.amount === "" || payForm.data.amount === "0" || payForm.data.phone === ""}
-                                      onClick={() => makePayment({ ...payForm, type: "contribution" }, currentUser!, groupBF!, caseItem._id)}
+                                      disabled={payForm.data.amount === "" || payForm.data.amount === "0"}
+                                      onClick={() => makePayment({ ...payForm, type: "contribution" }, currentUser!, groupBF.wallet?.walletAddress!, caseItem._id)}
                                       className="bg-blue-600 disabled:cursor-pointer-allowed hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
                                     >
                                       Confirm
@@ -648,9 +651,10 @@ function page({ }: Props) {
                       className="text-black p-2 rounded-r w-full"
                       type="text"
                       name="phone"
-                      maxLength={9}
+                      maxLength={10}
                       placeholder="Enter mobile phone number"
-                      value={payForm.data.phone}
+                      // value={payForm.data.phone}
+                      defaultValue={currentUser?.phone}
                       onChange={(e) => {
                         const input = e.target.value;
                         if (/^\d*$/.test(input)) { // Allows only digits
@@ -662,8 +666,8 @@ function page({ }: Props) {
                   </div>
                   <div className="flex gap-2 mt-3">
                     <Button
-                      disabled={payForm.data.amount === "" || payForm.data.amount === "0" || payForm.data.phone === ""}
-                      onClick={() => makePayment(payForm, currentUser!, groupBF!)}
+                      disabled={payForm.data.amount === "" || payForm.data.amount === "0"}
+                      onClick={() => makePayment(payForm, currentUser!, groupBF.wallet?.walletAddress!)}
                       className="bg-blue-600 disabled:cursor-pointer-allowed hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
                     >
                       Confirm
