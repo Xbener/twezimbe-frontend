@@ -490,8 +490,9 @@ function page({ }: Props) {
                                       type="text"
                                       name="phone"
                                       maxLength={9}
+                                      defaultValue={currentUser?.phone}
                                       placeholder="Enter mobile phone number"
-                                      value={payForm.data.phone}
+                                      // value={payForm.data.phone}
                                       onChange={(e) => {
                                         const input = e.target.value;
                                         if (/^\d*$/.test(input)) { // Allows only digits
