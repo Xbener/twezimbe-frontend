@@ -131,7 +131,7 @@ const Profile = () => {
           <div className="w-full flex justify-between p-3 border rounded-md">
             <div className="flex flex-col gap-2">
               <h2 className="text-xl font-extrabold">Balance</h2>
-              <p>{user.wallet?.balance && formatWithCommas(user.wallet?.balance)} UGX</p>
+              <p>{user.wallet?.balance ? formatWithCommas(user.wallet?.balance) : 0} UGX</p>
             </div>
 
             <div className="flex items-center gap-3">
