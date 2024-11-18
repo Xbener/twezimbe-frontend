@@ -238,7 +238,7 @@ const UserProfileForm = ({ onSave, isLoading, currentUser }: Props) => {
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSave)} className="space-y-2 bg-gray-50 rounded-lg md:p-10 w-full grid md:grid-cols-3 grid-cols-1 gap-5">
                     <FormDescription className="flex flex-col">
-                        View and change your profile information here
+                        View and change <strong>{currentUser?.firstName} {currentUser?.lastName}&apos;s profile</strong> profile information here
                         <span className="flex w-full items-center justify-between p-2 border rounded-md mt-3">
                             Profile Complete
                             {currentUser?.is_complete ? <CheckCircle color="green" /> : <XCircleIcon color="red" />}
