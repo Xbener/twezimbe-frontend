@@ -18,6 +18,7 @@ import { formatWithCommas } from '@/utils/formatNumber'
 import { makePayment } from '@/utils/makePayment'
 import { ArrowUpAz, Download, LucideOrigami, Settings } from 'lucide-react'
 import moment from 'moment'
+import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import React, { useEffect, useRef, useState } from 'react'
 import { AiFillCaretDown } from 'react-icons/ai'
@@ -281,11 +282,11 @@ function page({ }: Props) {
                           <SelectTrigger>
                             <SelectValue placeholder={"Select affected person"} />
                           </SelectTrigger>
-                          <SelectContent className='bg-white shadow-lg'>
+                          <SelectContent className='bg-white shadow-lg flex flex-col gap-2 items-start justify-normal'>
                             {
                               bfMembers?.map((member, index) => {
                                 return (
-                                  <SelectItem className='cursor-pointer flex justify-between w-full' value={member.user?._id!} key={index}>
+                                  <SelectItem className='cursor-pointer flex justify-between w-full hover:bg-neutral-100' value={member.user?._id!} key={index}>
                                     <h1>{member.user.firstName} {member.user.lastName}</h1>
                                   </SelectItem>
                                 )
@@ -306,9 +307,17 @@ function page({ }: Props) {
                             required
                           ></textarea>
                         </div>
-                        <div className='p-2 text-center w-full text-sm text-red-500'>
-                          {!newCase.affected.is_complete ? ("*please complete KYC for the affected person") : ("")}
-                        </div>
+                        {
+                          !newCase.affected.is_complete ?
+                            (
+                              <div className='p-2 text-center w-full text-sm'>
+                                <p className='text-red-500'>*please complete KYC for the affected person</p>
+                                <p><Link href={`/public_pages/Profile?id=${newCase.affected._id}`} className='text-blue-500'>click to update</Link></p>
+                              </div>
+
+                            ) :
+                            ("")
+                        }
                         {/* Submit Button */}
                         <div className="flex items-center gap-3 mt-3">
 
