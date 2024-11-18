@@ -25,6 +25,7 @@ const Profile = () => {
   const [user, setUser] = useState<User | null>(null)
   const [sortColumn, setSortColumn] = useState<any>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [isEditing, setIsEditing] = useState(false)
   const [payForm, setPayForm] = useState({
     open: false,
     data: {
@@ -101,20 +102,31 @@ const Profile = () => {
   });
   if (user) {
     return (
-      <section className="flex flex-col gap-4">
-        <div className="flex flex-col gap-4 p-5 md:p-0">
+      <section className="flex flex-col gap-4 w-full">
+        <div className="flex flex-col gap-4 p-5 md:p-0 w-full items-start">
           <h2 className='text-2xl font-bold'>Profile</h2>
-          <UserProfileForm
-            currentUser={user}
-            onSave={(data) => {
-              updateAccount(data)
-              // window.location.reload();
-            }
-            }
-            isLoading={isLoading}
-          />
+          {
+            isEditing ? (
+              <>
+                <Button className="text-blue-500 bg-transparent border border-blue-500" onClick={() => setIsEditing(prev => !prev)}>Cancel</Button>
+                <UserProfileForm
+                  currentUser={user}
+                  onSave={(data) => {
+                    updateAccount(data)
+                    // window.location.reload();
+                  }
+                  }
+                  isLoading={isLoading}
+                />
+              </>
+            ) : (
+              <>
+                <Button className="bg-blue-500 text-white" onClick={() => setIsEditing(prev => !prev)}>Edit profile</Button>
+              </>
+            )
+          }
         </div>
-        <div className="flex flex-col gap-4 p-5 md:p-0 text-neutral-700">
+        <div className="w-[100&] flex flex-col gap-4 md:p-0 p-2 text-neutral-700  items-start justify-start">
           <h2 className="text-2xl font-bold">Wallet</h2>
           <div className="w-full flex justify-between p-3 border rounded-md">
             <div className="flex flex-col gap-2">
@@ -208,7 +220,7 @@ const Profile = () => {
             </div>
           </div>
 
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 w-full">
             <h2 className="text-xl font-bold">Transaction history</h2>
 
             <Table className='border max-h-[500px] overflow-scroll bg-white  rounded-md'>

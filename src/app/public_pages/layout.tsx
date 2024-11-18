@@ -12,7 +12,7 @@ export default function HomeLayout({
    <Suspense>
       <div className="flex flex-col min-h-screen bg-white">
         <Header />
-        <div className={`fullWidth md:container mx-auto flex-1 py-10`}>
+        <div className={`w-full md:container mx-auto flex-1 py-10`}>
           {children}
         </div>
         <Footer />
