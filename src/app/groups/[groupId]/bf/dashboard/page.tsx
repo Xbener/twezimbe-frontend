@@ -363,7 +363,7 @@ function page({ }: Props) {
                   <TableHead>Affected person</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Contribution Status</TableHead>
-                  {/* <TableHead>Description</TableHead> */}
+                  <TableHead>Total contributions</TableHead>
                   <TableHead>Created At</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableHeader>
@@ -383,11 +383,9 @@ function page({ }: Props) {
                         {caseItem.contributionStatus}
                       </TableCell>
 
-                      {/* <TableCell>
-                        {caseItem.description.length > 20
-                          ? `${caseItem.description.slice(0, 20)}...`
-                          : caseItem.description}
-                      </TableCell> */}
+                      <TableCell>
+                        {caseItem.totalContributions ? formatWithCommas(caseItem.totalContributions) : 0} UGX
+                      </TableCell>
                       <TableCell>{moment(caseItem.createdAt).format('MM/DD/YY')}</TableCell>
 
                       {/* Actions dropdown */}

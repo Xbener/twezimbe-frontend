@@ -568,6 +568,8 @@ export type Case = {
     name: string
     _id: string
     affected?: User
+    totalContributions?: number
+    contributions?: Contribution[]
 }
 
 
