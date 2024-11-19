@@ -4,7 +4,7 @@ import { BF, User } from "@/types";
 import { FlutterWaveButton, closePaymentModal, useFlutterwave } from "flutterwave-react-v3";
 
 export async function makePayment(payForm: any, currentUser: User, walletAddress: string, contribute_case?: string) {
-    if (payForm.data.phone !== "") {
+    if (payForm.data.phone === "") {
         if (payForm.type === "contribution") {
             await makeContribution({ walletAddress, amount: payForm.data.amount, contributor: currentUser?._id!, contribute_case: contribute_case!, wallet: currentUser.wallet?.walletAddress })
         } else {
