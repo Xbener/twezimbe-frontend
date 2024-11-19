@@ -232,10 +232,19 @@ function ChannelDetails({ }: Props) {
                                                 router.push(`/groups/${group?._id}/principal-dashboard`)
                                             }}
                                         >
-                                            Principal dashboard
+                                            Principal
                                         </span>
                                     )
                                 }
+                                <span className="p-2 w-full bg-transparent hover:bg-[rgba(255,255,255,0.29)] cursor-pointer rounded-md duration-100 mb-3"
+                                    onClick={() => {
+                                        setIsSideBarOpen(false)
+                                        setIsMemberListOpen(false)
+                                        router.push(`/groups/${group?._id}/my-wallet`)
+                                    }}
+                                >
+                                    My wallet
+                                </span>
                                 {
                                     bfMembers && !bfMembers?.find(member => member?.user?._id === currentUser?._id) && (
                                         <span className="p-2 w-full bg-transparent hover:bg-[rgba(255,255,255,0.29)] cursor-pointer rounded-md duration-100 mb-3"
