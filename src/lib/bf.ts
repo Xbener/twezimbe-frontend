@@ -297,7 +297,7 @@ export const updateCase = async (caseId: string, body?: any) => {
 }
 
 
-export const updateWalletBalance = async (body: { userId: string, walletAddress: string, amount: number }) => {
+export const updateWalletBalance = async (body: { userId: string, walletAddress: string, amount: number, wallet?: string }) => {
     const token = Cookies.get("access-token")
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bf/wallet/balance`, {
@@ -320,7 +320,7 @@ export const updateWalletBalance = async (body: { userId: string, walletAddress:
 }
 
 
-export const makeContribution = async (body: { walletAddress: string, contributor: string, amount: number, contribute_case: string }) => {
+export const makeContribution = async (body: { walletAddress: string, contributor: string, amount: number, contribute_case: string, wallet?: string }) => {
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bf/contributions`, {
             method: 'POST',
@@ -334,7 +334,7 @@ export const makeContribution = async (body: { walletAddress: string, contributo
         const data = await res.json()
         if (!data.status) return toast.error(data.message || data.errors || "failed to contribute. please try again")
         toast.success(data.message)
-        // window.location.reload()
+        window.location.reload()
         return data
     } catch (error) {
         console.log('error contributing', error)

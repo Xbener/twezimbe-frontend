@@ -459,7 +459,58 @@ function page({ }: Props) {
                                 <DialogHeader className='font-bold text-[1.2rem] text-neutral-700'>
                                   Contribute to {caseItem.name}
                                 </DialogHeader>
+                                <div className='w-full p-2 border rounded-md flex items-center justify-between'>
+                                  <p>personal wallet: {currentUser?.wallet?.balance} UGX</p>
+                                  <Dialog>
+                                    <DialogTrigger>
+                                      <Button disabled={currentUser?.wallet?.balance === 0} className='bg-blue-500 text-white'>Use wallet</Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="bg-white">
+                                      <DialogTitle>
+                                        Deposit by personal wallet
+                                      </DialogTitle>
 
+                                      <div>
+                                        <p>Balance: {currentUser?.wallet?.balance} UGX</p>
+                                        <Input
+                                          className="text-black border-2 mt-2"
+                                          type="text"
+                                          name="amount"
+                                          placeholder="Enter amount to deposit"
+                                          value={payForm.data.amount}
+                                          onChange={(e) => {
+                                            const input = e.target.value;
+                                            if (/^\d*$/.test(input)) { // Allows only digits
+                                              setPayForm(prev => ({ ...prev, data: { ...prev.data, amount: input } }));
+                                            }
+                                          }}
+                                        />
+                                        {
+                                          parseFloat(payForm.data.amount) > currentUser?.wallet?.balance! && (
+                                            <p className='text-red-500 p-2 text-center'>*Insufficient funds</p>
+                                          )
+                                        }
+                                      </div>
+                                      <div className="flex gap-2 mt-3">
+                                        <Button
+                                          disabled={payForm.data.amount === "" || payForm.data.amount === "0" || parseFloat(payForm.data.amount) > currentUser?.wallet?.balance!}
+                                          onClick={() => makePayment({ ...payForm, type: 'contribution' }, currentUser!, groupBF.wallet?.walletAddress!, caseItem._id)}
+                                          className="bg-blue-600 disabled:cursor-pointer-allowed hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
+                                        >
+                                          deposit
+                                        </Button>
+
+                                        <DialogClose>
+                                          <Button
+                                            className="bg-transparent text-orange-500 border border-orange-500 ">
+                                            Cancel
+                                          </Button>
+                                        </DialogClose>
+
+                                      </div>
+                                    </DialogContent>
+                                  </Dialog>
+                                </div>
                                 <div className="flex flex-col gap-2 ">
                                   <Input
                                     className="text-black border-2 "
@@ -618,7 +669,58 @@ function page({ }: Props) {
                 <DialogHeader className='font-bold text-[1.2rem] text-neutral-700'>
                   Make a deposit to {groupBF?.fundName}
                 </DialogHeader>
+                <div className='w-full p-2 border rounded-md flex items-center justify-between'>
+                  <p>personal wallet: {currentUser?.wallet?.balance} UGX</p>
+                  <Dialog>
+                    <DialogTrigger>
+                      <Button disabled={currentUser?.wallet?.balance === 0} className='bg-blue-500 text-white'>Use wallet</Button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-white">
+                      <DialogTitle>
+                        Deposit by personal wallet
+                      </DialogTitle>
 
+                      <div>
+                        <p>Balance: {currentUser?.wallet?.balance} UGX</p>
+                        <Input
+                          className="text-black border-2 mt-2"
+                          type="text"
+                          name="amount"
+                          placeholder="Enter amount to deposit"
+                          value={payForm.data.amount}
+                          onChange={(e) => {
+                            const input = e.target.value;
+                            if (/^\d*$/.test(input)) { // Allows only digits
+                              setPayForm(prev => ({ ...prev, data: { ...prev.data, amount: input } }));
+                            }
+                          }}
+                        />
+                        {
+                          parseFloat(payForm.data.amount) > currentUser?.wallet?.balance! && (
+                            <p className='text-red-500 p-2 text-center'>*Insufficient funds</p>
+                          )
+                        }
+                      </div>
+                      <div className="flex gap-2 mt-3">
+                        <Button
+                          disabled={payForm.data.amount === "" || payForm.data.amount === "0" || parseFloat(payForm.data.amount) > currentUser?.wallet?.balance!}
+                          onClick={() => makePayment(payForm, currentUser!, groupBF.wallet?.walletAddress!)}
+                          className="bg-blue-600 disabled:cursor-pointer-allowed hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
+                        >
+                          deposit
+                        </Button>
+
+                        <DialogClose>
+                          <Button
+                            className="bg-transparent text-orange-500 border border-orange-500 ">
+                            Cancel
+                          </Button>
+                        </DialogClose>
+
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
                 <div className="flex flex-col gap-2 ">
                   <Input
                     className="text-black border-2 "

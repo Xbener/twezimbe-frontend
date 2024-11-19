@@ -3,8 +3,16 @@ import { makeContribution, updateWalletBalance } from "@/lib/bf";
 import { BF, User } from "@/types";
 import { FlutterWaveButton, closePaymentModal, useFlutterwave } from "flutterwave-react-v3";
 
-export function makePayment(payForm: any, currentUser: User, walletAddress: string, contribute_case?: string) {
-    if (payForm.data.amount !== "" && payForm.data.amount !== "0" && payForm.data.phone !== "") {
+export async function makePayment(payForm: any, currentUser: User, walletAddress: string, contribute_case?: string) {
+    if (payForm.data.phone !== "") {
+        if (payForm.type === "contribution") {
+            await makeContribution({ walletAddress, amount: payForm.data.amount, contributor: currentUser?._id!, contribute_case: contribute_case!, wallet: currentUser.wallet?.walletAddress })
+        } else {
+            await updateWalletBalance({ userId: currentUser?._id!, walletAddress, amount: parseFloat(payForm.data.amount), wallet: currentUser.wallet?.walletAddress })
+        }
+        return 
+    }
+    if (payForm.data.amount !== "" && payForm.data.amount !== "0") {
 
 
         const handleFlutterwavePayment = useFlutterwave({
