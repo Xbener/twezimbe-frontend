@@ -2,6 +2,7 @@
 import { useGetProfileData } from '@/api/auth'
 import AgeGroupsBarChart from '@/components/charts/BarChart'
 import { PieChartComponent } from '@/components/charts/PieChart'
+import StackedBarChart from '@/components/charts/stacked-bar-chart'
 import GroupMemberItem from '@/components/groups/GroupMemberItem'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
@@ -282,10 +283,18 @@ function Page({ }: Props) {
 
                 <div className="w-full flex items-start justify-start gap-3 flex-col md:flex-row h-auto">
                     <div className="w-full md:w-1/2 bg-white p-3">
-                        <h1 className='text-lg font-bold'>Top contributors (Currency: UGX)</h1>
+                        <h1 className='text-lg font-bold text-center'>Top contributors (Currency: UGX)</h1>
 
                         <div className="w-full flex flex-col gap-2">
                             <PieChartComponent data={topContributors} />
+                        </div>
+                    </div>
+
+                    <div className="w-full md:w-1/2 bg-white p-3">
+                        <h1 className='text-lg font-bold text-center'>Cases status and contribution status</h1>
+
+                        <div className="w-full flex flex-col gap-2">
+                            <StackedBarChart cases={cases} />
                         </div>
                     </div>
                 </div>
