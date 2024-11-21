@@ -490,6 +490,7 @@ export interface Wallet {
     transactionHistory: Transaction[]
 }
 
+
 export interface Contribution {
     contributor: any
     amount: number

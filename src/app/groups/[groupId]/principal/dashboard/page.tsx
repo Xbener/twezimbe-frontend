@@ -1,6 +1,7 @@
 'use client'
 import { useGetProfileData } from '@/api/auth'
 import AgeGroupsBarChart from '@/components/charts/BarChart'
+import { PieChartComponent } from '@/components/charts/PieChart'
 import GroupMemberItem from '@/components/groups/GroupMemberItem'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
@@ -22,7 +23,7 @@ function Page({ }: Props) {
     const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
     let [metadata, setMetadata] = useState<MetaData[] | null>(null)
     const [groupQuery, setGroupQuery] = useState('')
-    const [topContributors, setTopContributors] = useState<{ user: User; totalAmount: number }[]>([])
+    const [topContributors, setTopContributors] = useState<{ name: string; amount: number }[]>([])
     const router = useRouter()
     const [cases, setCases] = useState<Case[]>([])
     const [ageGroupsData, setAgeGroupsData] = useState<{ ageGroup: string; count: number }[]>([])
@@ -52,7 +53,7 @@ function Page({ }: Props) {
             },
             {
                 title: "Total transactions",
-                value: groupBF?.wallet?.transactionHistory.length | 0
+                value: groupBF?.wallet?.transactionHistory.length || 0
             },
             {
                 title: "Cases",
@@ -112,25 +113,31 @@ function Page({ }: Props) {
 
     useEffect(() => {
         if (cases?.length) {
-            const contributorMap: { [userId: string]: { user: User; totalAmount: number } } = {}
+            const contributorMap: { [userId: string]: number } = {}
 
             // Aggregate contributions for each contributor
             cases.forEach((singleCase) => {
                 singleCase.contributions?.forEach((contribution) => {
-                    const contributorId = contribution.contributor._id!
+                    const contributorId = contribution.contributor[0]._id!
                     if (!contributorMap[contributorId]) {
-                        contributorMap[contributorId] = {
-                            user: contribution.contributor[0] as User,
-                            totalAmount: 0,
-                        }
+                        contributorMap[contributorId] = 0
                     }
-                    contributorMap[contributorId].totalAmount += contribution.amount
+                    contributorMap[contributorId] += contribution.amount
                 })
             })
 
-            // Convert the map to an array and sort it by total amount
-            const sortedContributors = Object.values(contributorMap)
-                .sort((a, b) => b.totalAmount - a.totalAmount)
+            const sortedContributors = Object.keys(contributorMap)
+                .map((userId) => {
+                    const contributorCase = cases.filter((c) => c.contributions?.filter(cont => `${cont.contributor._id}` === `${userId}`))[0]
+                    const contributor = contributorCase?.contributions?.find((contribution) => contribution.contributor[0]._id === userId)?.contributor[0]
+                    const name = contributor ? `${contributor.firstName} ${contributor.lastName}` : 'Unknown'
+
+                    return {
+                        name,
+                        amount: contributorMap[userId],
+                    }
+                })
+                .sort((a, b) => b.amount - a.amount)
                 .slice(0, 5) // Get top 5 contributors
 
             setTopContributors(sortedContributors)
@@ -269,19 +276,10 @@ function Page({ }: Props) {
 
                 <div className="w-full flex items-start justify-start gap-3 flex-col md:flex-row h-auto">
                     <div className="w-full md:w-1/2 bg-white p-3">
-                        <h1 className='text-lg font-bold'>Top contributors</h1>
+                        <h1 className='text-lg font-bold'>Top contributors (Currency: UGX)</h1>
 
                         <div className="w-full flex flex-col gap-2">
-                            {topContributors.map((contributor, index) => {
-                                return (
-                                    <li key={contributor.user._id} className="flex justify-between items-center py-2 border-b">
-                                        <div className="text-md">
-                                            {index + 1}. {contributor.user.firstName} {contributor.user.lastName}
-                                        </div>
-                                        <div className="font-bold text-blue-500">{contributor.totalAmount} UGX</div>
-                                    </li>
-                                )
-                            })}
+                            <PieChartComponent data={topContributors} />
                         </div>
                     </div>
                 </div>
