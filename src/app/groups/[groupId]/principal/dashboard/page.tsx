@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { GroupContext } from '@/context/GroupContext'
-import { addBeneficiary, getBeneficiaries, removeBeneficiary } from '@/lib/bf'
-import { Beneficiary, MetaData } from '@/types'
+import { addBeneficiary, getBeneficiaries, getCases, removeBeneficiary } from '@/lib/bf'
+import { Beneficiary, Case, MetaData, User } from '@/types'
 import { formatWithCommas } from '@/utils/formatNumber'
 import { LucideOrigami, Settings } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -22,13 +22,17 @@ function Page({ }: Props) {
     const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
     let [metadata, setMetadata] = useState<MetaData[] | null>(null)
     const [groupQuery, setGroupQuery] = useState('')
+    const [topContributors, setTopContributors] = useState<{ user: User; totalAmount: number }[]>([])
     const router = useRouter()
+    const [cases, setCases] = useState<Case[]>([])
     const [ageGroupsData, setAgeGroupsData] = useState<{ ageGroup: string; count: number }[]>([])
 
     useEffect(() => {
         async function getData() {
             const beneficiaries = await getBeneficiaries(groupBF?._id!, currentUser?._id!)
             setBeneficiaries(beneficiaries || [])
+            const { cases, status } = await getCases(groupBF?._id!)
+            if (status) setCases(cases)
         }
 
         if (groupBF && currentUser) {
@@ -51,6 +55,10 @@ function Page({ }: Props) {
                 value: groupBF?.wallet?.transactionHistory.length
             },
             {
+                title: "Cases",
+                value: cases.length || 0
+            },
+            {
                 title: "Total contributions",
                 value: groupBF?.contributions?.length
             },
@@ -63,7 +71,8 @@ function Page({ }: Props) {
     }, [
         group,
         groupBF,
-        beneficiaries
+        beneficiaries,
+        cases
     ])
 
     useEffect(() => {
@@ -100,6 +109,33 @@ function Page({ }: Props) {
             setAgeGroupsData(ageGroupsArray)
         }
     }, [bfMembers])
+
+    useEffect(() => {
+        if (cases?.length) {
+            const contributorMap: { [userId: string]: { user: User; totalAmount: number } } = {}
+
+            // Aggregate contributions for each contributor
+            cases.forEach((singleCase) => {
+                singleCase.contributions?.forEach((contribution) => {
+                    const contributorId = contribution.contributor._id!
+                    if (!contributorMap[contributorId]) {
+                        contributorMap[contributorId] = {
+                            user: contribution.contributor[0] as User,
+                            totalAmount: 0,
+                        }
+                    }
+                    contributorMap[contributorId].totalAmount += contribution.amount
+                })
+            })
+
+            // Convert the map to an array and sort it by total amount
+            const sortedContributors = Object.values(contributorMap)
+                .sort((a, b) => b.totalAmount - a.totalAmount)
+                .slice(0, 5) // Get top 5 contributors
+
+            setTopContributors(sortedContributors)
+        }
+    }, [cases])
 
     const filterGroupMembers = (q: string) => {
         const filteredMembers = group?.members.filter(member => {
@@ -227,6 +263,25 @@ function Page({ }: Props) {
                     <div className="bg-white w-full md:w-1/2 p-2">
                         <div>
                             <AgeGroupsBarChart data={ageGroupsData} />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="w-full flex items-start justify-start gap-3 flex-col md:flex-row h-auto">
+                    <div className="w-full md:w-1/2 bg-white p-3">
+                        <h1 className='text-lg font-bold'>Top contributors</h1>
+
+                        <div className="w-full flex flex-col gap-2">
+                            {topContributors.map((contributor, index) => {
+                                return (
+                                    <li key={contributor.user._id} className="flex justify-between items-center py-2 border-b">
+                                        <div className="text-md">
+                                            {index + 1}. {contributor.user.firstName} {contributor.user.lastName}
+                                        </div>
+                                        <div className="font-bold text-blue-500">{contributor.totalAmount} UGX</div>
+                                    </li>
+                                )
+                            })}
                         </div>
                     </div>
                 </div>

@@ -491,7 +491,7 @@ export interface Wallet {
 }
 
 export interface Contribution {
-    contributor: User
+    contributor: any
     amount: number
     walletAddress: string
     case: string
