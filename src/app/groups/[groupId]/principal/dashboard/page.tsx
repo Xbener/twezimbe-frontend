@@ -160,7 +160,7 @@ function Page({ }: Props) {
         filteredGroupMembers = filterGroupMembers(groupQuery)
     }, [groupQuery])
 
-    if(!currentUser || !beneficiaries.length) return (
+    if(!currentUser) return (
         <div className='w-full h-[100dvh] grid place-content-center'>
             <PacmanLoader color='' />
         </div>
