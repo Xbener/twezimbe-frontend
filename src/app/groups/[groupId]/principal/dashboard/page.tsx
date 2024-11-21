@@ -44,7 +44,7 @@ function Page({ }: Props) {
         setMetadata([
             {
                 title: "Total members",
-                value: bfMembers?.length
+                value: bfMembers?.length || 0
             },
             {
                 title: "Balance",
@@ -52,7 +52,7 @@ function Page({ }: Props) {
             },
             {
                 title: "Total transactions",
-                value: groupBF?.wallet?.transactionHistory.length
+                value: groupBF?.wallet?.transactionHistory.length | 0
             },
             {
                 title: "Cases",
@@ -60,7 +60,7 @@ function Page({ }: Props) {
             },
             {
                 title: "Total contributions",
-                value: groupBF?.contributions?.length
+                value: groupBF?.contributions?.length || 0
             },
             {
                 title: "Total beneficiaries",
@@ -189,7 +189,7 @@ function Page({ }: Props) {
 
                 <div className='w-full flex items-start justify-start gap-3 flex-col md:flex-row h-auto'>
                     <div className='bg-white rounded-md w-full md:w-1/2'>
-                        <div className='shadow-md  h-[330px] overscroll-auto p-2'>
+                        <div className='shadow-md  h-[313px] overscroll-auto p-2'>
                             <div className="flex w-full justify-between items-center">
                                 <h1 className='text-[1.2rem] mb-4 p-2 font-bold'>Your beneficiaries</h1>
                                 <Dialog>
