@@ -229,7 +229,7 @@ function ChannelDetails({ }: Props) {
                                             onClick={() => {
                                                 setIsSideBarOpen(false)
                                                 setIsMemberListOpen(false)
-                                                router.push(`/groups/${group?._id}/principal-dashboard`)
+                                                router.push(`/groups/${group?._id}/principal/dashboard`)
                                             }}
                                         >
                                             Principal

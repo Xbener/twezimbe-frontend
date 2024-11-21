@@ -87,7 +87,7 @@ function page({ }: Props) {
                 onClick={() => router.back()}
             />
             <div className="w-full flex items-center justify-between p-4">
-                <h2 className="text-lg font-semibold text-white">Principal dashboard</h2>
+                <h2 className="text-lg font-semibold text-white">Principal settings</h2>
                 {
                     !isEditing && (
                         <Button
@@ -202,12 +202,12 @@ function page({ }: Props) {
                         <div className="space-y-6 bg-gray-800 p-6 rounded-lg shadow-md text-white w-full col-span-2">
                             <section>
                                 <h2 className="text-lg font-semibold">1. One-off Membership Fee</h2>
-                                    <p className="text-neutral-300">UGX {formatWithCommas(formValues.membershipFee.toLocaleString())}</p>
+                                <p className="text-neutral-300">UGX {formatWithCommas(formValues.membershipFee.toLocaleString())}</p>
                             </section>
 
                             <section>
                                 <h2 className="text-lg font-semibold">2. Annual Subscription</h2>
-                                    <p className="text-neutral-300">UGX {formatWithCommas(formValues.annualSubscription.toLocaleString())}</p>
+                                <p className="text-neutral-300">UGX {formatWithCommas(formValues.annualSubscription.toLocaleString())}</p>
                             </section>
 
                             <section>
