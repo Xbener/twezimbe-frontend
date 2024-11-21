@@ -3,6 +3,7 @@ import { useGetProfileData } from '@/api/auth'
 import AreaChartComponent from '@/components/charts/AreaChart'
 import { PieChartComponent } from '@/components/charts/PieChart'
 import GroupMemberItem from '@/components/groups/GroupMemberItem'
+import MainLoader from '@/components/MainLoader'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -22,6 +23,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import React, { useEffect, useRef, useState } from 'react'
 import { AiFillCaretDown } from 'react-icons/ai'
+import PacmanLoader from 'react-spinners/PacmanLoader'
 type Props = {}
 
 
@@ -138,7 +140,11 @@ function page({ }: Props) {
     cases
   ])
 
-  if (!groupBF) return ('loading ...')
+  if (!groupBF) return (
+    <div className='w-full h-[100dvh] grid place-content-center'>
+      <PacmanLoader color='' />
+    </div>
+  )
 
   const handleSort = (column: string) => {
     if (sortColumn === column) {

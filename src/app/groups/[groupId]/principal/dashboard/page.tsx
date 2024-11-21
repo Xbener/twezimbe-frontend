@@ -13,6 +13,7 @@ import { formatWithCommas } from '@/utils/formatNumber'
 import { LucideOrigami, Settings } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React, { useContext, useEffect, useState } from 'react'
+import PacmanLoader from 'react-spinners/PacmanLoader'
 
 type Props = {}
 
@@ -158,6 +159,11 @@ function Page({ }: Props) {
         filteredGroupMembers = filterGroupMembers(groupQuery)
     }, [groupQuery])
 
+    if(!currentUser || !beneficiaries.length) return (
+        <div className='w-full h-[100dvh] grid place-content-center'>
+            <PacmanLoader color='' />
+        </div>
+    )
     return (
         <div className='bg-neutral-100 text-neutral-700 min-h-full'>
             <div className='w-full p-2 flex justify-between border-b'>
