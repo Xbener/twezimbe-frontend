@@ -16,12 +16,15 @@ type User = {
     home_address?: string;
     office_address?: string;
     role: any;
+    wallet: {
+        walletAddress: string
+    }
 };
 
 type Props = {};
 
 function Page({ }: Props) {
-    const { selectedUser, currentUser } = useContext(AdminContext);
+    const { selectedUser, currentUser, setSelectedUser } = useContext(AdminContext);
     const { userId } = useParams();
     const { updateAccount, isLoading } = useUpdateUserAccount()
     const { register, handleSubmit, formState: { errors } } = useForm<User>({
@@ -38,6 +41,27 @@ function Page({ }: Props) {
         }
     };
 
+    const generateWallet = async () => {
+        try {
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/auth/wallets`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    method: 'POST',
+                    body: JSON.stringify({ userId: selectedUser?._id })
+                }
+            )
+
+            const data = await res.json()
+            if (!data.status) throw new Error(data.message)
+            toast.success("Wallet created successfully")
+            setSelectedUser((prev: User) => ({ ...prev, wallet: { walletAddress: data.walletAddress } }))
+        } catch (error) {
+
+        }
+    }
     return (
         <div className='w-full flex flex-col text-neutral-600'>
             <div className='w-full flex p-2 justify-between items-center'>
@@ -52,7 +76,17 @@ function Page({ }: Props) {
                     Update
                 </Button>
             </div>
-
+            <div className='w-full p-2'>
+                {
+                    !selectedUser?.wallet?.walletAddress ? (
+                        <Button onClick={generateWallet} className='bg-blue-500 text-white'>
+                            Generate wallet
+                        </Button>
+                    ) : (
+                        <p>Wallet: {selectedUser.wallet.walletAddress}</p>
+                    )
+                }
+            </div>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-4">
                 <div className="flex flex-col">
                     <label>First Name</label>
@@ -72,7 +106,7 @@ function Page({ }: Props) {
                     />
                 </div>
 
-            <div className="w-full flex items-center justify-normal gap-3">
+                <div className="w-full flex items-center justify-normal gap-3">
                     <div className="flex flex-col w-full">
                         <label>Email</label>
                         <input
@@ -90,10 +124,10 @@ function Page({ }: Props) {
                             className="border p-2 rounded"
                         />
                     </div>
-            </div>
+                </div>
 
                 <div className="w-full flex items-center justify-start gap-3">
-                    <div classNamew-full ="flex flex-col ">
+                    <div classNamew-full="flex flex-col ">
                         <label>Birthday</label>
                         <input
                             type="date"
@@ -101,7 +135,7 @@ function Page({ }: Props) {
                             className="border p-2 rounded"
                         />
                     </div>
-                    <div className="w-full flex flex-col"> 
+                    <div className="w-full flex flex-col">
                         <label>Home Address</label>
                         <input
                             type="text"
@@ -110,7 +144,7 @@ function Page({ }: Props) {
                         />
                     </div>
 
-                    <div className="w-full flex flex-col"> 
+                    <div className="w-full flex flex-col">
                         <label>Office Address</label>
                         <input
                             type="text"
@@ -119,7 +153,7 @@ function Page({ }: Props) {
                         />
                     </div>
 
-                    <div className="w-full flex flex-col"> 
+                    <div className="w-full flex flex-col">
                         <label>Role</label>
                         <select
                             disabled={currentUser?._id === userId}

@@ -199,7 +199,7 @@ function page({ }: Props) {
                 {isLoading ? 'loading ...' : (
                     <Table className='bg-white'>
                         <TableHeader>
-                          
+
                             <TableHead className='cursor-pointer' onClick={() => handleSort('firstName')}>
                                 First name {getSortIndicator('firstName')}
                             </TableHead>
@@ -208,6 +208,9 @@ function page({ }: Props) {
                             </TableHead>
                             <TableHead className='cursor-pointer' onClick={() => handleSort('createdAt')}>
                                 Joined at {getSortIndicator('createdAt')}
+                            </TableHead>
+                            <TableHead>
+                                Wallet
                             </TableHead>
                             <TableHead className='cursor-pointer' onClick={() => handleSort('role')}>
                                 Role {getSortIndicator('role')}
@@ -224,6 +227,7 @@ function page({ }: Props) {
                                             <TableCell>{user.firstName}</TableCell>
                                             <TableCell>{user.lastName}</TableCell>
                                             <TableCell>{moment(user.createdAt).format('DD/MM/yyyy')}</TableCell>
+                                            <TableCell>{user.wallet?.walletAddress}</TableCell>
                                             <TableCell>{user.role}</TableCell>
                                             <TableCell>
                                                 <Popover>
@@ -286,7 +290,7 @@ function page({ }: Props) {
                                                             </DialogTrigger>
                                                             <DialogContent className='bg-white grid place-content-center w-auto text-center'>
                                                                 <DialogTitle>
-                                                                   Confirm this operation
+                                                                    Confirm this operation
                                                                 </DialogTitle>
 
                                                                 <div>
