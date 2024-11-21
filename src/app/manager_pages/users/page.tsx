@@ -241,7 +241,7 @@ function page({ }: Props) {
                                                         <button
                                                             onClick={() => {
                                                                 setSelectedUser(user)
-                                                                router.push(`/manager_pages/users/${user.id}`)
+                                                                router.push(`/manager_pages/users/${user._id}`)
                                                             }}
                                                             className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit</button>
                                                         <Dialog>
