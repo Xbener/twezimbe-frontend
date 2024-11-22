@@ -407,7 +407,7 @@ function page({ }: Props) {
                               <DialogTrigger className="w-full">
                                 <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">View</button>
                               </DialogTrigger>
-                              <DialogContent className="w-auto bg-white p-6 overflow-scroll max-h-[600px] rounded-lg">
+                              <DialogContent className="w-auto bg-white p-6 overflow-auto max-h-[600px] rounded-lg">
                                 <DialogHeader className="text-xl font-bold mb-4">Case Details</DialogHeader>
                                 <p className="text-sm text-gray-600 mb-2">
                                   <span className="font-semibold">Name:</span> {caseItem.name}
