@@ -132,7 +132,7 @@ function page({ }: Props) {
                                   <div className="flex gap-2 mt-3">
                                       <Button
                                           disabled={payForm.data.amount === "" || payForm.data.amount === "0"}
-                                          onClick={() => makePayment(payForm, currentUser!, currentUser.wallet?.walletAddress!)}
+                                          onClick={() => makePayment(payForm, currentUser!, false, currentUser.wallet?.walletAddress!)}
                                           className="bg-blue-600 disabled:cursor-pointer-allowed hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
                                       >
                                           Confirm

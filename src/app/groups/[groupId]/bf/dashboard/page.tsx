@@ -471,7 +471,7 @@ function page({ }: Props) {
                                     </DialogTrigger>
                                     <DialogContent className="bg-white">
                                       <DialogTitle>
-                                        Deposit by personal wallet
+                                        contribute by personal wallet
                                       </DialogTitle>
 
                                       <div>
@@ -498,7 +498,7 @@ function page({ }: Props) {
                                       <div className="flex gap-2 mt-3">
                                         <Button
                                           disabled={payForm.data.amount === "" || payForm.data.amount === "0" || parseFloat(payForm.data.amount) > currentUser?.wallet?.balance!}
-                                          onClick={() => makePayment({ ...payForm, type: 'contribution' }, currentUser!, groupBF.wallet?.walletAddress!, caseItem._id)}
+                                          onClick={() => makePayment({ ...payForm, type: 'contribution' }, currentUser!, true, groupBF.wallet?.walletAddress!, caseItem._id)}
                                           className="bg-blue-600 disabled:cursor-pointer-allowed hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
                                         >
                                           deposit
@@ -563,7 +563,7 @@ function page({ }: Props) {
                                   <div className="flex gap-2 mt-3">
                                     <Button
                                       disabled={payForm.data.amount === "" || payForm.data.amount === "0"}
-                                      onClick={() => makePayment({ ...payForm, type: "contribution" }, currentUser!, groupBF.wallet?.walletAddress!, caseItem._id)}
+                                      onClick={() => makePayment({ ...payForm, type: "contribution" }, currentUser!, false, groupBF.wallet?.walletAddress!, caseItem._id)}
                                       className="bg-blue-600 disabled:cursor-pointer-allowed hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
                                     >
                                       Confirm
@@ -708,7 +708,7 @@ function page({ }: Props) {
                       <div className="flex gap-2 mt-3">
                         <Button
                           disabled={payForm.data.amount === "" || payForm.data.amount === "0" || parseFloat(payForm.data.amount) > currentUser?.wallet?.balance!}
-                          onClick={() => makePayment(payForm, currentUser!, groupBF.wallet?.walletAddress!)}
+                          onClick={() => makePayment(payForm, currentUser!, true, groupBF.wallet?.walletAddress!)}
                           className="bg-blue-600 disabled:cursor-pointer-allowed hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
                         >
                           deposit
@@ -773,7 +773,7 @@ function page({ }: Props) {
                   <div className="flex gap-2 mt-3">
                     <Button
                       disabled={payForm.data.amount === "" || payForm.data.amount === "0"}
-                      onClick={() => makePayment(payForm, currentUser!, groupBF.wallet?.walletAddress!)}
+                      onClick={() => makePayment(payForm, currentUser!, false, groupBF.wallet?.walletAddress!)}
                       className="bg-blue-600 disabled:cursor-pointer-allowed hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
                     >
                       Confirm
