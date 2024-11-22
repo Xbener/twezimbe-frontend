@@ -120,18 +120,20 @@ function Page({ }: Props) {
             // Aggregate contributions for each contributor
             cases.forEach((singleCase) => {
                 singleCase.contributions?.forEach((contribution) => {
-                    const contributorId = contribution.contributor[0]._id!
-                    if (!contributorMap[contributorId]) {
-                        contributorMap[contributorId] = 0
+                    if (contribution.contributor.length) {
+                        const contributorId = contribution.contributor[0]._id
+                        if (!contributorMap[contributorId]) {
+                            contributorMap[contributorId] = 0
+                        }
+                        contributorMap[contributorId] += contribution.amount
                     }
-                    contributorMap[contributorId] += contribution.amount
                 })
             })
 
             const sortedContributors = Object.keys(contributorMap)
                 .map((userId) => {
                     const contributorCase = cases.filter((c) => c.contributions?.filter(cont => `${cont.contributor._id}` === `${userId}`))[0]
-                    const contributor = contributorCase?.contributions?.find((contribution) => contribution.contributor[0]._id === userId)?.contributor[0]
+                    const contributor = contributorCase?.contributions?.find((contribution) => contribution.contributor.length && contribution.contributor[0]._id === userId)?.contributor[0]
                     const name = contributor ? `${contributor.firstName} ${contributor.lastName}` : 'Unknown'
 
                     return {
@@ -160,7 +162,7 @@ function Page({ }: Props) {
         filteredGroupMembers = filterGroupMembers(groupQuery)
     }, [groupQuery])
 
-    if(!currentUser) return (
+    if (!currentUser) return (
         <div className='w-full h-[100dvh] grid place-content-center'>
             <PacmanLoader color='' />
         </div>
